@@ -1,4 +1,4 @@
-import { Decimal128, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import Decimal from 'decimal.js';
 
 interface LineItemInput {
@@ -35,16 +35,16 @@ interface DiscountInput {
 
 interface SplitResult {
   userId: Types.ObjectId;
-  baseAmount: Decimal128;
-  taxAmount: Decimal128;
-  discountAmount: Decimal128;
-  finalAmount: Decimal128;
+  baseAmount: Types.Decimal128;
+  taxAmount: Types.Decimal128;
+  discountAmount: Types.Decimal128;
+  finalAmount: Types.Decimal128;
   isPayer: boolean;
   items: {
     itemId: string;
     name: string;
     category: string;
-    amount: Decimal128;
+    amount: Types.Decimal128;
     consumptionPercent: number;
   }[];
   settlementStatus: 'PENDING';
@@ -65,10 +65,10 @@ export class ExpenseCalculator {
     splits: SplitResult[];
     analytics: any;
     totals: {
-      subTotal: Decimal128;
-      taxTotal: Decimal128;
-      discountTotal: Decimal128;
-      totalAmount: Decimal128;
+      subTotal: Types.Decimal128;
+      taxTotal: Types.Decimal128;
+      discountTotal: Types.Decimal128;
+      totalAmount: Types.Decimal128;
     };
   } {
     const userConsumption = new Map<string, {
@@ -109,7 +109,7 @@ export class ExpenseCalculator {
           itemId: item.itemId,
           name: item.name,
           category: item.category,
-          amount: Decimal128.fromString(consumptionAmount.toFixed(2)),
+          amount: Types.Decimal128.fromString(consumptionAmount.toFixed(2)),
           consumptionPercent: consumer.consumptionPercentage
         });
       });
@@ -199,10 +199,10 @@ export class ExpenseCalculator {
 
       splits.push({
         userId: new Types.ObjectId(userId),
-        baseAmount: Decimal128.fromString(data.baseAmount.toFixed(2)),
-        taxAmount: Decimal128.fromString(data.taxAmount.toFixed(2)),
-        discountAmount: Decimal128.fromString(data.discountAmount.toFixed(2)),
-        finalAmount: Decimal128.fromString(roundedFinal.toFixed(2)),
+        baseAmount: Types.Decimal128.fromString(data.baseAmount.toFixed(2)),
+        taxAmount: Types.Decimal128.fromString(data.taxAmount.toFixed(2)),
+        discountAmount: Types.Decimal128.fromString(data.discountAmount.toFixed(2)),
+        finalAmount: Types.Decimal128.fromString(roundedFinal.toFixed(2)),
         isPayer: userId === paidBy,
         items: data.items,
         settlementStatus: 'PENDING'
@@ -220,10 +220,10 @@ export class ExpenseCalculator {
       splits,
       analytics,
       totals: {
-        subTotal: Decimal128.fromString(totalSubTotal.toFixed(2)),
-        taxTotal: Decimal128.fromString(totalTax.toFixed(2)),
-        discountTotal: Decimal128.fromString(totalDiscount.toFixed(2)),
-        totalAmount: Decimal128.fromString(
+        subTotal: Types.Decimal128.fromString(totalSubTotal.toFixed(2)),
+        taxTotal: Types.Decimal128.fromString(totalTax.toFixed(2)),
+        discountTotal: Types.Decimal128.fromString(totalDiscount.toFixed(2)),
+        totalAmount: Types.Decimal128.fromString(
           totalSubTotal.plus(totalTax).minus(totalDiscount).toFixed(2)
         )
       }
@@ -257,10 +257,10 @@ export class ExpenseCalculator {
 
       return {
         userId: new Types.ObjectId(userId),
-        baseAmount: Decimal128.fromString(finalAmount.toFixed(2)),
-        taxAmount: Decimal128.fromString('0'),
-        discountAmount: Decimal128.fromString('0'),
-        finalAmount: Decimal128.fromString(finalAmount.toFixed(2)),
+        baseAmount: Types.Decimal128.fromString(finalAmount.toFixed(2)),
+        taxAmount: Types.Decimal128.fromString('0'),
+        discountAmount: Types.Decimal128.fromString('0'),
+        finalAmount: Types.Decimal128.fromString(finalAmount.toFixed(2)),
         isPayer: userId === paidBy,
         items: [],
         settlementStatus: 'PENDING'
@@ -301,7 +301,7 @@ export class ExpenseCalculator {
     const categoryBreakdown: any = {};
     categoryConsumption.forEach((value, key) => {
       categoryBreakdown[key] = {
-        totalAmount: Decimal128.fromString(value.totalAmount.toFixed(2)),
+        totalAmount: Types.Decimal128.fromString(value.totalAmount.toFixed(2)),
         itemCount: value.itemCount,
         consumerCount: value.consumerCount.size
       };
@@ -317,7 +317,7 @@ export class ExpenseCalculator {
         maxPrice = price;
         mostExpensiveItem = {
           name: item.name,
-          amount: Decimal128.fromString(price.toString())
+          amount: Types.Decimal128.fromString(price.toString())
         };
       }
     });
@@ -337,7 +337,7 @@ export class ExpenseCalculator {
 
     return {
       categoryBreakdown,
-      averagePerPerson: Decimal128.fromString(
+      averagePerPerson: Types.Decimal128.fromString(
         (totalAmount / (splits.length || 1)).toFixed(2)
       ),
       mostExpensiveItem,

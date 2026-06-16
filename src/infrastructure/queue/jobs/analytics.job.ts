@@ -1,5 +1,5 @@
-import { QueueManager } from '../queue/bull.config';
-import { logger } from '../../config/logger';
+import { QueueManager } from '../bull.config';
+import { logger } from '../../../config/logger';
 
 const analyticsQueue = QueueManager.getQueue('analytics-generation');
 

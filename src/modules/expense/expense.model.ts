@@ -143,7 +143,7 @@ const ExpenseSchema = new Schema<IExpenseDocument>({
   }],
   
   discounts: [{
-    type: { type: String, enum: ['percentage', 'fixed'] },
+    type: { type: String, enum: ['percentage','fixed'] },
     value: Schema.Types.Decimal128,
     code: String,
     description: String,
@@ -154,8 +154,8 @@ const ExpenseSchema = new Schema<IExpenseDocument>({
   splits: [{
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     baseAmount: { type: Schema.Types.Decimal128, required: true },
-    taxAmount: { type: Schema.Types.Decimal128, default: 0 },
-    discountAmount: { type: Schema.Types.Decimal128, default: 0 },
+    taxAmount: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
+    discountAmount: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
     finalAmount: { type: Schema.Types.Decimal128, required: true },
     isPayer: { type: Boolean, default: false },
     items: [{
@@ -172,14 +172,14 @@ const ExpenseSchema = new Schema<IExpenseDocument>({
     }
   }],
   
-  paidBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  paidBy: { type: Schema.Types.ObjectId, ref: 'User', required:true },
   paymentMethod: { type: String, required: true },
   paymentDate: { type: Date, default: Date.now },
   
   totalAmount: { type: Schema.Types.Decimal128, required: true },
   subTotal: { type: Schema.Types.Decimal128, required: true },
-  taxTotal: { type: Schema.Types.Decimal128, default: 0 },
-  discountTotal: { type: Schema.Types.Decimal128, default: 0 },
+  taxTotal: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
+  discountTotal: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
   
   analytics: {
     categoryBreakdown: { type: Map, of: {
@@ -267,5 +267,3 @@ ExpenseSchema.statics.getUserCategoryAnalytics = async function(
 };
 
 export const Expense = mongoose.model<IExpenseDocument>('Expense', ExpenseSchema);
-
-

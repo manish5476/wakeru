@@ -26,7 +26,8 @@ export class AnalyticsController {
       const response: ApiResponse = {
         success: true,
         data: analytics,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -52,7 +53,8 @@ export class AnalyticsController {
       const response: ApiResponse = {
         success: true,
         data: analytics,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -76,7 +78,8 @@ export class AnalyticsController {
       const response: ApiResponse = {
         success: true,
         data: analytics,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -107,7 +110,8 @@ export class AnalyticsController {
           exportable: true,
           formats: ['json', 'csv', 'pdf']
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);

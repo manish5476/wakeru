@@ -1,6 +1,6 @@
-import { QueueManager } from '../queue/bull.config';
-import { ocrProcessor } from '../../modules/receipt/ocr.processor';
-import { logger } from '../../config/logger';
+import { QueueManager } from '../bull.config';
+import { ocrProcessor } from '../../../modules/receipt/ocr.processor';
+import { logger } from '../../../config/logger';
 
 const ocrQueue = QueueManager.getQueue('ocr-processing');
 

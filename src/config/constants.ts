@@ -50,16 +50,9 @@ export const CONSTANTS = {
       { name: 'Sales Tax', percentage: 8, description: 'State Sales Tax' },
     ] as const,
   
-    // Split types
     SPLIT_TYPES: ['EQUAL', 'EXACT', 'PERCENTAGE', 'PROPORTIONAL'] as const,
-  
-    // Settlement status
     SETTLEMENT_STATUS: ['PENDING', 'COMPLETED', 'CANCELLED', 'FAILED'] as const,
-  
-    // Group roles
     GROUP_ROLES: ['ADMIN', 'MEMBER', 'VIEWER'] as const,
-  
-    // Notification types
     NOTIFICATION_TYPES: [
       'EXPENSE_ADDED',
       'EXPENSE_UPDATED',
@@ -71,23 +64,17 @@ export const CONSTANTS = {
       'PAYMENT_REMINDER',
       'MONTHLY_REPORT',
     ] as const,
-  
-    // Rate limiting
     RATE_LIMITS: {
       PUBLIC: { windowMs: 15 * 60 * 1000, max: 100 },
       AUTHENTICATED: { windowMs: 15 * 60 * 1000, max: 300 },
       EXPENSE_CREATE: { windowMs: 60 * 1000, max: 10 },
       OCR_UPLOAD: { windowMs: 60 * 1000, max: 5 },
     },
-  
-    // File upload limits
     UPLOAD_LIMITS: {
       RECEIPT_IMAGE: { maxSize: 10 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png', 'image/heic'] },
       PROFILE_IMAGE: { maxSize: 5 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
       GROUP_AVATAR: { maxSize: 2 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
     },
-  
-    // Cache TTLs (in seconds)
     CACHE_TTL: {
       USER_PROFILE: 3600,
       GROUP_DETAILS: 1800,
@@ -95,8 +82,6 @@ export const CONSTANTS = {
       ANALYTICS: 7200,
       DASHBOARD: 300,
     },
-  
-    // Pagination
     PAGINATION: {
       DEFAULT_PAGE: 1,
       DEFAULT_LIMIT: 20,

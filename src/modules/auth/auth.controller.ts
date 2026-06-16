@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { authService } from './auth.service';
+import { AuthService } from './auth.service';
 import { AuthenticatedRequest } from '../../shared/types/common.types';
 import { ApiResponse } from '../../shared/types/common.types';
 import { 
@@ -13,7 +13,8 @@ import {
   resetPasswordSchema,
   changePasswordSchema
 } from './auth.validation';
-import { ValidationError } from '../../shared/errors/AppError';
+import { NotFoundError, ValidationError } from '../../shared/errors/AppError';
+import { User } from './auth.model';
 
 export class AuthController {
   /**
@@ -26,14 +27,13 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      const { user, tokens } = await authService.register(value);
+      const user = await AuthService.register(value);
 
       const response: ApiResponse = {
         success: true,
         message: 'Registration successful. Please verify your email.',
         data: {
-          user: this.sanitizeUser(user),
-          tokens
+          user: user.toJSON()
         },
         timestamp: new Date().toISOString()
       };
@@ -54,13 +54,13 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      const { user, tokens } = await authService.login(value);
+      const { user, tokens } = await AuthService.login(value.email, value.password);
 
       const response: ApiResponse = {
         success: true,
         message: 'Login successful',
         data: {
-          user: this.sanitizeUser(user),
+          user: user.toJSON(),
           tokens
         },
         timestamp: new Date().toISOString()
@@ -82,13 +82,13 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      const { user, tokens, isNewUser } = await authService.googleAuth(value.token);
+      const { user, tokens, isNewUser } = await AuthService.googleAuth(value.token);
 
       const response: ApiResponse = {
         success: true,
         message: isNewUser ? 'Account created successfully' : 'Login successful',
         data: {
-          user: this.sanitizeUser(user),
+          user: user.toJSON(),
           tokens,
           isNewUser
         },
@@ -111,7 +111,7 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      const { user, tokens, isNewUser } = await authService.appleAuth(
+      const { user, tokens, isNewUser } = await AuthService.appleAuth(
         value.token,
         { firstName: value.firstName, lastName: value.lastName }
       );
@@ -120,7 +120,7 @@ export class AuthController {
         success: true,
         message: isNewUser ? 'Account created successfully' : 'Login successful',
         data: {
-          user: this.sanitizeUser(user),
+          user: user.toJSON(),
           tokens,
           isNewUser
         },
@@ -143,7 +143,7 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      const tokens = await authService.refreshToken(value.refreshToken);
+      const tokens = await AuthService.refreshToken(value.refreshToken);
 
       const response: ApiResponse = {
         success: true,
@@ -164,7 +164,7 @@ export class AuthController {
   async logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const refreshToken = req.body.refreshToken;
-      await authService.logout(req.user!.userId, refreshToken);
+      await AuthService.logout(req.user!.userId, refreshToken);
 
       const response: ApiResponse = {
         success: true,
@@ -188,7 +188,7 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      await authService.verifyEmail(value.token);
+      await AuthService.verifyEmail(value.token);
 
       const response: ApiResponse = {
         success: true,
@@ -212,7 +212,7 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      await authService.forgotPassword(value.email);
+      await AuthService.forgotPassword(value.email);
 
       const response: ApiResponse = {
         success: true,
@@ -236,7 +236,7 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      await authService.resetPassword(value.token, value.newPassword);
+      await AuthService.resetPassword(value.token, value.newPassword);
 
       const response: ApiResponse = {
         success: true,
@@ -260,7 +260,7 @@ export class AuthController {
         throw new ValidationError(error.details[0].message, error.details);
       }
 
-      await authService.changePassword(req.user!.userId, value.currentPassword, value.newPassword);
+      await AuthService.changePassword(req.user!.userId, value.currentPassword, value.newPassword);
 
       const response: ApiResponse = {
         success: true,
@@ -279,9 +279,6 @@ export class AuthController {
    */
   async getProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { authService } = require('./auth.service');
-      const { User } = require('./auth.model');
-      
       const user = await User.findById(req.user!.userId);
       
       if (!user) {
@@ -290,27 +287,15 @@ export class AuthController {
 
       const response: ApiResponse = {
         success: true,
-        data: { user: this.sanitizeUser(user.toObject()) },
-        timestamp: new Date().toISOString()
+        data: { user: user.toJSON() },
+        timestamp: new Date().toISOString(),
+        message: 'Profile fetched successfully'
       };
 
       res.status(200).json(response);
     } catch (error) {
       next(error);
     }
-  }
-
-  /**
-   * Remove sensitive data from user object
-   */
-  private sanitizeUser(user: any): any {
-    const sanitized = { ...user };
-    delete sanitized.password;
-    delete sanitized.refreshTokens;
-    delete sanitized.passwordResetToken;
-    delete sanitized.passwordResetExpires;
-    delete sanitized.__v;
-    return sanitized;
   }
 }
 

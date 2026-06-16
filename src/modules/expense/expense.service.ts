@@ -1,6 +1,6 @@
 import { expenseRepository } from './expense.repository';
 import { expenseCalculator } from './expense.calculator';
-import { IExpenseDocument } from './expense.model';
+import { Expense, IExpenseDocument } from './expense.model';
 import { CreateExpenseDTO, UpdateExpenseDTO } from '../../shared/types/expense.types';
 import { NotFoundError, BadRequestError, ForbiddenError, ConflictError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
@@ -23,6 +23,15 @@ export class ExpenseService {
 
     if (!group) {
       throw new NotFoundError('Group not found or you are not a member');
+    }
+
+    // Idempotency Check
+    if (expenseData.idempotencyKey) {
+      const existingExpense = await Expense.findOne({ idempotencyKey: expenseData.idempotencyKey });
+      if (existingExpense) {
+        logger.info(`Idempotent request processed. Returning existing expense for key: ${expenseData.idempotencyKey}`);
+        return existingExpense;
+      }
     }
 
     // Validate expense data
@@ -48,12 +57,8 @@ export class ExpenseService {
       });
     });
 
-    // Check for duplicate idempotency key
-    const idempotencyKey = crypto.randomUUID();
-    const existingExpense = await Expense.findOne({ idempotencyKey });
-    if (existingExpense) {
-      throw new ConflictError('Duplicate expense detected. Please retry with a new request.');
-    }
+    // Use client-provided key or generate a new one
+    const idempotencyKey = expenseData.idempotencyKey || crypto.randomUUID();
 
     // Calculate proportional splits
     const { splits, analytics, totals } = expenseCalculator.calculateProportionalSplit(
@@ -162,7 +167,7 @@ export class ExpenseService {
   /**
    * Get expenses for a group
    */
-  async getGroupExpenses(groupId: string, userId: string, options: any = {}): Promise<{ expenses: IExpenseDocument[]; total: number }> {
+  async getGroupExpenses(groupId: string, userId: string, options: any = {}): Promise<{ expenses: IExpenseDocument[]; total: number }>{
     // Verify membership
     const group = await Group.findOne({
       groupId,

@@ -1,30 +1,32 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
+// Interface for the User document
 export interface IUser extends Document {
   userId: string;
   email: string;
   password?: string;
   firstName: string;
   lastName: string;
-  displayName: string;
   phoneNumber?: string;
-  profilePicture?: string;
+  profilePictureUrl?: string;
+  bio?: string;
   
   authProviders: {
-    google?: {
-      id: string;
-      email: string;
-    };
-    apple?: {
-      id: string;
-      email: string;
-    };
-    email?: {
-      verified: boolean;
-      verificationToken?: string;
-      verificationExpires?: Date;
+    google?: { id: string; email?: string };
+    apple?: { id: string; email?: string };
+    facebook?: { id: string; email?: string };
+  };
+  
+  preferences: {
+    currency: string;
+    language: string;
+    timeZone: string;
+    notificationSettings: {
+      push: boolean;
+      email: boolean;
+      sms: boolean;
     };
   };
   
@@ -37,27 +39,17 @@ export interface IUser extends Document {
   
   passwordResetToken?: string;
   passwordResetExpires?: Date;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
   
-  preferences: {
-    defaultCurrency: string;
-    language: string;
-    notificationPreferences: {
-      email: boolean;
-      push: boolean;
-      sms: boolean;
-      expenseReminders: boolean;
-      settlementReminders: boolean;
-      monthlyReports: boolean;
-    };
-    theme: 'light' | 'dark' | 'system';
-    timezone: string;
-  };
-  
-  stats: {
-    totalGroups: number;
-    totalExpenses: number;
-    totalSettled: mongoose.Types.Decimal128;
-    totalPending: mongoose.Types.Decimal128;
+  activityLog: Array<{
+    timestamp: Date;
+    activity: string;
+    ipAddress?: string;
+    deviceInfo?: string;
+  }>;
+
+  accountStatus: {
     lastActiveAt: Date;
   };
   
@@ -67,103 +59,71 @@ export interface IUser extends Document {
   role: 'user' | 'premium' | 'business' | 'admin';
   
   lastLoginAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  
+
+  // Method signatures for TypeScript
   comparePassword(candidatePassword: string): Promise<boolean>;
   generateVerificationToken(): string;
-  generatePasswordResetToken(): string;
 }
 
+// Mongoose Schema for the User
 const UserSchema = new Schema<IUser>({
   userId: { 
     type: String, 
     required: true, 
     unique: true,
-    default: () => crypto.randomUUID()
+    default: () => `usr_${crypto.randomBytes(16).toString('hex')}`
   },
   email: { 
     type: String, 
     required: true, 
-    unique: true,
-    lowercase: true,
-    trim: true,
-    validate: {
-      validator: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-      message: 'Invalid email format'
-    }
+    unique: true, 
+    lowercase: true, 
+    trim: true 
   },
-  password: { 
-    type: String,
-    select: false,
-    minlength: 8
-  },
-  firstName: { 
-    type: String, 
-    required: true,
-    trim: true,
-    maxlength: 50
-  },
-  lastName: { 
-    type: String, 
-    required: true,
-    trim: true,
-    maxlength: 50
-  },
-  displayName: { type: String },
-  phoneNumber: { type: String },
-  profilePicture: { type: String },
+  password: { type: String, select: false },
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  phoneNumber: { type: String, trim: true },
+  profilePictureUrl: String,
+  bio: String,
   
   authProviders: {
-    google: {
-      id: String,
-      email: String
-    },
-    apple: {
-      id: String,
-      email: String
-    },
-    email: {
-      verified: { type: Boolean, default: false },
-      verificationToken: String,
-      verificationExpires: Date
+    google: { id: String, email: String },
+    apple: { id: String, email: String },
+    facebook: { id: String, email: String }
+  },
+  
+  preferences: {
+    currency: { type: String, default: 'USD' },
+    language: { type: String, default: 'en' },
+    timeZone: { type: String, default: 'UTC' },
+    notificationSettings: {
+      push: { type: Boolean, default: true },
+      email: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false }
     }
   },
   
   refreshTokens: [{
-    token: String,
-    expiresAt: Date,
+    token: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
     deviceInfo: String,
     ipAddress: String
   }],
   
-  passwordResetToken: String,
-  passwordResetExpires: Date,
+  passwordResetToken: { type: String, select: false },
+  passwordResetExpires: { type: Date, select: false },
+  emailVerificationToken: { type: String, select: false },
+  emailVerificationExpires: { type: Date, select: false },
   
-  preferences: {
-    defaultCurrency: { type: String, default: 'INR' },
-    language: { type: String, default: 'en' },
-    notificationPreferences: {
-      email: { type: Boolean, default: true },
-      push: { type: Boolean, default: true },
-      sms: { type: Boolean, default: false },
-      expenseReminders: { type: Boolean, default: true },
-      settlementReminders: { type: Boolean, default: true },
-      monthlyReports: { type: Boolean, default: true }
-    },
-    theme: { 
-      type: String, 
-      enum: ['light', 'dark', 'system'],
-      default: 'system'
-    },
-    timezone: { type: String, default: 'Asia/Kolkata' }
-  },
-  
-  stats: {
-    totalGroups: { type: Number, default: 0 },
-    totalExpenses: { type: Number, default: 0 },
-    totalSettled: { type: Schema.Types.Decimal128, default: 0 },
-    totalPending: { type: Schema.Types.Decimal128, default: 0 },
+  activityLog: [{
+    timestamp: { type: Date, default: Date.now },
+    activity: String,
+    ipAddress: String,
+    deviceInfo: String
+  }],
+
+  accountStatus: {
     lastActiveAt: { type: Date, default: Date.now }
   },
   
@@ -181,12 +141,15 @@ const UserSchema = new Schema<IUser>({
   timestamps: true,
   toJSON: {
     transform: (doc, ret) => {
-      delete ret.password;
-      delete ret.refreshTokens;
-      delete ret.passwordResetToken;
-      delete ret.passwordResetExpires;
-      delete ret.__v;
-      return ret;
+      const retAny = ret as any;
+      delete retAny.password;
+      delete retAny.refreshTokens;
+      delete retAny.passwordResetToken;
+      delete retAny.passwordResetExpires;
+      delete retAny.emailVerificationToken;
+      delete retAny.emailVerificationExpires;
+      delete retAny.__v;
+      return retAny;
     }
   }
 });
@@ -194,48 +157,31 @@ const UserSchema = new Schema<IUser>({
 // Indexes for performance
 UserSchema.index({ email: 1 });
 UserSchema.index({ userId: 1 });
-UserSchema.index({ 'authProviders.google.id': 1 });
-UserSchema.index({ 'authProviders.apple.id': 1 });
 
 // Pre-save hook to hash password
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password') || !this.password) return next();
   
   try {
-    const salt = await bcrypt.genSalt(12);
+    const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    
-    // Generate display name if not set
-    if (!this.displayName) {
-      this.displayName = `${this.firstName} ${this.lastName}`;
-    }
-    
     next();
-  } catch (error) {
-    next(error as Error);
+  } catch (err: any) {
+    next(err);
   }
 });
 
-// Instance methods
+// Method to compare password for login
 UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
   if (!this.password) return false;
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+// Method to generate email verification token
 UserSchema.methods.generateVerificationToken = function(): string {
   const token = crypto.randomBytes(32).toString('hex');
-  this.authProviders.email = {
-    ...this.authProviders.email,
-    verificationToken: crypto.createHash('sha256').update(token).digest('hex'),
-    verificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-  };
-  return token;
-};
-
-UserSchema.methods.generatePasswordResetToken = function(): string {
-  const token = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
-  this.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  this.emailVerificationToken = token;
+  this.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
   return token;
 };
 

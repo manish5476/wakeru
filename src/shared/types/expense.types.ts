@@ -150,6 +150,7 @@ export interface CreateExpenseDTO {
   paymentMethod: string;
   paymentDate?: Date;
   receiptImage?: File;
+  idempotencyKey?: string;
 }
 
 export interface UpdateExpenseDTO {

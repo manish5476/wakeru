@@ -56,7 +56,7 @@ app.get('/health', (req, res) => {
 });
 
 // API routes with idempotency check
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authenticatedRateLimiter, authRoutes);
 app.use('/api/v1/users', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, userRoutes);
 app.use('/api/v1/groups', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, groupRoutes);
 app.use('/api/v1/expenses', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, expenseRoutes);
