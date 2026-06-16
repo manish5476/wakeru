@@ -11,7 +11,7 @@ router.post('/login', auth_controller_1.authController.login);
 router.post('/google', auth_controller_1.authController.googleAuth);
 router.post('/apple', auth_controller_1.authController.appleAuth);
 router.post('/refresh-token', auth_controller_1.authController.refreshToken);
-router.get('/verify-email/:token', auth_controller_1.authController.verifyEmail);
+// router.get('/verify-email/:token', authController.verifyEmail);
 router.post('/forgot-password', auth_controller_1.authController.forgotPassword);
 router.post('/reset-password', auth_controller_1.authController.resetPassword);
 // Protected routes

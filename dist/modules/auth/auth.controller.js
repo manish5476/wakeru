@@ -150,24 +150,26 @@ class AuthController {
     /**
      * Verify email
      */
-    async verifyEmail(req, res, next) {
-        try {
-            const { error, value } = auth_validation_1.verifyEmailSchema.validate(req.params);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            await auth_service_1.AuthService.verifyEmail(value.token);
-            const response = {
-                success: true,
-                message: 'Email verified successfully',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+    /* async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+        const { error, value } = verifyEmailSchema.validate(req.params);
+        if (error) {
+          throw new ValidationError(error.details[0].message, error.details);
         }
-        catch (error) {
-            next(error);
-        }
-    }
+  
+        await AuthService.verifyEmail(value.token);
+  
+        const response: ApiResponse = {
+          success: true,
+          message: 'Email verified successfully',
+          timestamp: new Date().toISOString()
+        };
+  
+        res.status(200).json(response);
+      } catch (error) {
+        next(error);
+      }
+    } */
     /**
      * Forgot password
      */

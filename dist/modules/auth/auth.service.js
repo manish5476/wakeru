@@ -29,7 +29,7 @@ exports.AuthService = {
             userId: (0, uuid_1.v4)()
         });
         // In a real app, you would send a verification email here
-        user.generateVerificationToken();
+        // user.generateVerificationToken(); 
         await user.save();
         return user;
     },
@@ -42,9 +42,9 @@ exports.AuthService = {
         if (!isMatch) {
             throw new AppError_1.AppError('Invalid credentials', 401);
         }
-        if (!user.isVerified) {
-            throw new AppError_1.AppError('Please verify your email before logging in.', 403);
-        }
+        /* if (!user.isVerified) {
+            throw new AppError('Please verify your email before logging in.', 403);
+        } */
         const tokens = await generateTokens(user);
         return { user, tokens };
     },
@@ -103,19 +103,21 @@ exports.AuthService = {
             await user.save();
         }
     },
-    async verifyEmail(token) {
-        const user = await auth_model_1.User.findOne({
-            emailVerificationToken: token,
-            emailVerificationExpires: { $gt: Date.now() },
-        });
-        if (!user) {
-            throw new AppError_1.AppError('Invalid or expired verification token', 400);
-        }
-        user.isVerified = true;
-        user.emailVerificationToken = undefined;
-        user.emailVerificationExpires = undefined;
-        await user.save();
-    },
+    /* async verifyEmail(token: string): Promise<void> {
+      const user = await User.findOne({
+        emailVerificationToken: token,
+        emailVerificationExpires: { $gt: Date.now() },
+      });
+  
+      if (!user) {
+        throw new AppError('Invalid or expired verification token', 400);
+      }
+  
+      user.isVerified = true;
+      user.emailVerificationToken = undefined;
+      user.emailVerificationExpires = undefined;
+      await user.save();
+    }, */
     async forgotPassword(email) {
         const user = await auth_model_1.User.findOne({ email });
         if (user) {

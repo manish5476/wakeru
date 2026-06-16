@@ -27,7 +27,7 @@ export const AuthService = {
       userId: uuidv4()
     });
     // In a real app, you would send a verification email here
-    user.generateVerificationToken(); 
+    // user.generateVerificationToken(); 
     await user.save();
     return user;
   },
@@ -43,9 +43,9 @@ export const AuthService = {
       throw new AppError('Invalid credentials', 401);
     }
 
-    if (!user.isVerified) {
+    /* if (!user.isVerified) {
         throw new AppError('Please verify your email before logging in.', 403);
-    }
+    } */
 
     const tokens = await generateTokens(user);
     return { user, tokens };
@@ -116,7 +116,7 @@ export const AuthService = {
       }
   },
 
-  async verifyEmail(token: string): Promise<void> {
+  /* async verifyEmail(token: string): Promise<void> {
     const user = await User.findOne({
       emailVerificationToken: token,
       emailVerificationExpires: { $gt: Date.now() },
@@ -130,7 +130,7 @@ export const AuthService = {
     user.emailVerificationToken = undefined;
     user.emailVerificationExpires = undefined;
     await user.save();
-  },
+  }, */
   
   async forgotPassword(email: string): Promise<void> {
       const user = await User.findOne({ email });

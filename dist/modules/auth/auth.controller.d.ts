@@ -28,7 +28,6 @@ export declare class AuthController {
     /**
      * Verify email
      */
-    verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void>;
     /**
      * Forgot password
      */

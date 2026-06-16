@@ -181,7 +181,7 @@ export class AuthController {
   /**
    * Verify email
    */
-  async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  /* async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { error, value } = verifyEmailSchema.validate(req.params);
       if (error) {
@@ -200,7 +200,7 @@ export class AuthController {
     } catch (error) {
       next(error);
     }
-  }
+  } */
 
   /**
    * Forgot password
