@@ -17,23 +17,44 @@ export class Database {
   }
 
   async connect(): Promise<void> {
-    // MODIFIED: This function is disabled to allow the server to run without a database.
-    logger.warn('Database connection is disabled. The application will run without connecting to MongoDB.');
-    return Promise.resolve();
+    if (config.NODE_ENV === 'test' || !config.MONGODB_URI) {
+      logger.warn('Database connection is disabled. The application will run without connecting to MongoDB.');
+      return;
+    }
+
+    try {
+      await mongoose.connect(config.MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 10000
+      });
+      logger.info('🔌 Connected to MongoDB');
+      this.retryCount = 0; // Reset retry count on successful connection
+      mongoose.connection.on('disconnected', () => {
+        logger.warn('MongoDB disconnected. Trying to reconnect...');
+        this.handleConnectionError();
+      });
+    } catch (error) {
+      logger.error('Initial MongoDB connection failed:', error);
+      this.handleConnectionError();
+    }
   }
 
   private handleConnectionError(): void {
-    // MODIFIED: This function is disabled to prevent connection retries and application exit.
+    if (this.retryCount < this.maxRetries) {
+      this.retryCount++;
+      logger.error(`MongoDB connection error. Retrying in 5 seconds... (${this.retryCount}/${this.maxRetries})`);
+      setTimeout(() => this.connect(), 5000);
+    } else {
+      logger.error('Could not connect to MongoDB after multiple retries. Exiting...');
+      process.exit(1);
+    }
   }
 
   async disconnect(): Promise<void> {
-    // MODIFIED: This function is disabled.
-    return Promise.resolve();
-  }
-
-  async healthCheck(): Promise<boolean> {
-    // MODIFIED: Always return false as the database is not connected.
-    return false;
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.disconnect();
+      logger.info('🔌 Disconnected from MongoDB');
+    }
   }
 }
 

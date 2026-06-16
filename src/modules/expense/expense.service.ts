@@ -136,7 +136,7 @@ export class ExpenseService {
     );
 
     // Invalidate caches
-    await this.invalidateRelatedCaches(group.groupId, expense.splits);
+    await this.invalidateRelatedCaches(group.groupId, expense.splits as unknown as ISplit[]);
 
     logger.info(`Expense created: ${expense.expenseId} in group ${group.groupId}`);
     return expense;
@@ -245,7 +245,7 @@ export class ExpenseService {
     await expense.save();
 
     // Invalidate caches
-    await this.invalidateRelatedCaches(group.groupId, expense.splits);
+    await this.invalidateRelatedCaches(group.groupId, expense.splits as unknown as ISplit[]);
 
     logger.info(`Expense updated: ${expenseId}`);
     return expense;
@@ -285,7 +285,7 @@ export class ExpenseService {
 
     // Reverse the financial impact
     await this.updateGroupFinancials(group.groupId);
-    await this.invalidateRelatedCaches(group.groupId, expense.splits);
+    await this.invalidateRelatedCaches(group.groupId, expense.splits as unknown as ISplit[]);
 
     logger.info(`Expense deleted: ${expenseId}`);
   }

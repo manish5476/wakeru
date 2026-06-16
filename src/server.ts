@@ -20,10 +20,10 @@ class Server {
       // Connect to Redis
       await redisClient.connect();
 
-      // Initialize job queues
-      QueueManager.getQueue('ocr-processing');
-      QueueManager.getQueue('analytics-generation');
-      logger.info('Job queues initialized');
+      // Initialize job queues (MODIFIED: Disabled)
+      // QueueManager.getQueue('ocr-processing');
+      // QueueManager.getQueue('analytics-generation');
+      // logger.info('Job queues initialized');
 
       // Start HTTP server
       this.server = app.listen(config.PORT, () => {
@@ -53,8 +53,8 @@ class Server {
         });
       }
 
-      // Close queues
-      await QueueManager.closeAll();
+      // Close queues (MODIFIED: Disabled)
+      // await QueueManager.closeAll();
 
       // Close Redis
       await redisClient.disconnect();

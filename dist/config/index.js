@@ -14,7 +14,7 @@ exports.config = {
     PORT: parseInt(process.env.PORT || '3000', 10),
     API_VERSION: process.env.API_VERSION || 'v1',
     // MongoDB
-    MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/wakeru',
+    MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://dummymailme_db_user:manishsingh@finance.ykj5rds.mongodb.net',
     MONGO_ROOT_USER: process.env.MONGO_ROOT_USER,
     MONGO_ROOT_PASSWORD: process.env.MONGO_ROOT_PASSWORD,
     // Redis

@@ -8,7 +8,6 @@ const config_1 = require("./config");
 const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
 const logger_1 = require("./config/logger");
-const bull_config_1 = require("./infrastructure/queue/bull.config");
 class Server {
     async start() {
         try {
@@ -19,10 +18,10 @@ class Server {
             await database_1.database.connect();
             // Connect to Redis
             await redis_1.redisClient.connect();
-            // Initialize job queues
-            bull_config_1.QueueManager.getQueue('ocr-processing');
-            bull_config_1.QueueManager.getQueue('analytics-generation');
-            logger_1.logger.info('Job queues initialized');
+            // Initialize job queues (MODIFIED: Disabled)
+            // QueueManager.getQueue('ocr-processing');
+            // QueueManager.getQueue('analytics-generation');
+            // logger.info('Job queues initialized');
             // Start HTTP server
             this.server = app_1.default.listen(config_1.config.PORT, () => {
                 logger_1.logger.info(`🚀 WAKERU API Server running on port ${config_1.config.PORT}`);
@@ -47,8 +46,8 @@ class Server {
                     logger_1.logger.info('HTTP server closed');
                 });
             }
-            // Close queues
-            await bull_config_1.QueueManager.closeAll();
+            // Close queues (MODIFIED: Disabled)
+            // await QueueManager.closeAll();
             // Close Redis
             await redis_1.redisClient.disconnect();
             // Close MongoDB

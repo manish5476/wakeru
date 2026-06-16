@@ -11,7 +11,7 @@ const upload = multer({
     fileSize: CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.maxSize
   },
   fileFilter: (req, file, cb) => {
-    if (CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.allowedTypes.includes(file.mimetype)) {
+    if ((CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.allowedTypes as readonly string[]).includes(file.mimetype)) {
       cb(null, true);
     } else {
       cb(null, false);

@@ -7,7 +7,6 @@ export declare class Database {
     connect(): Promise<void>;
     private handleConnectionError;
     disconnect(): Promise<void>;
-    healthCheck(): Promise<boolean>;
 }
 export declare const database: Database;
 //# sourceMappingURL=database.d.ts.map

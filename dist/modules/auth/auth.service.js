@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
+const uuid_1 = require("uuid");
 const auth_model_1 = require("./auth.model");
 const AppError_1 = require("../../shared/errors/AppError");
 const crypto_1 = __importDefault(require("crypto"));
@@ -23,7 +24,10 @@ exports.AuthService = {
         if (existingUser) {
             throw new AppError_1.AppError('User with this email already exists', 409);
         }
-        const user = new auth_model_1.User(userData);
+        const user = new auth_model_1.User({
+            ...userData,
+            userId: (0, uuid_1.v4)()
+        });
         // In a real app, you would send a verification email here
         user.generateVerificationToken();
         await user.save();
@@ -51,6 +55,7 @@ exports.AuthService = {
         let isNewUser = false;
         if (!user) {
             user = new auth_model_1.User({
+                userId: (0, uuid_1.v4)(),
                 email: fakeGoogleProfile.email,
                 firstName: fakeGoogleProfile.firstName,
                 lastName: fakeGoogleProfile.lastName,
@@ -70,6 +75,7 @@ exports.AuthService = {
         let isNewUser = false;
         if (!user) {
             user = new auth_model_1.User({
+                userId: (0, uuid_1.v4)(),
                 email: fakeAppleProfile.email, // This might not be available from Apple initially
                 firstName: extraData.firstName || 'Apple',
                 lastName: extraData.lastName || 'User',

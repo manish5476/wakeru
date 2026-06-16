@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { User, IUser } from './auth.model';
 import { AppError } from '../../shared/errors/AppError';
 import crypto from 'crypto';
@@ -21,7 +22,10 @@ export const AuthService = {
       throw new AppError('User with this email already exists', 409);
     }
 
-    const user = new User(userData);
+    const user = new User({
+      ...userData,
+      userId: uuidv4()
+    });
     // In a real app, you would send a verification email here
     user.generateVerificationToken(); 
     await user.save();
@@ -56,6 +60,7 @@ export const AuthService = {
 
     if (!user) {
         user = new User({
+            userId: uuidv4(),
             email: fakeGoogleProfile.email,
             firstName: fakeGoogleProfile.firstName,
             lastName: fakeGoogleProfile.lastName,
@@ -79,6 +84,7 @@ export const AuthService = {
 
     if (!user) {
         user = new User({
+            userId: uuidv4(),
             email: fakeAppleProfile.email, // This might not be available from Apple initially
             firstName: extraData.firstName || 'Apple',
             lastName: extraData.lastName || 'User',
