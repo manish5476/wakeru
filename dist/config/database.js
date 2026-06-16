@@ -26,7 +26,8 @@ class Database {
         try {
             await mongoose_1.default.connect(index_1.config.MONGODB_URI, {
                 serverSelectionTimeoutMS: 5000,
-                connectTimeoutMS: 10000
+                connectTimeoutMS: 10000,
+                family: 4
             });
             logger_1.logger.info('🔌 Connected to MongoDB');
             this.retryCount = 0; // Reset retry count on successful connection
@@ -47,8 +48,8 @@ class Database {
             setTimeout(() => this.connect(), 5000);
         }
         else {
-            logger_1.logger.error('Could not connect to MongoDB after multiple retries. Exiting...');
-            process.exit(1);
+            logger_1.logger.warn('Could not connect to MongoDB after multiple retries. The server will stay online, but database requests will fail.');
+            // process.exit(1);
         }
     }
     async disconnect() {

@@ -1,59 +1,35 @@
 import { Schema, model, Document } from 'mongoose';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 
 // Define the interface for the User document
 export interface IUser extends Document {
   userId: string;
+  firebaseUid: string;
   email: string;
-  password?: string;
-  firstName: string;
-  lastName: string;
+  displayName: string;
   role: string;
   phoneNumber?: string;
   profilePictureUrl?: string;
   bio?: string;
-  authProviders: {
-    google?: { id: string };
-    apple?: { id: string };
-  };
+  upiId?: string;
   preferences: Map<string, any>;
   refreshTokens?: string[];
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
-  emailVerificationToken?: string;
-  emailVerificationExpires?: Date;
-  isVerified: boolean;
   isActive: boolean;
   isDeleted: boolean;
-
-  // Methods
-  comparePassword(password: string): Promise<boolean>;
-  generateVerificationToken(): string;
 }
 
 const userSchema = new Schema<IUser>(
   {
     userId: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, select: false },
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firebaseUid: { type: String, required: true, unique: true, index: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+    displayName: { type: String, required: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
-    phoneNumber: { type: String },
+    phoneNumber: { type: String, index: true },
     profilePictureUrl: { type: String },
     bio: { type: String },
-    authProviders: {
-      google: { id: { type: String } },
-      apple: { id: { type: String } },
-    },
-    preferences: { type: Map, of: Schema.Types.Mixed },
+    upiId: { type: String },
+    preferences: { type: Map, of: Schema.Types.Mixed, default: {} },
     refreshTokens: [{ type: String }],
-    passwordResetToken: { type: String },
-    passwordResetExpires: { type: Date },
-    emailVerificationToken: { type: String },
-    emailVerificationExpires: { type: Date },
-    isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
   },
@@ -65,37 +41,10 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-// Pre-save hook to hash password
-userSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password') || !this.password) {
-    return next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-// Method to compare entered password with the hashed password
-userSchema.methods.comparePassword = async function (password: string): Promise<boolean> {
-  return bcrypt.compare(password, this.password || '');
-};
-
-// Method to generate email verification token
-userSchema.methods.generateVerificationToken = function (): string {
-  const token = crypto.randomBytes(32).toString('hex');
-  this.emailVerificationToken = crypto.createHash('sha256').update(token).digest('hex');
-  this.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-  return token;
-};
-
 // Securely serialize user data
 userSchema.set('toJSON', {
   transform: (doc, ret) => {
-    delete ret.password;
     delete ret.refreshTokens;
-    delete ret.passwordResetToken;
-    delete ret.passwordResetExpires;
-    delete ret.emailVerificationToken;
     return ret;
   },
 });

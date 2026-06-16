@@ -8,6 +8,7 @@ const config_1 = require("./config");
 const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
 const logger_1 = require("./config/logger");
+const firebase_1 = require("./config/firebase");
 class Server {
     async start() {
         try {
@@ -18,6 +19,8 @@ class Server {
             await database_1.database.connect();
             // Connect to Redis
             await redis_1.redisClient.connect();
+            // Initialize Firebase
+            (0, firebase_1.initializeFirebase)();
             // Initialize job queues (MODIFIED: Disabled)
             // QueueManager.getQueue('ocr-processing');
             // QueueManager.getQueue('analytics-generation');

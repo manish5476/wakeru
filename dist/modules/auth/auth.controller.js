@@ -7,20 +7,20 @@ const AppError_1 = require("../../shared/errors/AppError");
 const auth_model_1 = require("./auth.model");
 class AuthController {
     /**
-     * Register new user
+     * Register a new user
      */
     async register(req, res, next) {
         try {
-            const { error, value } = auth_validation_1.registerSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            const user = await auth_service_1.AuthService.register(value);
+            const { idToken, metadata } = req.body;
+            if (!idToken)
+                throw new AppError_1.ValidationError('idToken is required', []);
+            const { user, tokens } = await auth_service_1.AuthService.register(idToken, metadata);
             const response = {
                 success: true,
-                message: 'Registration successful. Please verify your email.',
+                message: 'Account created successfully',
                 data: {
-                    user: user.toJSON()
+                    user: user.toJSON(),
+                    tokens
                 },
                 timestamp: new Date().toISOString()
             };
@@ -31,15 +31,14 @@ class AuthController {
         }
     }
     /**
-     * Login user
+     * Login existing user
      */
     async login(req, res, next) {
         try {
-            const { error, value } = auth_validation_1.loginSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            const { user, tokens } = await auth_service_1.AuthService.login(value.email, value.password);
+            const { idToken } = req.body;
+            if (!idToken)
+                throw new AppError_1.ValidationError('idToken is required', []);
+            const { user, tokens } = await auth_service_1.AuthService.login(idToken);
             const response = {
                 success: true,
                 message: 'Login successful',
@@ -56,49 +55,18 @@ class AuthController {
         }
     }
     /**
-     * Google OAuth login
+     * Handle forgot password hook
      */
-    async googleAuth(req, res, next) {
+    async forgotPassword(req, res, next) {
         try {
-            const { error, value } = auth_validation_1.googleAuthSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            const { user, tokens, isNewUser } = await auth_service_1.AuthService.googleAuth(value.token);
+            // Firebase handles the email. This endpoint is for tracking/logging if necessary.
+            const { email } = req.body;
+            if (!email)
+                throw new AppError_1.ValidationError('email is required', []);
+            // In a real scenario, you could log this or trigger internal analytics.
             const response = {
                 success: true,
-                message: isNewUser ? 'Account created successfully' : 'Login successful',
-                data: {
-                    user: user.toJSON(),
-                    tokens,
-                    isNewUser
-                },
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    /**
-     * Apple OAuth login
-     */
-    async appleAuth(req, res, next) {
-        try {
-            const { error, value } = auth_validation_1.appleAuthSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            const { user, tokens, isNewUser } = await auth_service_1.AuthService.appleAuth(value.token, { firstName: value.firstName, lastName: value.lastName });
-            const response = {
-                success: true,
-                message: isNewUser ? 'Account created successfully' : 'Login successful',
-                data: {
-                    user: user.toJSON(),
-                    tokens,
-                    isNewUser
-                },
+                message: 'Password reset instructions dispatched',
                 timestamp: new Date().toISOString()
             };
             res.status(200).json(response);
@@ -139,92 +107,6 @@ class AuthController {
             const response = {
                 success: true,
                 message: 'Logged out successfully',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    /**
-     * Verify email
-     */
-    /* async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
-      try {
-        const { error, value } = verifyEmailSchema.validate(req.params);
-        if (error) {
-          throw new ValidationError(error.details[0].message, error.details);
-        }
-  
-        await AuthService.verifyEmail(value.token);
-  
-        const response: ApiResponse = {
-          success: true,
-          message: 'Email verified successfully',
-          timestamp: new Date().toISOString()
-        };
-  
-        res.status(200).json(response);
-      } catch (error) {
-        next(error);
-      }
-    } */
-    /**
-     * Forgot password
-     */
-    async forgotPassword(req, res, next) {
-        try {
-            const { error, value } = auth_validation_1.forgotPasswordSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            await auth_service_1.AuthService.forgotPassword(value.email);
-            const response = {
-                success: true,
-                message: 'If the email exists, a password reset link has been sent',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    /**
-     * Reset password
-     */
-    async resetPassword(req, res, next) {
-        try {
-            const { error, value } = auth_validation_1.resetPasswordSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            await auth_service_1.AuthService.resetPassword(value.token, value.newPassword);
-            const response = {
-                success: true,
-                message: 'Password reset successful. Please login with your new password.',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-    /**
-     * Change password
-     */
-    async changePassword(req, res, next) {
-        try {
-            const { error, value } = auth_validation_1.changePasswordSchema.validate(req.body);
-            if (error) {
-                throw new AppError_1.ValidationError(error.details[0].message, error.details);
-            }
-            await auth_service_1.AuthService.changePassword(req.user.userId, value.currentPassword, value.newPassword);
-            const response = {
-                success: true,
-                message: 'Password changed successfully',
                 timestamp: new Date().toISOString()
             };
             res.status(200).json(response);

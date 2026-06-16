@@ -18,13 +18,8 @@ const errorHandler = (err, req, res, next) => {
     if (err instanceof AppError_1.AppError) {
         res.status(err.statusCode).json({
             success: false,
-            error: {
-                code: err.code,
-                message: err.message,
-                details: err.details
-            },
-            timestamp: new Date().toISOString(),
-            requestId: req.requestId
+            error: err.message,
+            stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
         });
         return;
     }
@@ -32,12 +27,8 @@ const errorHandler = (err, req, res, next) => {
     if (err.name === 'ValidationError') {
         res.status(400).json({
             success: false,
-            error: {
-                code: 'VALIDATION_ERROR',
-                message: 'Validation failed',
-                details: err.message
-            },
-            timestamp: new Date().toISOString()
+            error: err.message,
+            stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
         });
         return;
     }
@@ -45,12 +36,8 @@ const errorHandler = (err, req, res, next) => {
     if (err.code === 11000) {
         res.status(409).json({
             success: false,
-            error: {
-                code: 'DUPLICATE_KEY',
-                message: 'Duplicate entry found',
-                details: err.keyValue
-            },
-            timestamp: new Date().toISOString()
+            error: 'Duplicate entry found: ' + JSON.stringify(err.keyValue),
+            stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
         });
         return;
     }
@@ -58,22 +45,16 @@ const errorHandler = (err, req, res, next) => {
     if (err.name === 'JsonWebTokenError') {
         res.status(401).json({
             success: false,
-            error: {
-                code: 'INVALID_TOKEN',
-                message: 'Invalid authentication token'
-            },
-            timestamp: new Date().toISOString()
+            error: 'Invalid authentication token',
+            stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
         });
         return;
     }
     if (err.name === 'TokenExpiredError') {
         res.status(401).json({
             success: false,
-            error: {
-                code: 'TOKEN_EXPIRED',
-                message: 'Authentication token has expired'
-            },
-            timestamp: new Date().toISOString()
+            error: 'Authentication token has expired',
+            stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
         });
         return;
     }
@@ -81,11 +62,8 @@ const errorHandler = (err, req, res, next) => {
     if (err.name === 'MulterError') {
         res.status(400).json({
             success: false,
-            error: {
-                code: 'FILE_UPLOAD_ERROR',
-                message: err.message
-            },
-            timestamp: new Date().toISOString()
+            error: err.message,
+            stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
         });
         return;
     }
@@ -96,13 +74,8 @@ const errorHandler = (err, req, res, next) => {
         : err.message;
     res.status(statusCode).json({
         success: false,
-        error: {
-            code: 'INTERNAL_ERROR',
-            message,
-            ...(config_1.config.NODE_ENV !== 'production' && { stack: err.stack })
-        },
-        timestamp: new Date().toISOString(),
-        requestId: req.requestId
+        error: message,
+        stack: config_1.config.NODE_ENV === 'development' ? err.stack : undefined
     });
 };
 exports.errorHandler = errorHandler;

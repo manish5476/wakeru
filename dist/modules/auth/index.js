@@ -14,5 +14,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./auth.route"), exports);
+__exportStar(require("./auth.routes"), exports);
+__exportStar(require("./auth.controller"), exports);
+__exportStar(require("./auth.service"), exports);
+__exportStar(require("./auth.model"), exports);
 //# sourceMappingURL=index.js.map

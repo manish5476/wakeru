@@ -193,7 +193,7 @@ export class NotificationService {
           member.userId._id.toString(),
           'EXPENSE_ADDED',
           'New Expense Added',
-          `${creator?.userId?.firstName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`,
+          `${creator?.userId?.displayName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`,
           {
             data: { groupId, expenseId },
             isActionable: true,
@@ -220,7 +220,7 @@ export class NotificationService {
       settlement.fromUser.toString(),
       'SETTLEMENT_COMPLETED',
       'Payment Sent',
-      `You paid ${toUser?.firstName} ₹${settlement.amount}`,
+      `You paid ${toUser?.displayName} ₹${settlement.amount}`,
       {
         data: { settlementId: settlement.settlementId },
         priority: 'high',
@@ -233,7 +233,7 @@ export class NotificationService {
       settlement.toUser.toString(),
       'SETTLEMENT_COMPLETED',
       'Payment Received',
-      `${fromUser?.firstName} paid you ₹${settlement.amount}`,
+      `${fromUser?.displayName} paid you ₹${settlement.amount}`,
       {
         data: { settlementId: settlement.settlementId },
         priority: 'high',
@@ -255,7 +255,7 @@ export class NotificationService {
       fromUserId,
       'PAYMENT_REMINDER',
       'Payment Reminder',
-      `Reminder: You owe ${toUser?.firstName} ₹${amount}`,
+      `Reminder: You owe ${toUser?.displayName} ₹${amount}`,
       {
         priority: 'urgent',
         channels: { push: true, email: true }

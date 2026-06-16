@@ -4,6 +4,7 @@ import { database } from './config/database';
 import { redisClient } from './config/redis';
 import { logger } from './config/logger';
 import { QueueManager } from './infrastructure/queue/bull.config';
+import { initializeFirebase } from './config/firebase';
 
 class Server {
   private server: any;
@@ -19,6 +20,9 @@ class Server {
 
       // Connect to Redis
       await redisClient.connect();
+
+      // Initialize Firebase
+      initializeFirebase();
 
       // Initialize job queues (MODIFIED: Disabled)
       // QueueManager.getQueue('ocr-processing');

@@ -2,21 +2,17 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../../shared/types/common.types';
 export declare class AuthController {
     /**
-     * Register new user
+     * Register a new user
      */
     register(req: Request, res: Response, next: NextFunction): Promise<void>;
     /**
-     * Login user
+     * Login existing user
      */
     login(req: Request, res: Response, next: NextFunction): Promise<void>;
     /**
-     * Google OAuth login
+     * Handle forgot password hook
      */
-    googleAuth(req: Request, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Apple OAuth login
-     */
-    appleAuth(req: Request, res: Response, next: NextFunction): Promise<void>;
+    forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
     /**
      * Refresh access token
      */
@@ -25,21 +21,6 @@ export declare class AuthController {
      * Logout user
      */
     logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Verify email
-     */
-    /**
-     * Forgot password
-     */
-    forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Reset password
-     */
-    resetPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Change password
-     */
-    changePassword(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
     /**
      * Get current user profile
      */

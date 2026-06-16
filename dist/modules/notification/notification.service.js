@@ -141,7 +141,7 @@ class NotificationService {
                 continue;
             const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
             if (!notificationPreferences?.muteExpenses) {
-                await this.createNotification(member.userId._id.toString(), 'EXPENSE_ADDED', 'New Expense Added', `${creator?.userId?.firstName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`, {
+                await this.createNotification(member.userId._id.toString(), 'EXPENSE_ADDED', 'New Expense Added', `${creator?.userId?.displayName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`, {
                     data: { groupId, expenseId },
                     isActionable: true,
                     actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
@@ -160,13 +160,13 @@ class NotificationService {
             auth_model_1.User.findById(settlement.toUser)
         ]);
         // Notify payer
-        await this.createNotification(settlement.fromUser.toString(), 'SETTLEMENT_COMPLETED', 'Payment Sent', `You paid ${toUser?.firstName} ₹${settlement.amount}`, {
+        await this.createNotification(settlement.fromUser.toString(), 'SETTLEMENT_COMPLETED', 'Payment Sent', `You paid ${toUser?.displayName} ₹${settlement.amount}`, {
             data: { settlementId: settlement.settlementId },
             priority: 'high',
             channels: { push: true }
         });
         // Notify recipient
-        await this.createNotification(settlement.toUser.toString(), 'SETTLEMENT_COMPLETED', 'Payment Received', `${fromUser?.firstName} paid you ₹${settlement.amount}`, {
+        await this.createNotification(settlement.toUser.toString(), 'SETTLEMENT_COMPLETED', 'Payment Received', `${fromUser?.displayName} paid you ₹${settlement.amount}`, {
             data: { settlementId: settlement.settlementId },
             priority: 'high',
             channels: { push: true }
@@ -180,7 +180,7 @@ class NotificationService {
             auth_model_1.User.findById(fromUserId),
             auth_model_1.User.findById(toUserId)
         ]);
-        await this.createNotification(fromUserId, 'PAYMENT_REMINDER', 'Payment Reminder', `Reminder: You owe ${toUser?.firstName} ₹${amount}`, {
+        await this.createNotification(fromUserId, 'PAYMENT_REMINDER', 'Payment Reminder', `Reminder: You owe ${toUser?.displayName} ₹${amount}`, {
             priority: 'urgent',
             channels: { push: true, email: true }
         });

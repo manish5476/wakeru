@@ -26,7 +26,7 @@ const app = (0, express_1.default)();
 // Security middleware
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)({
-    origin: config_1.config.ALLOWED_ORIGINS.split(','),
+    origin: config_1.config.ALLOWED_ORIGINS === '*' ? true : config_1.config.ALLOWED_ORIGINS.split(','),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key']

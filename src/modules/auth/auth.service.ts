@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { User, IUser } from './auth.model';
 import { AppError } from '../../shared/errors/AppError';
-import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { getAuth } from 'firebase-admin/auth';
 
 if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
   throw new Error('FATAL ERROR: JWT_SECRET and JWT_REFRESH_SECRET are not defined.');
@@ -31,37 +31,69 @@ const generateTokens = async (user: IUser) => {
 };
 
 export const AuthService = {
-  async register(userData: Partial<IUser>): Promise<IUser> {
-    if (!userData.email || !userData.password) {
-      throw new AppError('Email and password are required', 400);
-    }
+  async register(idToken: string, metadata?: any): Promise<{ user: IUser, tokens: any }> {
+    try {
+      const decodedToken = await getAuth().verifyIdToken(idToken);
+      const firebaseUid = decodedToken.uid;
+      const email = decodedToken.email;
 
-    const existingUser = await User.findOne({ email: userData.email });
-    if (existingUser) {
-      throw new AppError('User with this email already exists', 409);
-    }
+      if (!email) {
+        throw new AppError(400, 'Firebase token does not contain an email');
+      }
 
-    const user = new User({
-      ...userData,
-      userId: uuidv4()
-    });
-    await user.save();
-    return user;
+      let user = await User.findOne({ email });
+
+      if (user) {
+        throw new AppError(409, 'User already exists. Please login.');
+      }
+
+      // Create new user
+      user = new User({
+        userId: uuidv4(),
+        firebaseUid,
+        email,
+        displayName: metadata?.displayName || decodedToken.name || 'User',
+        profilePictureUrl: decodedToken.picture || '',
+        phoneNumber: metadata?.phoneNumber || '',
+      });
+      await user.save();
+
+      const tokens = await generateTokens(user);
+      return { user, tokens };
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(401, 'Invalid Firebase ID token or registration failed');
+    }
   },
 
-  async login(email: string, password: string): Promise<{ user: IUser, tokens: any }> {
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      throw new AppError('Invalid credentials', 401);
-    }
+  async login(idToken: string): Promise<{ user: IUser, tokens: any }> {
+    try {
+      const decodedToken = await getAuth().verifyIdToken(idToken);
+      const firebaseUid = decodedToken.uid;
+      
+      // We look up by firebaseUid. If they signed up with a different provider, 
+      // they need to link it. For simplicity, we just find by firebaseUid or email.
+      let user = await User.findOne({ firebaseUid });
+      
+      if (!user && decodedToken.email) {
+          user = await User.findOne({ email: decodedToken.email });
+          if (user) {
+              // Auto-link if email matches exactly
+              user.firebaseUid = firebaseUid;
+              await user.save();
+          }
+      }
 
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      throw new AppError('Invalid credentials', 401);
-    }
+      if (!user) {
+        throw new AppError(404, 'User not found. Please register first.');
+      }
 
-    const tokens = await generateTokens(user);
-    return { user, tokens };
+      const tokens = await generateTokens(user);
+      return { user, tokens };
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(401, 'Invalid Firebase ID token');
+    }
   },
   
   async refreshToken(refreshToken: string): Promise<any> {
@@ -70,7 +102,7 @@ export const AuthService = {
       const user = await User.findOne({ userId: decoded.userId });
 
       if (!user || !user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
-        throw new AppError('Invalid refresh token', 401);
+        throw new AppError(401, 'Invalid refresh token');
       }
 
       // Refresh token rotation: remove the old token
@@ -80,7 +112,7 @@ export const AuthService = {
       return newTokens;
 
     } catch (error) {
-      throw new AppError('Invalid or expired refresh token', 401);
+      throw new AppError(401, 'Invalid or expired refresh token');
     }
   },
   
@@ -90,98 +122,5 @@ export const AuthService = {
           user.refreshTokens = user.refreshTokens.filter(rt => rt !== refreshToken);
           await user.save({ validateBeforeSave: false });
       }
-  },
-
-  async googleAuth(googleToken: string): Promise<{ user: IUser, tokens: any, isNewUser: boolean }> {
-    // In a real app, you would verify the googleToken with Google
-    const fakeGoogleProfile = { email: 'user@google.com', firstName: 'Google', lastName: 'User', googleId: '12345' };
-
-    let user = await User.findOne({ email: fakeGoogleProfile.email });
-    let isNewUser = false;
-
-    if (!user) {
-        user = new User({
-            userId: uuidv4(),
-            email: fakeGoogleProfile.email,
-            firstName: fakeGoogleProfile.firstName,
-            lastName: fakeGoogleProfile.lastName,
-            isVerified: true,
-            authProviders: { google: { id: fakeGoogleProfile.googleId } }
-        });
-        await user.save();
-        isNewUser = true;
-    }
-
-    const tokens = await generateTokens(user);
-    return { user, tokens, isNewUser };
-  },
-  
-  async appleAuth(appleToken: string, extraData: { firstName?: string, lastName?: string }): Promise<{ user: IUser, tokens: any, isNewUser: boolean }> {
-    // In a real app, you would verify the appleToken with Apple
-    const fakeAppleProfile = { email: 'user@apple.com', appleId: '67890' };
-
-    let user = await User.findOne({ 'authProviders.apple.id': fakeAppleProfile.appleId });
-    let isNewUser = false;
-
-    if (!user) {
-        user = new User({
-            userId: uuidv4(),
-            email: fakeAppleProfile.email, // This might not be available from Apple initially
-            firstName: extraData.firstName || 'Apple',
-            lastName: extraData.lastName || 'User',
-            isVerified: true,
-            authProviders: { apple: { id: fakeAppleProfile.appleId } }
-        });
-        await user.save();
-        isNewUser = true;
-    }
-
-    const tokens = await generateTokens(user);
-    return { user, tokens, isNewUser };
-  },
-  
-  async forgotPassword(email: string): Promise<void> {
-      const user = await User.findOne({ email });
-      if (user) {
-          const resetToken = crypto.randomBytes(32).toString('hex');
-          user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-          user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-          await user.save();
-          // In a real app, you would email this token to the user
-          console.log(`Password reset token for ${email}: ${resetToken}`);
-      }
-  },
-  
-  async resetPassword(token: string, newPassword: string): Promise<void> {
-      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-      const user = await User.findOne({
-          passwordResetToken: hashedToken,
-          passwordResetExpires: { $gt: Date.now() }
-      }).select('+password');
-      
-      if (!user) {
-          throw new AppError('Invalid or expired password reset token', 400);
-      }
-      
-      user.password = newPassword;
-      user.passwordResetToken = undefined;
-      user.passwordResetExpires = undefined;
-      await user.save();
-  },
-  
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
-      const user = await User.findOne({ userId }).select('+password');
-      
-      if (!user) {
-          throw new AppError('User not found', 404);
-      }
-      
-      const isMatch = await user.comparePassword(currentPassword);
-      if (!isMatch) {
-          throw new AppError('Incorrect current password', 400);
-      }
-      
-      user.password = newPassword;
-      await user.save();
   }
 };
