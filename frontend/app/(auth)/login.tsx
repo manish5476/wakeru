@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useLoginMutation } from '../../src/features/auth/hooks/useAuth';
+import { useGoogleAuth } from '../../src/features/auth/hooks/useGoogleAuth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ export default function LoginScreen() {
   const router = useRouter();
   
   const loginMutation = useLoginMutation();
+  const { signInWithGoogle, isReady } = useGoogleAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -87,7 +89,11 @@ export default function LoginScreen() {
           </View>
 
           <View className="flex-row gap-3 justify-center mt-2">
-            <TouchableOpacity className="flex-1 h-12 rounded-lg bg-surface border border-border justify-center items-center active:opacity-80">
+            <TouchableOpacity 
+              className="flex-1 h-12 rounded-lg bg-surface border border-border justify-center items-center active:opacity-80"
+              onPress={() => signInWithGoogle()}
+              disabled={!isReady}
+            >
               <Text className="text-text font-semibold">Google</Text>
             </TouchableOpacity>
             <TouchableOpacity className="flex-1 h-12 rounded-lg bg-surface border border-border justify-center items-center active:opacity-80">

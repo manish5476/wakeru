@@ -23,19 +23,38 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+
+import { Toaster } from 'sonner';
+import { Platform } from 'react-native';
+
 export default function RootLayout() {
   const { hydrate, isLoading } = useAuthStore();
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     hydrate();
   }, []);
 
-  if (isLoading) {
+  // Hide splash screen when fonts are loaded and hydration is done
+  useEffect(() => {
+    if (fontsLoaded && !isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, isLoading]);
+
+  if (isLoading || !fontsLoaded) {
     return null; // Or a nice custom splash screen
   }
 
   return (
     <QueryClientProvider client={queryClient}>
+      {Platform.OS === 'web' && <Toaster position="top-center" richColors />}
       <RootLayoutNav />
     </QueryClientProvider>
   );
@@ -84,6 +103,12 @@ function RootLayoutNav() {
           name="(tabs)"
           options={{
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="groups/create"
+          options={{
+            presentation: 'modal',
           }}
         />
         <Stack.Screen

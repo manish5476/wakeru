@@ -14,10 +14,10 @@ const JWT_ACCESS_EXPIRATION = process.env.JWT_ACCESS_EXPIRATION || '15m';
 const JWT_REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
 
 const generateTokens = async (user: IUser) => {
-  const accessTokenPayload = { userId: user.userId, role: user.role };
+  const accessTokenPayload = { userId: user.userId, role: user.role, type: 'access' };
   const accessToken = jwt.sign(accessTokenPayload, JWT_SECRET, { expiresIn: JWT_ACCESS_EXPIRATION as any });
 
-  const refreshTokenPayload = { userId: user.userId };
+  const refreshTokenPayload = { userId: user.userId, type: 'refresh' };
   const refreshToken = jwt.sign(refreshTokenPayload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRATION as any });
 
   user.refreshTokens = user.refreshTokens || [];

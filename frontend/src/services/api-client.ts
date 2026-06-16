@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import * as Crypto from 'expo-crypto';
 
 // Dynamically resolve BaseURL for Web, Android Emulator, or iOS/Physical
 // Note: 10.0.2.2 is the alias to the host loopback interface for Android Emulator
@@ -24,7 +25,7 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Request Interceptor: Inject JWT if available
+// Request Interceptor: Inject JWT if available and add Idempotency-Key
 apiClient.interceptors.request.use(
   async (config) => {
     try {
@@ -37,6 +38,11 @@ apiClient.interceptors.request.use(
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
+      // Add Idempotency-Key for mutation operations
+      if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+        config.headers['Idempotency-Key'] = Crypto.randomUUID();
+      }
     } catch (error) {
       console.warn('Failed to retrieve token for request:', error);
     }
@@ -44,6 +50,8 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+import { useAuthStore } from '../features/auth/authStore';
 
 // Response Interceptor: Catch 401 Unauthorized globally
 apiClient.interceptors.response.use(
@@ -63,8 +71,8 @@ apiClient.interceptors.response.use(
         console.warn('Failed to wipe tokens:', err);
       }
 
-      // We rely on Zustand state sync or Expo Router push here.
-      // Usually, wiping the token in the global store triggers an automatic redirect.
+      // Immediately log the user out globally via Zustand, which will trigger the Router redirect
+      useAuthStore.getState().clearSession();
     }
     return Promise.reject(error);
   }

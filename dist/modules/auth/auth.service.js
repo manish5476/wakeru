@@ -17,9 +17,9 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 const JWT_ACCESS_EXPIRATION = process.env.JWT_ACCESS_EXPIRATION || '15m';
 const JWT_REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
 const generateTokens = async (user) => {
-    const accessTokenPayload = { userId: user.userId, role: user.role };
+    const accessTokenPayload = { userId: user.userId, role: user.role, type: 'access' };
     const accessToken = jsonwebtoken_1.default.sign(accessTokenPayload, JWT_SECRET, { expiresIn: JWT_ACCESS_EXPIRATION });
-    const refreshTokenPayload = { userId: user.userId };
+    const refreshTokenPayload = { userId: user.userId, type: 'refresh' };
     const refreshToken = jsonwebtoken_1.default.sign(refreshTokenPayload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRATION });
     user.refreshTokens = user.refreshTokens || [];
     user.refreshTokens.push(refreshToken);
