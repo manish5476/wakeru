@@ -2,12 +2,31 @@ import { v4 as uuidv4 } from 'uuid';
 import { User, IUser } from './auth.model';
 import { AppError } from '../../shared/errors/AppError';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
-// Placeholder for a real token generation service (e.g., JWT)
+if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+  throw new Error('FATAL ERROR: JWT_SECRET and JWT_REFRESH_SECRET are not defined.');
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const JWT_ACCESS_EXPIRATION = process.env.JWT_ACCESS_EXPIRATION || '15m';
+const JWT_REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
+
 const generateTokens = async (user: IUser) => {
+  const accessTokenPayload = { userId: user.userId, role: user.role };
+  const accessToken = jwt.sign(accessTokenPayload, JWT_SECRET, { expiresIn: JWT_ACCESS_EXPIRATION as any });
+
+  const refreshTokenPayload = { userId: user.userId };
+  const refreshToken = jwt.sign(refreshTokenPayload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRATION as any });
+
+  user.refreshTokens = user.refreshTokens || [];
+  user.refreshTokens.push(refreshToken);
+  await user.save({ validateBeforeSave: false });
+
   return {
-    accessToken: 'sample-access-token',
-    refreshToken: 'sample-refresh-token'
+    accessToken,
+    refreshToken
   };
 };
 
@@ -26,8 +45,6 @@ export const AuthService = {
       ...userData,
       userId: uuidv4()
     });
-    // In a real app, you would send a verification email here
-    // user.generateVerificationToken(); 
     await user.save();
     return user;
   },
@@ -43,12 +60,36 @@ export const AuthService = {
       throw new AppError('Invalid credentials', 401);
     }
 
-    /* if (!user.isVerified) {
-        throw new AppError('Please verify your email before logging in.', 403);
-    } */
-
     const tokens = await generateTokens(user);
     return { user, tokens };
+  },
+  
+  async refreshToken(refreshToken: string): Promise<any> {
+    try {
+      const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { userId: string };
+      const user = await User.findOne({ userId: decoded.userId });
+
+      if (!user || !user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
+        throw new AppError('Invalid refresh token', 401);
+      }
+
+      // Refresh token rotation: remove the old token
+      user.refreshTokens = user.refreshTokens.filter(rt => rt !== refreshToken);
+
+      const newTokens = await generateTokens(user);
+      return newTokens;
+
+    } catch (error) {
+      throw new AppError('Invalid or expired refresh token', 401);
+    }
+  },
+  
+  async logout(userId: string, refreshToken: string): Promise<void> {
+      const user = await User.findOne({ userId });
+      if (user && user.refreshTokens) {
+          user.refreshTokens = user.refreshTokens.filter(rt => rt !== refreshToken);
+          await user.save({ validateBeforeSave: false });
+      }
   },
 
   async googleAuth(googleToken: string): Promise<{ user: IUser, tokens: any, isNewUser: boolean }> {
@@ -99,54 +140,22 @@ export const AuthService = {
     return { user, tokens, isNewUser };
   },
   
-  async refreshToken(refreshToken: string): Promise<any> {
-    // In a real app, you'd verify the refresh token and issue a new access token
-    return {
-        accessToken: 'new-sample-access-token',
-        refreshToken: refreshToken, // Or a new refresh token
-    };
-  },
-  
-  async logout(userId: string, refreshToken: string): Promise<void> {
-      // In a real app, you would invalidate the refresh token in the database
-      const user = await User.findById(userId);
-      if (user && user.refreshTokens) {
-          user.refreshTokens = user.refreshTokens.filter(rt => rt !== refreshToken);
-          await user.save();
-      }
-  },
-
-  /* async verifyEmail(token: string): Promise<void> {
-    const user = await User.findOne({
-      emailVerificationToken: token,
-      emailVerificationExpires: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      throw new AppError('Invalid or expired verification token', 400);
-    }
-
-    user.isVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
-    await user.save();
-  }, */
-  
   async forgotPassword(email: string): Promise<void> {
       const user = await User.findOne({ email });
       if (user) {
-          // In a real app, you'd generate a proper reset token and email it
           const resetToken = crypto.randomBytes(32).toString('hex');
-          user.passwordResetToken = resetToken;
+          user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
           user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
           await user.save();
+          // In a real app, you would email this token to the user
           console.log(`Password reset token for ${email}: ${resetToken}`);
       }
   },
   
   async resetPassword(token: string, newPassword: string): Promise<void> {
+      const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
       const user = await User.findOne({
-          passwordResetToken: token,
+          passwordResetToken: hashedToken,
           passwordResetExpires: { $gt: Date.now() }
       }).select('+password');
       
@@ -161,7 +170,7 @@ export const AuthService = {
   },
   
   async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
-      const user = await User.findById(userId).select('+password');
+      const user = await User.findOne({ userId }).select('+password');
       
       if (!user) {
           throw new AppError('User not found', 404);
