@@ -42,64 +42,35 @@ export class RedisClient {
   }
 
   private setupEventHandlers(): void {
-    this.client.on('connect', () => {
-      logger.info('✅ Redis connected successfully');
-    });
-
-    this.client.on('error', (error) => {
-      logger.error('❌ Redis connection error:', error);
-    });
-
-    this.client.on('ready', () => {
-      logger.info('✅ Redis client ready');
-    });
-
-    this.client.on('reconnecting', () => {
-      logger.warn('⚠️ Redis reconnecting...');
-    });
+    // MODIFIED: Event handlers are disabled.
   }
 
   async connect(): Promise<void> {
-    try {
-      await this.client.connect();
-      await this.subscriber.connect();
-      await this.publisher.connect();
-    } catch (error) {
-      logger.error('Failed to connect to Redis:', error);
-      throw error;
-    }
+    // MODIFIED: This function is disabled to allow the server to run without a database.
+    logger.warn('Redis connection is disabled. The application will run without connecting to Redis.');
+    return Promise.resolve();
   }
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
-    if (ttl) {
-      await this.client.set(key, value, 'EX', ttl);
-    } else {
-      await this.client.set(key, value);
-    }
+    return Promise.resolve();
   }
 
   async get(key: string): Promise<string | null> {
-    return this.client.get(key);
+    return Promise.resolve(null);
   }
 
   async delete(key: string): Promise<void> {
-    await this.client.del(key);
+    return Promise.resolve();
   }
 
   async disconnect(): Promise<void> {
-    await this.client.quit();
-    await this.subscriber.quit();
-    await this.publisher.quit();
-    logger.info('Redis disconnected');
+    // MODIFIED: This function is disabled.
+    return Promise.resolve();
   }
 
   async healthCheck(): Promise<boolean> {
-    try {
-      const result = await this.client.ping();
-      return result === 'PONG';
-    } catch {
-      return false;
-    }
+    // MODIFIED: Always return false as Redis is not connected.
+    return false;
   }
 }
 

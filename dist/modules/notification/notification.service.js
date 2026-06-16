@@ -139,13 +139,14 @@ class NotificationService {
         for (const member of group.members) {
             if (member.userId._id.toString() === createdBy)
                 continue;
-            if (!member.userId.preferences?.notificationPreferences?.muteExpenses) {
+            const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
+            if (!notificationPreferences?.muteExpenses) {
                 await this.createNotification(member.userId._id.toString(), 'EXPENSE_ADDED', 'New Expense Added', `${creator?.userId?.firstName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`, {
                     data: { groupId, expenseId },
                     isActionable: true,
                     actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
                     priority: 'medium',
-                    channels: { email: member.userId.preferences?.notificationPreferences?.email }
+                    channels: { email: notificationPreferences?.email }
                 });
             }
         }
@@ -189,7 +190,7 @@ class NotificationService {
      */
     async notifyMonthlyReport(userId, reportData) {
         const user = await auth_model_1.User.findById(userId);
-        if (user?.preferences?.notificationPreferences?.monthlyReports) {
+        if (user?.preferences.get('notificationPreferences')?.monthlyReports) {
             await this.createNotification(userId, 'MONTHLY_REPORT', 'Monthly Spending Report', `Your monthly spending report is ready. Total: ₹${reportData.totalSpent}`, {
                 data: { reportUrl: `/reports/monthly` },
                 isActionable: true,

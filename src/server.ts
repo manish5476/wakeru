@@ -16,16 +16,14 @@ class Server {
 
       // Connect to MongoDB
       await database.connect();
-      // logger.info('MongoDB connected successfully');
 
       // Connect to Redis
-      // await redisClient.connect();
-      // logger.info('Redis connected successfully');
+      await redisClient.connect();
 
       // Initialize job queues
-      // QueueManager.getQueue('ocr-processing');
-      // QueueManager.getQueue('analytics-generation');
-      // logger.info('Job queues initialized');
+      QueueManager.getQueue('ocr-processing');
+      QueueManager.getQueue('analytics-generation');
+      logger.info('Job queues initialized');
 
       // Start HTTP server
       this.server = app.listen(config.PORT, () => {
@@ -56,13 +54,13 @@ class Server {
       }
 
       // Close queues
-      // await QueueManager.closeAll();
+      await QueueManager.closeAll();
 
       // Close Redis
-      // await redisClient.disconnect();
+      await redisClient.disconnect();
 
       // Close MongoDB
-      // await database.disconnect();
+      await database.disconnect();
 
       logger.info('Graceful shutdown completed');
       process.exit(0);

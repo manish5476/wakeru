@@ -187,7 +187,8 @@ export class NotificationService {
     for (const member of group.members) {
       if (member.userId._id.toString() === createdBy) continue;
       
-      if (!member.userId.preferences?.notificationPreferences?.muteExpenses) {
+      const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
+      if (!notificationPreferences?.muteExpenses) {
         await this.createNotification(
           member.userId._id.toString(),
           'EXPENSE_ADDED',
@@ -198,7 +199,7 @@ export class NotificationService {
             isActionable: true,
             actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
             priority: 'medium',
-            channels: { email: member.userId.preferences?.notificationPreferences?.email }
+            channels: { email: notificationPreferences?.email }
           }
         );
       }
@@ -268,7 +269,7 @@ export class NotificationService {
   async notifyMonthlyReport(userId: string, reportData: any): Promise<void> {
     const user = await User.findById(userId);
     
-    if (user?.preferences.notificationPreferences?.monthlyReports) {
+    if (user?.preferences.get('notificationPreferences')?.monthlyReports) {
       await this.createNotification(
         userId,
         'MONTHLY_REPORT',

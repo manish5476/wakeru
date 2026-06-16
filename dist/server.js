@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const config_1 = require("./config");
 const database_1 = require("./config/database");
+const redis_1 = require("./config/redis");
 const logger_1 = require("./config/logger");
+const bull_config_1 = require("./infrastructure/queue/bull.config");
 class Server {
     async start() {
         try {
@@ -15,14 +17,12 @@ class Server {
             logger_1.logger.info('Configuration validated successfully');
             // Connect to MongoDB
             await database_1.database.connect();
-            // logger.info('MongoDB connected successfully');
             // Connect to Redis
-            // await redisClient.connect();
-            // logger.info('Redis connected successfully');
+            await redis_1.redisClient.connect();
             // Initialize job queues
-            // QueueManager.getQueue('ocr-processing');
-            // QueueManager.getQueue('analytics-generation');
-            // logger.info('Job queues initialized');
+            bull_config_1.QueueManager.getQueue('ocr-processing');
+            bull_config_1.QueueManager.getQueue('analytics-generation');
+            logger_1.logger.info('Job queues initialized');
             // Start HTTP server
             this.server = app_1.default.listen(config_1.config.PORT, () => {
                 logger_1.logger.info(`🚀 WAKERU API Server running on port ${config_1.config.PORT}`);
@@ -48,11 +48,11 @@ class Server {
                 });
             }
             // Close queues
-            // await QueueManager.closeAll();
+            await bull_config_1.QueueManager.closeAll();
             // Close Redis
-            // await redisClient.disconnect();
+            await redis_1.redisClient.disconnect();
             // Close MongoDB
-            // await database.disconnect();
+            await database_1.database.disconnect();
             logger_1.logger.info('Graceful shutdown completed');
             process.exit(0);
         };

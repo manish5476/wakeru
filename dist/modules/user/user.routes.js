@@ -19,7 +19,7 @@ const upload = (0, multer_1.default)({
             cb(null, true);
         }
         else {
-            cb(new Error('Invalid file type'));
+            cb(null, false);
         }
     }
 });
