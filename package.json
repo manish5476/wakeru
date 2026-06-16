@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@google-cloud/vision": "^4.0.0",
+    "@types/ioredis": "^4.28.10",
     "apple-signin-auth": "^1.5.0",
     "aws-sdk": "^2.1500.0",
     "axios": "^1.6.0",
@@ -26,6 +27,7 @@
     "csv-writer": "^1.6.0",
     "currency.js": "^2.0.4",
     "decimal.js": "^10.4.3",
+    "dotenv": "^17.4.2",
     "express": "^4.18.2",
     "express-rate-limit": "^7.0.0",
     "google-auth-library": "^9.0.0",

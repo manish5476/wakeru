@@ -3,6 +3,8 @@ import { User } from '../auth/auth.model';
 import { logger } from '../../config/logger';
 import { Types } from 'mongoose';
 import { redisClient } from '../../config/redis';
+import { IGroupMember, Group } from '../group/group.model';
+import { Expense } from '../expense/expense.model';
 
 export class NotificationService {
   /**
@@ -173,9 +175,6 @@ export class NotificationService {
    * Send expense notification
    */
   async notifyExpenseAdded(groupId: string, expenseId: string, createdBy: string): Promise<void> {
-    const { Group } = require('../group/group.model');
-    const { Expense } = require('../expense/expense.model');
-    
     const [group, expense] = await Promise.all([
       Group.findOne({ groupId }).populate('members.userId', 'userId email preferences'),
       Expense.findOne({ expenseId })
@@ -183,12 +182,12 @@ export class NotificationService {
 
     if (!group || !expense) return;
 
-    const creator = group.members.find(m => m.userId._id.toString() === createdBy);
+    const creator = group.members.find((m: IGroupMember) => m.userId._id.toString() === createdBy);
     
     for (const member of group.members) {
       if (member.userId._id.toString() === createdBy) continue;
       
-      if (!member.preferences?.notificationSettings?.muteExpenses) {
+      if (!member.userId.preferences?.notificationPreferences?.muteExpenses) {
         await this.createNotification(
           member.userId._id.toString(),
           'EXPENSE_ADDED',
@@ -210,8 +209,6 @@ export class NotificationService {
    * Notify settlement completed
    */
   async notifySettlementCompleted(settlement: any): Promise<void> {
-    const { Group } = require('../group/group.model');
-    
     const [fromUser, toUser] = await Promise.all([
       User.findById(settlement.fromUser),
       User.findById(settlement.toUser)
@@ -271,7 +268,7 @@ export class NotificationService {
   async notifyMonthlyReport(userId: string, reportData: any): Promise<void> {
     const user = await User.findById(userId);
     
-    if (user?.preferences?.notificationPreferences?.monthlyReports) {
+    if (user?.preferences.notificationPreferences?.monthlyReports) {
       await this.createNotification(
         userId,
         'MONTHLY_REPORT',

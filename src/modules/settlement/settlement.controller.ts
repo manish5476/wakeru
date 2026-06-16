@@ -28,6 +28,7 @@ export class SettlementController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Simplified debts retrieved successfully',
         data: debts,
         timestamp: new Date().toISOString()
       };
@@ -48,6 +49,7 @@ export class SettlementController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Debt summary retrieved successfully',
         data: summary,
         timestamp: new Date().toISOString()
       };
@@ -157,6 +159,7 @@ export class SettlementController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Settlement history retrieved successfully',
         data: result,
         timestamp: new Date().toISOString()
       };

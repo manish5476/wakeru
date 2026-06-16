@@ -1,5 +1,5 @@
 import { Group, IGroup, IGroupMember } from './group.model';
-import { Types, Decimal128 } from 'mongoose';
+import { Types } from 'mongoose';
 import { CreateGroupDTO, UpdateGroupDTO } from '../../shared/types/group.types';
 
 export class GroupRepository {
@@ -12,9 +12,9 @@ export class GroupRepository {
         joinedAt: new Date(),
         invitationStatus: 'ACCEPTED',
         balance: {
-          totalOwed: Decimal128.fromString('0'),
-          totalLent: Decimal128.fromString('0'),
-          netBalance: Decimal128.fromString('0')
+          totalOwed: Types.Decimal128.fromString('0'),
+          totalLent: Types.Decimal128.fromString('0'),
+          netBalance: Types.Decimal128.fromString('0')
         }
       },
       ...memberIds.map(id => ({
@@ -24,9 +24,9 @@ export class GroupRepository {
         invitedBy: new Types.ObjectId(createdBy),
         invitationStatus: 'ACCEPTED' as const,
         balance: {
-          totalOwed: Decimal128.fromString('0'),
-          totalLent: Decimal128.fromString('0'),
-          netBalance: Decimal128.fromString('0')
+          totalOwed: Types.Decimal128.fromString('0'),
+          totalLent: Types.Decimal128.fromString('0'),
+          netBalance: Types.Decimal128.fromString('0')
         }
       }))
     ];
@@ -117,7 +117,7 @@ export class GroupRepository {
   async updateMemberBalance(
     groupId: string, 
     userId: string, 
-    balance: { totalOwed: Decimal128; totalLent: Decimal128; netBalance: Decimal128 }
+    balance: { totalOwed: Types.Decimal128; totalLent: Types.Decimal128; netBalance: Types.Decimal128 }
   ): Promise<void> {
     await Group.findOneAndUpdate(
       { 

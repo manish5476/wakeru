@@ -120,7 +120,7 @@ export class UserService {
   async uploadProfilePicture(userId: string, file: Express.Multer.File): Promise<string> {
     // Validate file type
     const allowedTypes = CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.allowedTypes;
-    if (!allowedTypes.includes(file.mimetype)) {
+    if (!(allowedTypes as readonly string[]).includes(file.mimetype)) {
       throw new BadRequestError('Invalid file type. Allowed: JPEG, PNG');
     }
 

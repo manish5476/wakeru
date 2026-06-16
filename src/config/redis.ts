@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import Redis, { RedisOptions } from 'ioredis';
 import { config } from './index';
 import { logger } from './logger';
 
@@ -9,7 +9,7 @@ export class RedisClient {
   public publisher: Redis;
 
   private constructor() {
-    const redisOptions: Redis.RedisOptions = {
+    const redisOptions: RedisOptions = {
       retryStrategy: (times: number) => {
         if (times > 10) {
           logger.error('Redis retry limit exceeded');

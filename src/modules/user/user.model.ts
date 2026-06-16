@@ -103,7 +103,7 @@ const UserSchema = new Schema<IUserDocument>({
   timestamps: true,
   toJSON: {
     virtuals: true,
-    transform: (doc, ret) => {
+    transform: (doc, ret: { [key: string]: any }) => {
       delete ret.__v;
       delete ret._id;
       return ret;
@@ -121,4 +121,4 @@ UserSchema.index({ email: 1 });
 UserSchema.index({ phoneNumber: 1 });
 UserSchema.index({ 'preferences.defaultCurrency': 1 });
 
-export const UserModel = mongoose.model<IUserDocument>('User', UserSchema);
+export const UserModel = mongoose.models.User || mongoose.model<IUserDocument>('User', UserSchema);

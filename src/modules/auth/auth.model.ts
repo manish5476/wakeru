@@ -13,13 +13,19 @@ export interface IUser extends Document {
   phoneNumber?: string;
   profilePictureUrl?: string;
   bio?: string;
-  authProviders: { provider: string; providerId: string }[];
+  authProviders: {
+    google?: { id: string };
+    apple?: { id: string };
+  };
   preferences: Map<string, any>;
   refreshTokens?: string[];
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   emailVerificationToken?: string;
-  isEmailVerified: boolean;
+  emailVerificationExpires?: Date;
+  isVerified: boolean;
+  isActive: boolean;
+  isDeleted: boolean;
 
   // Methods
   comparePassword(password: string): Promise<boolean>;
@@ -37,24 +43,25 @@ const userSchema = new Schema<IUser>(
     phoneNumber: { type: String },
     profilePictureUrl: { type: String },
     bio: { type: String },
-    authProviders: [
-      {
-        provider: { type: String, required: true },
-        providerId: { type: String, required: true },
-      },
-    ],
+    authProviders: {
+      google: { id: { type: String } },
+      apple: { id: { type: String } },
+    },
     preferences: { type: Map, of: Schema.Types.Mixed },
     refreshTokens: [{ type: String }],
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
     emailVerificationToken: { type: String },
-    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationExpires: { type: Date },
+    isVerified: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
   },
-  { 
-    timestamps: true, 
-    toJSON: { virtuals: true }, 
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    versionKey: false // Prevent __v from being added to documents
+    versionKey: false
   }
 );
 
@@ -77,6 +84,7 @@ userSchema.methods.comparePassword = async function (password: string): Promise<
 userSchema.methods.generateVerificationToken = function (): string {
   const token = crypto.randomBytes(32).toString('hex');
   this.emailVerificationToken = crypto.createHash('sha256').update(token).digest('hex');
+  this.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
   return token;
 };
 
@@ -88,7 +96,6 @@ userSchema.set('toJSON', {
     delete ret.passwordResetToken;
     delete ret.passwordResetExpires;
     delete ret.emailVerificationToken;
-    // __v is no longer present, so no need to delete it
     return ret;
   },
 });

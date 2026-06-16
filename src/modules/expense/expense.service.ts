@@ -1,12 +1,13 @@
 import { expenseRepository } from './expense.repository';
 import { expenseCalculator } from './expense.calculator';
 import { Expense, IExpenseDocument } from './expense.model';
-import { CreateExpenseDTO, UpdateExpenseDTO } from '../../shared/types/expense.types';
+import { CreateExpenseDTO, UpdateExpenseDTO, ISplit } from '../../shared/types/expense.types';
 import { NotFoundError, BadRequestError, ForbiddenError, ConflictError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
 import { redisClient } from '../../config/redis';
-import { Decimal128, Types } from 'mongoose';
-import { Group } from '../group/group.model';
+import { Types } from 'mongoose';
+import { Group, IGroupMember } from '../group/group.model';
+import { UserModel } from '../user/user.model';
 import crypto from 'crypto';
 
 export class ExpenseService {
@@ -46,8 +47,8 @@ export class ExpenseService {
 
     // Verify all consumers are group members
     const memberIds = group.members
-      .filter(m => m.invitationStatus === 'ACCEPTED')
-      .map(m => m.userId.toString());
+      .filter((m: IGroupMember) => m.invitationStatus === 'ACCEPTED')
+      .map((m: IGroupMember) => m.userId.toString());
 
     expenseData.lineItems.forEach(item => {
       item.consumers.forEach(consumer => {
@@ -80,7 +81,7 @@ export class ExpenseService {
         itemId: crypto.randomUUID(),
         name: item.name,
         category: item.category,
-        basePrice: Decimal128.fromString(item.basePrice.toFixed(2)),
+        basePrice: Types.Decimal128.fromString(item.basePrice.toFixed(2)),
         quantity: item.quantity,
         consumers: item.consumers.map(c => ({
           userId: new Types.ObjectId(c.userId),
@@ -92,14 +93,14 @@ export class ExpenseService {
       taxes: expenseData.taxes?.map(tax => ({
         name: tax.name,
         percentage: tax.percentage,
-        amount: Decimal128.fromString('0'), // Will be calculated
+        amount: Types.Decimal128.fromString('0'), // Will be calculated
         applicableTo: tax.applicableTo,
         applicableItems: tax.applicableItems,
         taxCode: tax.taxCode
       })),
       discounts: expenseData.discounts?.map(discount => ({
         type: discount.type,
-        value: Decimal128.fromString(discount.value.toFixed(2)),
+        value: Types.Decimal128.fromString(discount.value.toFixed(2)),
         code: discount.code,
         description: discount.description,
         applicableTo: discount.applicableTo,
@@ -210,7 +211,7 @@ export class ExpenseService {
     }
 
     const isAdmin = group.members.find(
-      m => m.userId.toString() === userId && m.role === 'ADMIN'
+      (m: IGroupMember) => m.userId.toString() === userId && m.role === 'ADMIN'
     );
 
     if (expense.metadata.createdBy.toString() !== userId && !isAdmin) {
@@ -269,7 +270,7 @@ export class ExpenseService {
       throw new ForbiddenError('You do not have permission to delete this expense');
     }
 
-    const isAdmin = group.members.find(m => m.userId.toString() === userId && m.role === 'ADMIN');
+    const isAdmin = group.members.find((m: IGroupMember) => m.userId.toString() === userId && m.role === 'ADMIN');
     if (expense.metadata.createdBy.toString() !== userId && !isAdmin) {
       throw new ForbiddenError('Only the expense creator or group admin can delete this expense');
     }
@@ -302,8 +303,8 @@ export class ExpenseService {
         {
           $set: {
             'financialSummary.totalExpenses': stat.totalExpenses,
-            'financialSummary.totalPending': Decimal128.fromString(stat.totalAmount.toFixed(2)),
-            'financialSummary.averageExpenseAmount': Decimal128.fromString(stat.averageAmount.toFixed(2)),
+            'financialSummary.totalPending': Types.Decimal128.fromString(stat.totalAmount.toFixed(2)),
+            'financialSummary.averageExpenseAmount': Types.Decimal128.fromString(stat.averageAmount.toFixed(2)),
             'financialSummary.lastExpenseDate': stat.lastExpenseDate,
             'financialSummary.expenseCount': stat.totalExpenses
           }
@@ -316,8 +317,6 @@ export class ExpenseService {
    * Update user statistics
    */
   private async updateUserStats(userIds: string[]): Promise<void> {
-    const { UserModel } = require('../user/user.model');
-    
     for (const userId of userIds) {
       const totalExpenses = await Expense.countDocuments({
         'splits.userId': new Types.ObjectId(userId),
@@ -339,12 +338,12 @@ export class ExpenseService {
   /**
    * Invalidate related caches
    */
-  private async invalidateRelatedCaches(groupId: string, splits: any[]): Promise<void> {
+  private async invalidateRelatedCaches(groupId: string, splits: ISplit[]): Promise<void> {
     await redisClient.delete(`group:${groupId}`);
     
     // Invalidate user caches
     const userIds = new Set<string>();
-    splits.forEach((split: any) => userIds.add(split.userId.toString()));
+    splits.forEach((split: ISplit) => userIds.add(split.userId.toString()));
     
     for (const userId of userIds) {
       await redisClient.delete(`user:${userId}:groups`);

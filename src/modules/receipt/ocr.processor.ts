@@ -96,7 +96,8 @@ export class OCRProcessor {
 
       return ocrResult;
     } catch (error) {
-      logger.error('OCR processing failed:', error);
+      const err = error as Error;
+      logger.error('OCR processing failed:', err);
       
       // Update receipt with error
       await Receipt.findOneAndUpdate(
@@ -105,13 +106,13 @@ export class OCRProcessor {
           $set: {
             status: 'FAILED',
             'ocrData.processed': true,
-            'ocrData.error': error.message
+            'ocrData.error': err.message
           },
           $push: {
             statusHistory: {
               status: 'FAILED',
               timestamp: new Date(),
-              message: `OCR failed: ${error.message}`
+              message: `OCR failed: ${err.message}`
             }
           }
         }
@@ -120,7 +121,7 @@ export class OCRProcessor {
       return {
         success: false,
         confidence: 0,
-        error: error.message
+        error: err.message
       };
     }
   }
@@ -168,11 +169,12 @@ export class OCRProcessor {
         taxAmount: 0
       };
     } catch (error) {
-      logger.error('Google Vision OCR failed:', error);
+      const err = error as Error;
+      logger.error('Google Vision OCR failed:', err);
       return {
         success: false,
         confidence: 0,
-        error: error.message
+        error: err.message
       };
     }
   }
@@ -198,11 +200,12 @@ export class OCRProcessor {
         taxAmount: 0
       };
     } catch (error) {
-      logger.error('AWS Textract OCR failed:', error);
+      const err = error as Error;
+      logger.error('AWS Textract OCR failed:', err);
       return {
         success: false,
         confidence: 0,
-        error: error.message
+        error: err.message
       };
     }
   }
@@ -228,11 +231,12 @@ export class OCRProcessor {
         taxAmount: 0
       };
     } catch (error) {
-      logger.error('Tesseract OCR failed:', error);
+      const err = error as Error;
+      logger.error('Tesseract OCR failed:', err);
       return {
         success: false,
         confidence: 0,
-        error: error.message
+        error: err.message
       };
     }
   }

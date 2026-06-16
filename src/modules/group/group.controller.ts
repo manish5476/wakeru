@@ -47,6 +47,7 @@ export class GroupController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Group retrieved successfully',
         data: { group },
         timestamp: new Date().toISOString()
       };
@@ -66,6 +67,7 @@ export class GroupController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'User groups retrieved successfully',
         data: { groups },
         timestamp: new Date().toISOString()
       };
@@ -231,6 +233,7 @@ export class GroupController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Financial summary retrieved successfully',
         data: { summary },
         timestamp: new Date().toISOString()
       };
@@ -255,6 +258,7 @@ export class GroupController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Groups retrieved successfully',
         data: { groups },
         timestamp: new Date().toISOString()
       };

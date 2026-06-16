@@ -19,6 +19,7 @@ export class NotificationController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Notifications retrieved successfully',
         data: result,
         timestamp: new Date().toISOString()
       };
@@ -38,6 +39,7 @@ export class NotificationController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Unread count retrieved successfully',
         data: { unreadCount: count },
         timestamp: new Date().toISOString()
       };

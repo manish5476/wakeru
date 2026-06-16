@@ -152,7 +152,7 @@ const GroupSchema = new Schema<IGroup>({
   timestamps: true,
   toJSON: {
     virtuals: true,
-    transform: (doc, ret) => {
+    transform: (doc, ret: { [key: string]: any }) => {
       delete ret.__v;
       return ret;
     }
@@ -180,4 +180,4 @@ GroupSchema.pre('save', function(next) {
   next();
 });
 
-export const Group = mongoose.model<IGroup>('Group', GroupSchema);
+export const Group = mongoose.models.Group || mongoose.model<IGroup>('Group', GroupSchema);

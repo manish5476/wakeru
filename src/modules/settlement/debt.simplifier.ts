@@ -1,10 +1,10 @@
-import { Decimal128 } from 'mongoose';
+import { Types } from 'mongoose';
 import Decimal from 'decimal.js';
 
-interface Debt {
+export interface Debt {
   from: string;
   to: string;
-  amount: Decimal128;
+  amount: Types.Decimal128;
   groupId: string;
   expenseId?: string;
 }
@@ -12,7 +12,7 @@ interface Debt {
 interface SimplifiedTransaction {
   from: string;
   to: string;
-  amount: Decimal128;
+  amount: Types.Decimal128;
   note: string;
   relatedExpenses?: string[];
 }
@@ -77,7 +77,7 @@ export class DebtSimplifier {
         simplifiedTransactions.push({
           from: debtor.userId,
           to: creditor.userId,
-          amount: Decimal128.fromString(transferAmount.toFixed(2)),
+          amount: Types.Decimal128.fromString(transferAmount.toFixed(2)),
           note: `Settlement payment`,
           relatedExpenses: debts
             .filter(d => (d.from === debtor.userId && d.to === creditor.userId) ||
@@ -142,7 +142,7 @@ export class DebtSimplifier {
             const diff = amount1.minus(amount2);
             optimized.push({
               ...tx1,
-              amount: Decimal128.fromString(diff.toFixed(2))
+              amount: Types.Decimal128.fromString(diff.toFixed(2))
             });
             processed.add(key1);
             processed.add(key2);
@@ -153,7 +153,7 @@ export class DebtSimplifier {
             const diff = amount2.minus(amount1);
             optimized.push({
               ...tx2,
-              amount: Decimal128.fromString(diff.toFixed(2))
+              amount: Types.Decimal128.fromString(diff.toFixed(2))
             });
             processed.add(key1);
             processed.add(key2);

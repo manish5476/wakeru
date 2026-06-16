@@ -44,6 +44,7 @@ export class ExpenseController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Expense retrieved successfully',
         data: { expense },
         timestamp: new Date().toISOString()
       };
@@ -69,6 +70,7 @@ export class ExpenseController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'Group expenses retrieved successfully',
         data: result,
         timestamp: new Date().toISOString()
       };
@@ -93,6 +95,7 @@ export class ExpenseController {
 
       const response: ApiResponse = {
         success: true,
+        message: 'User expenses retrieved successfully',
         data: result,
         timestamp: new Date().toISOString()
       };

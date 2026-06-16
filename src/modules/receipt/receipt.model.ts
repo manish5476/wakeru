@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import crypto from 'crypto';
 
+export type AllowedMimeTypes = 'image/jpeg' | 'image/png' | 'image/heic' | 'image/webp';
+
 export interface IReceiptDocument extends Document {
   receiptId: string;
   userId: mongoose.Types.ObjectId;
@@ -11,7 +13,7 @@ export interface IReceiptDocument extends Document {
     originalUrl: string;
     thumbnailUrl: string;
     processedUrl?: string;
-    mimeType: string;
+    mimeType: AllowedMimeTypes;
     size: number;
     width?: number;
     height?: number;
@@ -80,7 +82,7 @@ const ReceiptSchema = new Schema<IReceiptDocument>({
     originalUrl: { type: String, required: true },
     thumbnailUrl: { type: String, required: true },
     processedUrl: String,
-    mimeType: { type: String, required: true },
+    mimeType: { type: String, required: true, enum: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'] },
     size: { type: Number, required: true },
     width: Number,
     height: Number

@@ -5,7 +5,8 @@ import { NotFoundError, BadRequestError, ForbiddenError, ConflictError } from '.
 import { logger } from '../../config/logger';
 import { redisClient } from '../../config/redis';
 import { CONSTANTS } from '../../config/constants';
-import { Decimal128, Types } from 'mongoose';
+import { Types } from 'mongoose';
+import { UserModel } from '../user/user.model';
 
 export class GroupService {
   /**
@@ -37,9 +38,9 @@ export class GroupService {
     // Try cache
     const cached = await redisClient.get(cacheKey);
     if (cached) {
-      const group = JSON.parse(cached);
+      const group: IGroup = JSON.parse(cached) as IGroup;
       // Verify user is a member
-      if (!group.members.some((m: any) => m.userId === userId)) {
+      if (!group.members.some((m: IGroupMember) => m.userId.toString() === userId)) {
         throw new ForbiddenError('You are not a member of this group');
       }
       return group;
@@ -51,7 +52,7 @@ export class GroupService {
     }
 
     // Verify user is a member
-    const isMember = group.members.some(m => m.userId.toString() === userId);
+    const isMember = group.members.some((m: IGroupMember) => m.userId.toString() === userId);
     if (!isMember) {
       throw new ForbiddenError('You are not a member of this group');
     }
@@ -91,7 +92,7 @@ export class GroupService {
     }
 
     // Check if user is admin
-    const member = group.members.find(m => m.userId.toString() === userId);
+    const member = group.members.find((m: IGroupMember) => m.userId.toString() === userId);
     if (!member || member.role !== 'ADMIN') {
       throw new ForbiddenError('Only group admins can update group settings');
     }
@@ -119,19 +120,19 @@ export class GroupService {
     }
 
     // Check if admin
-    const adminMember = group.members.find(m => m.userId.toString() === adminId);
+    const adminMember = group.members.find((m: IGroupMember) => m.userId.toString() === adminId);
     if (!adminMember || adminMember.role !== 'ADMIN') {
       throw new ForbiddenError('Only group admins can add members');
     }
 
     // Check if user already a member
-    const existingMember = group.members.find(m => m.userId.toString() === newMemberId);
+    const existingMember = group.members.find((m: IGroupMember) => m.userId.toString() === newMemberId);
     if (existingMember) {
       throw new ConflictError('User is already a member of this group');
     }
 
     // Check member limit
-    const activeMembers = group.members.filter(m => m.invitationStatus === 'ACCEPTED');
+    const activeMembers = group.members.filter((m: IGroupMember) => m.invitationStatus === 'ACCEPTED');
     if (activeMembers.length >= 100) {
       throw new BadRequestError('Group has reached maximum member limit (100)');
     }
@@ -143,9 +144,9 @@ export class GroupService {
       invitedBy: new Types.ObjectId(adminId),
       invitationStatus: 'ACCEPTED',
       balance: {
-        totalOwed: Decimal128.fromString('0'),
-        totalLent: Decimal128.fromString('0'),
-        netBalance: Decimal128.fromString('0')
+        totalOwed: Types.Decimal128.fromString('0'),
+        totalLent: Types.Decimal128.fromString('0'),
+        netBalance: Types.Decimal128.fromString('0')
       }
     };
 
@@ -177,7 +178,7 @@ export class GroupService {
     }
 
     // Check permissions
-    const adminMember = group.members.find(m => m.userId.toString() === adminId);
+    const adminMember = group.members.find((m: IGroupMember) => m.userId.toString() === adminId);
     const isSelfRemoval = adminId === memberId;
     
     if (!isSelfRemoval && (!adminMember || adminMember.role !== 'ADMIN')) {
@@ -186,14 +187,14 @@ export class GroupService {
 
     // Cannot remove the last admin
     if (adminMember?.role === 'ADMIN') {
-      const adminCount = group.members.filter(m => m.role === 'ADMIN').length;
+      const adminCount = group.members.filter((m: IGroupMember) => m.role === 'ADMIN').length;
       if (adminCount === 1 && isSelfRemoval) {
         throw new BadRequestError('Cannot remove the last admin. Promote another member first.');
       }
     }
 
     // Check if member has pending balances
-    const member = group.members.find(m => m.userId.toString() === memberId);
+    const member = group.members.find((m: IGroupMember) => m.userId.toString() === memberId);
     if (member && parseFloat(member.balance.netBalance.toString()) !== 0) {
       throw new BadRequestError('Cannot remove member with pending balances. Settle all dues first.');
     }
@@ -226,14 +227,14 @@ export class GroupService {
     }
 
     // Check if admin
-    const adminMember = group.members.find(m => m.userId.toString() === adminId);
+    const adminMember = group.members.find((m: IGroupMember) => m.userId.toString() === adminId);
     if (!adminMember || adminMember.role !== 'ADMIN') {
       throw new ForbiddenError('Only group admins can change member roles');
     }
 
     // Cannot change own role if last admin
     if (adminId === memberId && newRole !== 'ADMIN') {
-      const adminCount = group.members.filter(m => m.role === 'ADMIN').length;
+      const adminCount = group.members.filter((m: IGroupMember) => m.role === 'ADMIN').length;
       if (adminCount === 1) {
         throw new BadRequestError('Cannot demote the last admin. Promote another member first.');
       }
@@ -260,7 +261,7 @@ export class GroupService {
     }
 
     // Check if already a member
-    const existingMember = group.members.find(m => m.userId.toString() === userId);
+    const existingMember = group.members.find((m: IGroupMember) => m.userId.toString() === userId);
     if (existingMember) {
       if (existingMember.invitationStatus === 'ACCEPTED') {
         throw new ConflictError('You are already a member of this group');
@@ -283,9 +284,9 @@ export class GroupService {
       joinedAt: new Date(),
       invitationStatus: 'ACCEPTED',
       balance: {
-        totalOwed: Decimal128.fromString('0'),
-        totalLent: Decimal128.fromString('0'),
-        netBalance: Decimal128.fromString('0')
+        totalOwed: Types.Decimal128.fromString('0'),
+        totalLent: Types.Decimal128.fromString('0'),
+        netBalance: Types.Decimal128.fromString('0')
       }
     };
 
@@ -311,7 +312,7 @@ export class GroupService {
     }
 
     // Check if admin
-    const member = group.members.find(m => m.userId.toString() === userId);
+    const member = group.members.find((m: IGroupMember) => m.userId.toString() === userId);
     if (!member || member.role !== 'ADMIN') {
       throw new ForbiddenError('Only group admins can archive groups');
     }
@@ -323,7 +324,7 @@ export class GroupService {
 
     // Invalidate all caches
     for (const member of group.members) {
-      await redisClient.delete(`user:${member.userId}:groups`);
+      await redisClient.delete(`user:${member.userId.toString()}:groups`);
     }
     await redisClient.delete(`group:${groupId}`);
 
@@ -338,8 +339,8 @@ export class GroupService {
     const group = await this.getGroupById(groupId, userId);
     
     const memberBalances = group.members
-      .filter(m => m.invitationStatus === 'ACCEPTED')
-      .map(m => ({
+      .filter((m: IGroupMember) => m.invitationStatus === 'ACCEPTED')
+      .map((m: IGroupMember) => ({
         userId: m.userId,
         role: m.role,
         balance: {
@@ -365,7 +366,6 @@ export class GroupService {
    * Update user's group count stats
    */
   private async updateUserGroupStats(userId: string): Promise<void> {
-    const { UserModel } = require('../user/user.model');
     const groups = await groupRepository.getUserGroups(userId);
     
     await UserModel.findOneAndUpdate(

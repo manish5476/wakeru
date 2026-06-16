@@ -14,7 +14,7 @@ const upload = multer({
     if (CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type'));
+      cb(null, false);
     }
   }
 });

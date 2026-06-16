@@ -105,7 +105,7 @@ export const AuthService = {
       // In a real app, you would invalidate the refresh token in the database
       const user = await User.findById(userId);
       if (user && user.refreshTokens) {
-          user.refreshTokens = user.refreshTokens.filter(rt => rt.token !== refreshToken);
+          user.refreshTokens = user.refreshTokens.filter(rt => rt !== refreshToken);
           await user.save();
       }
   },
@@ -130,7 +130,7 @@ export const AuthService = {
       const user = await User.findOne({ email });
       if (user) {
           // In a real app, you'd generate a proper reset token and email it
-          const resetToken = crypto.randomBytes(32).toString('hex';
+          const resetToken = crypto.randomBytes(32).toString('hex');
           user.passwordResetToken = resetToken;
           user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
           await user.save();

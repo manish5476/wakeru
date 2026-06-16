@@ -1,0 +1,34 @@
+export declare const config: {
+    readonly NODE_ENV: string;
+    readonly PORT: number;
+    readonly API_VERSION: string;
+    readonly MONGODB_URI: string;
+    readonly MONGO_ROOT_USER: string | undefined;
+    readonly MONGO_ROOT_PASSWORD: string | undefined;
+    readonly REDIS_URL: string;
+    readonly REDIS_PASSWORD: string | undefined;
+    readonly JWT_SECRET: string;
+    readonly JWT_EXPIRES_IN: string;
+    readonly JWT_REFRESH_EXPIRES_IN: string;
+    readonly GOOGLE_CLIENT_ID: string;
+    readonly GOOGLE_CLIENT_SECRET: string;
+    readonly APPLE_CLIENT_ID: string;
+    readonly APPLE_TEAM_ID: string;
+    readonly OCR_SERVICE_PROVIDER: string;
+    readonly GOOGLE_VISION_API_KEY: string;
+    readonly AWS_TEXTRACT_ACCESS_KEY: string;
+    readonly AWS_TEXTRACT_SECRET_KEY: string;
+    readonly UPI_MERCHANT_ID: string;
+    readonly UPI_API_KEY: string;
+    readonly EXCHANGE_RATE_API_KEY: string;
+    readonly EXCHANGE_RATE_API_URL: string;
+    readonly RATE_LIMIT_WINDOW_MS: number;
+    readonly RATE_LIMIT_MAX_REQUESTS: number;
+    readonly ALLOWED_ORIGINS: string;
+    readonly LOG_LEVEL: string;
+    readonly LOG_FILE: string;
+    readonly MAX_FILE_SIZE: number;
+    readonly UPLOAD_DIR: string;
+};
+export declare const validateConfig: () => void;
+//# sourceMappingURL=index.d.ts.map

@@ -65,11 +65,6 @@ export class AuthMiddleware {
         role: decoded.role,
       };
 
-      // Update last active timestamp (async, don't wait)
-      User.findByIdAndUpdate(decoded.userId, {
-        'stats.lastActiveAt': new Date()
-      }).catch(err => logger.error('Failed to update last active:', err));
-
       next();
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {

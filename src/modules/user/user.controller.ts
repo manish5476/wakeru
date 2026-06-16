@@ -21,7 +21,8 @@ export class UserController {
       const response: ApiResponse = {
         success: true,
         data: { user },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -41,7 +42,8 @@ export class UserController {
       const response: ApiResponse = {
         success: true,
         data: { user },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -223,7 +225,8 @@ export class UserController {
       const response: ApiResponse = {
         success: true,
         data: result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -242,7 +245,8 @@ export class UserController {
       const response: ApiResponse = {
         success: true,
         data: { stats },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);
@@ -261,7 +265,8 @@ export class UserController {
       const response: ApiResponse = {
         success: true,
         data: { linkedAccounts },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        message: ''
       };
 
       res.status(200).json(response);

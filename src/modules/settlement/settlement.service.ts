@@ -5,7 +5,7 @@ import { Group } from '../group/group.model';
 import { NotFoundError, BadRequestError, ForbiddenError, ConflictError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
 import { redisClient } from '../../config/redis';
-import { Decimal128, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import crypto from 'crypto';
 import Decimal from 'decimal.js';
 
@@ -137,7 +137,7 @@ export class SettlementService {
 
     // Verify both users are members
     const toMember = group.members.find(
-      m => m.userId.toString() === toUser && m.invitationStatus === 'ACCEPTED'
+      (m:any) => m.userId.toString() === toUser && m.invitationStatus === 'ACCEPTED'
     );
 
     if (!toMember) {
@@ -157,7 +157,7 @@ export class SettlementService {
       groupId: group._id,
       fromUser: new Types.ObjectId(fromUser),
       toUser: new Types.ObjectId(toUser),
-      amount: Decimal128.fromString(amount.toFixed(2)),
+      amount: Types.Decimal128.fromString(amount.toFixed(2)),
       currency: group.settings.defaultCurrency,
       expenses: [],
       paymentMethod,
@@ -315,14 +315,14 @@ export class SettlementService {
     if (!group) return;
 
     // Update payer's balance (reduces what they owe)
-    const payerMember = group.members.find(m => m.userId.toString() === fromUser);
+    const payerMember = group.members.find((m:any) => m.userId.toString() === fromUser);
     if (payerMember) {
       const newOwed = new Decimal(payerMember.balance.totalOwed.toString())
         .minus(amount)
         .toFixed(2);
       
-      payerMember.balance.totalOwed = Decimal128.fromString(newOwed);
-      payerMember.balance.netBalance = Decimal128.fromString(
+      payerMember.balance.totalOwed = Types.Decimal128.fromString(newOwed);
+      payerMember.balance.netBalance = Types.Decimal128.fromString(
         new Decimal(payerMember.balance.totalLent.toString())
           .minus(newOwed)
           .toFixed(2)
@@ -330,14 +330,14 @@ export class SettlementService {
     }
 
     // Update recipient's balance (reduces what they are owed)
-    const recipientMember = group.members.find(m => m.userId.toString() === toUser);
+    const recipientMember = group.members.find((m:any) => m.userId.toString() === toUser);
     if (recipientMember) {
       const newLent = new Decimal(recipientMember.balance.totalLent.toString())
         .minus(amount)
         .toFixed(2);
       
-      recipientMember.balance.totalLent = Decimal128.fromString(newLent);
-      recipientMember.balance.netBalance = Decimal128.fromString(
+      recipientMember.balance.totalLent = Types.Decimal128.fromString(newLent);
+      recipientMember.balance.netBalance = Types.Decimal128.fromString(
         new Decimal(newLent)
           .minus(recipientMember.balance.totalOwed.toString())
           .toFixed(2)

@@ -130,6 +130,7 @@ export interface CreateExpenseDTO {
       userId: string;
       consumptionPercentage: number;
       quantity?: number;
+      notes?: string;
     }[];
   }[];
   taxes?: {
@@ -137,6 +138,7 @@ export interface CreateExpenseDTO {
     percentage: number;
     applicableTo: 'all' | 'specific';
     applicableItems?: string[];
+    taxCode?: string;
   }[];
   discounts?: {
     type: 'percentage' | 'fixed';
