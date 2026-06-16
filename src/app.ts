@@ -10,7 +10,7 @@ import { IdempotencyMiddleware } from './middleware/idempotency.middleware';
 import { publicRateLimiter, authenticatedRateLimiter } from './middleware/rateLimiter.middleware';
 
 // Import routes
-import authRoutes from './modules/auth/auth.routes';
+import { authRoutes } from './modules/auth';
 import userRoutes from './modules/user/user.routes';
 import groupRoutes from './modules/group/group.routes';
 import expenseRoutes from './modules/expense/expense.routes';
