@@ -15,16 +15,7 @@ export interface JwtPayload {
   iss?: string;
   sub?: string;
 }
-
 export class AuthMiddleware {
-  /**
-   * Verify JWT access token and attach the user to the request.
-   *
-   * IMPORTANT: your User schema's identity field is the custom `userId`
-   * string (a UUID), not Mongoose's built-in `_id` ObjectId. Every lookup
-   * here uses findOne({ userId }) — NOT findById() — because findById()
-   * queries by `_id` and will fail to find anything when given a UUID.
-   */
   static async authenticate(
     req: AuthenticatedRequest,
     res: Response,
@@ -37,9 +28,7 @@ export class AuthMiddleware {
       }
 
       const token = authHeader.split(' ')[1];
-      if (!token) {
-        throw new UnauthorizedError('No authentication token provided');
-      }
+      if (!token) throw new UnauthorizedError('No authentication token provided');
 
       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
@@ -47,20 +36,14 @@ export class AuthMiddleware {
         throw new UnauthorizedError('Invalid token type');
       }
 
-      // FIX: findOne({ userId }) instead of findById(decoded.userId)
-      const user = await User.findOne({ userId: decoded.userId }).select('-refreshTokens');
+      // CRITICAL FIX: Select only needed fields and use .lean() for performance
+      const user = await User.findOne({ userId: decoded.userId })
+        .select('email isActive isDeleted')
+        .lean();
 
-      if (!user) {
-        throw new UnauthorizedError('User no longer exists');
-      }
-
-      if (!user.isActive) {
-        throw new UnauthorizedError('Account is deactivated');
-      }
-
-      if (user.isDeleted) {
-        throw new UnauthorizedError('Account has been deleted');
-      }
+      if (!user) throw new UnauthorizedError('User no longer exists');
+      if (!user.isActive) throw new UnauthorizedError('Account is deactivated');
+      if (user.isDeleted) throw new UnauthorizedError('Account has been deleted');
 
       req.user = {
         userId: decoded.userId,
@@ -79,120 +62,183 @@ export class AuthMiddleware {
       }
     }
   }
+// export class AuthMiddleware {
+//   /**
+//    * Verify JWT access token and attach the user to the request.
+//    *
+//    * IMPORTANT: your User schema's identity field is the custom `userId`
+//    * string (a UUID), not Mongoose's built-in `_id` ObjectId. Every lookup
+//    * here uses findOne({ userId }) — NOT findById() — because findById()
+//    * queries by `_id` and will fail to find anything when given a UUID.
+//    */
+//   static async authenticate(
+//     req: AuthenticatedRequest,
+//     res: Response,
+//     next: NextFunction
+//   ): Promise<void> {
+//     try {
+//       const authHeader = req.headers.authorization;
+//       if (!authHeader || !authHeader.startsWith('Bearer ')) {
+//         throw new UnauthorizedError('No authentication token provided');
+//       }
 
-  /**
-   * Optional authentication — proceeds even if no token is present,
-   * but attaches req.user if a valid one is found.
-   */
-  static async optionalAuth(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return next();
-      }
+//       const token = authHeader.split(' ')[1];
+//       if (!token) {
+//         throw new UnauthorizedError('No authentication token provided');
+//       }
 
-      const token = authHeader.split(' ')[1];
-      if (!token) {
-        return next();
-      }
+//       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
-      const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
+//       if (decoded.type !== 'access') {
+//         throw new UnauthorizedError('Invalid token type');
+//       }
 
-      // FIX: findOne({ userId }) instead of findById(decoded.userId)
-      const user = await User.findOne({ userId: decoded.userId });
+//       // FIX: findOne({ userId }) instead of findById(decoded.userId)
+//       const user = await User.findOne({ userId: decoded.userId }).select('-refreshTokens');
 
-      if (user && user.isActive && !user.isDeleted) {
-        req.user = {
-          userId: decoded.userId,
-          email: user.email,
-          role: decoded.role,
-        };
-      }
+//       if (!user) {
+//         throw new UnauthorizedError('User no longer exists');
+//       }
 
-      next();
-    } catch {
-      // Optional auth — any failure here just means "proceed unauthenticated"
-      next();
-    }
-  }
+//       if (!user.isActive) {
+//         throw new UnauthorizedError('Account is deactivated');
+//       }
 
-  /**
-   * Role-based authorization. Use after `authenticate`.
-   */
-  static authorize(...roles: string[]) {
-    return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-      try {
-        if (!req.user) {
-          throw new UnauthorizedError('Authentication required');
-        }
+//       if (user.isDeleted) {
+//         throw new UnauthorizedError('Account has been deleted');
+//       }
 
-        if (roles.length > 0 && !roles.includes(req.user.role)) {
-          throw new ForbiddenError('Insufficient permissions');
-        }
+//       req.user = {
+//         userId: decoded.userId,
+//         email: user.email,
+//         role: decoded.role,
+//       };
 
-        next();
-      } catch (error) {
-        next(error);
-      }
-    };
-  }
+//       next();
+//     } catch (error) {
+//       if (error instanceof jwt.TokenExpiredError) {
+//         next(new UnauthorizedError('Token has expired'));
+//       } else if (error instanceof jwt.JsonWebTokenError) {
+//         next(new UnauthorizedError('Invalid token'));
+//       } else {
+//         next(error);
+//       }
+//     }
+//   }
 
-  /**
-   * Premium user check.
-   */
-  static async requirePremium(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      if (!req.user) {
-        throw new UnauthorizedError('Authentication required');
-      }
+//   /**
+//    * Optional authentication — proceeds even if no token is present,
+//    * but attaches req.user if a valid one is found.
+//    */
+//   static async optionalAuth(
+//     req: AuthenticatedRequest,
+//     res: Response,
+//     next: NextFunction
+//   ): Promise<void> {
+//     try {
+//       const authHeader = req.headers.authorization;
+//       if (!authHeader || !authHeader.startsWith('Bearer ')) {
+//         return next();
+//       }
 
-      // FIX: findOne({ userId }) instead of findById(req.user.userId)
-      const user = await User.findOne({ userId: req.user.userId });
+//       const token = authHeader.split(' ')[1];
+//       if (!token) {
+//         return next();
+//       }
 
-      if (!user || !['premium', 'business', 'admin'].includes(user.role)) {
-        throw new ForbiddenError('Premium subscription required');
-      }
+//       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
-      next();
-    } catch (error) {
-      next(error);
-    }
-  }
+//       // FIX: findOne({ userId }) instead of findById(decoded.userId)
+//       const user = await User.findOne({ userId: decoded.userId });
 
-  /**
-   * Business account check.
-   */
-  static async requireBusiness(
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      if (!req.user) {
-        throw new UnauthorizedError('Authentication required');
-      }
+//       if (user && user.isActive && !user.isDeleted) {
+//         req.user = {
+//           userId: decoded.userId,
+//           email: user.email,
+//           role: decoded.role,
+//         };
+//       }
 
-      // FIX: findOne({ userId }) instead of findById(req.user.userId)
-      const user = await User.findOne({ userId: req.user.userId });
+//       next();
+//     } catch {
+//       // Optional auth — any failure here just means "proceed unauthenticated"
+//       next();
+//     }
+//   }
 
-      if (!user || !['business', 'admin'].includes(user.role)) {
-        throw new ForbiddenError('Business account required');
-      }
+//   /**
+//    * Role-based authorization. Use after `authenticate`.
+//    */
+//   static authorize(...roles: string[]) {
+//     return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+//       try {
+//         if (!req.user) {
+//           throw new UnauthorizedError('Authentication required');
+//         }
 
-      next();
-    } catch (error) {
-      next(error);
-    }
-  }
-}
+//         if (roles.length > 0 && !roles.includes(req.user.role)) {
+//           throw new ForbiddenError('Insufficient permissions');
+//         }
+
+//         next();
+//       } catch (error) {
+//         next(error);
+//       }
+//     };
+//   }
+
+//   /**
+//    * Premium user check.
+//    */
+//   static async requirePremium(
+//     req: AuthenticatedRequest,
+//     res: Response,
+//     next: NextFunction
+//   ): Promise<void> {
+//     try {
+//       if (!req.user) {
+//         throw new UnauthorizedError('Authentication required');
+//       }
+
+//       // FIX: findOne({ userId }) instead of findById(req.user.userId)
+//       const user = await User.findOne({ userId: req.user.userId });
+
+//       if (!user || !['premium', 'business', 'admin'].includes(user.role)) {
+//         throw new ForbiddenError('Premium subscription required');
+//       }
+
+//       next();
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+
+//   /**
+//    * Business account check.
+//    */
+//   static async requireBusiness(
+//     req: AuthenticatedRequest,
+//     res: Response,
+//     next: NextFunction
+//   ): Promise<void> {
+//     try {
+//       if (!req.user) {
+//         throw new UnauthorizedError('Authentication required');
+//       }
+
+//       // FIX: findOne({ userId }) instead of findById(req.user.userId)
+//       const user = await User.findOne({ userId: req.user.userId });
+
+//       if (!user || !['business', 'admin'].includes(user.role)) {
+//         throw new ForbiddenError('Business account required');
+//       }
+
+//       next();
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// }
 
 // Export a ready-to-use `protect` alias matching your auth.routes.ts import
 export const protect = AuthMiddleware.authenticate;// import { Request, Response, NextFunction } from 'express';
