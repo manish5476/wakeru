@@ -21,17 +21,15 @@ module.exports = {
           DEFAULT: '#f97316',
           foreground: '#ffffff',
         },
-        // Auth Section Theme
+        // Auth Section Theme - Premium Desert
         auth: {
-          dark: '#0A0A0A',
-          webBg: '#09271E',      // Dark emerald for web gradient
-          webCard: '#121212',
-          webText: '#FFFFFF',
-          webInput: '#1C1C1C',
-          mobileBg: '#FFFFFF',
-          mobileInput: '#E8EFE9', // Light pale green
-          mobileBtn: '#3A5C45',   // Dark plant green
-          mobileText: '#2D3A31',
+          bg: '#F7F6F3',         // Soft off-white background
+          card: '#FFFFFF',       // Pure white cards
+          primary: '#DE6B48',    // Rich terracotta
+          text: '#1C1917',       // Deep charcoal
+          textMuted: '#78716C',  // Warm gray for subtitles/placeholders
+          input: '#F4F5F7',      // Soft neutral input background
+          border: '#E5E5E5',     // Soft divider border
         },
 
         secondary: {

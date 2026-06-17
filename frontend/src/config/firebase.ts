@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, initializeAuth, browserLocalPersistence } from 'firebase/auth';
+import { Platform } from 'react-native';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -13,5 +14,9 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth
-export const auth = getAuth(app);
+// Initialize Firebase Auth with correct persistence.
+// On web, using browserLocalPersistence avoids WebCrypto issues on HTTP dev servers.
+// On native, getAuth uses AsyncStorage-based persistence automatically.
+export const auth = Platform.OS === 'web'
+  ? initializeAuth(app, { persistence: browserLocalPersistence })
+  : getAuth(app);
