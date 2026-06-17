@@ -138,8 +138,8 @@ export const createTripSchema = z.object({
 
   coverImage: z.string().url('Cover image must be a valid URL').optional(),
 
-  startDate: z.coerce.date({ required_error: 'Start date is required' }),
-  endDate: z.coerce.date({ required_error: 'End date is required' }),
+  startDate: z.coerce.date({ message: 'Start date is required' }),
+  endDate: z.coerce.date({ message: 'End date is required' }),
 
   baseCurrency: currencyCode,
 
@@ -188,7 +188,7 @@ export const updateTripSchema = z.object({
 
 export const updateMemberRoleSchema = z.object({
   role: z.enum(['admin', 'member', 'viewer'], {
-    errorMap: () => ({ message: 'Role must be admin, member, or viewer' }),
+    message: 'Role must be admin, member, or viewer',
   }),
 });
 

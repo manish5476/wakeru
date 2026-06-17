@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as tripService from './trip.service';
-import { AppError } from '../utils/AppError';
+import { AppError } from '@/shared/errors/AppError';
 import {
   CreateTripInput,
   UpdateTripInput,
@@ -21,7 +21,7 @@ const getUser = (req: Request) => {
 };
 
 // Helper to read req.trip set by loadTrip middleware
-const getTrip = (req: Request) => {
+const getTripFromReq = (req: Request) => {
   const trip = (req as any).trip;
   if (!trip) throw new AppError('Trip not loaded', 500);
   return trip;
@@ -102,7 +102,7 @@ export const getTrip = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
 
     res.status(200).json({
       success: true,
@@ -147,7 +147,7 @@ export const updateTrip = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const input = req.body as UpdateTripInput;
 
     const updated = await tripService.updateTrip(trip, input);
@@ -173,7 +173,7 @@ export const archiveTrip = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     await tripService.archiveTrip(trip);
 
     res.status(200).json({
@@ -201,7 +201,7 @@ export const addStop = async (
 ): Promise<void> => {
   try {
     const user = getUser(req);
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const input = req.body as CreateStopInput;
 
     const updated = await tripService.addStop(trip, input, user.uid);
@@ -230,7 +230,7 @@ export const updateStop = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const { stopId } = req.params;
     const input = req.body as UpdateStopInput;
 
@@ -259,7 +259,7 @@ export const updateStopRate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const { stopId } = req.params;
     const input = req.body as UpdateExchangeRateInput;
 
@@ -295,7 +295,7 @@ export const reorderStops = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const input = req.body as ReorderStopsInput;
 
     const updated = await tripService.reorderStops(trip, input);
@@ -322,12 +322,12 @@ export const deleteStop = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const { stopId } = req.params;
 
     // Import Expense model inline to avoid circular dependency
     // In your project, import at top of file if no circular dep
-    const { Expense } = await import('../expenses/expense.model');
+    const { Expense } = await import('../expense/expense.model');
     const expenseCount = await Expense.countDocuments({ stopId });
 
     await tripService.deleteStop(trip, stopId, expenseCount);
@@ -356,7 +356,7 @@ export const getMembers = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const activeMembers = trip.getActiveMembers();
 
     const members = activeMembers.map((m: any) => ({
@@ -395,7 +395,7 @@ export const updateMemberRole = async (
 ): Promise<void> => {
   try {
     const user = getUser(req);
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const { userId: targetUserId } = req.params;
     const { role } = req.body as UpdateMemberRoleInput;
 
@@ -428,7 +428,7 @@ export const removeMember = async (
 ): Promise<void> => {
   try {
     const user = getUser(req);
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const { userId: targetUserId } = req.params;
 
     await tripService.removeMember(
@@ -492,7 +492,7 @@ export const generateInviteCode = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     const input = req.body as GenerateInviteInput;
 
     const result = await tripService.regenerateInviteCode(trip, input);
@@ -522,7 +522,7 @@ export const revokeInviteCode = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const trip = getTrip(req);
+    const trip = getTripFromReq(req);
     await tripService.revokeInviteCode(trip);
 
     res.status(200).json({

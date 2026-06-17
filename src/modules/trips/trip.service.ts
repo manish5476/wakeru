@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Trip, ITrip, IStop, ITripMember } from './trip.model';
-import { AppError } from '../utils/AppError';
+
 import {
   CreateTripInput,
   UpdateTripInput,
@@ -11,6 +11,7 @@ import {
   UpdateExchangeRateInput,
   GenerateInviteInput,
 } from './trip.validators';
+import { AppError } from '@/shared/errors/AppError';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -94,7 +95,8 @@ export const getUserTrips = async (
     query.status = filters.status;
   }
 
-  return Trip.find(query).sort({ startDate: -1 }).lean();
+  const trips = await Trip.find(query).sort({ startDate: -1 }).lean().exec();
+  return trips as unknown as ITrip[];
 };
 
 /**
@@ -185,8 +187,8 @@ export const getTripSummary = async (tripId: string) => {
       ? stop.totalSpentLocal / stop.budget < 0.8
         ? 'green'
         : stop.totalSpentLocal / stop.budget <= 1.0
-        ? 'amber'
-        : 'red'
+          ? 'amber'
+          : 'red'
       : null,
     order: stop.order,
   }));
@@ -350,7 +352,7 @@ export const reorderStops = async (
 
   // Validate all provided IDs exist in this trip
   const existingIds = trip.stops.map((s) => s._id.toString());
-  const allValid = stopIds.every((id) => existingIds.includes(id));
+  const allValid = stopIds.every((id: string) => existingIds.includes(id));
 
   if (!allValid || stopIds.length !== trip.stops.length) {
     throw new AppError(
@@ -360,7 +362,7 @@ export const reorderStops = async (
   }
 
   // Assign new order values based on position in the input array
-  stopIds.forEach((stopId, index) => {
+  stopIds.forEach((stopId: string, index: number) => {
     const stop = trip.stops.find((s) => s._id.toString() === stopId);
     if (stop) stop.order = index;
   });
