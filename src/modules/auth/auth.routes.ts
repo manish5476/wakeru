@@ -1,38 +1,38 @@
 import { Router } from 'express';
 import { authController } from './auth.controller';
 import { protect } from '../../middleware/auth.middleware';
-import { validate } from '../../middleware/validate.middleware'; // Import your Zod middleware here
-import { 
-  verifyFirebaseTokenSchema, 
-  refreshTokenSchema, 
+import { validate } from '../trips/trip.middleware'; // Import your Zod middleware here
+import {
+  verifyFirebaseTokenSchema,
+  refreshTokenSchema,
   logoutSchema,
   forgotPasswordSchema
-} from './auth.validators';
+} from './auth.validation';
 
 const router = Router();
 
 // Public routes — no auth required
 router.post(
-  '/register', 
-  validate(verifyFirebaseTokenSchema), 
+  '/register',
+  validate(verifyFirebaseTokenSchema),
   authController.register.bind(authController)
 );
 
 router.post(
-  '/login', 
-  validate(verifyFirebaseTokenSchema), 
+  '/login',
+  validate(verifyFirebaseTokenSchema),
   authController.login.bind(authController)
 );
 
 router.post(
-  '/forgot-password', 
-  validate(forgotPasswordSchema), 
+  '/forgot-password',
+  validate(forgotPasswordSchema),
   authController.forgotPassword.bind(authController)
 );
 
 router.post(
-  '/refresh-token', 
-  validate(refreshTokenSchema), 
+  '/refresh-token',
+  validate(refreshTokenSchema),
   authController.refreshToken.bind(authController)
 );
 
@@ -40,13 +40,13 @@ router.post(
 router.use(protect);
 
 router.post(
-  '/logout', 
-  validate(logoutSchema), 
+  '/logout',
+  validate(logoutSchema),
   authController.logout.bind(authController)
 );
 
 router.get(
-  '/profile', 
+  '/profile',
   authController.getProfile.bind(authController)
 );
 

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { Trip } from './trip.model';
-import { AppError } from '../utils/AppError';
+import { AppError } from '../../shared/errors/AppError';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ZOD VALIDATION MIDDLEWARE
@@ -25,7 +25,7 @@ export const validate =
       next();
     } catch (err) {
       if (err instanceof ZodError) {
-        const errors = err.errors.map((e) => ({
+        const errors = (err as ZodError).issues.map((e: any) => ({
           field: e.path.join('.'),
           message: e.message,
         }));

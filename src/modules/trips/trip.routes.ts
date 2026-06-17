@@ -22,12 +22,12 @@ import {
   stopIdParamSchema,
   memberParamSchema,
 } from './trip.validators';
-import { authenticate } from '../middleware/authenticate'; // your existing Firebase auth middleware
+import { AuthMiddleware } from '../auth/auth.middleware'; // your existing Firebase auth middleware
 
 const router = Router();
 
 // All trip routes require a valid Firebase token
-router.use(authenticate);
+router.use(AuthMiddleware.authenticate);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TRIP ROUTES

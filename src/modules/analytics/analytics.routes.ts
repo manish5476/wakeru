@@ -9,9 +9,9 @@ router.use(AuthMiddleware.authenticate);
 // User analytics
 router.get('/user', analyticsController.getUserAnalytics.bind(analyticsController));
 
-// Group analytics
-router.get('/group/:groupId', analyticsController.getGroupAnalytics.bind(analyticsController));
-router.get('/group/:groupId/predictive', analyticsController.getPredictiveAnalytics.bind(analyticsController));
-router.get('/group/:groupId/report', analyticsController.getSpendingReport.bind(analyticsController));
+// Trip analytics
+router.get('/trip/:tripId', analyticsController.getTripAnalytics.bind(analyticsController));
+router.get('/trip/:tripId/predictive', analyticsController.getPredictiveAnalytics.bind(analyticsController));
+router.get('/trip/:tripId/report', analyticsController.getSpendingReport.bind(analyticsController));
 
 export default router;

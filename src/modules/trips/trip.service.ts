@@ -11,7 +11,7 @@ import {
   UpdateExchangeRateInput,
   GenerateInviteInput,
 } from './trip.validators';
-import { AppError } from '@/shared/errors/AppError';
+import { AppError } from '../../shared/errors/AppError';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES

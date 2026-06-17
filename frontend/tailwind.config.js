@@ -21,6 +21,18 @@ module.exports = {
           DEFAULT: '#f97316',
           foreground: '#ffffff',
         },
+        // Auth Section Theme
+        auth: {
+          dark: '#0A0A0A',
+          webBg: '#09271E',      // Dark emerald for web gradient
+          webCard: '#121212',
+          webText: '#FFFFFF',
+          webInput: '#1C1C1C',
+          mobileBg: '#FFFFFF',
+          mobileInput: '#E8EFE9', // Light pale green
+          mobileBtn: '#3A5C45',   // Dark plant green
+          mobileText: '#2D3A31',
+        },
 
         secondary: {
           50: '#faf5ff',

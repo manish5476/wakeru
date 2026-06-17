@@ -74,21 +74,21 @@ function RootLayoutNav() {
     if (token) {
       // Hide splash once we know auth state
       SplashScreen.hideAsync();
-      
-      // If user is authenticated and tries to access auth screens, redirect to tabs
+
+      // If user is authenticated and tries to access auth screens, redirect to app core
       if (inAuthGroup || (segments as string[]).length === 0) {
-        router.replace('/(tabs)');
+        router.replace('/(app)/index');
       }
     } else {
       SplashScreen.hideAsync();
-      
+
       // If not authenticated and NOT already in auth group, force redirect to login
       if (!inAuthGroup) {
         router.replace('/(auth)/login');
       }
     }
   }, [token, segments, isLoading]);
-  
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
@@ -100,25 +100,9 @@ function RootLayoutNav() {
           }}
         />
         <Stack.Screen
-          name="(tabs)"
+          name="(app)"
           options={{
             headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="groups/create"
-          options={{
-            presentation: 'modal',
-          }}
-        />
-        <Stack.Screen
-          name="modal"
-          options={{
-            title: 'Welcome',
-            presentation: 'modal',
-            animation: 'slide_from_right',
-            gestureEnabled: true,
-            gestureDirection: 'horizontal',
           }}
         />
       </Stack>

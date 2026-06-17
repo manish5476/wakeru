@@ -1,5 +1,5 @@
 import { Expense } from '../expense/expense.model';
-import { Group } from '../group/group.model';
+import { Trip } from '../trips/trip.model';
 import { Settlement } from '../settlement/settlement.model';
 import { Types } from 'mongoose';
 import { NotFoundError } from '../../shared/errors/AppError';
@@ -22,18 +22,18 @@ export class AnalyticsService {
 
     // Get consumption vs payment data
     const consumptionVsPayment = await this.getConsumptionVsPayment(userId, dateFilter);
-    
+
     // Get category breakdown
     const categoryBreakdown = await this.getCategoryBreakdown(userId, dateFilter);
-    
+
     // Get spending trends
     const spendingTrends = await this.getSpendingTrends(userId, timeframe);
-    
+
     // Get settlement efficiency
     const settlementEfficiency = await this.getSettlementEfficiency(userId, dateFilter);
-    
-    // Get group insights
-    const groupInsights = await this.getGroupInsights(userId, dateFilter);
+
+    // Get trip insights
+    const tripInsights = await this.getTripInsights(userId, dateFilter);
 
     const analytics = {
       timeframe,
@@ -48,7 +48,7 @@ export class AnalyticsService {
       categoryBreakdown,
       spendingTrends,
       settlementEfficiency,
-      groupInsights,
+      tripInsights,
       generatedAt: new Date().toISOString()
     };
 
@@ -59,42 +59,38 @@ export class AnalyticsService {
   }
 
   /**
-   * Get group analytics
+   * Get trip analytics
    */
-  async getGroupAnalytics(groupId: string, userId: string, timeframe: 'week' | 'month' | 'year' = 'month'): Promise<any> {
-    // Verify group membership
-    const group = await Group.findOne({
-      groupId,
-      'members.userId': new Types.ObjectId(userId),
-      'members.invitationStatus': 'ACCEPTED'
-    });
+  async getTripAnalytics(tripId: string, userId: string, timeframe: 'week' | 'month' | 'year' = 'month'): Promise<any> {
+    // Verify trip membership
+    const trip = await Trip.findById(tripId);
 
-    if (!group) {
-      throw new NotFoundError('Group not found or you are not a member');
+    if (!trip || !trip.isMember(userId)) {
+      throw new NotFoundError('Trip not found or you are not a member');
     }
 
     const dateFilter = this.getTimeframeFilter(timeframe);
 
-    const cacheKey = `analytics:group:${groupId}:${timeframe}`;
+    const cacheKey = `analytics:trip:${tripId}:${timeframe}`;
     const cached = await redisClient.get(cacheKey);
     if (cached) {
       return JSON.parse(cached);
     }
 
-    // Get group spending overview
-    const overview = await this.getGroupOverview(group._id, dateFilter);
-    
+    // Get trip spending overview
+    const overview = await this.getTripOverview(trip._id, dateFilter);
+
     // Get member contributions
-    const memberContributions = await this.getMemberContributions(group._id, dateFilter);
-    
+    const memberContributions = await this.getMemberContributions(trip._id, dateFilter);
+
     // Get category distribution
-    const categoryDistribution = await this.getGroupCategoryDistribution(group._id, dateFilter);
-    
+    const categoryDistribution = await this.getTripCategoryDistribution(trip._id, dateFilter);
+
     // Get expense timeline
-    const expenseTimeline = await this.getExpenseTimeline(group._id, timeframe);
-    
+    const expenseTimeline = await this.getExpenseTimeline(trip._id, timeframe);
+
     // Get settlement status
-    const settlementStatus = await this.getGroupSettlementStatus(group._id);
+    const settlementStatus = await this.getTripSettlementStatus(trip._id);
 
     const analytics = {
       timeframe,
@@ -103,7 +99,7 @@ export class AnalyticsService {
       categoryDistribution,
       expenseTimeline,
       settlementStatus,
-      groupCurrency: group.settings.defaultCurrency,
+      tripCurrency: trip.baseCurrency,
       generatedAt: new Date().toISOString()
     };
 
@@ -116,15 +112,11 @@ export class AnalyticsService {
   /**
    * Get predictive analytics
    */
-  async getPredictiveAnalytics(userId: string, groupId: string): Promise<any> {
-    const group = await Group.findOne({
-      groupId,
-      'members.userId': new Types.ObjectId(userId),
-      'members.invitationStatus': 'ACCEPTED'
-    });
+  async getPredictiveAnalytics(userId: string, tripId: string): Promise<any> {
+    const trip = await Trip.findById(tripId);
 
-    if (!group) {
-      throw new NotFoundError('Group not found');
+    if (!trip || !trip.isMember(userId)) {
+      throw new NotFoundError('Trip not found or you are not a member');
     }
 
     const sixMonthsAgo = new Date();
@@ -133,9 +125,8 @@ export class AnalyticsService {
     const expenses = await Expense.aggregate([
       {
         $match: {
-          groupId: group._id,
-          'splits.userId': new Types.ObjectId(userId),
-          'metadata.isDeleted': false,
+          tripId: trip._id,
+          'splits.userId': userId,
           createdAt: { $gte: sixMonthsAgo }
         }
       },
@@ -146,7 +137,7 @@ export class AnalyticsService {
             year: { $year: '$createdAt' },
             category: '$category'
           },
-          totalAmount: { $sum: { $toDouble: '$totalAmount' } },
+          totalAmount: { $sum: '$amountBase' },
           count: { $sum: 1 }
         }
       },
@@ -159,7 +150,7 @@ export class AnalyticsService {
     return {
       historicalData: expenses,
       predictions,
-      currency: group.settings.defaultCurrency,
+      currency: trip.baseCurrency,
       generatedAt: new Date().toISOString()
     };
   }
@@ -171,8 +162,10 @@ export class AnalyticsService {
     const pipeline = [
       {
         $match: {
-          'splits.userId': new Types.ObjectId(userId),
-          'metadata.isDeleted': false,
+          $or: [
+            { 'splits.userId': userId },
+            { paidBy: userId }
+          ],
           createdAt: { $gte: dateFilter }
         }
       },
@@ -180,38 +173,35 @@ export class AnalyticsService {
         $facet: {
           consumption: [
             { $unwind: '$splits' },
-            { $match: { 'splits.userId': new Types.ObjectId(userId) } },
-            { $unwind: '$splits.items' },
+            { $match: { 'splits.userId': userId } },
             {
               $group: {
                 _id: null,
-                totalConsumed: { 
-                  $sum: { $toDouble: '$splits.items.amount' } 
-                },
-                categories: { $addToSet: '$splits.items.category' }
+                totalConsumed: { $sum: '$splits.amountBase' },
+                categories: { $addToSet: '$category' }
               }
             }
           ],
           payments: [
-            { $match: { paidBy: new Types.ObjectId(userId) } },
+            { $match: { paidBy: userId } },
             {
               $group: {
                 _id: null,
-                totalPaid: { $sum: { $toDouble: '$totalAmount' } },
+                totalPaid: { $sum: '$amountBase' },
                 count: { $sum: 1 }
               }
             }
           ],
           stats: [
             { $unwind: '$splits' },
-            { $match: { 'splits.userId': new Types.ObjectId(userId) } },
+            { $match: { 'splits.userId': userId } },
             {
               $group: {
                 _id: null,
                 totalExpenses: { $sum: 1 },
-                averageAmount: { $avg: { $toDouble: '$splits.finalAmount' } },
-                maxAmount: { $max: { $toDouble: '$splits.finalAmount' } },
-                minAmount: { $min: { $toDouble: '$splits.finalAmount' } }
+                averageAmount: { $avg: '$splits.amountBase' },
+                maxAmount: { $max: '$splits.amountBase' },
+                minAmount: { $min: '$splits.amountBase' }
               }
             }
           ]
@@ -243,20 +233,17 @@ export class AnalyticsService {
     return Expense.aggregate([
       {
         $match: {
-          'splits.userId': new Types.ObjectId(userId),
-          'metadata.isDeleted': false,
+          'splits.userId': userId,
           createdAt: { $gte: dateFilter }
         }
       },
       { $unwind: '$splits' },
-      { $match: { 'splits.userId': new Types.ObjectId(userId) } },
-      { $unwind: '$splits.items' },
+      { $match: { 'splits.userId': userId } },
       {
         $group: {
-          _id: '$splits.items.category',
-          totalAmount: { $sum: { $toDouble: '$splits.items.amount' } },
-          count: { $sum: 1 },
-          percentage: { $sum: 100 }
+          _id: '$category',
+          totalAmount: { $sum: '$splits.amountBase' },
+          count: { $sum: 1 }
         }
       },
       {
@@ -282,18 +269,19 @@ export class AnalyticsService {
     return Expense.aggregate([
       {
         $match: {
-          'splits.userId': new Types.ObjectId(userId),
-          'metadata.isDeleted': false,
+          'splits.userId': userId,
           createdAt: { $gte: startDate }
         }
       },
+      { $unwind: '$splits' },
+      { $match: { 'splits.userId': userId } },
       {
         $group: {
           _id: {
             year: { $year: '$createdAt' },
             month: { $month: '$createdAt' }
           },
-          totalAmount: { $sum: { $toDouble: '$totalAmount' } },
+          totalAmount: { $sum: '$splits.amountBase' },
           expenseCount: { $sum: 1 },
           uniqueCategories: { $addToSet: '$category' }
         }
@@ -323,24 +311,29 @@ export class AnalyticsService {
     const settlements = await Settlement.aggregate([
       {
         $match: {
-          $or: [
-            { fromUser: new Types.ObjectId(userId) },
-            { toUser: new Types.ObjectId(userId) }
-          ],
           createdAt: { $gte: dateFilter }
+        }
+      },
+      { $unwind: '$transactions' },
+      {
+        $match: {
+          $or: [
+            { 'transactions.from': userId },
+            { 'transactions.to': userId }
+          ]
         }
       },
       {
         $group: {
-          _id: '$status',
+          _id: '$transactions.status',
           count: { $sum: 1 },
-          totalAmount: { $sum: { $toDouble: '$amount' } }
+          totalAmount: { $sum: '$transactions.amountBase' }
         }
       }
     ]);
 
-    const completed = settlements.find(s => s._id === 'COMPLETED') || { count: 0, totalAmount: 0 };
-    const pending = settlements.find(s => s._id === 'PENDING') || { count: 0, totalAmount: 0 };
+    const completed = settlements.find(s => s._id === 'confirmed') || { count: 0, totalAmount: 0 };
+    const pending = settlements.find(s => s._id === 'pending' || s._id === 'initiated') || { count: 0, totalAmount: 0 };
     const total = settlements.reduce((sum, s) => sum + s.count, 0);
 
     return {
@@ -354,64 +347,63 @@ export class AnalyticsService {
   }
 
   /**
-   * Group insights
+   * Trip insights
    */
-  private async getGroupInsights(userId: string, dateFilter: Date): Promise<any> {
-    const groups = await Group.find({
-      'members.userId': new Types.ObjectId(userId),
-      'members.invitationStatus': 'ACCEPTED'
+  private async getTripInsights(userId: string, dateFilter: Date): Promise<any> {
+    const trips = await Trip.find({
+      'members.userId': userId,
+      isArchived: false
     });
 
-    const groupAnalytics = await Promise.all(
-      groups.map(async (group) => {
+    const tripAnalytics = await Promise.all(
+      trips.map(async (trip: any) => {
         const expenses = await Expense.countDocuments({
-          groupId: group._id,
-          'splits.userId': new Types.ObjectId(userId),
-          'metadata.isDeleted': false,
+          tripId: trip._id,
+          'splits.userId': userId,
           createdAt: { $gte: dateFilter }
         });
 
         const totalAmount = await Expense.aggregate([
           {
             $match: {
-              groupId: group._id,
-              'splits.userId': new Types.ObjectId(userId),
-              'metadata.isDeleted': false,
+              tripId: trip._id,
+              'splits.userId': userId,
               createdAt: { $gte: dateFilter }
             }
           },
+          { $unwind: '$splits' },
+          { $match: { 'splits.userId': userId } },
           {
             $group: {
               _id: null,
-              total: { $sum: { $toDouble: '$totalAmount' } }
+              total: { $sum: '$splits.amountBase' }
             }
           }
         ]);
 
         return {
-          groupId: group.groupId,
-          name: group.name,
-          type: group.type,
+          tripId: trip._id,
+          title: trip.title,
+          status: trip.status,
           expenseCount: expenses,
           totalSpent: totalAmount[0]?.total || 0,
-          memberCount: group.members.length,
-          currency: group.settings.defaultCurrency
+          memberCount: trip.members.length,
+          currency: trip.baseCurrency
         };
       })
     );
 
-    return groupAnalytics;
+    return tripAnalytics;
   }
 
   /**
-   * Group overview
+   * Trip overview
    */
-  private async getGroupOverview(groupId: Types.ObjectId, dateFilter: Date): Promise<any> {
+  private async getTripOverview(tripId: Types.ObjectId, dateFilter: Date): Promise<any> {
     return Expense.aggregate([
       {
         $match: {
-          groupId,
-          'metadata.isDeleted': false,
+          tripId,
           createdAt: { $gte: dateFilter }
         }
       },
@@ -419,10 +411,10 @@ export class AnalyticsService {
         $group: {
           _id: null,
           totalExpenses: { $sum: 1 },
-          totalAmount: { $sum: { $toDouble: '$totalAmount' } },
-          averageExpense: { $avg: { $toDouble: '$totalAmount' } },
+          totalAmount: { $sum: '$amountBase' },
+          averageExpense: { $avg: '$amountBase' },
           categories: { $addToSet: '$category' },
-          mostExpensiveCategory: { $max: { $toDouble: '$totalAmount' } }
+          mostExpensiveCategory: { $max: '$amountBase' }
         }
       }
     ]);
@@ -431,12 +423,11 @@ export class AnalyticsService {
   /**
    * Member contributions
    */
-  private async getMemberContributions(groupId: Types.ObjectId, dateFilter: Date): Promise<any> {
+  private async getMemberContributions(tripId: Types.ObjectId, dateFilter: Date): Promise<any> {
     return Expense.aggregate([
       {
         $match: {
-          groupId,
-          'metadata.isDeleted': false,
+          tripId,
           createdAt: { $gte: dateFilter }
         }
       },
@@ -444,25 +435,16 @@ export class AnalyticsService {
       {
         $group: {
           _id: '$splits.userId',
-          totalConsumed: { $sum: { $toDouble: '$splits.finalAmount' } },
+          displayName: { $first: '$splits.displayName' },
+          totalConsumed: { $sum: '$splits.amountBase' },
           expenseCount: { $sum: 1 },
           categories: { $addToSet: '$category' }
         }
       },
       {
-        $lookup: {
-          from: 'users',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'user'
-        }
-      },
-      { $unwind: '$user' },
-      {
         $project: {
           userId: '$_id',
-          firstName: '$user.firstName',
-          lastName: '$user.lastName',
+          displayName: 1,
           totalConsumed: { $round: ['$totalConsumed', 2] },
           expenseCount: 1,
           categoryCount: { $size: '$categories' }
@@ -473,23 +455,20 @@ export class AnalyticsService {
   }
 
   /**
-   * Group category distribution
+   * Trip category distribution
    */
-  private async getGroupCategoryDistribution(groupId: Types.ObjectId, dateFilter: Date): Promise<any> {
+  private async getTripCategoryDistribution(tripId: Types.ObjectId, dateFilter: Date): Promise<any> {
     return Expense.aggregate([
       {
         $match: {
-          groupId,
-          'metadata.isDeleted': false,
+          tripId,
           createdAt: { $gte: dateFilter }
         }
       },
-      { $unwind: '$splits' },
-      { $unwind: '$splits.items' },
       {
         $group: {
-          _id: '$splits.items.category',
-          totalAmount: { $sum: { $toDouble: '$splits.items.amount' } },
+          _id: '$category',
+          totalAmount: { $sum: '$amountBase' },
           count: { $sum: 1 }
         }
       },
@@ -507,7 +486,7 @@ export class AnalyticsService {
   /**
    * Expense timeline
    */
-  private async getExpenseTimeline(groupId: Types.ObjectId, timeframe: string): Promise<any> {
+  private async getExpenseTimeline(tripId: Types.ObjectId, timeframe: string): Promise<any> {
     const months = timeframe === 'year' ? 12 : timeframe === 'month' ? 4 : 1;
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
@@ -515,8 +494,7 @@ export class AnalyticsService {
     return Expense.aggregate([
       {
         $match: {
-          groupId,
-          'metadata.isDeleted': false,
+          tripId,
           createdAt: { $gte: startDate }
         }
       },
@@ -527,7 +505,7 @@ export class AnalyticsService {
             month: { $month: '$createdAt' },
             day: timeframe === 'week' ? { $dayOfMonth: '$createdAt' } : null
           },
-          totalAmount: { $sum: { $toDouble: '$totalAmount' } },
+          totalAmount: { $sum: '$amountBase' },
           count: { $sum: 1 }
         }
       },
@@ -536,18 +514,19 @@ export class AnalyticsService {
   }
 
   /**
-   * Group settlement status
+   * Trip settlement status
    */
-  private async getGroupSettlementStatus(groupId: Types.ObjectId): Promise<any> {
+  private async getTripSettlementStatus(tripId: Types.ObjectId): Promise<any> {
     return Settlement.aggregate([
       {
-        $match: { groupId }
+        $match: { tripId }
       },
+      { $unwind: '$transactions' },
       {
         $group: {
-          _id: '$status',
+          _id: '$transactions.status',
           count: { $sum: 1 },
-          totalAmount: { $sum: { $toDouble: '$amount' } }
+          totalAmount: { $sum: '$transactions.amountBase' }
         }
       }
     ]);
@@ -558,7 +537,7 @@ export class AnalyticsService {
    */
   private calculatePredictions(historicalData: any[]): any {
     const categoryMap = new Map<string, number[]>();
-    
+
     historicalData.forEach(record => {
       const category = record._id.category;
       if (!categoryMap.has(category)) {
@@ -568,16 +547,16 @@ export class AnalyticsService {
     });
 
     const predictions: any = {};
-    
+
     categoryMap.forEach((values, category) => {
       if (values.length >= 3) {
         const n = values.length;
         const xMean = (n - 1) / 2;
         const yMean = values.reduce((a, b) => a + b, 0) / n;
-        
+
         let numerator = 0;
         let denominator = 0;
-        
+
         values.forEach((y, x) => {
           numerator += (x - xMean) * (y - yMean);
           denominator += (x - xMean) ** 2;
@@ -585,7 +564,7 @@ export class AnalyticsService {
 
         const slope = denominator !== 0 ? numerator / denominator : 0;
         const nextMonthPrediction = yMean + slope * n;
-        
+
         predictions[category] = {
           predictedAmount: Math.round(Math.max(0, nextMonthPrediction) * 100) / 100,
           trend: slope > 0.1 ? 'increasing' : slope < -0.1 ? 'decreasing' : 'stable',
@@ -602,7 +581,7 @@ export class AnalyticsService {
    */
   private getTimeframeFilter(timeframe: 'week' | 'month' | 'year'): Date {
     const now = new Date();
-    
+
     switch (timeframe) {
       case 'week':
         now.setDate(now.getDate() - 7);
@@ -614,7 +593,7 @@ export class AnalyticsService {
         now.setFullYear(now.getFullYear() - 1);
         break;
     }
-    
+
     return now;
   }
 }

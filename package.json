@@ -4,7 +4,7 @@
   "description": "WAKERU - Enterprise Financial Ledger & Expense Coordination Platform",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest --coverage",

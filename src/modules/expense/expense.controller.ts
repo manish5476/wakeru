@@ -4,8 +4,8 @@ import {
   CreateExpenseInput,
   UpdateExpenseInput,
   ExpenseListQuery,
-} from './expense.validators';
-import { AppError } from '../utils/AppError';
+} from './expense.validation';
+import { AppError } from '../../shared/errors/AppError';
 
 const getUser = (req: Request) => {
   const user = (req as any).user;
@@ -234,7 +234,7 @@ export const markSplitPaid = async (
 };// import { Request, Response, NextFunction } from 'express';
 // import { expenseService } from './expense.service';
 // import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
-// import { 
+// import {
 //   createExpenseSchema,
 //   updateExpenseSchema,
 //   getExpensesQuerySchema

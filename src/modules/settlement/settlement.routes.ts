@@ -1,7 +1,7 @@
 // import { Router, Request, Response, NextFunction } from 'express';
-// import * as settlementService from './settlement.service';
-// import { authenticate } from '../middleware/authenticate';
-// import { AppError } from '../utils/AppError';
+// // import * as settlementService from './settlement.service';
+// import { AuthMiddleware } from '../auth/auth.middleware';
+// import { AppError } from '../../shared/errors/AppError';
 
 // const getUser = (req: Request) => {
 //     const user = (req as any).user;
@@ -157,7 +157,7 @@
 // // ─────────────────────────────────────────────────────────────────────────────
 
 // const router = Router();
-// router.use(authenticate);
+// router.use(AuthMiddleware.authenticate);
 
 // router.get('/trip/:tripId', getSettlement);
 // router.post('/trip/:tripId/calculate', calculateSettlement);
@@ -166,25 +166,3 @@
 // router.post('/trip/:tripId/dispute/:transactionId', disputePayment);
 
 // export default router;
-
-// // import { Router } from 'express';
-// // import { settlementController } from './settlement.controller';
-// // import { AuthMiddleware } from '../auth/auth.middleware';
-
-// // const router = Router();
-
-// // router.use(AuthMiddleware.authenticate);
-
-// // // Debt management
-// // router.get('/debts/:groupId', settlementController.getSimplifiedDebts.bind(settlementController));
-// // router.get('/debts/:groupId/summary', settlementController.getDebtSummary.bind(settlementController));
-
-// // // Settlement operations
-// // router.post('/', settlementController.createSettlement.bind(settlementController));
-// // router.post('/:settlementId/pay', settlementController.processPayment.bind(settlementController));
-// // router.post('/:settlementId/cancel', settlementController.cancelSettlement.bind(settlementController));
-
-// // // History
-// // router.get('/history/:groupId', settlementController.getSettlementHistory.bind(settlementController));
-
-// // export default router;

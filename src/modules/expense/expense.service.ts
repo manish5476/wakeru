@@ -2,13 +2,13 @@ import { Types, FilterQuery } from 'mongoose';
 import { Expense, IExpense, ISplit } from './expense.model';
 import { Trip } from '../trips/trip.model';
 import { incrementStopTotals, decrementStopTotals } from '../trips/trip.service';
-import { AppError } from '../utils/AppError';
+import { AppError } from '../../shared/errors/AppError';
 import {
   CreateExpenseInput,
   UpdateExpenseInput,
   ExpenseListQuery,
   SplitInput,
-} from './expense.validators';
+} from './expense.validation';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES

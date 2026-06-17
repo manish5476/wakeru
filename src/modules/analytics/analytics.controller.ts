@@ -37,15 +37,15 @@ export class AnalyticsController {
   }
 
   /**
-   * Get group analytics
+   * Get trip analytics
    */
-  async getGroupAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getTripAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { groupId } = req.params;
+      const { tripId } = req.params;
       const timeframe = (req.query.timeframe as string) || 'month';
       
-      const analytics = await analyticsService.getGroupAnalytics(
-        groupId, 
+      const analytics = await analyticsService.getTripAnalytics(
+        tripId, 
         req.user!.userId,
         timeframe as 'week' | 'month' | 'year'
       );
@@ -68,11 +68,11 @@ export class AnalyticsController {
    */
   async getPredictiveAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { groupId } = req.params;
+      const { tripId } = req.params;
       
       const analytics = await analyticsService.getPredictiveAnalytics(
         req.user!.userId,
-        groupId
+        tripId
       );
 
       const response: ApiResponse = {
@@ -93,12 +93,12 @@ export class AnalyticsController {
    */
   async getSpendingReport(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { groupId } = req.params;
+      const { tripId } = req.params;
       const timeframe = (req.query.timeframe as string) || 'month';
       
       // This can generate PDF reports
-      const report = await analyticsService.getGroupAnalytics(
-        groupId,
+      const report = await analyticsService.getTripAnalytics(
+        tripId,
         req.user!.userId,
         timeframe as 'week' | 'month' | 'year'
       );

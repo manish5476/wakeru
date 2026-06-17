@@ -12,12 +12,12 @@ import { publicRateLimiter, authenticatedRateLimiter } from './middleware/rateLi
 // Import routes
 import { authRoutes } from './modules/auth';
 import userRoutes from './modules/user/user.routes';
-import groupRoutes from './modules/group/group.routes';
+import tripRoutes from './modules/trips/trip.routes';
 import expenseRoutes from './modules/expense/expense.routes';
-import settlementRoutes from './modules/settlement/settlement.routes';
+// import settlementRoutes from './modules/settlement/settlement.routes';
 import analyticsRoutes from './modules/analytics/analytics.routes';
 import receiptRoutes from './modules/receipt/receipt.routes';
-import notificationRoutes from './modules/notification/notification.routes';
+// import notificationRoutes from './modules/notification/notification.routes';
 
 const app = express();
 
@@ -58,12 +58,12 @@ app.get('/health', (req, res) => {
 // API routes with idempotency check
 app.use('/api/v1/auth', authenticatedRateLimiter, authRoutes);
 app.use('/api/v1/users', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, userRoutes);
-app.use('/api/v1/groups', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, groupRoutes);
+app.use('/api/v1/trips', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, tripRoutes);
 app.use('/api/v1/expenses', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, expenseRoutes);
-app.use('/api/v1/settlements', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, settlementRoutes);
+// app.use('/api/v1/settlements', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, settlementRoutes);
 app.use('/api/v1/analytics', authenticatedRateLimiter, analyticsRoutes);
 app.use('/api/v1/receipts', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, receiptRoutes);
-app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
+// app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -81,3 +81,6 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 export default app;
+
+
+

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as tripService from './trip.service';
-import { AppError } from '@/shared/errors/AppError';
+import { AppError } from '../../shared/errors/AppError';
 import {
   CreateTripInput,
   UpdateTripInput,
