@@ -1,3 +1,4 @@
+// app/(auth)/register.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -6,13 +7,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Platform,
-  StyleSheet,
 } from 'react-native';
-import { Link } from 'expo-router';
-import { useRegisterMutation } from '../../src/features/auth/hooks/useAuth';
-import { useGoogleAuth } from '../../src/features/auth/hooks/useGoogleAuth';
-import AuthLayout, { COLORS } from '../../src/components/AuthLayout';
+import { Link, useRouter } from 'expo-router';
+import { useRegisterMutation } from '@/features/auth/hooks/useAuth';
+import { useGoogleAuth } from '@/features/auth/hooks/useGoogleAuth';
+import AuthLayout from '@/components/AuthLayout';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -24,6 +23,7 @@ export default function RegisterScreen() {
 
   const registerMutation = useRegisterMutation();
   const { signInWithGoogle, isReady } = useGoogleAuth();
+  const router = useRouter();
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
@@ -34,24 +34,43 @@ export default function RegisterScreen() {
       Alert.alert('Terms Required', 'Please agree to the Terms & Conditions to continue.');
       return;
     }
+    if (password.length < 8) {
+      Alert.alert('Weak Password', 'Password must be at least 8 characters.');
+      return;
+    }
     try {
       await registerMutation.mutateAsync({ name, email, password });
+      router.replace('/(app)');
     } catch (error: any) {
       const message = error.response?.data?.error || error.message || 'Registration failed.';
       Alert.alert('Registration Failed', message);
     }
   };
 
-  return (
-    <AuthLayout title="Create an account" subtitle="Join TripSplit and start splitting elegantly.">
-      <View style={styles.form}>
+  const getInputStyle = (fieldName: string) => {
+    return `flex-row items-center h-14 px-4 bg-surface-1 border-2 rounded-xl transition-all duration-200 ${
+      focusedInput === fieldName
+        ? 'border-brand-primary shadow-glow-brand'
+        : 'border-border-light hover:border-border-default'
+    }`;
+  };
 
+  return (
+    <AuthLayout 
+      title="Create an account" 
+      subtitle="Join TripSplit and start splitting elegantly."
+    >
+      <View className="gap-5">
+        
         {/* ── Full Name ─────────────────────────────── */}
-        <View>
-          <Text style={styles.label}>FULL NAME</Text>
-          <View style={[styles.inputWrap, focusedInput === 'name' && styles.inputWrapFocused]}>
+        <View className="animate-slide-up">
+          <Text className="text-xs font-semibold text-text-tertiary tracking-widest uppercase mb-2">
+            Full Name
+          </Text>
+          <View className={getInputStyle('name')}>
+            <Text className="text-lg mr-3 opacity-40">👤</Text>
             <TextInput
-              style={styles.input}
+              className="flex-1 font-sans text-base text-text-primary"
               placeholder="e.g., John Doe"
               placeholderTextColor="#A8A29E"
               value={name}
@@ -59,16 +78,26 @@ export default function RegisterScreen() {
               onFocus={() => setFocusedInput('name')}
               onBlur={() => setFocusedInput(null)}
               autoCapitalize="words"
+              accessibilityLabel="Full name"
+              accessibilityHint="Enter your full name"
             />
+            {name.length > 0 && (
+              <TouchableOpacity onPress={() => setName('')} className="p-1">
+                <Text className="text-text-quaternary text-base">✕</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
         {/* ── Email ─────────────────────────────────── */}
-        <View>
-          <Text style={styles.label}>EMAIL ADDRESS</Text>
-          <View style={[styles.inputWrap, focusedInput === 'email' && styles.inputWrapFocused]}>
+        <View className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <Text className="text-xs font-semibold text-text-tertiary tracking-widest uppercase mb-2">
+            Email Address
+          </Text>
+          <View className={getInputStyle('email')}>
+            <Text className="text-lg mr-3 opacity-40">✉️</Text>
             <TextInput
-              style={styles.input}
+              className="flex-1 font-sans text-base text-text-primary"
               placeholder="e.g., hello@tripsplit.com"
               placeholderTextColor="#A8A29E"
               value={email}
@@ -77,16 +106,27 @@ export default function RegisterScreen() {
               onBlur={() => setFocusedInput(null)}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoComplete="email"
+              accessibilityLabel="Email address"
+              accessibilityHint="Enter your email address"
             />
+            {email.length > 0 && (
+              <TouchableOpacity onPress={() => setEmail('')} className="p-1">
+                <Text className="text-text-quaternary text-base">✕</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
         {/* ── Password ──────────────────────────────── */}
-        <View>
-          <Text style={styles.label}>PASSWORD</Text>
-          <View style={[styles.inputWrap, focusedInput === 'password' && styles.inputWrapFocused]}>
+        <View className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <Text className="text-xs font-semibold text-text-tertiary tracking-widest uppercase mb-2">
+            Password
+          </Text>
+          <View className={getInputStyle('password')}>
+            <Text className="text-lg mr-3 opacity-40">🔒</Text>
             <TextInput
-              style={[styles.input, { flex: 1 }]}
+              className="flex-1 font-sans text-base text-text-primary"
               placeholder="Min. 8 characters"
               placeholderTextColor="#A8A29E"
               value={password}
@@ -94,64 +134,149 @@ export default function RegisterScreen() {
               onFocus={() => setFocusedInput('password')}
               onBlur={() => setFocusedInput(null)}
               secureTextEntry={secureText}
+              autoComplete="new-password"
+              accessibilityLabel="Password"
+              accessibilityHint="Create a password with at least 8 characters"
             />
-            <TouchableOpacity onPress={() => setSecureText(!secureText)} style={styles.eyeBtn}>
-              <Text style={styles.eyeIcon}>{secureText ? '👁' : '🙈'}</Text>
+            <TouchableOpacity 
+              onPress={() => setSecureText(!secureText)} 
+              className="p-2"
+              accessibilityLabel={secureText ? "Show password" : "Hide password"}
+            >
+              <Text className="text-lg opacity-50">{secureText ? '👁️' : '🙈'}</Text>
             </TouchableOpacity>
           </View>
+          {/* Password strength indicator */}
+          {password.length > 0 && (
+            <View className="mt-2">
+              <View className="flex-row gap-1 mb-1">
+                {[1, 2, 3, 4].map((level) => (
+                  <View
+                    key={level}
+                    className={`flex-1 h-1 rounded-full ${
+                      password.length >= level * 3
+                        ? level <= 2
+                          ? 'bg-red-400'
+                          : level === 3
+                          ? 'bg-yellow-400'
+                          : 'bg-green-400'
+                        : 'bg-border-light'
+                    }`}
+                  />
+                ))}
+              </View>
+              <Text className="text-xs text-text-quaternary">
+                {password.length < 4
+                  ? 'Too weak'
+                  : password.length < 8
+                  ? 'Could be stronger'
+                  : password.length < 12
+                  ? 'Strong password'
+                  : 'Very strong password'}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* ── Terms Checkbox ────────────────────────── */}
-        <TouchableOpacity style={styles.checkboxRow} onPress={() => setAgreed(!agreed)} activeOpacity={0.7}>
-          <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-            {agreed && <Text style={styles.checkmark}>✓</Text>}
+        <TouchableOpacity 
+          className="animate-slide-up flex-row items-center gap-3 py-2"
+          onPress={() => setAgreed(!agreed)} 
+          activeOpacity={0.7}
+          style={{ animationDelay: '300ms' }}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: agreed }}
+        >
+          <View className={`w-5 h-5 rounded-md border-2 items-center justify-center transition-all duration-200 ${
+            agreed 
+              ? 'bg-brand-primary border-brand-primary' 
+              : 'bg-surface-1 border-border-default'
+          }`}>
+            {agreed && <Text className="text-white text-xs font-bold">✓</Text>}
           </View>
-          <Text style={styles.checkboxText}>
+          <Text className="flex-1 font-sans text-sm text-text-secondary leading-5">
             I agree to the{' '}
-            <Text style={styles.checkboxLink}>Terms & Conditions</Text>
+            <Text className="text-brand-primary font-semibold">Terms & Conditions</Text>
+            {' '}and{' '}
+            <Text className="text-brand-primary font-semibold">Privacy Policy</Text>
           </Text>
         </TouchableOpacity>
 
         {/* ── Register Button ───────────────────────── */}
         <TouchableOpacity
-          style={[styles.primaryBtn, registerMutation.isPending && styles.primaryBtnDisabled]}
+          className={`animate-slide-up h-14 bg-brand-primary rounded-xl items-center justify-center mt-2
+            shadow-lg shadow-brand-primary/20 transition-all duration-200
+            hover:bg-brand-primary-hover hover:shadow-xl hover:shadow-brand-primary/30
+            active:scale-[0.98]
+            ${registerMutation.isPending ? 'opacity-70' : 'opacity-100'}
+          `}
+          style={{ animationDelay: '400ms' }}
           onPress={handleRegister}
           disabled={registerMutation.isPending}
+          accessibilityRole="button"
+          accessibilityLabel="Create account"
+          accessibilityState={{ disabled: registerMutation.isPending }}
         >
-          {registerMutation.isPending
-            ? <ActivityIndicator color="#FFFFFF" />
-            : <Text style={styles.primaryBtnText}>Create Account</Text>
-          }
+          {registerMutation.isPending ? (
+            <ActivityIndicator color="white" size="small" />
+          ) : (
+            <Text className="font-sans text-base font-bold text-white tracking-wide">
+              Create Account
+            </Text>
+          )}
         </TouchableOpacity>
 
         {/* ── Divider ───────────────────────────────── */}
-        <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>Or continue with</Text>
-          <View style={styles.dividerLine} />
+        <View className="animate-fade-in flex-row items-center gap-4 my-1" 
+              style={{ animationDelay: '500ms' }}>
+          <View className="flex-1 h-px bg-border-light" />
+          <Text className="font-sans text-sm text-text-quaternary font-medium">
+            Or continue with
+          </Text>
+          <View className="flex-1 h-px bg-border-light" />
         </View>
 
         {/* ── Social Buttons ────────────────────────── */}
-        <View style={styles.socialRow}>
+        <View className="animate-slide-up flex-row justify-center gap-4" 
+              style={{ animationDelay: '600ms' }}>
+          {/* Google */}
           <TouchableOpacity
-            style={styles.socialBtn}
             onPress={() => signInWithGoogle()}
             disabled={!isReady}
+            className={`w-14 h-14 rounded-xl border-2 border-border-light bg-surface-1
+              items-center justify-center transition-all duration-200
+              hover:border-brand-primary hover:bg-brand-primary-light hover:scale-105
+              active:scale-95
+              ${!isReady ? 'opacity-50' : 'opacity-100'}
+            `}
+            accessibilityLabel="Sign up with Google"
           >
-            <Text style={styles.socialIcon}>G</Text>
+            <Text className="font-display text-xl font-bold text-text-primary">G</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialIcon}>🍏</Text>
+          {/* Apple */}
+          <TouchableOpacity
+            className="w-14 h-14 rounded-xl border-2 border-border-light bg-surface-1 
+              items-center justify-center transition-all duration-200
+              hover:border-text-primary hover:bg-surface-2 hover:scale-105
+              active:scale-95"
+            accessibilityLabel="Sign up with Apple"
+          >
+            <Text className="font-display text-xl font-bold text-text-primary">🍎</Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Footer ────────────────────────────────── */}
-        <View style={styles.footerRow}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+        <View className="animate-fade-in flex-row justify-center pt-2" 
+              style={{ animationDelay: '700ms' }}>
+          <Text className="font-sans text-sm text-text-tertiary">
+            Already have an account?{' '}
+          </Text>
           <Link href="/(auth)/login" asChild>
             <TouchableOpacity>
-              <Text style={styles.footerLink}>Sign In</Text>
+              <Text className="font-sans text-sm font-bold text-brand-primary hover:text-brand-primary-hover">
+                Sign In
+              </Text>
             </TouchableOpacity>
           </Link>
         </View>
@@ -160,151 +285,3 @@ export default function RegisterScreen() {
     </AuthLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  form: {
-    gap: 18,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.textMuted,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  inputWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 52,
-    backgroundColor: COLORS.input,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  inputWrapFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.inputFocus,
-  },
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: COLORS.text,
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
-  },
-  eyeBtn: {
-    padding: 4,
-    marginLeft: 4,
-    opacity: 0.55,
-  },
-  eyeIcon: {
-    fontSize: 14,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.input,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  checkboxChecked: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  checkmark: {
-    fontSize: 11,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  checkboxText: {
-    fontSize: 13,
-    color: COLORS.textMuted,
-    flex: 1,
-    lineHeight: 20,
-  },
-  checkboxLink: {
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  primaryBtn: {
-    height: 54,
-    backgroundColor: COLORS.primary,
-    borderRadius: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 6,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  primaryBtnDisabled: {
-    opacity: 0.7,
-  },
-  primaryBtnText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.4,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginVertical: 4,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  dividerText: {
-    fontSize: 12,
-    color: COLORS.textMuted,
-    fontWeight: '500',
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  socialBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 100,
-    backgroundColor: COLORS.input,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  socialIcon: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 6,
-  },
-  footerText: {
-    fontSize: 13,
-    color: COLORS.textMuted,
-  },
-  footerLink: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-});

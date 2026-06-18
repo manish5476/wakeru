@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswor
 import { auth } from '../../../config/firebase';
 import apiClient from '../../../services/api-client';
 import { useAuthStore } from '../authStore';
+import { useRouter } from 'expo-router';
 
 export const useRegisterMutation = () => {
   const setSession = useAuthStore((state) => state.setSession);
@@ -35,6 +36,7 @@ export const useRegisterMutation = () => {
 
 export const useLoginMutation = () => {
   const setSession = useAuthStore((state) => state.setSession);
+  const router = useRouter();
 
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
@@ -51,6 +53,7 @@ export const useLoginMutation = () => {
     onSuccess: (data) => {
       if (data.success && data.data) {
         setSession(data.data.user, data.data.tokens.accessToken);
+        router.replace('/(app)');
       }
     },
   });

@@ -1,294 +1,336 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}"
+  ],
+  
   presets: [require("nativewind/preset")],
-  darkMode: 'class', // Enables switching themes via a 'dark' class on the root element
+  
+  darkMode: 'class',
+  
   theme: {
     extend: {
-      // --- 1. DYNAMIC THEME TOKENS (Mapped to CSS Variables) ---
-      // These will automatically change whether you are in Light, Dark, Desert, or Forest theme!
+      // ═══════════════════════════════════════════
+      // 1. DYNAMIC COLOR TOKENS (CSS Variables)
+      // ═══════════════════════════════════════════
       colors: {
-        background: 'var(--color-background)', 
-        surface: {
-          DEFAULT: 'var(--color-surface)',     
-          hover: 'var(--color-surface-hover)', 
-        },
+        // Brand colors
         brand: {
-          DEFAULT: 'var(--color-brand)',       
-          light: 'var(--color-brand-light)',   
-          glow: 'var(--color-brand-glow)',     
-        },
-        text: {
-          main: 'var(--color-text-main)',      
-          muted: 'var(--color-text-muted)',    
-          faint: 'var(--color-text-faint)',    
-          inverse: 'var(--color-text-inverse)',
-        },
-        border: {
-          DEFAULT: 'var(--color-border)',
-          light: 'var(--color-border-light)',
-          focus: 'var(--color-border-focus)',
+          primary: 'var(--brand-primary)',
+          'primary-hover': 'var(--brand-primary-hover)',
+          'primary-active': 'var(--brand-primary-active)',
+          'primary-light': 'var(--brand-primary-light)',
+          'primary-glow': 'var(--brand-primary-glow)',
+          secondary: 'var(--brand-secondary)',
+          accent: 'var(--brand-accent)',
         },
         
-        // --- 2. STATIC BRAND/NEUTRAL SCALES ---
-        // Use these when you need an exact color regardless of the theme
-        primary: {
-          50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
-          400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c',
-          800: '#9a3412', 900: '#7c2d12',
+        // Surface hierarchy
+        surface: {
+          0: 'var(--surface-0)',
+          1: 'var(--surface-1)',
+          2: 'var(--surface-2)',
+          3: 'var(--surface-3)',
+          glass: 'var(--surface-glass)',
+          'glass-dark': 'var(--surface-glass-dark)',
         },
+        
+        // Text hierarchy
+        text: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+          quaternary: 'var(--text-quaternary)',
+          inverse: 'var(--text-inverse)',
+          brand: 'var(--text-brand)',
+          link: 'var(--text-link)',
+        },
+        
+        // Border system
+        border: {
+          light: 'var(--border-light)',
+          default: 'var(--border-default)',
+          strong: 'var(--border-strong)',
+          focus: 'var(--border-focus)',
+          error: 'var(--border-error)',
+        },
+        
+        // Semantic colors (not themed)
+        success: {
+          DEFAULT: '#10B981',
+          bg: 'rgba(16, 185, 129, 0.1)',
+          border: '#34D399',
+          text: '#065F46',
+        },
+        error: {
+          DEFAULT: '#EF4444',
+          bg: 'rgba(239, 68, 68, 0.1)',
+          border: '#F87171',
+          text: '#991B1B',
+        },
+        warning: {
+          DEFAULT: '#F59E0B',
+          bg: 'rgba(245, 158, 11, 0.1)',
+          border: '#FBBF24',
+          text: '#92400E',
+        },
+        info: {
+          DEFAULT: '#3B82F6',
+          bg: 'rgba(59, 130, 246, 0.1)',
+          border: '#60A5FA',
+          text: '#1E40AF',
+        },
+        
+        // Static color scales (not themed)
         neutral: {
-          50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
-          400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
-          800: '#1e293b', 900: '#0f172a', 950: '#020617',
+          50: '#FAFAFA',
+          100: '#F5F5F5',
+          200: '#E5E5E5',
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
+          950: '#0A0A0A',
         },
-        // Semantic Alerts
-        success: { DEFAULT: '#10B981', bg: 'rgba(16, 185, 129, 0.1)', border: '#34d399' },
-        error: { DEFAULT: '#EF4444', bg: 'rgba(239, 68, 68, 0.1)', border: '#f87171' },
-        warning: { DEFAULT: '#F59E0B', bg: 'rgba(254, 243, 199, 0.5)', border: '#fbbf24' },
+        
+        transparent: 'transparent',
+        current: 'currentColor',
       },
 
-      // --- 3. LUXURY TYPOGRAPHY SCALES ---
+      // ═══════════════════════════════════════════
+      // 2. TYPOGRAPHY SYSTEM
+      // ═══════════════════════════════════════════
       fontFamily: {
-        display: ['Outfit', 'Georgia', 'serif'],
-        body: ['Inter', 'System', 'sans-serif'],
-        mono: ['Menlo', 'monospace'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'Menlo', 'monospace'],
       },
+      
       fontSize: {
-        'xs': ['11px', { lineHeight: '14px', letterSpacing: '0.05em' }],
-        'sm': ['13px', { lineHeight: '18px', letterSpacing: '0.01em' }],
-        'base': ['15px', { lineHeight: '22px', letterSpacing: '0em' }],
-        'lg': ['18px', { lineHeight: '26px', letterSpacing: '-0.01em' }],
-        'xl': ['24px', { lineHeight: '30px', letterSpacing: '-0.02em' }],
-        '2xl': ['32px', { lineHeight: '38px', letterSpacing: '-0.03em' }],
-        '3xl': ['42px', { lineHeight: '48px', letterSpacing: '-0.04em' }],
-        'hero': ['48px', { lineHeight: '54px', letterSpacing: '-0.04em' }],
+        'xs': ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.05em' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.01em' }],
+        'base': ['1rem', { lineHeight: '1.5rem', letterSpacing: '0' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem', letterSpacing: '-0.01em' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem', letterSpacing: '-0.01em' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem', letterSpacing: '-0.02em' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem', letterSpacing: '-0.02em' }],
+        '4xl': ['2.25rem', { lineHeight: '2.75rem', letterSpacing: '-0.03em' }],
+        '5xl': ['3rem', { lineHeight: '3.5rem', letterSpacing: '-0.03em' }],
+        '6xl': ['3.75rem', { lineHeight: '4.25rem', letterSpacing: '-0.04em' }],
+        'hero': ['4.5rem', { lineHeight: '5rem', letterSpacing: '-0.04em' }],
+      },
+      
+      fontWeight: {
+        thin: '100',
+        extralight: '200',
+        light: '300',
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
+        black: '900',
+      },
+      
+      lineHeight: {
+        tight: 'var(--leading-tight)',
+        snug: 'var(--leading-snug)',
+        normal: 'var(--leading-normal)',
+        relaxed: 'var(--leading-relaxed)',
+        loose: 'var(--leading-loose)',
+      },
+      
+      letterSpacing: {
+        tighter: 'var(--tracking-tighter)',
+        tight: 'var(--tracking-tight)',
+        normal: 'var(--tracking-normal)',
+        wide: 'var(--tracking-wide)',
+        wider: 'var(--tracking-wider)',
+        widest: 'var(--tracking-widest)',
       },
 
-      // --- 4. PREMIUM RADII (Soft & Rounded) ---
-      borderRadius: {
-        'none': '0',
-        'sm': '8px',
-        'DEFAULT': '12px',
-        'md': '16px',
-        'lg': '24px',
-        'xl': '32px',
-        '2xl': '40px',
-        'pill': '9999px',
-      },
-
-      // --- 5. EXACT SPACING SCALES ---
+      // ═══════════════════════════════════════════
+      // 3. SPACING SCALE
+      // ═══════════════════════════════════════════
       spacing: {
-        'xs': '4px',
-        'sm': '8px',
-        'md': '16px',
-        'lg': '24px',
-        'xl': '32px',
-        'xxl': '48px',
-        '112': '28rem', 
+        '0': 'var(--space-0)',
+        '1': 'var(--space-1)',
+        '2': 'var(--space-2)',
+        '3': 'var(--space-3)',
+        '4': 'var(--space-4)',
+        '5': 'var(--space-5)',
+        '6': 'var(--space-6)',
+        '8': 'var(--space-8)',
+        '10': 'var(--space-10)',
+        '12': 'var(--space-12)',
+        '16': 'var(--space-16)',
+        '20': 'var(--space-20)',
+        '24': 'var(--space-24)',
+        '32': 'var(--space-32)',
+        '112': '28rem',
         '128': '32rem',
       },
 
-      // --- 6. DIFFUSED SHADOWS (For Glassmorphism & Elevation) ---
-      boxShadow: {
-        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'soft': '0 4px 20px rgba(0, 0, 0, 0.03)',
-        'card': '0 10px 30px rgba(0, 0, 0, 0.06)',
-        'float': '0 12px 32px rgba(0, 0, 0, 0.08)',
-        'nav': '0 20px 40px rgba(0, 0, 0, 0.25)',
-        'glow-brand': '0 12px 24px -8px var(--color-brand-glow)',
+      // ═══════════════════════════════════════════
+      // 4. BORDER RADIUS
+      // ═══════════════════════════════════════════
+      borderRadius: {
+        'none': 'var(--radius-none)',
+        'xs': 'var(--radius-xs)',
+        'sm': 'var(--radius-sm)',
+        'DEFAULT': 'var(--radius-md)',
+        'md': 'var(--radius-md)',
+        'lg': 'var(--radius-lg)',
+        'xl': 'var(--radius-xl)',
+        '2xl': 'var(--radius-2xl)',
+        '3xl': 'var(--radius-3xl)',
+        'full': 'var(--radius-full)',
       },
 
-      // --- 7. RESPONSIVE BREAKPOINTS (For Web/App parity) ---
-      screens: {
-        'md': '768px',   // Tablet boundary (triggers split-screen web layouts)
-        'lg': '1024px',  // Desktop boundary
+      // ═══════════════════════════════════════════
+      // 5. SHADOWS / ELEVATION
+      // ═══════════════════════════════════════════
+      boxShadow: {
+        'xs': 'var(--shadow-xs)',
+        'sm': 'var(--shadow-sm)',
+        'DEFAULT': 'var(--shadow-md)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
+        'xl': 'var(--shadow-xl)',
+        '2xl': 'var(--shadow-2xl)',
+        'glow-brand': 'var(--shadow-glow-brand)',
+        'float': 'var(--shadow-float)',
+      },
+
+      // ═══════════════════════════════════════════
+      // 6. ANIMATION
+      // ═══════════════════════════════════════════
+      transitionDuration: {
+        'instant': 'var(--duration-instant)',
+        'fast': 'var(--duration-fast)',
+        'normal': 'var(--duration-normal)',
+        'slow': 'var(--duration-slow)',
+        'very-slow': 'var(--duration-very-slow)',
       },
       
-      // --- 8. Z-INDEX (Layering System) ---
+      transitionTimingFunction: {
+        'default': 'var(--ease-default)',
+        'in': 'var(--ease-in)',
+        'out': 'var(--ease-out)',
+        'in-out': 'var(--ease-in-out)',
+        'spring': 'var(--ease-spring)',
+        'bounce': 'var(--ease-bounce)',
+      },
+      
+      keyframes: {
+        'slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'slide-down': {
+          '0%': { opacity: '0', transform: 'translateY(-16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'slide-left': {
+          '0%': { opacity: '0', transform: 'translateX(16px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'scale-in': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { boxShadow: '0 0 0 0 var(--brand-primary-glow)' },
+          '50%': { boxShadow: '0 0 0 12px transparent' },
+        },
+      },
+      
+      animation: {
+        'slide-up': 'slide-up var(--duration-normal) var(--ease-out)',
+        'slide-down': 'slide-down var(--duration-normal) var(--ease-out)',
+        'slide-left': 'slide-left var(--duration-normal) var(--ease-out)',
+        'fade-in': 'fade-in var(--duration-normal) var(--ease-out)',
+        'scale-in': 'scale-in var(--duration-normal) var(--ease-spring)',
+        'float': 'float 3s var(--ease-in-out) infinite',
+        'pulse-glow': 'pulse-glow 2s var(--ease-in-out) infinite',
+      },
+
+      // ═══════════════════════════════════════════
+      // 7. LAYOUT & SIZING
+      // ═══════════════════════════════════════════
+      screens: {
+        'xs': '480px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
+      },
+      
+      maxWidth: {
+        'container-sm': 'var(--container-sm)',
+        'container-md': 'var(--container-md)',
+        'container-lg': 'var(--container-lg)',
+        'container-xl': 'var(--container-xl)',
+        'container-2xl': 'var(--container-2xl)',
+      },
+
+      // ═══════════════════════════════════════════
+      // 8. Z-INDEX
+      // ═══════════════════════════════════════════
       zIndex: {
-        '0': '0',
-        '10': '10',   // Sticky headers
-        '20': '20',   // Overlays / Backdrops
-        '30': '30',   // Floating Action Buttons (FAB)
-        '40': '40',   // Modals / Bottom Sheets
-        '50': '50',   // Toasts / Notifications
+        '0': 'var(--z-base)',
+        '10': 'var(--z-docked)',
+        '20': 'var(--z-dropdown)',
+        '30': 'var(--z-sticky)',
+        '40': 'var(--z-overlay)',
+        '50': 'var(--z-modal)',
+        '60': 'var(--z-toast)',
+        '70': 'var(--z-tooltip)',
       },
     },
   },
-  plugins: [],
-}
-// /** @type {import('tailwindcss').Config} */
-// module.exports = {
-//   content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
-//   presets: [require("nativewind/preset")],
-//   darkMode: 'class',
-//   theme: {
-//     extend: {
-//       colors: {
-//         // --- 1. CORE BRAND SCALES ---
-//         primary: {
-//           50: '#fff7ed',
-//           100: '#ffedd5',
-//           200: '#fed7aa',
-//           300: '#fdba74',
-//           400: '#fb923c',      // Light Orange
-//           500: '#f97316',      // Brand Base (Orange)
-//           600: '#ea580c',
-//           700: '#c2410c',
-//           800: '#9a3412',
-//           900: '#7c2d12',
-//           DEFAULT: '#f97316',
-//           foreground: '#ffffff',
-//         },
-//         // Auth Section Theme - Premium Desert
-//         auth: {
-//           bg: '#F7F6F3',         // Soft off-white background
-//           card: '#FFFFFF',       // Pure white cards
-//           primary: '#DE6B48',    // Rich terracotta
-//           text: '#1C1917',       // Deep charcoal
-//           textMuted: '#78716C',  // Warm gray for subtitles/placeholders
-//           input: '#F4F5F7',      // Soft neutral input background
-//           border: '#E5E5E5',     // Soft divider border
-//         },
-
-//         secondary: {
-//           50: '#faf5ff',
-//           100: '#f3e8ff',
-//           500: '#a855f7',      // Purple
-//           600: '#9333ea',
-//           900: '#581c87',
-//           DEFAULT: '#a855f7',
-//           foreground: '#ffffff',
-//         },
-
-//         accent: {
-//           50: '#f0fdfa',
-//           500: '#14b8a6',      // Teal
-//           900: '#134e4a',
-//           DEFAULT: '#14b8a6',
-//         },
-        
-//         // --- 2. NEUTRAL/GRAY SCALES (For UI depth, borders, text hierarchy) ---
-//         neutral: {
-//           50: '#f8fafc',
-//           100: '#f1f5f9',
-//           200: '#e2e8f0',
-//           300: '#cbd5e1',
-//           400: '#94a3b8',
-//           500: '#64748b',
-//           600: '#475569',
-//           700: '#334155',
-//           800: '#1e293b',
-//           900: '#0f172a',
-//           950: '#020617', // Deepest background
-//         },
-
-//         // --- 3. SEMANTIC ALERTS & STATES ---
-//         success: { DEFAULT: '#10B981', background: '#d1fae5', border: '#34d399' },
-//         error: { DEFAULT: '#EF4444', background: '#fee2e2', border: '#f87171' },
-//         warning: { DEFAULT: '#F59E0B', background: '#fef3c7', border: '#fbbf24' },
-//         info: { DEFAULT: '#3B82F6', background: '#dbeafe', border: '#60a5fa' },
-
-//         // --- 4. ALIASED TOKENS (Abstracted for easy Dark/Light switching) ---
-//         background: '#020617', // Deep dark mode base
-//         surface: {
-//           DEFAULT: '#0f172a',  // Cards, Modals
-//           light: '#1e293b',    // Hover states, elevated cards
-//           dark: '#020617',
-//         },
-//         border: {
-//           DEFAULT: '#1e293b',
-//           focus: '#fb923c',    // Focus ring matches light orange
-//         },
-//         text: {
-//           DEFAULT: '#f8fafc',  // Primary Text
-//           muted: '#94a3b8',    // Secondary Text / Subtitles
-//           inverse: '#0f172a',  // Dark text on light backgrounds
-//         },
-//         textMuted: '#94a3b8', // Backward compatibility for existing screens
-//       },
-
-//       // --- 5. TYPOGRAPHY SCALES ---
-//       fontFamily: {
-//         sans: ['Inter', 'System', 'sans-serif'],
-//         bold: ['InterBold', 'System', 'sans-serif'],
-//         mono: ['Menlo', 'monospace'],
-//       },
-//       fontSize: {
-//         'xs': ['12px', { lineHeight: '16px', letterSpacing: '0.01em' }],
-//         'sm': ['14px', { lineHeight: '20px', letterSpacing: '0.01em' }],
-//         'base': ['16px', { lineHeight: '24px', letterSpacing: '0em' }],
-//         'lg': ['18px', { lineHeight: '28px', letterSpacing: '-0.01em' }],
-//         'xl': ['20px', { lineHeight: '28px', letterSpacing: '-0.01em' }],
-//         '2xl': ['24px', { lineHeight: '32px', letterSpacing: '-0.02em' }],
-//         '3xl': ['30px', { lineHeight: '36px', letterSpacing: '-0.02em' }],
-//         '4xl': ['36px', { lineHeight: '40px', letterSpacing: '-0.03em' }],
-//         '5xl': ['48px', { lineHeight: '48px', letterSpacing: '-0.04em' }],
-//       },
-
-//       // --- 6. SPACING, PADDING, BORDER WIDTHS ---
-//       borderWidth: {
-//         '3': '3px',
-//         '0.5': '0.5px',
-//       },
-//       spacing: {
-//         '4.5': '1.125rem', // 18px
-//         '18': '4.5rem',    // 72px
-//         '22': '5.5rem',    // 88px
-//         '26': '6.5rem',
-//         '30': '7.5rem',
-//         '112': '28rem',    // 448px (Standard Max Width for forms)
-//         '128': '32rem',
-//       },
-
-//       // --- 7. RADII (Border Radius) ---
-//       borderRadius: {
-//         'none': '0',
-//         'sm': '4px',
-//         DEFAULT: '8px',
-//         'md': '12px',
-//         'lg': '16px',
-//         'xl': '20px',
-//         '2xl': '24px',
-//         '3xl': '32px',
-//         '4xl': '40px',
-//         'full': '9999px',
-//       },
-
-//       // --- 8. SHADOWS / ELEVATION ---
-//       boxShadow: {
-//         'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-//         DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
-//         'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
-//         'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
-//         'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-//         '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-//         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)', // Deep shadow for glassmorphism panels
-//         'glow-primary': '0 0 15px -3px rgba(249, 115, 22, 0.4)', // Orange glow
-//         'none': '0 0 #0000',
-//       },
-
-//       // --- 9. Z-INDEX (Layering System) ---
-//       zIndex: {
-//         '0': '0',
-//         '10': '10',   // Sticky headers
-//         '20': '20',   // Overlays / Backdrops
-//         '30': '30',   // Floating Action Buttons (FAB)
-//         '40': '40',   // Modals / Bottom Sheets
-//         '50': '50',   // Toasts / Notifications / Popovers
-//       },
-
-//       // --- 10. OPACITY (For Glassmorphism & Overlays) ---
-//       opacity: {
-//         '3': '0.03',
-//         '5': '0.05',
-//         '15': '0.15',
-//         '85': '0.85',
-//         '95': '0.95',
-//       }
-//     },
-//   },
-//   plugins: [],
-// }
-
+  
+  plugins: [
+    // Custom plugin for TripSplit utilities
+    function({ addUtilities, addComponents, theme }) {
+      addUtilities({
+        '.text-balance': {
+          'text-wrap': 'balance',
+        },
+        '.text-pretty': {
+          'text-wrap': 'pretty',
+        },
+        '.scrollbar-hide': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+      });
+      
+      addComponents({
+        '.glassmorphism': {
+          'backdrop-filter': 'blur(20px)',
+          'background': 'var(--surface-glass)',
+          'border': '1px solid rgba(255, 255, 255, 0.2)',
+          'box-shadow': 'var(--shadow-lg)',
+        },
+      });
+    },
+  ],
+};
