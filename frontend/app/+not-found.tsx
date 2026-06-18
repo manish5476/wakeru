@@ -8,11 +8,11 @@ export default function NotFoundScreen() {
 
   return (
     <>
-      <Stack.Screen 
-        options={{ 
+      <Stack.Screen
+        options={{
           title: 'Oops!',
           headerShown: false,
-        }} 
+        }}
       />
       <View className="flex-1 justify-center items-center bg-surface-0 px-8">
         {/* 404 Illustration */}
@@ -21,10 +21,10 @@ export default function NotFoundScreen() {
           <Text className="text-8xl font-bold text-brand-primary font-display opacity-80">
             404
           </Text>
-          
+
           {/* Decorative element */}
           <View className="w-16 h-1 bg-brand-primary rounded-full" />
-          
+
           {/* Message */}
           <Text className="text-2xl font-bold text-text-primary font-display text-center">
             Lost your way?
@@ -38,7 +38,7 @@ export default function NotFoundScreen() {
         <View className="gap-4 w-full max-w-[280px]">
           {/* Go Home */}
           <Link href="/" asChild>
-            <TouchableOpacity 
+            <TouchableOpacity
               className="h-14 bg-brand-primary rounded-full items-center justify-center shadow-lg shadow-brand-primary/25 active:scale-[0.98] transition-transform"
               accessibilityLabel="Go to home page"
             >
