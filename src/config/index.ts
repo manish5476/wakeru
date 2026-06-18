@@ -11,7 +11,7 @@ export const config = {
   API_VERSION: process.env.API_VERSION || 'v1',
 
   // MongoDB
-  MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/wakeru_local_db',
+  MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb+srv://dummymailme_db_user:w40EUbHTeAalEkiX@wareku.mxusxdr.mongodb.net/?appName=wareku',
   MONGO_ROOT_USER: process.env.MONGO_ROOT_USER,
   MONGO_ROOT_PASSWORD: process.env.MONGO_ROOT_PASSWORD,
 
