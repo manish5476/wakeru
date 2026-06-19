@@ -1,124 +1,44 @@
 import { Request, Response, NextFunction } from 'express';
 import { analyticsService } from './analytics.service';
-import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
-import { ValidationError } from '../../shared/errors/AppError';
-import Joi from 'joi';
 
-const timeframeSchema = Joi.string().valid('week', 'month', 'year').default('month');
+const getUser = (req: Request) => {
+  const user = (req as any).user;
+  if (!user?.userId) throw new Error('Not authenticated');
+  return user.userId;
+};
 
-export class AnalyticsController {
-  /**
-   * Get user analytics
-   */
-  async getUserAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+export const analyticsController = {
+  async getQuickStats(req: Request, res: Response, next: NextFunction) {
     try {
-      const timeframe = (req.query.timeframe as string) || 'month';
-      const { error } = timeframeSchema.validate(timeframe);
-      if (error) {
-        throw new ValidationError('Invalid timeframe');
-      }
+      const userId = getUser(req);
+      const stats = await analyticsService.getQuickStats(userId);
+      res.status(200).json({ success: true, data: stats });
+    } catch (err) { next(err); }
+  },
 
-      const analytics = await analyticsService.getUserAnalytics(
-        req.user!.userId, 
-        timeframe as 'week' | 'month' | 'year'
-      );
-
-      const response: ApiResponse = {
-        success: true,
-        data: analytics,
-        timestamp: new Date().toISOString(),
-        message: ''
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Get trip analytics
-   */
-  async getTripAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getUserAnalytics(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = getUser(req);
+      const data = await analyticsService.getUserAnalytics(userId, req.query as any);
+      res.status(200).json({ success: true, data });
+    } catch (err) { next(err); }
+  },
+
+  async getTripAnalytics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
       const { tripId } = req.params;
-      const timeframe = (req.query.timeframe as string) || 'month';
-      
-      const analytics = await analyticsService.getTripAnalytics(
-        tripId, 
-        req.user!.userId,
-        timeframe as 'week' | 'month' | 'year'
-      );
+      const data = await analyticsService.getTripAnalytics(tripId, userId, req.query as any);
+      res.status(200).json({ success: true, data });
+    } catch (err) { next(err); }
+  },
 
-      const response: ApiResponse = {
-        success: true,
-        data: analytics,
-        timestamp: new Date().toISOString(),
-        message: ''
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Get predictive analytics
-   */
-  async getPredictiveAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getYearlySummary(req: Request, res: Response, next: NextFunction) {
     try {
-      const { tripId } = req.params;
-      
-      const analytics = await analyticsService.getPredictiveAnalytics(
-        req.user!.userId,
-        tripId
-      );
-
-      const response: ApiResponse = {
-        success: true,
-        data: analytics,
-        timestamp: new Date().toISOString(),
-        message: ''
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /**
-   * Get spending report
-   */
-  async getSpendingReport(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { tripId } = req.params;
-      const timeframe = (req.query.timeframe as string) || 'month';
-      
-      // This can generate PDF reports
-      const report = await analyticsService.getTripAnalytics(
-        tripId,
-        req.user!.userId,
-        timeframe as 'week' | 'month' | 'year'
-      );
-
-      const response: ApiResponse = {
-        success: true,
-        data: {
-          report,
-          exportable: true,
-          formats: ['json', 'csv', 'pdf']
-        },
-        timestamp: new Date().toISOString(),
-        message: ''
-      };
-
-      res.status(200).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-}
-
-export const analyticsController = new AnalyticsController();
+      const userId = getUser(req);
+      const year = parseInt(req.params.year);
+      const data = await analyticsService.getYearlySummary(userId, year);
+      res.status(200).json({ success: true, data });
+    } catch (err) { next(err); }
+  },
+};

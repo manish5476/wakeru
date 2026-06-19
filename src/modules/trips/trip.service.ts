@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Trip, ITrip, IStop, ITripMember } from './trip.model';
 import { User } from '../auth/auth.model';
+import { socketServer } from '../../infrastructure/websocket/socket.server';
 
 import {
   CreateTripInput,
@@ -407,6 +408,13 @@ export const addStop = async (
   trip.stopCount = trip.stops.length;
 
   await trip.save();
+
+  socketServer.notifyStopAdded(
+    trip._id.toString(),
+    input.name,
+    creatorUid
+  );
+
   return trip;
 };
 
@@ -496,6 +504,15 @@ export const updateStopExchangeRate = async (
   }
 
   await trip.save();
+
+  socketServer.notifyExchangeRateUpdated(
+    trip._id.toString(),
+    stop.name,
+    input.currentExchangeRate,
+    stop.currency,
+    trip.baseCurrency
+  );
+
   return trip;
 };
 

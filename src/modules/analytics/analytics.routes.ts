@@ -1,17 +1,22 @@
 import { Router } from 'express';
 import { analyticsController } from './analytics.controller';
-import { AuthMiddleware } from '../auth/auth.middleware';
+import { protect } from '../../middleware/auth.middleware';
+import { validate } from '../trips/trip.middleware';
+import { analyticsQuerySchema, yearlySummarySchema, tripAnalyticsParamSchema } from './analytics.validators';
 
 const router = Router();
+router.use(protect);
 
-router.use(AuthMiddleware.authenticate);
+// Dashboard widgets
+router.get('/quick-stats', analyticsController.getQuickStats);
 
-// User analytics
-router.get('/user', analyticsController.getUserAnalytics.bind(analyticsController));
+// User analytics with filters: ?startDate=&endDate=&groupBy=month&category=food&tripId=&compareWith=previous_period
+router.get('/user', validate(analyticsQuerySchema, 'query'), analyticsController.getUserAnalytics);
 
-// Trip analytics
-router.get('/trip/:tripId', analyticsController.getTripAnalytics.bind(analyticsController));
-router.get('/trip/:tripId/predictive', analyticsController.getPredictiveAnalytics.bind(analyticsController));
-router.get('/trip/:tripId/report', analyticsController.getSpendingReport.bind(analyticsController));
+// Trip analytics: /trip/:tripId?startDate=&endDate=&category=food&stopId=
+router.get('/trip/:tripId', validate(tripAnalyticsParamSchema, 'params'), validate(analyticsQuerySchema, 'query'), analyticsController.getTripAnalytics);
+
+// Yearly summary: /yearly/2026
+router.get('/yearly/:year', validate(yearlySummarySchema, 'params'), analyticsController.getYearlySummary);
 
 export default router;

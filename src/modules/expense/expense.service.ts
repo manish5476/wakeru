@@ -547,6 +547,15 @@ export const updateExpense = async (
   await expense.save();
   await markSettlementStale(trip._id.toString());
 
+  socketServer.notifyExpenseUpdated(
+    trip._id.toString(),
+    {
+      _id: expense._id,
+      title: expense.title,
+    },
+    editorUid
+  );
+
   return expense;
 };
 
