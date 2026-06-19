@@ -1,15 +1,25 @@
 import { Router } from 'express';
+import { notificationController } from './notification.controller';
+import { protect } from '../auth/auth.middleware';
 
 const router = Router();
 
-// Placeholder route - get all notifications
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Fetched all notifications' });
-});
+// All routes require authentication
+router.use(protect);
 
-// Placeholder route - mark a notification as read
-router.patch('/:id/read', (req, res) => {
-  res.status(200).json({ message: `Notification ${req.params.id} marked as read` });
-});
+// Get notifications (with pagination & filters)
+router.get('/', notificationController.getNotifications.bind(notificationController));
+
+// Get unread count
+router.get('/unread-count', notificationController.getUnreadCount.bind(notificationController));
+
+// Mark all as read
+router.post('/read-all', notificationController.markAllAsRead.bind(notificationController));
+
+// Mark single as read
+router.patch('/:notificationId/read', notificationController.markAsRead.bind(notificationController));
+
+// Delete notification
+router.delete('/:notificationId', notificationController.deleteNotification.bind(notificationController));
 
 export default router;
