@@ -1,108 +1,152 @@
 import { Response, NextFunction } from 'express';
 import { receiptService } from './receipt.service';
-import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
+import { AppError } from '../../shared/errors/AppError';
+
+// ============================================================
+// HELPER
+// ============================================================
+
+const getUser = (req: any) => {
+  if (!req.user?.userId) throw new AppError('Not authenticated', 401);
+  return req.user.userId;
+};
+
+// ============================================================
+// CONTROLLER
+// ============================================================
 
 export class ReceiptController {
-
-  async uploadReceipt(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  
+  async uploadReceipt(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const receipt = await receiptService.uploadReceipt(req.user!.userId, req.file!);
-      const response: ApiResponse = {
+      const userId = getUser(req);
+      const { tripId, expenseId } = req.body;
+      
+      const receipt = await receiptService.uploadReceipt(
+        userId,
+        req.file!,
+        tripId,
+        expenseId
+      );
+
+      res.status(201).json({
         success: true,
-        message: 'Receipt uploaded successfully',
-        data: receipt,
-        timestamp: new Date().toISOString()
-      };
-      res.status(201).json(response);
+        message: 'Receipt uploaded — processing started',
+        data: { receipt },
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async getUserReceipts(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getUserReceipts(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const receipts = await receiptService.getUserReceipts(req.user!.userId);
-      const response: ApiResponse = {
-        success: true,
-        message: 'Receipts retrieved successfully',
-        data: receipts,
-        timestamp: new Date().toISOString()
-      };
-      res.status(200).json(response);
+      const userId = getUser(req);
+      const { page, limit, status } = req.query;
+      
+      const result = await receiptService.getUserReceipts(userId, {
+        page: Number(page) || 1,
+        limit: Number(limit) || 20,
+        status: status as string,
+      });
+
+      res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
   }
 
-  async getReceipt(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getTripReceipts(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const receipt = await receiptService.getReceipt(req.params.receiptId, req.user!.userId);
-      const response: ApiResponse = {
-        success: true,
-        message: 'Receipt retrieved successfully',
-        data: receipt,
-        timestamp: new Date().toISOString()
-      };
-      res.status(200).json(response);
+      const { tripId } = req.params;
+      const { page, limit } = req.query;
+      
+      const result = await receiptService.getTripReceipts(tripId, {
+        page: Number(page) || 1,
+        limit: Number(limit) || 20,
+      });
+
+      res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
   }
 
-  async updateReceipt(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getReceipt(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const receipt = await receiptService.updateReceipt(req.params.receiptId, req.user!.userId, req.body);
-      const response: ApiResponse = {
-        success: true,
-        message: 'Receipt updated successfully',
-        data: receipt,
-        timestamp: new Date().toISOString()
-      };
-      res.status(200).json(response);
+      const userId = getUser(req);
+      const receipt = await receiptService.getReceipt(req.params.receiptId, userId);
+
+      res.status(200).json({ success: true, data: { receipt } });
     } catch (error) {
       next(error);
     }
   }
 
-  async deleteReceipt(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async updateReceipt(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      await receiptService.deleteReceipt(req.params.receiptId, req.user!.userId);
-      const response: ApiResponse = {
+      const userId = getUser(req);
+      const receipt = await receiptService.updateReceipt(
+        req.params.receiptId,
+        userId,
+        req.body
+      );
+
+      res.status(200).json({
         success: true,
-        message: 'Receipt deleted successfully',
-        timestamp: new Date().toISOString()
-      };
-      res.status(200).json(response);
+        message: 'Receipt updated',
+        data: { receipt },
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async reprocessReceipt(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async deleteReceipt(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await receiptService.reprocessReceipt(req.params.receiptId, req.user!.userId);
-      const response: ApiResponse = {
+      const userId = getUser(req);
+      await receiptService.deleteReceipt(req.params.receiptId, userId);
+
+      res.status(200).json({
         success: true,
-        message: 'Receipt reprocessing started',
-        data: result,
-        timestamp: new Date().toISOString()
-      };
-      res.status(202).json(response);
+        message: 'Receipt deleted',
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  async convertToExpense(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async reprocessReceipt(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const expense = await receiptService.convertToExpense(req.params.receiptId, req.user!.userId, req.body.groupId);
-      const response: ApiResponse = {
+      const userId = getUser(req);
+      const result = await receiptService.reprocessReceipt(req.params.receiptId, userId);
+
+      res.status(202).json({
         success: true,
-        message: 'Receipt converted to expense successfully',
-        data: expense,
-        timestamp: new Date().toISOString()
-      };
-      res.status(201).json(response);
+        message: 'OCR reprocessing started',
+        data: { receipt: result },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async convertToExpense(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = getUser(req);
+      const { tripId } = req.body;
+      
+      const expenseData = await receiptService.convertToExpense(
+        req.params.receiptId,
+        userId,
+        tripId
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Receipt data ready for expense creation',
+        data: { expenseData },
+      });
     } catch (error) {
       next(error);
     }

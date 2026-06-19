@@ -1,29 +1,39 @@
 import { Router } from 'express';
 import { receiptController } from './receipt.controller';
-import { AuthMiddleware } from '../auth/auth.middleware';
+import { protect } from '../auth/auth.middleware';
 import multer from 'multer';
 
 const router = Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp'];
-    if (allowedTypes.includes(file.mimetype)) {
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/heic', 'image/webp'];
+    if (allowed.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type'));
+      cb(new Error(`Invalid file type: ${file.mimetype}`));
     }
-  }
+  },
 });
 
-router.use(AuthMiddleware.authenticate);
+// All routes require authentication
+router.use(protect);
 
-// Receipt CRUD
-router.post('/upload', upload.single('receipt'), receiptController.uploadReceipt.bind(receiptController));
+// Upload
+router.post(
+  '/upload',
+  upload.single('receipt'),
+  receiptController.uploadReceipt.bind(receiptController)
+);
+
+// User's receipts
 router.get('/', receiptController.getUserReceipts.bind(receiptController));
+
+// Trip receipts
+router.get('/trip/:tripId', receiptController.getTripReceipts.bind(receiptController));
+
+// Single receipt CRUD
 router.get('/:receiptId', receiptController.getReceipt.bind(receiptController));
 router.put('/:receiptId', receiptController.updateReceipt.bind(receiptController));
 router.delete('/:receiptId', receiptController.deleteReceipt.bind(receiptController));
