@@ -10,6 +10,7 @@ import {
   SplitInput,
 } from './expense.validation';
 import { markSettlementStale } from '../settlement/settlement.service';
+import { socketServer } from '../../infrastructure/websocket/socket.server';
 
 // ============================================================
 // TYPES
@@ -185,7 +186,6 @@ export const createExpense = async (
   adderUid: string,
   adderDisplayName: string
 ): Promise<IExpense> => {
-  // Load trip with the specific stop
   const trip = await Trip.findOne({
     isArchived: false,
     'stops._id': new Types.ObjectId(input.stopId),
@@ -276,6 +276,8 @@ export const createExpense = async (
     owedAmounts
   );
   await markSettlementStale(trip._id.toString());
+
+  socketServer.notifyExpenseAdded(trip._id.toString(), expense, adderUid);
 
   return expense;
 };
@@ -591,6 +593,7 @@ export const deleteExpense = async (
   );
   await markSettlementStale(trip._id.toString());
 
+  socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
   await expense.deleteOne();
 };
 

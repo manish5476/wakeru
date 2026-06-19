@@ -46,7 +46,7 @@ router.get('/linked-accounts', userController.getLinkedAccounts.bind(userControl
 router.get('/stats', userController.getStats.bind(userController));
 
 // Search
-router.get('/search', ValidationMiddleware.validate(searchUsersSchema), userController.searchUsers.bind(userController));
+router.get('/search', ValidationMiddleware.validateQuery(searchUsersSchema), userController.searchUsers.bind(userController));
 
 // Public profile (must be after /search to avoid conflict)
 router.get('/:userId', userController.getPublicProfile.bind(userController));

@@ -1,13 +1,14 @@
+import http from 'http';
 import app from './app';
 import { config, validateConfig } from './config';
 import { database } from './config/database';
 import { redisClient } from './config/redis';
 import { logger } from './config/logger';
-import { QueueManager } from './infrastructure/queue/bull.config';
 import { initializeFirebase } from './config/firebase';
+import { socketServer } from './infrastructure/websocket/socket.server';
 
 class Server {
-  private server: any;
+  private httpServer: http.Server | null = null;
 
   async start(): Promise<void> {
     try {
@@ -24,14 +25,17 @@ class Server {
       // Initialize Firebase
       initializeFirebase();
 
-      // Initialize job queues (MODIFIED: Disabled)
-      // QueueManager.getQueue('ocr-processing');
-      // QueueManager.getQueue('analytics-generation');
-      // logger.info('Job queues initialized');
+      // Create HTTP server (needed for Socket.IO)
+      this.httpServer = http.createServer(app);
 
-      // Start HTTP server
-      this.server = app.listen(config.PORT, () => {
+      // Initialize WebSocket server
+      socketServer.initialize(this.httpServer);
+      logger.info('🔌 WebSocket server initialized');
+
+      // Start HTTP server (NOT app.listen — use httpServer.listen for Socket.IO)
+      this.httpServer.listen(config.PORT, () => {
         logger.info(`🚀 WAKERU API Server running on port ${config.PORT}`);
+        logger.info(`🔌 WebSocket server running on port ${config.PORT}`);
         logger.info(`📚 API Documentation: http://localhost:${config.PORT}/api-docs`);
         logger.info(`🏥 Health Check: http://localhost:${config.PORT}/health`);
         logger.info(`🌍 Environment: ${config.NODE_ENV}`);
@@ -50,15 +54,18 @@ class Server {
     const shutdown = async (signal: string) => {
       logger.info(`${signal} received. Starting graceful shutdown...`);
 
-      // Close HTTP server
-      if (this.server) {
-        this.server.close(() => {
-          logger.info('HTTP server closed');
+      // Close HTTP server (stops accepting new connections)
+      if (this.httpServer) {
+        await new Promise<void>((resolve) => {
+          this.httpServer!.close(() => {
+            logger.info('HTTP server closed');
+            resolve();
+          });
         });
       }
 
-      // Close queues (MODIFIED: Disabled)
-      // await QueueManager.closeAll();
+      // Close WebSocket server
+      await socketServer.shutdown();
 
       // Close Redis
       await redisClient.disconnect();
@@ -70,17 +77,22 @@ class Server {
       process.exit(0);
     };
 
+    // Handle termination signals
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));
-    
-    // For nodemon restarts
+
+    // Handle nodemon restarts gracefully
     process.once('SIGUSR2', async () => {
       await shutdown('SIGUSR2');
       process.kill(process.pid, 'SIGUSR2');
     });
+
+    // Handle unhandled rejections
     process.on('unhandledRejection', (reason, promise) => {
       logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
     });
+
+    // Handle uncaught exceptions
     process.on('uncaughtException', (error) => {
       logger.error('Uncaught Exception:', error);
       shutdown('UNCAUGHT_EXCEPTION');

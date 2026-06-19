@@ -463,6 +463,31 @@ export const removeMember = async (
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * POST /api/v1/trips/:tripId/members
+ * Add a new member directly. Admin only.
+ */
+export const addMember = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const trip = getTripFromReq(req);
+    const { userId: targetUserId, role } = req.body;
+
+    await tripService.addMember(trip, targetUserId, role || 'member');
+
+    res.status(200).json({
+      success: true,
+      message: 'Member added successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * POST /api/v1/trips/join/:inviteCode
  * Join a trip via invite code. No loadTrip middleware needed here.
  */

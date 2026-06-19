@@ -207,6 +207,15 @@ router.get(
   tripController.getMembers
 );
 
+router.post(
+  '/:tripId/members',
+  validate(tripIdParamSchema, 'params'),
+  loadTrip(),
+  requireAdmin,
+  validate(addMemberSchema),
+  tripController.addMember
+);
+
 router.patch(
   '/:tripId/members/:userId/role',
   validate(memberParamSchema, 'params'),

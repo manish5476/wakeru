@@ -17,70 +17,116 @@ import expenseRoutes from './modules/expense/expense.routes';
 import settlementRoutes from './modules/settlement/settlement.routes';
 import analyticsRoutes from './modules/analytics/analytics.routes';
 import receiptRoutes from './modules/receipt/receipt.routes';
-// import notificationRoutes from './modules/notification/notification.routes';
+import notificationRoutes from './modules/notification/notification.routes';
+import invitationRoutes from './modules/trips/invitation.routes';
 
 const app = express();
 
-// Security middleware
+// ============================================================
+// Security Middleware
+// ============================================================
 app.use(helmet());
 app.use(cors({
   origin: config.ALLOWED_ORIGINS === '*' ? true : config.ALLOWED_ORIGINS.split(','),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key'],
 }));
 
-// Performance middleware
+// ============================================================
+// Performance Middleware
+// ============================================================
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static files
+// ============================================================
+// Static Files
+// ============================================================
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Request logging
+// ============================================================
+// Request Logging
+// ============================================================
 app.use(requestLogger);
 
-// Public rate limiting
+// ============================================================
+// Rate Limiting (Public)
+// ============================================================
 app.use('/api/', publicRateLimiter);
 
-// Health check (no auth required)
-app.get('/health', (req, res) => {
+// ============================================================
+// Health Check (No Auth Required)
+// ============================================================
+app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'healthy',
     service: 'WAKERU API',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
   });
 });
 
-// API routes with idempotency check
-app.use('/api/v1/auth', authenticatedRateLimiter, authRoutes);
-app.use('/api/v1/users', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, userRoutes);
-app.use('/api/v1/trips', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, tripRoutes);
-app.use('/api/v1/expenses', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, expenseRoutes);
-app.use('/api/v1/settlements', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, settlementRoutes);
-app.use('/api/v1/analytics', authenticatedRateLimiter, analyticsRoutes);
-app.use('/api/v1/receipts', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, receiptRoutes);
-// app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
+// ============================================================
+// WebSocket Health Check
+// ============================================================
+app.get('/ws-health', (_req, res) => {
+  const { socketServer } = require('./infrastructure/websocket/socket.server');
+  res.status(200).json({
+    status: 'healthy',
+    onlineUsers: socketServer.getOnlineCount(),
+    timestamp: new Date().toISOString(),
+  });
+});
 
-// 404 handler
+// ============================================================
+// API Routes
+// ============================================================
+
+// Auth routes — has its own strict rate limiting for login/register
+app.use('/api/v1/auth', authenticatedRateLimiter, authRoutes);
+
+// User routes
+app.use('/api/v1/users', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, userRoutes);
+
+// Trip routes
+app.use('/api/v1/trips', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, tripRoutes);
+
+// Expense routes
+app.use('/api/v1/expenses', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, expenseRoutes);
+
+// Settlement routes
+app.use('/api/v1/settlements', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, settlementRoutes);
+
+// Analytics routes
+app.use('/api/v1/analytics', authenticatedRateLimiter, analyticsRoutes);
+
+// Receipt routes
+app.use('/api/v1/receipts', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, receiptRoutes);
+
+// Notification routes
+app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
+
+app.use('/api/v1/invitations', authenticatedRateLimiter, invitationRoutes);
+
+// ============================================================
+// 404 Handler
+// ============================================================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     error: {
       code: 'NOT_FOUND',
-      message: `Route ${req.method} ${req.path} not found`
+      message: `Route ${req.method} ${req.path} not found`,
     },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
-// Global error handler
+// ============================================================
+// Global Error Handler
+// ============================================================
 app.use(errorHandler);
 
 export default app;
-
-
-

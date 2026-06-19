@@ -4,6 +4,7 @@ import { Expense } from '../expense/expense.model';
 import { Trip } from '../trips/trip.model';
 import { User } from '../auth/auth.model';
 import { AppError } from '../../shared/errors/AppError';
+import { socketServer } from '../../infrastructure/websocket/socket.server';
 
 // ============================================================
 // TYPES
@@ -281,6 +282,8 @@ export const initiatePayment = async (
 
   await settlement.save();
 
+  socketServer.notifySettlementRequest(txn.to, txn.fromName, txn.amountBase, txn.baseCurrency, tripId);
+
   return {
     transaction: txn,
     upiDeepLink,
@@ -375,6 +378,8 @@ export const confirmPayment = async (
   }
 
   await settlement.save();
+
+  socketServer.notifySettlementCompleted(txn.from, txn.to, txn.amountBase, txn.baseCurrency, tripId);
   return settlement;
 };
 
