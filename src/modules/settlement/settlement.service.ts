@@ -1,348 +1,428 @@
+import { Types } from 'mongoose';
+import { Settlement, ISettlement, ISettlementTransaction } from './settlement.model';
+import { Expense } from '../expense/expense.model';
+import { Trip } from '../trips/trip.model';
+import { User } from '../auth/auth.model';
+import { AppError } from '../../shared/errors/AppError';
 
-// import { Types } from 'mongoose';
-// import { Settlement, ISettlement, ISettlementTransaction } from './settlement.model';
-// import { Expense } from '../expense/expense.model';
-// import { Trip } from '../trips/trip.model';
-// import { AppError } from '../../shared/errors/AppError';
+// ============================================================
+// TYPES
+// ============================================================
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // TYPES
-// // ─────────────────────────────────────────────────────────────────────────────
+interface NetBalance {
+  userId: string;
+  displayName: string;
+  amount: number; // Positive = creditor (owed money), Negative = debtor (owes money)
+}
 
-// interface NetBalance {
-//   userId: string;
-//   displayName: string;
-//   amount: number; // positive = owed money (creditor), negative = owes money (debtor)
-// }
+interface MinTransaction {
+  from: string;
+  fromName: string;
+  to: string;
+  toName: string;
+  amount: number;
+}
 
-// interface MinTransaction {
-//   from: string;
-//   fromName: string;
-//   to: string;
-//   toName: string;
-//   amount: number;
-// }
+// ============================================================
+// MINIMUM TRANSACTION ALGORITHM
+// ============================================================
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // CORE ALGORITHM — Minimum Transaction Debt Settlement
-// // ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Greedy minimum-transaction settlement algorithm.
+ *
+ * For N people: max N-1 transfers (instead of O(N²) naive).
+ * Example: 8 friends, 47 expenses → max 7 transfers.
+ *
+ * Algorithm:
+ * 1. Compute net balance per person
+ * 2. Split into creditors (+) and debtors (-)
+ * 3. Greedily match largest creditor with largest debtor
+ */
+export const computeMinimumTransactions = (
+  balances: NetBalance[]
+): MinTransaction[] => {
+  const EPSILON = 0.01; // Ignore balances below 1 paisa
 
-// /**
-//  * For N people, naive settlement needs O(N²) transfers.
-//  * This greedy algorithm reduces it to at most N-1 transfers.
-//  *
-//  * Example: 8 friends, 47 expenses → 7 transfers max instead of up to 28.
-//  *
-//  * Steps:
-//  * 1. Compute net balance per person (total paid - total owed)
-//  * 2. Split into creditors (positive) and debtors (negative)
-//  * 3. Greedily match largest creditor with largest debtor
-//  */
-// export const computeMinimumTransactions = (
-//   balances: NetBalance[]
-// ): MinTransaction[] => {
-//   const EPSILON = 0.01; // ignore balances below 1 paisa
+  // Creditors: people who are OWED money (positive balance)
+  const creditors = balances
+    .filter((b) => b.amount > EPSILON)
+    .sort((a, b) => b.amount - a.amount);
 
-//   const creditors = balances
-//     .filter((b) => b.amount > EPSILON)
-//     .map((b) => ({ ...b }))
-//     .sort((a, b) => b.amount - a.amount);
+  // Debtors: people who OWE money (negative balance → flip to positive)
+  const debtors = balances
+    .filter((b) => b.amount < -EPSILON)
+    .map((b) => ({ ...b, amount: -b.amount }))
+    .sort((a, b) => b.amount - a.amount);
 
-//   const debtors = balances
-//     .filter((b) => b.amount < -EPSILON)
-//     .map((b) => ({ ...b, amount: -b.amount })) // flip to positive for easier math
-//     .sort((a, b) => b.amount - a.amount);
+  const transactions: MinTransaction[] = [];
+  let i = 0; // Creditor index
+  let j = 0; // Debtor index
 
-//   const transactions: MinTransaction[] = [];
-//   let i = 0;
-//   let j = 0;
+  while (i < creditors.length && j < debtors.length) {
+    const settleAmount = Math.min(creditors[i].amount, debtors[j].amount);
+    const rounded = parseFloat(settleAmount.toFixed(2));
 
-//   while (i < creditors.length && j < debtors.length) {
-//     const settleAmount = Math.min(creditors[i].amount, debtors[j].amount);
+    if (rounded > 0) {
+      transactions.push({
+        from: debtors[j].userId,
+        fromName: debtors[j].displayName,
+        to: creditors[i].userId,
+        toName: creditors[i].displayName,
+        amount: rounded,
+      });
+    }
 
-//     transactions.push({
-//       from: debtors[j].userId,
-//       fromName: debtors[j].displayName,
-//       to: creditors[i].userId,
-//       toName: creditors[i].displayName,
-//       amount: parseFloat(settleAmount.toFixed(2)),
-//     });
+    creditors[i].amount -= settleAmount;
+    debtors[j].amount -= settleAmount;
 
-//     creditors[i].amount -= settleAmount;
-//     debtors[j].amount -= settleAmount;
+    if (creditors[i].amount < EPSILON) i++;
+    if (debtors[j].amount < EPSILON) j++;
+  }
 
-//     if (creditors[i].amount < EPSILON) i++;
-//     if (debtors[j].amount < EPSILON) j++;
-//   }
+  return transactions;
+};
 
-//   return transactions;
-// };
+// ============================================================
+// CALCULATE SETTLEMENT
+// ============================================================
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // CALCULATE & STORE SETTLEMENT
-// // ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Calculate the current settlement plan for a trip.
+ *
+ * Flow:
+ * 1. Load all unsettled expenses for the trip
+ * 2. Compute net balance per member (in baseCurrency)
+ * 3. Run min-transaction algorithm
+ * 4. Upsert Settlement document
+ */
+export const calculateSettlement = async (
+  tripId: string,
+  requestingUid: string
+): Promise<ISettlement> => {
+  // Load trip
+  const trip = await Trip.findById(tripId);
+  if (!trip) throw new AppError('Trip not found', 404);
+  if (!trip.isMember(requestingUid)) {
+    throw new AppError('You are not a member of this trip', 403);
+  }
 
-// /**
-//  * Calculate the current settlement plan for a trip.
-//  *
-//  * Flow:
-//  * 1. Load all unsettled expenses for the trip
-//  * 2. Compute net balance per member
-//  * 3. Run minimum-transaction algorithm
-//  * 4. Store result as a Settlement document (replaces previous)
-//  *
-//  * This is called:
-//  * - When a user opens the settlement screen
-//  * - After any expense is added, updated, or deleted (marks existing as stale)
-//  */
-// export const calculateSettlement = async (
-//   tripId: string,
-//   requestingUid: string
-// ): Promise<ISettlement> => {
-//   const trip = await Trip.findById(tripId);
-//   if (!trip) throw new AppError('Trip not found', 404);
-//   if (!trip.isMember(requestingUid)) throw new AppError('Access denied', 403);
+  // Load all unsettled expenses
+  const expenses = await Expense.find({
+    tripId: new Types.ObjectId(tripId),
+    isSettled: false,
+  }).lean();
 
-//   // Load ALL expenses for this trip (settled ones still affect historical balances
-//   // but we only compute based on unpaid splits)
-//   const expenses = await Expense.find({
-//     tripId: new Types.ObjectId(tripId),
-//     isSettled: false,
-//   }).lean();
+  // Build member display name lookup
+  const memberMap = new Map<string, string>();
+  trip.getActiveMembers().forEach((m) => {
+    memberMap.set(m.userId, m.displayName);
+  });
 
-//   // Build member lookup for display names
-//   const memberMap = new Map(
-//     trip.getActiveMembers().map((m) => [m.userId, m.displayName])
-//   );
+  // Compute net balance per member
+  const balanceMap = new Map<string, number>();
 
-//   // Compute net balance per member across all unsettled expenses
-//   const balanceMap = new Map<string, number>();
+  // Initialize all active members at 0
+  trip.getActiveMembers().forEach((m) => balanceMap.set(m.userId, 0));
 
-//   // Initialize all active members at 0
-//   trip.getActiveMembers().forEach((m) => balanceMap.set(m.userId, 0));
+  for (const expense of expenses) {
+    // Payer gets credit for the full amount
+    const currentPayer = balanceMap.get(expense.paidBy) ?? 0;
+    balanceMap.set(expense.paidBy, currentPayer + expense.amountBase);
 
-//   for (const expense of expenses) {
-//     // Payer gets credit for the full amount
-//     const payerBalance = balanceMap.get(expense.paidBy) ?? 0;
-//     balanceMap.set(expense.paidBy, payerBalance + expense.amountBase);
+    // Each unpaid split debits the member
+    for (const split of expense.splits) {
+      if (!split.isPaid) {
+        const current = balanceMap.get(split.userId) ?? 0;
+        balanceMap.set(split.userId, current - split.amountBase);
+      }
+    }
+  }
 
-//     // Each member in splits owes their share
-//     for (const split of expense.splits) {
-//       if (!split.isPaid) {
-//         const memberBalance = balanceMap.get(split.userId) ?? 0;
-//         balanceMap.set(split.userId, memberBalance - split.amountBase);
-//       }
-//     }
-//   }
+  // Convert to NetBalance array
+  const netBalances: NetBalance[] = Array.from(balanceMap.entries()).map(
+    ([userId, amount]) => ({
+      userId,
+      displayName: memberMap.get(userId) ?? 'Unknown',
+      amount,
+    })
+  );
 
-//   const netBalances: NetBalance[] = Array.from(balanceMap.entries()).map(
-//     ([userId, amount]) => ({
-//       userId,
-//       displayName: memberMap.get(userId) ?? 'Unknown',
-//       amount,
-//     })
-//   );
+  // Run minimum transaction algorithm
+  const minTransactions = computeMinimumTransactions(netBalances);
 
-//   const minTransactions = computeMinimumTransactions(netBalances);
+  // Build settlement transaction documents
+  const settlementTransactions = minTransactions.map((t) => ({
+    from: t.from,
+    fromName: t.fromName,
+    to: t.to,
+    toName: t.toName,
+    amountBase: t.amount,
+    baseCurrency: trip.baseCurrency,
+    status: 'pending' as const,
+  }));
 
-//   // Build settlement transaction documents
-//   const settlementTransactions: ISettlementTransaction[] = minTransactions.map(
-//     (t) => ({
-//       from: t.from,
-//       fromName: t.fromName,
-//       to: t.to,
-//       toName: t.toName,
-//       amountBase: t.amount,
-//       baseCurrency: trip.baseCurrency,
-//       status: 'pending' as const,
-//     })
-//   );
+  // Upsert settlement (one per trip)
+  const settlement = await Settlement.findOneAndUpdate(
+    { tripId: new Types.ObjectId(tripId) },
+    {
+      tripId: new Types.ObjectId(tripId),
+      baseCurrency: trip.baseCurrency,
+      transactions: settlementTransactions,
+      totalTransactions: settlementTransactions.length,
+      calculatedAt: new Date(),
+      isStale: false,
+    },
+    { upsert: true, new: true }
+  );
 
-//   // Replace any existing settlement for this trip
-//   const settlement = await Settlement.findOneAndUpdate(
-//     { tripId: new Types.ObjectId(tripId) },
-//     {
-//       tripId: new Types.ObjectId(tripId),
-//       transactions: settlementTransactions,
-//       totalTransactions: settlementTransactions.length,
-//       calculatedAt: new Date(),
-//       isStale: false,
-//     },
-//     { upsert: true, new: true }
-//   );
+  return settlement;
+};
 
-//   return settlement;
-// };
+// ============================================================
+// GET SETTLEMENT
+// ============================================================
 
-// /**
-//  * Get the current settlement for a trip.
-//  * If none exists or it's stale, recalculates automatically.
-//  */
-// export const getSettlement = async (
-//   tripId: string,
-//   requestingUid: string
-// ): Promise<ISettlement> => {
-//   const existing = await Settlement.findOne({
-//     tripId: new Types.ObjectId(tripId),
-//   });
+/**
+ * Get current settlement for a trip.
+ * Auto-recalculates if missing or stale.
+ */
+export const getSettlement = async (
+  tripId: string,
+  requestingUid: string
+): Promise<ISettlement> => {
+  const existing = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
 
-//   // Recalculate if missing or stale
-//   if (!existing || existing.isStale) {
-//     return calculateSettlement(tripId, requestingUid);
-//   }
+  if (!existing || existing.isStale) {
+    return calculateSettlement(tripId, requestingUid);
+  }
 
-//   return existing;
-// };
+  return existing;
+};
 
-// /**
-//  * Mark the settlement for a trip as stale.
-//  * Called automatically whenever an expense is added, edited, or deleted.
-//  */
-// export const markSettlementStale = async (tripId: string): Promise<void> => {
-//   await Settlement.findOneAndUpdate(
-//     { tripId: new Types.ObjectId(tripId) },
-//     { isStale: true }
-//   );
-// };
+// ============================================================
+// MARK STALE
+// ============================================================
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // UPI PAYMENT FLOW
-// // ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Mark settlement as stale when expenses change.
+ * Called by Expense service after create/update/delete.
+ */
+export const markSettlementStale = async (tripId: string): Promise<void> => {
+  await Settlement.findOneAndUpdate(
+    { tripId: new Types.ObjectId(tripId) },
+    { $set: { isStale: true } }
+  );
+};
 
-// /**
-//  * Initiate a payment for a settlement transaction.
-//  * Generates a UPI deep link and marks the transaction as 'initiated'.
-//  *
-//  * UPI deep link format:
-//  * upi://pay?pa=<vpa>&pn=<name>&am=<amount>&cu=INR&tn=TripSplit+Settlement
-//  */
-// export const initiatePayment = async (
-//   tripId: string,
-//   transactionId: string,
-//   fromUid: string
-// ): Promise<{ transaction: ISettlementTransaction; upiDeepLink: string }> => {
-//   const settlement = await Settlement.findOne({
-//     tripId: new Types.ObjectId(tripId),
-//   });
+// ============================================================
+// UPI PAYMENT FLOW
+// ============================================================
 
-//   if (!settlement) throw new AppError('No settlement found for this trip', 404);
+/**
+ * Initiate a UPI payment for a settlement transaction.
+ * Generates UPI deep link and marks transaction as 'initiated'.
+ *
+ * UPI deep link format:
+ * upi://pay?pa=vpa@bank&pn=Name&am=Amount&cu=INR&tn=Note
+ */
+export const initiatePayment = async (
+  tripId: string,
+  transactionId: string,
+  fromUid: string
+): Promise<{ transaction: ISettlementTransaction; upiDeepLink: string }> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
 
-//   const txn = settlement.transactions.find(
-//     (t) => t._id?.toString() === transactionId
-//   );
+  if (!settlement) {
+    throw new AppError('No settlement found. Calculate settlement first.', 404);
+  }
 
-//   if (!txn) throw new AppError('Transaction not found', 404);
-//   if (txn.from !== fromUid) throw new AppError('This is not your payment to make', 403);
-//   if (txn.status === 'confirmed') throw new AppError('Payment already confirmed', 400);
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
 
-//   // Load recipient UPI ID from their User document
-//   const { User } = await import('../user/user.model');
-//   const recipient = await User.findOne({ firebaseUid: txn.to }).lean();
+  if (!txn) throw new AppError('Transaction not found', 404);
+  if (txn.from !== fromUid) {
+    throw new AppError('This is not your payment to make', 403);
+  }
+  if (txn.status === 'confirmed') {
+    throw new AppError('Payment already confirmed', 400);
+  }
 
-//   let upiDeepLink = '';
-//   if (recipient?.upiId) {
-//     const note = encodeURIComponent('TripSplit Settlement');
-//     const name = encodeURIComponent(txn.toName);
-//     upiDeepLink = `upi://pay?pa=${recipient.upiId}&pn=${name}&am=${txn.amountBase}&cu=${txn.baseCurrency}&tn=${note}`;
-//   }
+  // Get recipient's UPI ID
+  const recipient = await User.findOne({
+    firebaseUid: txn.to,
+    isActive: true,
+    isDeleted: false,
+  }).select('bankingDetails.upiId displayName').lean();
 
-//   txn.status = 'initiated';
-//   txn.upiDeepLink = upiDeepLink;
-//   txn.initiatedAt = new Date();
+  if (!recipient?.bankingDetails?.upiId) {
+    throw new AppError(
+      `${txn.toName} has not set up their UPI ID yet`,
+      400
+    );
+  }
 
-//   await settlement.save();
+  // Build UPI deep link
+  const pa = encodeURIComponent(recipient.bankingDetails.upiId);
+  const pn = encodeURIComponent(txn.toName);
+  const am = txn.amountBase.toFixed(2);
+  const cu = txn.baseCurrency;
+  const tn = encodeURIComponent('TripSplit Settlement');
+  const upiDeepLink = `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
 
-//   return { transaction: txn, upiDeepLink };
-// };
+  // Update transaction
+  txn.status = 'initiated';
+  txn.upiDeepLink = upiDeepLink;
+  txn.initiatedAt = new Date();
 
-// /**
-//  * Confirm receipt of a payment.
-//  * Can only be confirmed by the recipient (the 'to' user).
-//  * Marks all relevant expense splits as paid.
-//  */
-// export const confirmPayment = async (
-//   tripId: string,
-//   transactionId: string,
-//   confirmingUid: string
-// ): Promise<ISettlement> => {
-//   const settlement = await Settlement.findOne({
-//     tripId: new Types.ObjectId(tripId),
-//   });
+  await settlement.save();
 
-//   if (!settlement) throw new AppError('No settlement found', 404);
+  return {
+    transaction: txn,
+    upiDeepLink,
+  };
+};
 
-//   const txn = settlement.transactions.find(
-//     (t) => t._id?.toString() === transactionId
-//   );
+/**
+ * Confirm receipt of a payment.
+ * Only the recipient can confirm.
+ * Marks all relevant expense splits as paid.
+ */
+export const confirmPayment = async (
+  tripId: string,
+  transactionId: string,
+  confirmingUid: string
+): Promise<ISettlement> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
 
-//   if (!txn) throw new AppError('Transaction not found', 404);
-//   if (txn.to !== confirmingUid) throw new AppError('Only the recipient can confirm payment', 403);
-//   if (txn.status === 'confirmed') throw new AppError('Already confirmed', 400);
-//   if (txn.status === 'pending') throw new AppError('Payment was never initiated', 400);
+  if (!settlement) throw new AppError('Settlement not found', 404);
 
-//   txn.status = 'confirmed';
-//   txn.confirmedAt = new Date();
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
 
-//   // Mark all splits between these two users as paid
-//   await Expense.updateMany(
-//     {
-//       tripId: new Types.ObjectId(tripId),
-//       'splits.userId': txn.from,
-//       paidBy: txn.to,
-//       isSettled: false,
-//     },
-//     {
-//       $set: {
-//         'splits.$[elem].isPaid': true,
-//         'splits.$[elem].paidAt': new Date(),
-//       },
-//     },
-//     {
-//       arrayFilters: [{ 'elem.userId': txn.from, 'elem.isPaid': false }],
-//     }
-//   );
+  if (!txn) throw new AppError('Transaction not found', 404);
+  if (txn.to !== confirmingUid) {
+    throw new AppError('Only the recipient can confirm receipt', 403);
+  }
+  if (txn.status === 'confirmed') {
+    throw new AppError('Payment already confirmed', 400);
+  }
+  if (txn.status === 'pending') {
+    throw new AppError('Payment was never initiated', 400);
+  }
 
-//   // Update isSettled flag on any now-fully-settled expenses
-//   const expenses = await Expense.find({
-//     tripId: new Types.ObjectId(tripId),
-//     isSettled: false,
-//   });
+  // Confirm the transaction
+  txn.status = 'confirmed';
+  txn.confirmedAt = new Date();
 
-//   for (const expense of expenses) {
-//     if (expense.splits.every((s: any) => s.isPaid)) {
-//       expense.isSettled = true;
-//       await expense.save();
-//     }
-//   }
+  // Mark all splits between these two users as paid
+  // This handles the case where one settlement covers multiple expenses
+  await Expense.updateMany(
+    {
+      tripId: new Types.ObjectId(tripId),
+      isSettled: false,
+      'splits.userId': txn.from,
+      paidBy: txn.to,
+    },
+    {
+      $set: {
+        'splits.$[elem].isPaid': true,
+        'splits.$[elem].paidAt': new Date(),
+      },
+    },
+    {
+      arrayFilters: [{ 'elem.userId': txn.from, 'elem.isPaid': false }],
+    }
+  );
 
-//   await settlement.save();
-//   return settlement;
-// };
+  // Also handle the reverse: where the payer is the 'from' user
+  await Expense.updateMany(
+    {
+      tripId: new Types.ObjectId(tripId),
+      isSettled: false,
+      paidBy: txn.from,
+      'splits.userId': txn.to,
+    },
+    {
+      $set: {
+        'splits.$[elem].isPaid': true,
+        'splits.$[elem].paidAt': new Date(),
+      },
+    },
+    {
+      arrayFilters: [{ 'elem.userId': txn.to, 'elem.isPaid': false }],
+    }
+  );
 
-// /**
-//  * Dispute a payment (flag it for group review).
-//  */
-// export const disputePayment = async (
-//   tripId: string,
-//   transactionId: string,
-//   requestingUid: string
-// ): Promise<ISettlement> => {
-//   const settlement = await Settlement.findOne({
-//     tripId: new Types.ObjectId(tripId),
-//   });
+  // Update isSettled on fully-settled expenses
+  const affectedExpenses = await Expense.find({
+    tripId: new Types.ObjectId(tripId),
+    isSettled: false,
+  });
 
-//   if (!settlement) throw new AppError('No settlement found', 404);
+  for (const expense of affectedExpenses) {
+    if (expense.splits.every((s) => s.isPaid)) {
+      expense.isSettled = true;
+      await expense.save();
+    }
+  }
 
-//   const txn = settlement.transactions.find(
-//     (t) => t._id?.toString() === transactionId
-//   );
+  await settlement.save();
+  return settlement;
+};
 
-//   if (!txn) throw new AppError('Transaction not found', 404);
+/**
+ * Dispute a payment.
+ * Either participant can dispute.
+ */
+export const disputePayment = async (
+  tripId: string,
+  transactionId: string,
+  requestingUid: string
+): Promise<ISettlement> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
 
-//   const isParticipant = txn.from === requestingUid || txn.to === requestingUid;
-//   if (!isParticipant) throw new AppError('You are not part of this transaction', 403);
+  if (!settlement) throw new AppError('Settlement not found', 404);
 
-//   txn.status = 'disputed';
-//   await settlement.save();
-//   return settlement;
-// };
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
+
+  if (!txn) throw new AppError('Transaction not found', 404);
+
+  const isParticipant = txn.from === requestingUid || txn.to === requestingUid;
+  if (!isParticipant) {
+    throw new AppError('You are not part of this transaction', 403);
+  }
+
+  if (txn.status === 'disputed') {
+    throw new AppError('Transaction is already disputed', 400);
+  }
+
+  txn.status = 'disputed';
+  await settlement.save();
+  return settlement;
+};
+
+// ============================================================
+// EXPORT ALL AS NAMESPACE
+// ============================================================
+
+export const settlementService = {
+  calculateSettlement,
+  getSettlement,
+  markSettlementStale,
+  initiatePayment,
+  confirmPayment,
+  disputePayment,
+  computeMinimumTransactions,
+};

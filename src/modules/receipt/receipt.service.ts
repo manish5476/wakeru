@@ -1,37 +1,35 @@
+import { Types } from 'mongoose';
 import { Receipt } from './receipt.model';
 import { ocrProcessor } from './ocr.processor';
 import { NotFoundError, BadRequestError, ForbiddenError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
-import { redisClient } from '../../config/redis';
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
 import { config } from '../../config';
-import { Types } from 'mongoose';
-import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 export class ReceiptService {
+  
   /**
-   * Upload and process receipt
+   * Upload and process a receipt image.
    */
   async uploadReceipt(
     userId: string,
     file: Express.Multer.File,
-    groupId?: string,
+    tripId?: string,
     expenseId?: string
   ): Promise<any> {
-    // Validate file
     this.validateFile(file);
 
     try {
-      // Generate unique filename
-      const receiptId = crypto.randomUUID();
+      const receiptId = uuidv4();
       const filename = `receipt-${receiptId}-${Date.now()}`;
       const uploadDir = path.join(config.UPLOAD_DIR, 'receipts');
       
       await fs.mkdir(uploadDir, { recursive: true });
 
-      // Save original image
+      // Save original
       const originalPath = path.join(uploadDir, `${filename}.jpg`);
       await sharp(file.buffer)
         .jpeg({ quality: 85 })
@@ -44,11 +42,11 @@ export class ReceiptService {
         .jpeg({ quality: 60 })
         .toFile(thumbnailPath);
 
-      // Create receipt record
+      // Create receipt document
       const receipt = new Receipt({
         receiptId,
-        userId: new Types.ObjectId(userId),
-        groupId: groupId ? new Types.ObjectId(groupId) : undefined,
+        userId,
+        tripId: tripId ? new Types.ObjectId(tripId) : undefined,
         expenseId: expenseId ? new Types.ObjectId(expenseId) : undefined,
         image: {
           originalUrl: `/uploads/receipts/${filename}.jpg`,
@@ -56,26 +54,23 @@ export class ReceiptService {
           mimeType: file.mimetype,
           size: file.size,
           width: metadata.width,
-          height: metadata.height
+          height: metadata.height,
         },
         status: 'UPLOADED',
         statusHistory: [{
           status: 'UPLOADED',
           timestamp: new Date(),
-          message: 'Receipt uploaded successfully'
+          message: 'Receipt uploaded successfully',
         }],
-        metadata: {
-          createdBy: new Types.ObjectId(userId),
-          isDeleted: false,
-          version: 1
-        }
+        addedBy: userId,
+        isDeleted: false,
       });
 
       await receipt.save();
 
-      // Start OCR processing in background
-      this.processReceiptAsync(receiptId, originalPath).catch(err => {
-        logger.error('Background OCR processing failed:', err);
+      // Process OCR in background
+      this.processReceiptAsync(receiptId, originalPath).catch((err) => {
+        logger.error('Background OCR failed:', err);
       });
 
       logger.info(`Receipt uploaded: ${receiptId}`);
@@ -87,16 +82,16 @@ export class ReceiptService {
   }
 
   /**
-   * Get receipt by ID
+   * Get receipt by ID.
    */
   async getReceipt(receiptId: string, userId: string): Promise<any> {
-    const receipt = await Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-    
-    if (!receipt) {
-      throw new NotFoundError('Receipt');
-    }
+    const receipt = await Receipt.findOne({
+      receiptId,
+      isDeleted: false,
+    });
 
-    if (receipt.userId.toString() !== userId) {
+    if (!receipt) throw new NotFoundError('Receipt');
+    if (receipt.userId !== userId) {
       throw new ForbiddenError('You do not have access to this receipt');
     }
 
@@ -104,75 +99,81 @@ export class ReceiptService {
   }
 
   /**
-   * Get user's receipts
+   * Get user's receipts (paginated).
    */
-  async getUserReceipts(userId: string, options: { page?: number; limit?: number; status?: string } = {}): Promise<any> {
+  async getUserReceipts(
+    userId: string,
+    options: { page?: number; limit?: number; status?: string } = {}
+  ) {
     const { page = 1, limit = 20, status } = options;
     const skip = (page - 1) * limit;
 
-    const query: any = {
-      userId: new Types.ObjectId(userId),
-      'metadata.isDeleted': false
-    };
-
-    if (status) {
-      query.status = status;
-    }
+    const query: any = { userId, isDeleted: false };
+    if (status) query.status = status;
 
     const [receipts, total] = await Promise.all([
       Receipt.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit),
-      Receipt.countDocuments(query)
+        .limit(limit)
+        .lean(),
+      Receipt.countDocuments(query),
     ]);
 
-    return { receipts, total };
+    return {
+      receipts,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      },
+    };
   }
 
   /**
-   * Get group receipts
+   * Get trip receipts.
    */
-  async getGroupReceipts(groupId: string, userId: string, options: any = {}): Promise<any> {
+  async getTripReceipts(
+    tripId: string,
+    options: { page?: number; limit?: number } = {}
+  ) {
     const { page = 1, limit = 20 } = options;
     const skip = (page - 1) * limit;
 
     const query = {
-      groupId: new Types.ObjectId(groupId),
-      'metadata.isDeleted': false
+      tripId: new Types.ObjectId(tripId),
+      isDeleted: false,
     };
 
     const [receipts, total] = await Promise.all([
       Receipt.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit),
-      Receipt.countDocuments(query)
+        .limit(limit)
+        .lean(),
+      Receipt.countDocuments(query),
     ]);
 
-    return { receipts, total };
+    return {
+      receipts,
+      pagination: { total, page, limit, pages: Math.ceil(total / limit) },
+    };
   }
 
   /**
-   * Update receipt with manual corrections
+   * Update receipt (manual corrections).
    */
-  async updateReceipt(receiptId: string, userId: string, updateData: any): Promise<any> {
-    const receipt = await Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-    
-    if (!receipt) {
-      throw new NotFoundError('Receipt');
+  async updateReceipt(receiptId: string, userId: string, updateData: any) {
+    const receipt = await Receipt.findOne({ receiptId, isDeleted: false });
+
+    if (!receipt) throw new NotFoundError('Receipt');
+    if (receipt.userId !== userId) {
+      throw new ForbiddenError('Access denied');
     }
 
-    if (receipt.userId.toString() !== userId) {
-      throw new ForbiddenError('You do not have access to this receipt');
-    }
-
-    // Update OCR data
     if (updateData.ocrData) {
-      receipt.ocrData = {
-        ...receipt.ocrData,
-        ...updateData.ocrData
-      };
+      receipt.ocrData = { ...receipt.ocrData.toObject(), ...updateData.ocrData };
     }
 
     if (updateData.status) {
@@ -180,73 +181,69 @@ export class ReceiptService {
       receipt.statusHistory.push({
         status: updateData.status,
         timestamp: new Date(),
-        message: updateData.message || 'Status updated manually'
+        message: updateData.message || 'Status updated',
       });
     }
 
-    receipt.metadata.version += 1;
+    receipt.markModified('ocrData');
     await receipt.save();
-
     return receipt;
   }
 
   /**
-   * Delete receipt
+   * Soft delete receipt.
    */
   async deleteReceipt(receiptId: string, userId: string): Promise<void> {
-    const receipt = await Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-    
-    if (!receipt) {
-      throw new NotFoundError('Receipt');
-    }
+    const receipt = await Receipt.findOne({ receiptId, isDeleted: false });
 
-    if (receipt.userId.toString() !== userId) {
-      throw new ForbiddenError('You do not have access to this receipt');
-    }
+    if (!receipt) throw new NotFoundError('Receipt');
+    if (receipt.userId !== userId) throw new ForbiddenError('Access denied');
 
-    receipt.metadata.isDeleted = true;
+    receipt.isDeleted = true;
     await receipt.save();
 
-    // Delete files
-    const originalPath = path.join(config.UPLOAD_DIR, receipt.image.originalUrl.replace('/uploads/', ''));
-    const thumbnailPath = path.join(config.UPLOAD_DIR, receipt.image.thumbnailUrl.replace('/uploads/', ''));
-    
+    // Clean up files
+    const originalPath = path.join(
+      config.UPLOAD_DIR,
+      receipt.image.originalUrl.replace('/uploads/', '')
+    );
+    const thumbnailPath = path.join(
+      config.UPLOAD_DIR,
+      receipt.image.thumbnailUrl.replace('/uploads/', '')
+    );
+
     await Promise.all([
       fs.unlink(originalPath).catch(() => {}),
-      fs.unlink(thumbnailPath).catch(() => {})
+      fs.unlink(thumbnailPath).catch(() => {}),
     ]);
 
     logger.info(`Receipt deleted: ${receiptId}`);
   }
 
   /**
-   * Reprocess receipt OCR
+   * Reprocess OCR.
    */
-  async reprocessReceipt(receiptId: string, userId: string): Promise<any> {
-    const receipt = await Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-    
-    if (!receipt) {
-      throw new NotFoundError('Receipt');
-    }
+  async reprocessReceipt(receiptId: string, userId: string) {
+    const receipt = await Receipt.findOne({ receiptId, isDeleted: false });
 
-    if (receipt.userId.toString() !== userId) {
-      throw new ForbiddenError('You do not have access to this receipt');
-    }
+    if (!receipt) throw new NotFoundError('Receipt');
+    if (receipt.userId !== userId) throw new ForbiddenError('Access denied');
 
-    // Reset OCR data
     receipt.ocrData.processed = false;
     receipt.ocrData.confidence = 0;
     receipt.status = 'PROCESSING';
     receipt.statusHistory.push({
       status: 'PROCESSING',
       timestamp: new Date(),
-      message: 'OCR reprocessing started'
+      message: 'OCR reprocessing started',
     });
     await receipt.save();
 
-    // Start reprocessing
-    const imagePath = path.join(config.UPLOAD_DIR, receipt.image.originalUrl.replace('/uploads/', ''));
-    this.processReceiptAsync(receiptId, imagePath).catch(err => {
+    const imagePath = path.join(
+      config.UPLOAD_DIR,
+      receipt.image.originalUrl.replace('/uploads/', '')
+    );
+    this.processReceiptAsync(receiptId, imagePath).catch((err) => {
       logger.error('OCR reprocessing failed:', err);
     });
 
@@ -254,26 +251,45 @@ export class ReceiptService {
   }
 
   /**
-   * Process receipt asynchronously
+   * Convert receipt data to expense input.
    */
-  private async processReceiptAsync(receiptId: string, imagePath: string): Promise<void> {
-    try {
-      await ocrProcessor.processReceipt(receiptId, imagePath);
-      logger.info(`OCR processing completed for receipt: ${receiptId}`);
-    } catch (error) {
-      logger.error(`OCR processing failed for receipt ${receiptId}:`, error);
+  async convertToExpense(receiptId: string, userId: string, tripId: string) {
+    const receipt = await this.getReceipt(receiptId, userId);
+
+    if (receipt.status !== 'COMPLETED' && receipt.status !== 'REVIEWED') {
+      throw new BadRequestError('Receipt must be processed before converting');
     }
+
+    if (!receipt.ocrData.extractedItems?.length) {
+      throw new BadRequestError('No items extracted from receipt');
+    }
+
+    // Return expense-ready data — the frontend/expense service creates the expense
+    return {
+      tripId,
+      title: `Receipt: ${receipt.ocrData.merchantName || 'Unknown'}`,
+      category: 'food', // Can be changed by user
+      amountLocal: receipt.ocrData.totalAmount || receipt.extractedTotal,
+      currency: receipt.ocrData.currency || 'INR',
+      date: receipt.ocrData.date || new Date(),
+      notes: `Auto-generated from receipt ${receiptId}`,
+      extractedItems: receipt.ocrData.extractedItems,
+      merchantName: receipt.ocrData.merchantName,
+    };
   }
 
-  /**
-   * Validate uploaded file
-   */
+  // ============================================================
+  // PRIVATE HELPERS
+  // ============================================================
+
   private validateFile(file: Express.Multer.File): void {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp'];
     const maxSize = 10 * 1024 * 1024; // 10MB
 
     if (!allowedTypes.includes(file.mimetype)) {
-      throw new BadRequestError('Invalid file type. Allowed: JPEG, PNG, HEIC, WebP');
+      throw new BadRequestError(
+        `Invalid file type: ${file.mimetype}. Allowed: JPEG, PNG, HEIC, WebP`
+      );
     }
 
     if (file.size > maxSize) {
@@ -281,44 +297,13 @@ export class ReceiptService {
     }
   }
 
-  /**
-   * Convert receipt to expense
-   */
-  async convertToExpense(receiptId: string, userId: string, groupId: string): Promise<any> {
-    const receipt = await this.getReceipt(receiptId, userId);
-    
-    if (receipt.status !== 'COMPLETED' && receipt.status !== 'REVIEWED') {
-      throw new BadRequestError('Receipt must be processed before converting to expense');
+  private async processReceiptAsync(receiptId: string, imagePath: string): Promise<void> {
+    try {
+      await ocrProcessor.processReceipt(receiptId, imagePath);
+      logger.info(`OCR completed for receipt: ${receiptId}`);
+    } catch (error) {
+      logger.error(`OCR failed for receipt ${receiptId}:`, error);
     }
-
-    if (!receipt.ocrData.extractedItems || receipt.ocrData.extractedItems.length === 0) {
-      throw new BadRequestError('No items extracted from receipt');
-    }
-
-    // Format items for expense creation
-    const lineItems = receipt.ocrData.extractedItems.map((item: any) => ({
-      name: item.name,
-      category: item.category,
-      basePrice: item.price,
-      quantity: item.quantity || 1,
-      consumers: [{
-        userId,
-        consumptionPercentage: 100
-      }]
-    }));
-
-    const expenseData = {
-      groupId,
-      description: `Receipt from ${receipt.ocrData.merchantName || 'Unknown'}`,
-      category: lineItems[0]?.category || 'Other',
-      currency: receipt.ocrData.currency || 'INR',
-      lineItems,
-      paidBy: userId,
-      paymentMethod: receipt.ocrData.paymentMethod || 'Cash',
-      paymentDate: receipt.ocrData.date || new Date()
-    };
-
-    return expenseData;
   }
 }
 

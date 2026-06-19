@@ -1,14 +1,17 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
+// ============================================================
+// TYPES
+// ============================================================
+
 export type PaymentStatus = 'pending' | 'initiated' | 'confirmed' | 'disputed';
 
 export interface ISettlementTransaction {
-  _id?: Types.ObjectId;
-  from: string;        // Firebase UID — who pays
-  fromName: string;
-  to: string;          // Firebase UID — who receives
-  toName: string;
-  amountBase: number;  // amount in trip baseCurrency
+  from: string;           // Firebase UID — who pays
+  fromName: string;       // Denormalized
+  to: string;             // Firebase UID — who receives
+  toName: string;         // Denormalized
+  amountBase: number;     // Amount in trip's baseCurrency
   baseCurrency: string;
   status: PaymentStatus;
   upiDeepLink?: string;
@@ -19,13 +22,18 @@ export interface ISettlementTransaction {
 
 export interface ISettlement extends Document {
   tripId: Types.ObjectId;
+  baseCurrency: string;
   transactions: ISettlementTransaction[];
   totalTransactions: number;
   calculatedAt: Date;
-  isStale: boolean;    // true when any expense changes after this was computed
+  isStale: boolean;       // True when an expense changes after calculation
   createdAt: Date;
   updatedAt: Date;
 }
+
+// ============================================================
+// SUB-SCHEMA: Transaction
+// ============================================================
 
 const transactionSchema = new Schema<ISettlementTransaction>(
   {
@@ -45,8 +53,12 @@ const transactionSchema = new Schema<ISettlementTransaction>(
     initiatedAt: { type: Date },
     confirmedAt: { type: Date },
   },
-  { _id: true }
+  { _id: true } // Each transaction needs its own _id for reference
 );
+
+// ============================================================
+// MAIN SCHEMA: Settlement
+// ============================================================
 
 const settlementSchema = new Schema<ISettlement>(
   {
@@ -54,14 +66,59 @@ const settlementSchema = new Schema<ISettlement>(
       type: Schema.Types.ObjectId,
       ref: 'Trip',
       required: true,
+      unique: true, // One settlement per trip
       index: true,
     },
-    transactions: { type: [transactionSchema], default: [] },
-    totalTransactions: { type: Number, default: 0 },
-    calculatedAt: { type: Date, default: Date.now },
-    isStale: { type: Boolean, default: false, index: true },
+    baseCurrency: {
+      type: String,
+      required: true,
+      uppercase: true,
+    },
+    transactions: {
+      type: [transactionSchema],
+      default: [],
+    },
+    totalTransactions: {
+      type: Number,
+      default: 0,
+    },
+    calculatedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    isStale: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
-  { timestamps: true, versionKey: false }
+  {
+    timestamps: true,
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+// ============================================================
+// VIRTUALS
+// ============================================================
+
+settlementSchema.virtual('totalAmount').get(function () {
+  return this.transactions.reduce((sum, t) => sum + t.amountBase, 0);
+  return this.transactions.filter((t) => t.status === 'pending').length;
+});
+
+settlementSchema.virtual('confirmedCount').get(function () {
+  return this.transactions.filter((t) => t.status === 'confirmed').length;
+});
+
+settlementSchema.virtual('isFullySettled').get(function () {
+  return this.transactions.every((t) => t.status === 'confirmed');
+});
+
+// ============================================================
+// EXPORT
+// ============================================================
 
 export const Settlement = model<ISettlement>('Settlement', settlementSchema);

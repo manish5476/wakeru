@@ -1,168 +1,64 @@
-// import { Router, Request, Response, NextFunction } from 'express';
-// // import * as settlementService from './settlement.service';
-// import { AuthMiddleware } from '../auth/auth.middleware';
-// import { AppError } from '../../shared/errors/AppError';
+import { Router } from 'express';
+import * as settlementController from './settlement.controller';
+import { protect } from '../auth/auth.middleware';
+import { validate } from '../trips/trip.middleware';
+import {
+  tripSettlementParamSchema,
+  initiatePaymentSchema,
+  confirmPaymentSchema,
+  disputePaymentSchema,
+} from './settlement.validation';
 
-// const getUser = (req: Request) => {
-//     const user = (req as any).user;
-//     if (!user?.uid) throw new AppError('Not authenticated', 401);
-//     return user as { uid: string; displayName: string };
-// };
+const router = Router();
 
-// // ─────────────────────────────────────────────────────────────────────────────
-// // CONTROLLERS
-// // ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// ALL ROUTES REQUIRE AUTHENTICATION
+// ============================================================
+router.use(protect);
 
-// /**
-//  * GET /api/v1/settlements/trip/:tripId
-//  * Get current settlement plan. Recalculates if stale.
-//  */
-// const getSettlement = async (
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-// ): Promise<void> => {
-//     try {
-//         const user = getUser(req);
-//         const { tripId } = req.params;
+// ============================================================
+// SETTLEMENT ROUTES
+// ============================================================
 
-//         const settlement = await settlementService.getSettlement(tripId, user.uid);
+/**
+ * GET  /api/v1/settlements/trip/:tripId             → Get settlement
+ * POST /api/v1/settlements/trip/:tripId/calculate    → Recalculate
+ * POST /api/v1/settlements/trip/:tripId/pay          → Initiate UPI payment
+ * POST /api/v1/settlements/trip/:tripId/confirm      → Confirm payment
+ * POST /api/v1/settlements/trip/:tripId/dispute      → Dispute payment
+ */
 
-//         res.status(200).json({
-//             success: true,
-//             data: { settlement },
-//         });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
+router.get(
+  '/trip/:tripId',
+  validate(tripSettlementParamSchema, 'params'),
+  settlementController.getSettlement
+);
 
-// /**
-//  * POST /api/v1/settlements/trip/:tripId/calculate
-//  * Force recalculate the settlement plan.
-//  */
-// const calculateSettlement = async (
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-// ): Promise<void> => {
-//     try {
-//         const user = getUser(req);
-//         const { tripId } = req.params;
+router.post(
+  '/trip/:tripId/calculate',
+  validate(tripSettlementParamSchema, 'params'),
+  settlementController.calculateSettlement
+);
 
-//         const settlement = await settlementService.calculateSettlement(
-//             tripId,
-//             user.uid
-//         );
+router.post(
+  '/trip/:tripId/pay',
+  validate(tripSettlementParamSchema, 'params'),
+  validate(initiatePaymentSchema),
+  settlementController.initiatePayment
+);
 
-//         res.status(200).json({
-//             success: true,
-//             message: 'Settlement recalculated',
-//             data: { settlement },
-//         });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
+router.post(
+  '/trip/:tripId/confirm',
+  validate(tripSettlementParamSchema, 'params'),
+  validate(confirmPaymentSchema),
+  settlementController.confirmPayment
+);
 
-// /**
-//  * POST /api/v1/settlements/trip/:tripId/pay/:transactionId
-//  * Initiate a UPI payment for a specific transaction.
-//  */
-// const initiatePayment = async (
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-// ): Promise<void> => {
-//     try {
-//         const user = getUser(req);
-//         const { tripId, transactionId } = req.params;
+router.post(
+  '/trip/:tripId/dispute',
+  validate(tripSettlementParamSchema, 'params'),
+  validate(disputePaymentSchema),
+  settlementController.disputePayment
+);
 
-//         const result = await settlementService.initiatePayment(
-//             tripId,
-//             transactionId,
-//             user.uid
-//         );
-
-//         res.status(200).json({
-//             success: true,
-//             message: 'Payment initiated',
-//             data: result,
-//         });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
-
-// /**
-//  * POST /api/v1/settlements/trip/:tripId/confirm/:transactionId
-//  * Recipient confirms they received payment.
-//  */
-// const confirmPayment = async (
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-// ): Promise<void> => {
-//     try {
-//         const user = getUser(req);
-//         const { tripId, transactionId } = req.params;
-
-//         const settlement = await settlementService.confirmPayment(
-//             tripId,
-//             transactionId,
-//             user.uid
-//         );
-
-//         res.status(200).json({
-//             success: true,
-//             message: 'Payment confirmed. Splits marked as paid.',
-//             data: { settlement },
-//         });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
-
-// /**
-//  * POST /api/v1/settlements/trip/:tripId/dispute/:transactionId
-//  * Flag a transaction as disputed.
-//  */
-// const disputePayment = async (
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-// ): Promise<void> => {
-//     try {
-//         const user = getUser(req);
-//         const { tripId, transactionId } = req.params;
-
-//         const settlement = await settlementService.disputePayment(
-//             tripId,
-//             transactionId,
-//             user.uid
-//         );
-
-//         res.status(200).json({
-//             success: true,
-//             message: 'Transaction flagged as disputed',
-//             data: { settlement },
-//         });
-//     } catch (err) {
-//         next(err);
-//     }
-// };
-
-// // ─────────────────────────────────────────────────────────────────────────────
-// // ROUTER
-// // ─────────────────────────────────────────────────────────────────────────────
-
-// const router = Router();
-// router.use(AuthMiddleware.authenticate);
-
-// router.get('/trip/:tripId', getSettlement);
-// router.post('/trip/:tripId/calculate', calculateSettlement);
-// router.post('/trip/:tripId/pay/:transactionId', initiatePayment);
-// router.post('/trip/:tripId/confirm/:transactionId', confirmPayment);
-// router.post('/trip/:tripId/dispute/:transactionId', disputePayment);
-
-// export default router;
+export default router;

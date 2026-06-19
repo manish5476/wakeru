@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { Trip } from './trip.model';
-import { AppError } from '../../shared/errors/AppError';
+import { AppError } from '@shared/errors/AppError';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ZOD VALIDATION MIDDLEWARE
@@ -17,28 +17,28 @@ import { AppError } from '../../shared/errors/AppError';
  */
 export const validate =
   (schema: ZodSchema, source: 'body' | 'params' | 'query' = 'body') =>
-  (req: Request, res: Response, next: NextFunction): void => {
-    try {
-      const parsed = schema.parse(req[source]);
-      // Attach parsed (coerced, trimmed, uppercased) data back to request
-      req[source] = parsed;
-      next();
-    } catch (err) {
-      if (err instanceof ZodError) {
-        const errors = (err as ZodError).issues.map((e: any) => ({
-          field: e.path.join('.'),
-          message: e.message,
-        }));
-        res.status(400).json({
-          success: false,
-          message: 'Validation failed',
-          errors,
-        });
-        return;
+    (req: Request, res: Response, next: NextFunction): void => {
+      try {
+        const parsed = schema.parse(req[source]);
+        // Attach parsed (coerced, trimmed, uppercased) data back to request
+        req[source] = parsed;
+        next();
+      } catch (err) {
+        if (err instanceof ZodError) {
+          const errors = err.issues.map((issue) => ({
+            field: issue.path.join('.'),
+            message: issue.message,
+          }));
+          res.status(400).json({
+            success: false,
+            message: 'Validation failed',
+            errors,
+          });
+          return;
+        }
+        next(err);
       }
-      next(err);
-    }
-  };
+    };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TRIP MEMBERSHIP GUARDS
@@ -88,7 +88,8 @@ export const requireMember = async (
 ): Promise<void> => {
   try {
     const trip = (req as any).trip;
-    const userId = (req as any).user?.uid;  // set by Firebase auth middleware
+    const userId = (req as any).user?.userId;
+    // set by Firebase auth middleware
 
     if (!trip) {
       return next(new AppError('Trip not loaded — use loadTrip() first', 500));
@@ -115,7 +116,8 @@ export const requireAdmin = async (
 ): Promise<void> => {
   try {
     const trip = (req as any).trip;
-    const userId = (req as any).user?.uid;
+    const userId = (req as any).user?.userId;
+
 
     if (!trip) {
       return next(new AppError('Trip not loaded — use loadTrip() first', 500));
@@ -143,7 +145,8 @@ export const requireEditor = async (
 ): Promise<void> => {
   try {
     const trip = (req as any).trip;
-    const userId = (req as any).user?.uid;
+    const userId = (req as any).user?.userId;
+
 
     if (!trip) {
       return next(new AppError('Trip not loaded — use loadTrip() first', 500));

@@ -1,109 +1,91 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { notificationService } from './notification.service';
-import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
+import { AppError } from '../../shared/errors/AppError';
+
+// ============================================================
+// HELPER
+// ============================================================
+
+const getUser = (req: any) => {
+  if (!req.user?.userId) throw new AppError('Not authenticated', 401);
+  return req.user.userId;
+};
+
+// ============================================================
+// CONTROLLER
+// ============================================================
 
 export class NotificationController {
-  /**
-   * Get notifications
-   */
-  async getNotifications(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  
+  async getNotifications(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = getUser(req);
       const { page, limit, unreadOnly, type } = req.query;
-      
-      const result = await notificationService.getUserNotifications(req.user!.userId, {
+
+      const result = await notificationService.getUserNotifications(userId, {
         page: Number(page) || 1,
         limit: Number(limit) || 20,
         unreadOnly: unreadOnly === 'true',
-        type: type as string
+        type: type as string,
       });
 
-      const response: ApiResponse = {
-        success: true,
-        message: 'Notifications retrieved successfully',
-        data: result,
-        timestamp: new Date().toISOString()
-      };
-
-      res.status(200).json(response);
+      res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
   }
 
-  /**
-   * Get unread count
-   */
-  async getUnreadCount(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async getUnreadCount(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const count = await notificationService.getUnreadCount(req.user!.userId);
+      const userId = getUser(req);
+      const count = await notificationService.getUnreadCount(userId);
 
-      const response: ApiResponse = {
+      res.status(200).json({
         success: true,
-        message: 'Unread count retrieved successfully',
         data: { unreadCount: count },
-        timestamp: new Date().toISOString()
-      };
-
-      res.status(200).json(response);
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  /**
-   * Mark as read
-   */
-  async markAsRead(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async markAsRead(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { notificationId } = req.params;
-      await notificationService.markAsRead(notificationId, req.user!.userId);
+      const userId = getUser(req);
+      await notificationService.markAsRead(req.params.notificationId, userId);
 
-      const response: ApiResponse = {
+      res.status(200).json({
         success: true,
         message: 'Notification marked as read',
-        timestamp: new Date().toISOString()
-      };
-
-      res.status(200).json(response);
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  /**
-   * Mark all as read
-   */
-  async markAllAsRead(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async markAllAsRead(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      await notificationService.markAllAsRead(req.user!.userId);
+      const userId = getUser(req);
+      await notificationService.markAllAsRead(userId);
 
-      const response: ApiResponse = {
+      res.status(200).json({
         success: true,
         message: 'All notifications marked as read',
-        timestamp: new Date().toISOString()
-      };
-
-      res.status(200).json(response);
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  /**
-   * Delete notification
-   */
-  async deleteNotification(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async deleteNotification(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { notificationId } = req.params;
-      await notificationService.deleteNotification(notificationId, req.user!.userId);
+      const userId = getUser(req);
+      await notificationService.delete(req.params.notificationId, userId);
 
-      const response: ApiResponse = {
+      res.status(200).json({
         success: true,
         message: 'Notification deleted',
-        timestamp: new Date().toISOString()
-      };
-
-      res.status(200).json(response);
+      });
     } catch (error) {
       next(error);
     }

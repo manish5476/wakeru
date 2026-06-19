@@ -8,6 +8,9 @@ export declare const config: {
     readonly REDIS_URL: string;
     readonly REDIS_PASSWORD: string | undefined;
     readonly JWT_SECRET: string;
+    readonly JWT_REFRESH_SECRET: string;
+    readonly JWT_ACCESS_EXPIRATION: string;
+    readonly JWT_REFRESH_EXPIRATION: string;
     readonly JWT_EXPIRES_IN: string;
     readonly JWT_REFRESH_EXPIRES_IN: string;
     readonly GOOGLE_CLIENT_ID: string;

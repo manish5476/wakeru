@@ -1,8 +1,8 @@
-import { IExpenseDocument } from './expense.model';
+import { IExpense } from './expense.model';
 export declare class ExpenseRepository {
-    createExpense(expenseData: Partial<IExpenseDocument>): Promise<IExpenseDocument>;
-    findById(expenseId: string): Promise<IExpenseDocument | null>;
-    findByIdWithDeleted(expenseId: string): Promise<IExpenseDocument | null>;
+    createExpense(expenseData: Partial<IExpense>): Promise<IExpense>;
+    findById(expenseId: string): Promise<IExpense | null>;
+    findByIdWithDeleted(expenseId: string): Promise<IExpense | null>;
     findByGroupId(groupId: string, options?: {
         page?: number;
         limit?: number;
@@ -12,7 +12,7 @@ export declare class ExpenseRepository {
         sortBy?: string;
         sortOrder?: 'asc' | 'desc';
     }): Promise<{
-        expenses: IExpenseDocument[];
+        expenses: IExpense[];
         total: number;
     }>;
     findByUserId(userId: string, options?: {
@@ -21,14 +21,14 @@ export declare class ExpenseRepository {
         startDate?: Date;
         endDate?: Date;
     }): Promise<{
-        expenses: IExpenseDocument[];
+        expenses: IExpense[];
         total: number;
     }>;
-    softDelete(expenseId: string, deletedBy: string): Promise<IExpenseDocument | null>;
+    softDelete(expenseId: string, deletedBy: string): Promise<IExpense | null>;
     updateSettlementStatus(expenseId: string, userId: string, status: 'PENDING' | 'SETTLED' | 'PARTIAL'): Promise<void>;
     getGroupExpenseStats(groupId: string): Promise<any>;
     getCategoryAnalytics(userId: string, groupId: string, startDate: Date, endDate: Date): Promise<any>;
-    findByDateRange(startDate: Date, endDate: Date, groupId?: string): Promise<IExpenseDocument[]>;
+    findByDateRange(startDate: Date, endDate: Date, groupId?: string): Promise<IExpense[]>;
     getTotalExpenseAmountForPeriod(userId: string, startDate: Date, endDate: Date): Promise<number>;
 }
 export declare const expenseRepository: ExpenseRepository;

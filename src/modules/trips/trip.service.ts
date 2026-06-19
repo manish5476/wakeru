@@ -14,6 +14,89 @@ import {
 import { AppError } from '../../shared/errors/AppError';
 
 // ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type TripTemplate = 'quick' | 'domestic' | 'international';
+
+interface TemplateConfig {
+  autoCreateStop: boolean;
+  stopCurrency?: string;
+  allowMultiCurrency: boolean;
+  description: string;
+}
+
+const TEMPLATE_CONFIGS: Record<TripTemplate, TemplateConfig> = {
+  quick: {
+    autoCreateStop: true,
+    allowMultiCurrency: false,
+    description: 'One stop, one currency — perfect for a single destination trip',
+  },
+  domestic: {
+    autoCreateStop: false,
+    allowMultiCurrency: false,
+    description: 'Multiple stops within one country — all expenses in one currency',
+  },
+  international: {
+    autoCreateStop: false,
+    allowMultiCurrency: true,
+    description: 'Multiple countries with different currencies and exchange rates',
+  },
+};
+
+/**
+ * Create a trip using a template.
+ * Templates pre-configure the trip for common travel scenarios.
+ *
+ * @param template - 'quick' | 'domestic' | 'international'
+ * @param input - Trip creation data
+ * @param creator - The user creating the trip
+ */
+export const createTripFromTemplate = async (
+  template: TripTemplate,
+  input: CreateTripInput,
+  creator: UserInfo
+): Promise<ITrip> => {
+  const config = TEMPLATE_CONFIGS[template];
+
+  if (!config) {
+    throw new AppError(
+      `Invalid template: ${template}. Must be quick, domestic, or international`,
+      400
+    );
+  }
+
+  // For Quick Trip: auto-create a matching stop
+  if (config.autoCreateStop && !input.initialStop) {
+    input.initialStop = {
+      name: input.title,
+      currency: input.baseCurrency,
+      currentExchangeRate: 1.0,
+      startDate: input.startDate,
+      endDate: input.endDate,
+    };
+  }
+
+  const trip = await createTrip(input, creator);
+
+  return trip;
+};
+
+/**
+ * Get available templates with descriptions.
+ * Useful for the frontend template picker screen.
+ */
+export const getTemplates = () => {
+  return Object.entries(TEMPLATE_CONFIGS).map(([key, config]) => ({
+    id: key as TripTemplate,
+    name: key === 'quick' ? 'Quick Trip' 
+      : key === 'domestic' ? 'Domestic Multi-City' 
+      : 'International Tour',
+    ...config,
+  }));
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -37,6 +120,42 @@ interface TripFilters {
  * The creator is automatically added as an admin member.
  * If initialStop is provided, it is added as the first stop.
  */
+// export const createTrip = async (
+//   input: CreateTripInput,
+//   creator: UserInfo
+// ): Promise<ITrip> => {
+//   const { initialStop, ...tripData } = input;
+
+//   const creatorMember: ITripMember = {
+//     userId: creator.uid,
+//     displayName: creator.displayName,
+//     photoURL: creator.photoURL,
+//     role: 'admin',
+//     joinedAt: new Date(),
+//     isActive: true,
+//     totalPaidBase: 0,
+//     totalOwesBase: 0,
+//   };
+
+//   const trip = new Trip({
+//     ...tripData,
+//     createdBy: creator.uid,
+//     members: [creatorMember],
+//     stops: [],
+//     stopCount: 0,
+//     totalSpentBase: 0,
+//   });
+
+//   // If the creator included an initial stop (e.g. from Quick Trip template)
+//   if (initialStop) {
+//     const stop = buildStopSubdoc(initialStop, creator.uid, 0);
+//     trip.stops.push(stop as any);
+//     trip.stopCount = 1;
+//   }
+
+//   await trip.save();
+//   return trip;
+// };
 export const createTrip = async (
   input: CreateTripInput,
   creator: UserInfo
@@ -63,17 +182,31 @@ export const createTrip = async (
     totalSpentBase: 0,
   });
 
-  // If the creator included an initial stop (e.g. from Quick Trip template)
+  // ✅ NEW: Always ensure at least ONE stop exists
   if (initialStop) {
     const stop = buildStopSubdoc(initialStop, creator.uid, 0);
     trip.stops.push(stop as any);
-    trip.stopCount = 1;
+  } else {
+    // Auto-create a default stop matching the trip
+    // This makes the trip work like a simple expense group for basic users
+    const defaultStop = buildStopSubdoc(
+      {
+        name: tripData.title,
+        currency: tripData.baseCurrency,
+        currentExchangeRate: 1.0,
+        startDate: tripData.startDate,
+        endDate: tripData.endDate,
+      },
+      creator.uid,
+      0
+    );
+    trip.stops.push(defaultStop as any);
   }
 
+  trip.stopCount = trip.stops.length;
   await trip.save();
   return trip;
 };
-
 /**
  * Get all trips where the user is an active member.
  * Excludes archived trips by default.

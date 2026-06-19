@@ -1,55 +1,74 @@
 import { Notification } from './notification.model';
 import { User } from '../auth/auth.model';
-import { logger } from '../../config/logger';
-import { Types } from 'mongoose';
-import { redisClient } from '../../config/redis';
-import { IGroupMember, Group } from '../group/group.model';
+import { Trip } from '../trips/trip.model';
 import { Expense } from '../expense/expense.model';
+import { logger } from '../../config/logger';
+import { AppError } from '../../shared/errors/AppError';
+
+// ============================================================
+// TYPES
+// ============================================================
+
+interface CreateNotificationOptions {
+  data?: Record<string, any>;
+  isActionable?: boolean;
+  actionUrl?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  channels?: Partial<{
+    inApp: boolean;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  }>;
+}
+
+interface NotificationQuery {
+  page?: number;
+  limit?: number;
+  unreadOnly?: boolean;
+  type?: string;
+}
+
+// ============================================================
+// NOTIFICATION SERVICE
+// ============================================================
 
 export class NotificationService {
+  
   /**
-   * Create a notification
+   * Create a notification for a user.
    */
-  async createNotification(
+  async create(
     userId: string,
     type: string,
     title: string,
     message: string,
-    options: {
-      data?: any;
-      isActionable?: boolean;
-      actionUrl?: string;
-      priority?: 'low' | 'medium' | 'high' | 'urgent';
-      channels?: Partial<{ inApp: boolean; email: boolean; push: boolean; sms: boolean }>;
-    } = {}
-  ): Promise<any> {
+    options: CreateNotificationOptions = {}
+  ) {
     try {
       const notification = new Notification({
-        userId: new Types.ObjectId(userId),
+        userId,
         type,
         title,
         message,
         data: options.data,
-        isActionable: options.isActionable || false,
+        isActionable: options.isActionable ?? false,
         actionUrl: options.actionUrl,
-        priority: options.priority || 'medium',
+        priority: options.priority ?? 'medium',
         channels: {
           inApp: options.channels?.inApp ?? true,
           email: options.channels?.email ?? false,
           push: options.channels?.push ?? false,
-          sms: options.channels?.sms ?? false
-        }
+          sms: options.channels?.sms ?? false,
+        },
       });
 
       await notification.save();
 
-      // Send through other channels
-      this.sendThroughChannels(notification, userId).catch(err => {
-        logger.error('Failed to send notification through channels:', err);
+      // Fire-and-forget: send through other channels
+      this.sendThroughChannels(notification).catch((err) => {
+        logger.error('Channel delivery failed:', err);
       });
-
-      // Invalidate notification cache
-      await redisClient.delete(`notifications:${userId}:unread`);
 
       return notification;
     } catch (error) {
@@ -59,283 +78,310 @@ export class NotificationService {
   }
 
   /**
-   * Get user's notifications
+   * Get user's notifications (paginated).
    */
-  async getUserNotifications(
-    userId: string,
-    options: {
-      page?: number;
-      limit?: number;
-      unreadOnly?: boolean;
-      type?: string;
-    } = {}
-  ): Promise<any> {
+  async getUserNotifications(userId: string, options: NotificationQuery = {}) {
     const { page = 1, limit = 20, unreadOnly = false, type } = options;
     const skip = (page - 1) * limit;
 
-    const query: any = { userId: new Types.ObjectId(userId) };
-    
-    if (unreadOnly) {
-      query.isRead = false;
-    }
-
-    if (type) {
-      query.type = type;
-    }
+    const query: Record<string, any> = { userId };
+    if (unreadOnly) query.isRead = false;
+    if (type) query.type = type;
 
     const [notifications, total, unreadCount] = await Promise.all([
       Notification.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit),
+        .limit(limit)
+        .lean(),
       Notification.countDocuments(query),
-      Notification.countDocuments({ userId: new Types.ObjectId(userId), isRead: false })
+      Notification.countDocuments({ userId, isRead: false }),
     ]);
 
     return {
       notifications,
-      total,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+        hasMore: skip + notifications.length < total,
+      },
       unreadCount,
-      page,
-      limit
     };
   }
 
   /**
-   * Mark notification as read
+   * Mark single notification as read.
    */
-  async markAsRead(notificationId: string, userId: string): Promise<any> {
+  async markAsRead(notificationId: string, userId: string) {
     const notification = await Notification.findOneAndUpdate(
-      { _id: notificationId, userId: new Types.ObjectId(userId) },
-      { 
-        $set: { 
-          isRead: true,
-          readAt: new Date()
-        } 
-      },
+      { _id: notificationId, userId },
+      { $set: { isRead: true, readAt: new Date() } },
       { new: true }
     );
 
-    if (notification) {
-      await redisClient.delete(`notifications:${userId}:unread`);
-    }
-
+    if (!notification) throw new AppError('Notification not found', 404);
     return notification;
   }
 
   /**
-   * Mark all notifications as read
+   * Mark ALL notifications as read for a user.
    */
   async markAllAsRead(userId: string): Promise<void> {
     await Notification.updateMany(
-      { userId: new Types.ObjectId(userId), isRead: false },
-      { 
-        $set: { 
-          isRead: true,
-          readAt: new Date()
-        } 
-      }
+      { userId, isRead: false },
+      { $set: { isRead: true, readAt: new Date() } }
     );
-
-    await redisClient.delete(`notifications:${userId}:unread`);
   }
 
   /**
-   * Delete notification
+   * Delete a notification.
    */
-  async deleteNotification(notificationId: string, userId: string): Promise<void> {
-    await Notification.findOneAndDelete({
+  async delete(notificationId: string, userId: string): Promise<void> {
+    const result = await Notification.findOneAndDelete({
       _id: notificationId,
-      userId: new Types.ObjectId(userId)
+      userId,
     });
+
+    if (!result) throw new AppError('Notification not found', 404);
   }
 
   /**
-   * Get unread count
+   * Get unread count.
    */
   async getUnreadCount(userId: string): Promise<number> {
-    const cacheKey = `notifications:${userId}:unread`;
-    
-    const cached = await redisClient.get(cacheKey);
-    if (cached) {
-      return parseInt(cached);
-    }
-
-    const count = await Notification.countDocuments({
-      userId: new Types.ObjectId(userId),
-      isRead: false
-    });
-
-    await redisClient.set(cacheKey, count.toString(), 300); // 5 minutes
-
-    return count;
+    return Notification.countDocuments({ userId, isRead: false });
   }
 
-  /**
-   * Send expense notification
-   */
-  async notifyExpenseAdded(groupId: string, expenseId: string, createdBy: string): Promise<void> {
-    const [group, expense] = await Promise.all([
-      Group.findOne({ groupId }).populate('members.userId', 'userId email preferences'),
-      Expense.findOne({ expenseId })
-    ]);
-
-    if (!group || !expense) return;
-
-    const creator = group.members.find((m: IGroupMember) => m.userId._id.toString() === createdBy);
-    
-    for (const member of group.members) {
-      if (member.userId._id.toString() === createdBy) continue;
-      
-      const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
-      if (!notificationPreferences?.muteExpenses) {
-        await this.createNotification(
-          member.userId._id.toString(),
-          'EXPENSE_ADDED',
-          'New Expense Added',
-          `${creator?.userId?.displayName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`,
-          {
-            data: { groupId, expenseId },
-            isActionable: true,
-            actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
-            priority: 'medium',
-            channels: { email: notificationPreferences?.email }
-          }
-        );
-      }
-    }
-  }
+  // ============================================================
+  // TRIPSPLIT-SPECIFIC NOTIFICATIONS
+  // ============================================================
 
   /**
-   * Notify settlement completed
+   * Notify all trip members (except the actor) about a new expense.
    */
-  async notifySettlementCompleted(settlement: any): Promise<void> {
-    const [fromUser, toUser] = await Promise.all([
-      User.findById(settlement.fromUser),
-      User.findById(settlement.toUser)
-    ]);
+  async notifyExpenseAdded(
+    tripId: string,
+    expenseId: string,
+    actorUid: string
+  ): Promise<void> {
+    const trip = await Trip.findById(tripId).lean();
+    if (!trip) return;
 
-    // Notify payer
-    await this.createNotification(
-      settlement.fromUser.toString(),
-      'SETTLEMENT_COMPLETED',
-      'Payment Sent',
-      `You paid ${toUser?.displayName} ₹${settlement.amount}`,
-      {
-        data: { settlementId: settlement.settlementId },
-        priority: 'high',
-        channels: { push: true }
-      }
-    );
+    const expense = await Expense.findById(expenseId).lean();
+    if (!expense) return;
 
-    // Notify recipient
-    await this.createNotification(
-      settlement.toUser.toString(),
-      'SETTLEMENT_COMPLETED',
-      'Payment Received',
-      `${fromUser?.displayName} paid you ₹${settlement.amount}`,
-      {
-        data: { settlementId: settlement.settlementId },
-        priority: 'high',
-        channels: { push: true }
-      }
-    );
-  }
+    const actor = trip.members.find((m) => m.userId === actorUid);
+    const actorName = actor?.displayName || 'Someone';
 
-  /**
-   * Notify payment reminder
-   */
-  async notifyPaymentReminder(fromUserId: string, toUserId: string, amount: number): Promise<void> {
-    const [fromUser, toUser] = await Promise.all([
-      User.findById(fromUserId),
-      User.findById(toUserId)
-    ]);
+    for (const member of trip.members) {
+      if (member.userId === actorUid || !member.isActive) continue;
 
-    await this.createNotification(
-      fromUserId,
-      'PAYMENT_REMINDER',
-      'Payment Reminder',
-      `Reminder: You owe ${toUser?.displayName} ₹${amount}`,
-      {
-        priority: 'urgent',
-        channels: { push: true, email: true }
-      }
-    );
-  }
-
-  /**
-   * Send monthly report notification
-   */
-  async notifyMonthlyReport(userId: string, reportData: any): Promise<void> {
-    const user = await User.findById(userId);
-    
-    if (user?.preferences.get('notificationPreferences')?.monthlyReports) {
-      await this.createNotification(
-        userId,
-        'MONTHLY_REPORT',
-        'Monthly Spending Report',
-        `Your monthly spending report is ready. Total: ₹${reportData.totalSpent}`,
+      await this.create(
+        member.userId,
+        'EXPENSE_ADDED',
+        'New Expense Added',
+        `${actorName} added "${expense.title}" — ${expense.amountLocal} ${expense.localCurrency}`,
         {
-          data: { reportUrl: `/reports/monthly` },
+          data: { tripId, expenseId: expense._id.toString(), stopId: expense.stopId.toString() },
           isActionable: true,
-          priority: 'low',
-          channels: { email: true }
+          actionUrl: `/trips/${tripId}/expenses/${expense._id}`,
+          priority: 'medium',
         }
       );
     }
   }
 
   /**
-   * Send through different channels
+   * Notify about settlement request.
    */
-  private async sendThroughChannels(notification: any, userId: string): Promise<void> {
-    const user = await User.findById(userId);
+  async notifySettlementRequest(
+    fromUid: string,
+    toUid: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string
+  ): Promise<void> {
+    const [fromUser, toUser] = await Promise.all([
+      User.findById(fromUid).lean(),
+      User.findById(toUid).lean(),
+    ]);
+
+    await this.create(
+      toUid,
+      'SETTLEMENT_REQUEST',
+      'Settlement Request',
+      `${fromUser?.displayName || 'Someone'} requests ₹${amount} ${baseCurrency}`,
+      {
+        data: { tripId, fromUid, amount, baseCurrency },
+        isActionable: true,
+        actionUrl: `/trips/${tripId}/settle`,
+        priority: 'high',
+        channels: { push: true, email: true },
+      }
+    );
+  }
+
+  /**
+   * Notify about completed settlement.
+   */
+  async notifySettlementCompleted(
+    fromUid: string,
+    toUid: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string
+  ): Promise<void> {
+    const [fromUser, toUser] = await Promise.all([
+      User.findById(fromUid).lean(),
+      User.findById(toUid).lean(),
+    ]);
+
+    // Notify payer
+    await this.create(
+      fromUid,
+      'SETTLEMENT_COMPLETED',
+      'Payment Sent',
+      `You paid ${toUser?.displayName || 'Someone'} ₹${amount} ${baseCurrency}`,
+      {
+        data: { tripId, toUid, amount },
+        priority: 'high',
+        channels: { push: true },
+      }
+    );
+
+    // Notify recipient
+    await this.create(
+      toUid,
+      'SETTLEMENT_COMPLETED',
+      'Payment Received',
+      `${fromUser?.displayName || 'Someone'} paid you ₹${amount} ${baseCurrency}`,
+      {
+        data: { tripId, fromUid, amount },
+        priority: 'high',
+        channels: { push: true },
+      }
+    );
+  }
+
+  /**
+   * Notify user about trip invitation.
+   */
+  async notifyTripInvitation(
+    toUid: string,
+    tripId: string,
+    tripTitle: string,
+    inviterName: string
+  ): Promise<void> {
+    await this.create(
+      toUid,
+      'TRIP_INVITATION',
+      'Trip Invitation',
+      `${inviterName} invited you to "${tripTitle}"`,
+      {
+        data: { tripId },
+        isActionable: true,
+        actionUrl: `/trips/${tripId}/join`,
+        priority: 'high',
+        channels: { push: true, email: true },
+      }
+    );
+  }
+
+  /**
+   * Notify trip members that someone joined.
+   */
+  async notifyTripJoined(
+    tripId: string,
+    joinerUid: string
+  ): Promise<void> {
+    const trip = await Trip.findById(tripId).lean();
+    if (!trip) return;
+
+    const joiner = trip.members.find((m) => m.userId === joinerUid);
+    const joinerName = joiner?.displayName || 'Someone';
+
+    for (const member of trip.members) {
+      if (member.userId === joinerUid || !member.isActive) continue;
+
+      await this.create(
+        member.userId,
+        'TRIP_JOINED',
+        'New Member Joined',
+        `${joinerName} joined "${trip.title}"`,
+        {
+          data: { tripId, joinerUid },
+          priority: 'low',
+        }
+      );
+    }
+  }
+
+  /**
+   * Notify user about payment reminder.
+   */
+  async notifyPaymentReminder(
+    fromUid: string,
+    toUid: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string
+  ): Promise<void> {
+    const toUser = await User.findById(toUid).lean();
+
+    await this.create(
+      fromUid,
+      'PAYMENT_REMINDER',
+      'Payment Reminder',
+      `Reminder: You owe ${toUser?.displayName || 'Someone'} ₹${amount} ${baseCurrency}`,
+      {
+        data: { tripId, toUid, amount },
+        isActionable: true,
+        actionUrl: `/trips/${tripId}/settle`,
+        priority: 'urgent',
+        channels: { push: true, email: true },
+      }
+    );
+  }
+
+  // ============================================================
+  // CHANNEL DELIVERY (Placeholders)
+  // ============================================================
+
+  private async sendThroughChannels(notification: any): Promise<void> {
+    const user = await User.findById(notification.userId).lean();
     if (!user) return;
 
-    // Send push notification
+    const promises: Promise<void>[] = [];
+
     if (notification.channels.push) {
-      this.sendPushNotification(userId, notification).catch(err => {
-        logger.error('Push notification failed:', err);
-      });
+      promises.push(this.sendPush(user, notification));
     }
-
-    // Send email
     if (notification.channels.email) {
-      this.sendEmailNotification(user.email, notification).catch(err => {
-        logger.error('Email notification failed:', err);
-      });
+      promises.push(this.sendEmail(user.email, notification));
     }
-
-    // Send SMS
     if (notification.channels.sms && user.phoneNumber) {
-      this.sendSMSNotification(user.phoneNumber, notification).catch(err => {
-        logger.error('SMS notification failed:', err);
-      });
+      promises.push(this.sendSMS(user.phoneNumber, notification));
     }
+
+    await Promise.allSettled(promises);
   }
 
-  /**
-   * Send push notification (placeholder)
-   */
-  private async sendPushNotification(userId: string, notification: any): Promise<void> {
-    // TODO: Integrate with Firebase Cloud Messaging or APNs
-    logger.info(`Push notification sent to user ${userId}: ${notification.title}`);
+  private async sendPush(user: any, notification: any): Promise<void> {
+    if (!user.fcmToken) return;
+    // TODO: Integrate with Firebase Cloud Messaging
+    logger.info(`📱 Push to ${user._id}: ${notification.title}`);
   }
 
-  /**
-   * Send email notification (placeholder)
-   */
-  private async sendEmailNotification(email: string, notification: any): Promise<void> {
-    // TODO: Integrate with email service (SendGrid, SES, etc.)
-    logger.info(`Email sent to ${email}: ${notification.title}`);
+  private async sendEmail(email: string, notification: any): Promise<void> {
+    // TODO: Integrate with SendGrid / SES
+    logger.info(`📧 Email to ${email}: ${notification.title}`);
   }
 
-  /**
-   * Send SMS notification (placeholder)
-   */
-  private async sendSMSNotification(phone: string, notification: any): Promise<void> {
-    // TODO: Integrate with SMS service (Twilio, etc.)
-    logger.info(`SMS sent to ${phone}: ${notification.title}`);
+  private async sendSMS(phone: string, notification: any): Promise<void> {
+    // TODO: Integrate with Twilio
+    logger.info(`💬 SMS to ${phone}: ${notification.title}`);
   }
 }
 

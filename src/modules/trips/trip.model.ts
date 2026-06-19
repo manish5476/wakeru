@@ -96,6 +96,7 @@ export interface ITrip extends Document {
 
   // Currency — the entire financial system anchors to this
   baseCurrency: string;    // e.g. "INR" — ALL analytics & settlement display in this
+  template?: 'quick' | 'domestic' | 'international';
 
   // Budget
   totalBudget?: number;    // optional overall budget in baseCurrency
@@ -252,7 +253,10 @@ const tripSchema = new Schema<ITrip>(
       maxlength: [1000, 'Description cannot exceed 1000 characters'],
     },
     coverImage: { type: String },
-
+    template: {
+      type: String,
+      enum: ['quick', 'domestic', 'international'],
+    },
     startDate: {
       type: Date,
       required: [true, 'Start date is required'],
