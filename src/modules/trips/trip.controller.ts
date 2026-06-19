@@ -543,6 +543,67 @@ export const revokeInviteCode = async (
     next(err);
   }
 };
+
+// /**
+//  * GET /api/v1/trips/templates
+//  * Get available trip templates with descriptions.
+//  */
+// export const getTemplates = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): Promise<void> => {
+//   try {
+//     const templates = tripService.getTemplates();
+
+//     res.status(200).json({
+//       success: true,
+//       data: { templates },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
+// /**
+//  * POST /api/v1/trips/template/:type
+//  * Create a trip from a template.
+//  */
+// export const createTripFromTemplate = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): Promise<void> => {
+//   try {
+//     const user = getUser(req);
+//     const { type } = req.params as { type: string };
+//     const input = req.body as CreateTripInput;
+
+//     const trip = await tripService.createTripFromTemplate(
+//       type as 'quick' | 'domestic' | 'international',
+//       input,
+//       {
+//         uid: user.uid,
+//         displayName: user.displayName,
+//         photoURL: user.photoURL,
+//       }
+//     );
+
+//     res.status(201).json({
+//       success: true,
+//       message: `Trip created using ${type} template`,
+//       data: { trip },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
+
+
+
+
+
 /**
  * GET /api/v1/trips/templates
  * Get available trip templates with descriptions.

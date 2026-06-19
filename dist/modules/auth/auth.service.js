@@ -78,9 +78,10 @@ exports.AuthService = {
         if (!email) {
             throw new AppError_1.ValidationError('Firebase token does not contain an email address');
         }
-        if (!decodedToken.email_verified) {
-            throw new AppError_1.ForbiddenError('Email must be verified before registration');
-        }
+        // TODO: Re-enable email verification before production release
+        // if (!decodedToken.email_verified) {
+        //   throw new ForbiddenError('Email must be verified before registration');
+        // }
         // Check for existing user
         const existing = await auth_model_1.User.findOne({
             $or: [

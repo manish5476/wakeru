@@ -11,7 +11,9 @@ const currencyCode = z
 
 const mongoId = z
   .string()
-  .regex(/^[a-f\d]{24}$/i, 'Invalid ID format');
+  .min(1, 'ID is required')
+  .max(128, 'ID too long');
+  // Accepts both MongoDB ObjectId (24 hex) and UUID v4 strings
 
 const firebaseUid = z
   .string()

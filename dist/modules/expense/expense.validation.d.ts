@@ -382,9 +382,9 @@ export declare const createExpenseSchema: z.ZodObject<{
     } | {
         method: "personal";
     };
-    amountLocal: number;
-    stopId: string;
     title: string;
+    stopId: string;
+    amountLocal: number;
     category: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other";
     paidBy: string;
     notes?: string | undefined;
@@ -416,13 +416,13 @@ export declare const createExpenseSchema: z.ZodObject<{
     } | {
         method: "personal";
     };
-    amountLocal: number;
-    stopId: string;
     title: string;
+    stopId: string;
+    amountLocal: number;
     paidBy: string;
     date?: Date | undefined;
-    category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     notes?: string | undefined;
+    category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
 }>;
 export declare const updateExpenseSchema: z.ZodObject<{
     title: z.ZodOptional<z.ZodString>;
@@ -574,10 +574,10 @@ export declare const updateExpenseSchema: z.ZodObject<{
     } | {
         method: "personal";
     } | undefined;
-    amountLocal?: number | undefined;
-    title?: string | undefined;
-    category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     notes?: string | undefined;
+    title?: string | undefined;
+    amountLocal?: number | undefined;
+    category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
 }, {
     date?: Date | undefined;
@@ -608,10 +608,10 @@ export declare const updateExpenseSchema: z.ZodObject<{
     } | {
         method: "personal";
     } | undefined;
-    amountLocal?: number | undefined;
-    title?: string | undefined;
-    category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     notes?: string | undefined;
+    title?: string | undefined;
+    amountLocal?: number | undefined;
+    category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
 }>;
 export declare const expenseListQuerySchema: z.ZodObject<{
@@ -627,22 +627,22 @@ export declare const expenseListQuerySchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     limit: number;
     page: number;
-    sortBy: "createdAt" | "date" | "amountLocal" | "amountBase";
+    sortBy: "createdAt" | "date" | "amountBase" | "amountLocal";
     sortOrder: "asc" | "desc";
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
     isSettled?: boolean | undefined;
-    startDate?: Date | undefined;
-    endDate?: Date | undefined;
 }, {
     limit?: number | undefined;
     page?: number | undefined;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
     isSettled?: "true" | "false" | undefined;
-    startDate?: Date | undefined;
-    endDate?: Date | undefined;
-    sortBy?: "createdAt" | "date" | "amountLocal" | "amountBase" | undefined;
+    sortBy?: "createdAt" | "date" | "amountBase" | "amountLocal" | undefined;
     sortOrder?: "asc" | "desc" | undefined;
 }>;
 export declare const expenseParamSchema: z.ZodObject<{

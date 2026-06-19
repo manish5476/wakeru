@@ -16,7 +16,9 @@ const rateLimiter_middleware_1 = require("./middleware/rateLimiter.middleware");
 // Import routes
 const auth_1 = require("./modules/auth");
 const user_routes_1 = __importDefault(require("./modules/user/user.routes"));
+const trip_routes_1 = __importDefault(require("./modules/trips/trip.routes"));
 const expense_routes_1 = __importDefault(require("./modules/expense/expense.routes"));
+const settlement_routes_1 = __importDefault(require("./modules/settlement/settlement.routes"));
 const analytics_routes_1 = __importDefault(require("./modules/analytics/analytics.routes"));
 const receipt_routes_1 = __importDefault(require("./modules/receipt/receipt.routes"));
 // import notificationRoutes from './modules/notification/notification.routes';
@@ -52,8 +54,9 @@ app.get('/health', (req, res) => {
 // API routes with idempotency check
 app.use('/api/v1/auth', rateLimiter_middleware_1.authenticatedRateLimiter, auth_1.authRoutes);
 app.use('/api/v1/users', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, user_routes_1.default);
-// app.use('/api/v1/groups', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, groupRoutes);
+app.use('/api/v1/trips', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, trip_routes_1.default);
 app.use('/api/v1/expenses', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, expense_routes_1.default);
+app.use('/api/v1/settlements', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, settlement_routes_1.default);
 app.use('/api/v1/analytics', rateLimiter_middleware_1.authenticatedRateLimiter, analytics_routes_1.default);
 app.use('/api/v1/receipts', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, receipt_routes_1.default);
 // app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);

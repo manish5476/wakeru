@@ -17,7 +17,7 @@ import { AppError } from '../../shared/errors/AppError';
 // TEMPLATE SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type TripTemplate = 'quick' | 'domestic' | 'international';
+// export type TripTemplate = 'quick' | 'domestic' | 'international';
 
 interface TemplateConfig {
   autoCreateStop: boolean;
@@ -26,75 +26,75 @@ interface TemplateConfig {
   description: string;
 }
 
-const TEMPLATE_CONFIGS: Record<TripTemplate, TemplateConfig> = {
-  quick: {
-    autoCreateStop: true,
-    allowMultiCurrency: false,
-    description: 'One stop, one currency — perfect for a single destination trip',
-  },
-  domestic: {
-    autoCreateStop: false,
-    allowMultiCurrency: false,
-    description: 'Multiple stops within one country — all expenses in one currency',
-  },
-  international: {
-    autoCreateStop: false,
-    allowMultiCurrency: true,
-    description: 'Multiple countries with different currencies and exchange rates',
-  },
-};
+// const TEMPLATE_CONFIGS: Record<TripTemplate, TemplateConfig> = {
+//   quick: {
+//     autoCreateStop: true,
+//     allowMultiCurrency: false,
+//     description: 'One stop, one currency — perfect for a single destination trip',
+//   },
+//   domestic: {
+//     autoCreateStop: false,
+//     allowMultiCurrency: false,
+//     description: 'Multiple stops within one country — all expenses in one currency',
+//   },
+//   international: {
+//     autoCreateStop: false,
+//     allowMultiCurrency: true,
+//     description: 'Multiple countries with different currencies and exchange rates',
+//   },
+// };
 
-/**
- * Create a trip using a template.
- * Templates pre-configure the trip for common travel scenarios.
- *
- * @param template - 'quick' | 'domestic' | 'international'
- * @param input - Trip creation data
- * @param creator - The user creating the trip
- */
-export const createTripFromTemplate = async (
-  template: TripTemplate,
-  input: CreateTripInput,
-  creator: UserInfo
-): Promise<ITrip> => {
-  const config = TEMPLATE_CONFIGS[template];
+// /**
+//  * Create a trip using a template.
+//  * Templates pre-configure the trip for common travel scenarios.
+//  *
+//  * @param template - 'quick' | 'domestic' | 'international'
+//  * @param input - Trip creation data
+//  * @param creator - The user creating the trip
+//  */
+// export const createTripFromTemplate = async (
+//   template: TripTemplate,
+//   input: CreateTripInput,
+//   creator: UserInfo
+// ): Promise<ITrip> => {
+//   const config = TEMPLATE_CONFIGS[template];
 
-  if (!config) {
-    throw new AppError(
-      `Invalid template: ${template}. Must be quick, domestic, or international`,
-      400
-    );
-  }
+//   if (!config) {
+//     throw new AppError(
+//       `Invalid template: ${template}. Must be quick, domestic, or international`,
+//       400
+//     );
+//   }
 
-  // For Quick Trip: auto-create a matching stop
-  if (config.autoCreateStop && !input.initialStop) {
-    input.initialStop = {
-      name: input.title,
-      currency: input.baseCurrency,
-      currentExchangeRate: 1.0,
-      startDate: input.startDate,
-      endDate: input.endDate,
-    };
-  }
+//   // For Quick Trip: auto-create a matching stop
+//   if (config.autoCreateStop && !input.initialStop) {
+//     input.initialStop = {
+//       name: input.title,
+//       currency: input.baseCurrency,
+//       currentExchangeRate: 1.0,
+//       startDate: input.startDate,
+//       endDate: input.endDate,
+//     };
+//   }
 
-  const trip = await createTrip(input, creator);
+//   const trip = await createTrip(input, creator);
 
-  return trip;
-};
+//   return trip;
+// };
 
-/**
- * Get available templates with descriptions.
- * Useful for the frontend template picker screen.
- */
-export const getTemplates = () => {
-  return Object.entries(TEMPLATE_CONFIGS).map(([key, config]) => ({
-    id: key as TripTemplate,
-    name: key === 'quick' ? 'Quick Trip' 
-      : key === 'domestic' ? 'Domestic Multi-City' 
-      : 'International Tour',
-    ...config,
-  }));
-};
+// /**
+//  * Get available templates with descriptions.
+//  * Useful for the frontend template picker screen.
+//  */
+// export const getTemplates = () => {
+//   return Object.entries(TEMPLATE_CONFIGS).map(([key, config]) => ({
+//     id: key as TripTemplate,
+//     name: key === 'quick' ? 'Quick Trip'
+//       : key === 'domestic' ? 'Domestic Multi-City'
+//         : 'International Tour',
+//     ...config,
+//   }));
+// };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -837,3 +837,81 @@ function buildStopSubdoc(
     updatedAt: new Date(),
   };
 }
+
+
+
+
+// ============================================================
+// TEMPLATE SYSTEM
+// ============================================================
+
+export type TripTemplate = 'quick' | 'domestic' | 'international';
+
+interface TemplateConfig {
+  autoCreateStop: boolean;
+  allowMultiCurrency: boolean;
+  description: string;
+}
+
+const TEMPLATE_CONFIGS: Record<TripTemplate, TemplateConfig> = {
+  quick: {
+    autoCreateStop: true,
+    allowMultiCurrency: false,
+    description: 'One stop, one currency — perfect for a single destination trip',
+  },
+  domestic: {
+    autoCreateStop: false,
+    allowMultiCurrency: false,
+    description: 'Multiple stops within one country — all expenses in one currency',
+  },
+  international: {
+    autoCreateStop: false,
+    allowMultiCurrency: true,
+    description: 'Multiple countries with different currencies and exchange rates',
+  },
+};
+
+/**
+ * Get available templates with descriptions.
+ */
+export const getTemplates = () => {
+  return Object.entries(TEMPLATE_CONFIGS).map(([key, config]) => ({
+    id: key as TripTemplate,
+    name: key === 'quick' ? 'Quick Trip'
+      : key === 'domestic' ? 'Domestic Multi-City'
+        : 'International Tour',
+    ...config,
+  }));
+};
+
+/**
+ * Create a trip using a template.
+ */
+export const createTripFromTemplate = async (
+  template: TripTemplate,
+  input: CreateTripInput,
+  creator: UserInfo
+): Promise<ITrip> => {
+  const config = TEMPLATE_CONFIGS[template];
+
+  if (!config) {
+    throw new AppError(
+      `Invalid template: ${template}. Must be quick, domestic, or international`,
+      400
+    );
+  }
+
+  // For Quick Trip: auto-create a matching stop
+  if (config.autoCreateStop && !input.initialStop) {
+    input.initialStop = {
+      name: input.title,
+      currency: input.baseCurrency,
+      currentExchangeRate: 1.0,
+      startDate: input.startDate,
+      endDate: input.endDate,
+    };
+  }
+
+  const trip = await createTrip(input, creator);
+  return trip;
+};
