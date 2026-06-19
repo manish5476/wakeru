@@ -9,6 +9,7 @@ import {
   ExpenseListQuery,
   SplitInput,
 } from './expense.validation';
+import { markSettlementStale } from '../settlement/settlement.service';
 
 // ============================================================
 // TYPES
@@ -274,6 +275,7 @@ export const createExpense = async (
     input.paidBy,
     owedAmounts
   );
+  await markSettlementStale(trip._id.toString());
 
   return expense;
 };
@@ -541,6 +543,7 @@ export const updateExpense = async (
   expense.editedBy = editorUid;
   expense.editedAt = new Date();
   await expense.save();
+  await markSettlementStale(trip._id.toString());
 
   return expense;
 };
@@ -586,6 +589,7 @@ export const deleteExpense = async (
     expense.paidBy,
     owedAmounts
   );
+  await markSettlementStale(trip._id.toString());
 
   await expense.deleteOne();
 };
