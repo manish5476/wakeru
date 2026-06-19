@@ -3,15 +3,15 @@ export declare const equalSplitInputSchema: z.ZodObject<{
     method: z.ZodLiteral<"equal">;
     memberIds: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }>;
 export declare const percentageSplitInputSchema: z.ZodObject<{
     method: z.ZodLiteral<"percentage">;
-    members: z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
+    members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
         userId: z.ZodString;
         displayName: z.ZodString;
     }, {
@@ -24,7 +24,15 @@ export declare const percentageSplitInputSchema: z.ZodObject<{
         displayName: string;
         userId: string;
         percentage: number;
-    }>, "many">;
+    }>, "many">, {
+        displayName: string;
+        userId: string;
+        percentage: number;
+    }[], {
+        displayName: string;
+        userId: string;
+        percentage: number;
+    }[]>;
 }, "strip", z.ZodTypeAny, {
     members: {
         displayName: string;
@@ -113,14 +121,14 @@ export declare const splitInputSchema: z.ZodDiscriminatedUnion<"method", [z.ZodO
     method: z.ZodLiteral<"equal">;
     memberIds: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }>, z.ZodObject<{
     method: z.ZodLiteral<"percentage">;
-    members: z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
+    members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
         userId: z.ZodString;
         displayName: z.ZodString;
     }, {
@@ -133,7 +141,15 @@ export declare const splitInputSchema: z.ZodDiscriminatedUnion<"method", [z.ZodO
         displayName: string;
         userId: string;
         percentage: number;
-    }>, "many">;
+    }>, "many">, {
+        displayName: string;
+        userId: string;
+        percentage: number;
+    }[], {
+        displayName: string;
+        userId: string;
+        percentage: number;
+    }[]>;
 }, "strip", z.ZodTypeAny, {
     members: {
         displayName: string;
@@ -227,14 +243,14 @@ export declare const createExpenseSchema: z.ZodObject<{
         method: z.ZodLiteral<"equal">;
         memberIds: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }>, z.ZodObject<{
         method: z.ZodLiteral<"percentage">;
-        members: z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
+        members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
             userId: z.ZodString;
             displayName: z.ZodString;
         }, {
@@ -247,7 +263,15 @@ export declare const createExpenseSchema: z.ZodObject<{
             displayName: string;
             userId: string;
             percentage: number;
-        }>, "many">;
+        }>, "many">, {
+            displayName: string;
+            userId: string;
+            percentage: number;
+        }[], {
+            displayName: string;
+            userId: string;
+            percentage: number;
+        }[]>;
     }, "strip", z.ZodTypeAny, {
         members: {
             displayName: string;
@@ -332,8 +356,8 @@ export declare const createExpenseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     date: Date;
     split: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -366,8 +390,8 @@ export declare const createExpenseSchema: z.ZodObject<{
     notes?: string | undefined;
 }, {
     split: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -411,14 +435,14 @@ export declare const updateExpenseSchema: z.ZodObject<{
         method: z.ZodLiteral<"equal">;
         memberIds: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }>, z.ZodObject<{
         method: z.ZodLiteral<"percentage">;
-        members: z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
+        members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
             userId: z.ZodString;
             displayName: z.ZodString;
         }, {
@@ -431,7 +455,15 @@ export declare const updateExpenseSchema: z.ZodObject<{
             displayName: string;
             userId: string;
             percentage: number;
-        }>, "many">;
+        }>, "many">, {
+            displayName: string;
+            userId: string;
+            percentage: number;
+        }[], {
+            displayName: string;
+            userId: string;
+            percentage: number;
+        }[]>;
     }, "strip", z.ZodTypeAny, {
         members: {
             displayName: string;
@@ -516,8 +548,8 @@ export declare const updateExpenseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     date?: Date | undefined;
     split?: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -550,8 +582,8 @@ export declare const updateExpenseSchema: z.ZodObject<{
 }, {
     date?: Date | undefined;
     split?: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -587,15 +619,15 @@ export declare const expenseListQuerySchema: z.ZodObject<{
     limit: z.ZodDefault<z.ZodNumber>;
     category: z.ZodOptional<z.ZodEnum<["food", "stay", "transport", "activity", "shopping", "health", "other"]>>;
     paidBy: z.ZodOptional<z.ZodString>;
-    isSettled: z.ZodOptional<z.ZodEffects<z.ZodString, boolean, string>>;
+    isSettled: z.ZodOptional<z.ZodEffects<z.ZodEnum<["true", "false"]>, boolean, "true" | "false">>;
     startDate: z.ZodOptional<z.ZodDate>;
     endDate: z.ZodOptional<z.ZodDate>;
-    sortBy: z.ZodDefault<z.ZodEnum<["date", "amountBase", "amountLocal"]>>;
+    sortBy: z.ZodDefault<z.ZodEnum<["date", "amountBase", "amountLocal", "createdAt"]>>;
     sortOrder: z.ZodDefault<z.ZodEnum<["asc", "desc"]>>;
 }, "strip", z.ZodTypeAny, {
     limit: number;
     page: number;
-    sortBy: "date" | "amountLocal" | "amountBase";
+    sortBy: "createdAt" | "date" | "amountLocal" | "amountBase";
     sortOrder: "asc" | "desc";
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
@@ -607,10 +639,10 @@ export declare const expenseListQuerySchema: z.ZodObject<{
     page?: number | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
-    isSettled?: string | undefined;
+    isSettled?: "true" | "false" | undefined;
     startDate?: Date | undefined;
     endDate?: Date | undefined;
-    sortBy?: "date" | "amountLocal" | "amountBase" | undefined;
+    sortBy?: "createdAt" | "date" | "amountLocal" | "amountBase" | undefined;
     sortOrder?: "asc" | "desc" | undefined;
 }>;
 export declare const expenseParamSchema: z.ZodObject<{
@@ -620,6 +652,13 @@ export declare const expenseParamSchema: z.ZodObject<{
 }, {
     expenseId: string;
 }>;
+export declare const stopExpenseParamSchema: z.ZodObject<{
+    stopId: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    stopId: string;
+}, {
+    stopId: string;
+}>;
 export declare const tripExpenseParamSchema: z.ZodObject<{
     tripId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
@@ -627,15 +666,15 @@ export declare const tripExpenseParamSchema: z.ZodObject<{
 }, {
     tripId: string;
 }>;
-export declare const stopExpenseParamSchema: z.ZodObject<{
-    tripId: z.ZodString;
-    stopId: z.ZodString;
+export declare const markSplitPaidParamSchema: z.ZodObject<{
+    expenseId: z.ZodString;
+    userId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    tripId: string;
-    stopId: string;
+    userId: string;
+    expenseId: string;
 }, {
-    tripId: string;
-    stopId: string;
+    userId: string;
+    expenseId: string;
 }>;
 export type CreateExpenseInput = z.infer<typeof createExpenseSchema>;
 export type UpdateExpenseInput = z.infer<typeof updateExpenseSchema>;

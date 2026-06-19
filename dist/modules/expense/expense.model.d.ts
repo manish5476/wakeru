@@ -2,13 +2,9 @@ import { Document, Types } from 'mongoose';
 export type ExpenseCategory = 'food' | 'stay' | 'transport' | 'activity' | 'shopping' | 'health' | 'other';
 export type SplitMethod = 'equal' | 'percentage' | 'exact' | 'shares' | 'personal';
 /**
- * ISplit — per-member breakdown of an expense.
- *
- * amountLocal  = their share in the stop's local currency (what they see in stop view)
- * amountBase   = their share in the trip's base currency (used for settlement)
- *
- * Both are stored so we never re-compute on read. The exchange rate is locked
- * at expense creation time — changing the stop rate doesn't touch existing splits.
+ * Per-member split breakdown.
+ * Both amountLocal and amountBase are stored so we never re-compute on read.
+ * The exchange rate is locked at expense creation time.
  */
 export interface ISplit {
     userId: string;
@@ -21,6 +17,9 @@ export interface ISplit {
     paidAt?: Date;
     paymentId?: Types.ObjectId;
 }
+/**
+ * Expense document — the core transaction record.
+ */
 export interface IExpense extends Document {
     tripId: Types.ObjectId;
     stopId: Types.ObjectId;

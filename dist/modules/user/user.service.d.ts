@@ -1,22 +1,31 @@
-import { IUserDocument } from './user.model';
-import { UpdateUserDTO } from '../../shared/types/user.types';
+import { IUserDocument } from '../auth/auth.model';
+interface PaginatedUserSearchResult {
+    users: Partial<IUserDocument>[];
+    total: number;
+    page: number;
+    limit: number;
+}
 export declare class UserService {
     /**
-     * Get user by ID
+     * Get user by ID (with cache)
      */
     getUserById(userId: string): Promise<IUserDocument>;
     /**
-     * Update user profile
+     * Get public profile
      */
-    updateProfile(userId: string, updateData: UpdateUserDTO): Promise<IUserDocument>;
+    getPublicProfile(userId: string): Promise<Record<string, any>>;
     /**
-     * Update user preferences
+     * Update profile
      */
-    updatePreferences(userId: string, preferences: any): Promise<IUserDocument>;
+    updateProfile(userId: string, updateData: Record<string, any>): Promise<IUserDocument>;
+    /**
+     * Update preferences
+     */
+    updatePreferences(userId: string, preferences: Record<string, any>): Promise<IUserDocument>;
     /**
      * Update banking details
      */
-    updateBankingDetails(userId: string, bankingDetails: any): Promise<IUserDocument>;
+    updateBankingDetails(userId: string, bankingDetails: Record<string, any>): Promise<IUserDocument>;
     /**
      * Upload profile picture
      */
@@ -36,26 +45,31 @@ export declare class UserService {
     /**
      * Search users
      */
-    searchUsers(query: string, page?: number, limit?: number): Promise<{
-        users: IUserDocument[];
-        total: number;
-    }>;
+    searchUsers(query: string, page?: number, limit?: number): Promise<PaginatedUserSearchResult>;
     /**
      * Get user stats
      */
-    getUserStats(userId: string): Promise<any>;
+    getUserStats(userId: string): Promise<{
+        totalGroups: any;
+        totalExpenses: any;
+        totalSettled: any;
+        totalPending: any;
+        totalOwedAcrossTrips: any;
+        totalLentAcrossTrips: any;
+        netBalance: number;
+        lastActiveAt: any;
+        memberSince: any;
+        role: any;
+    }>;
     /**
-     * Get user's public profile
+     * Get linked accounts
      */
-    getPublicProfile(userId: string): Promise<Partial<IUserDocument>>;
+    getLinkedAccounts(userId: string): Promise<Record<string, any>>;
     /**
-     * Upgrade user role
+     * Upgrade user role (admin only)
      */
     upgradeRole(userId: string, newRole: string): Promise<IUserDocument>;
-    /**
-     * Get user's linked accounts
-     */
-    getLinkedAccounts(userId: string): Promise<any>;
 }
 export declare const userService: UserService;
+export {};
 //# sourceMappingURL=user.service.d.ts.map

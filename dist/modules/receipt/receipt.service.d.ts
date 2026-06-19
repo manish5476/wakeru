@@ -1,48 +1,88 @@
+import { Types } from 'mongoose';
 export declare class ReceiptService {
     /**
-     * Upload and process receipt
+     * Upload and process a receipt image.
      */
-    uploadReceipt(userId: string, file: Express.Multer.File, groupId?: string, expenseId?: string): Promise<any>;
+    uploadReceipt(userId: string, file: Express.Multer.File, tripId?: string, expenseId?: string): Promise<any>;
     /**
-     * Get receipt by ID
+     * Get receipt by ID.
      */
     getReceipt(receiptId: string, userId: string): Promise<any>;
     /**
-     * Get user's receipts
+     * Get user's receipts (paginated).
      */
     getUserReceipts(userId: string, options?: {
         page?: number;
         limit?: number;
         status?: string;
-    }): Promise<any>;
+    }): Promise<{
+        receipts: (import("mongoose").FlattenMaps<import("./receipt.model").IReceipt> & Required<{
+            _id: Types.ObjectId;
+        }> & {
+            __v: number;
+        })[];
+        pagination: {
+            total: number;
+            page: number;
+            limit: number;
+            pages: number;
+        };
+    }>;
     /**
-     * Get group receipts
+     * Get trip receipts.
      */
-    getGroupReceipts(groupId: string, userId: string, options?: any): Promise<any>;
+    getTripReceipts(tripId: string, options?: {
+        page?: number;
+        limit?: number;
+    }): Promise<{
+        receipts: (import("mongoose").FlattenMaps<import("./receipt.model").IReceipt> & Required<{
+            _id: Types.ObjectId;
+        }> & {
+            __v: number;
+        })[];
+        pagination: {
+            total: number;
+            page: number;
+            limit: number;
+            pages: number;
+        };
+    }>;
     /**
-     * Update receipt with manual corrections
+     * Update receipt (manual corrections).
      */
-    updateReceipt(receiptId: string, userId: string, updateData: any): Promise<any>;
+    updateReceipt(receiptId: string, userId: string, updateData: any): Promise<import("mongoose").Document<unknown, {}, import("./receipt.model").IReceipt, {}, {}> & import("./receipt.model").IReceipt & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
     /**
-     * Delete receipt
+     * Soft delete receipt.
      */
     deleteReceipt(receiptId: string, userId: string): Promise<void>;
     /**
-     * Reprocess receipt OCR
+     * Reprocess OCR.
      */
-    reprocessReceipt(receiptId: string, userId: string): Promise<any>;
+    reprocessReceipt(receiptId: string, userId: string): Promise<import("mongoose").Document<unknown, {}, import("./receipt.model").IReceipt, {}, {}> & import("./receipt.model").IReceipt & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
     /**
-     * Process receipt asynchronously
+     * Convert receipt data to expense input.
      */
-    private processReceiptAsync;
-    /**
-     * Validate uploaded file
-     */
+    convertToExpense(receiptId: string, userId: string, tripId: string): Promise<{
+        tripId: string;
+        title: string;
+        category: string;
+        amountLocal: any;
+        currency: any;
+        date: any;
+        notes: string;
+        extractedItems: any;
+        merchantName: any;
+    }>;
     private validateFile;
-    /**
-     * Convert receipt to expense
-     */
-    convertToExpense(receiptId: string, userId: string, groupId: string): Promise<any>;
+    private processReceiptAsync;
 }
 export declare const receiptService: ReceiptService;
 //# sourceMappingURL=receipt.service.d.ts.map

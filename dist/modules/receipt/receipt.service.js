@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.receiptService = exports.ReceiptService = void 0;
+const mongoose_1 = require("mongoose");
 const receipt_model_1 = require("./receipt.model");
 const ocr_processor_1 = require("./ocr.processor");
 const AppError_1 = require("../../shared/errors/AppError");
@@ -12,22 +13,19 @@ const sharp_1 = __importDefault(require("sharp"));
 const path_1 = __importDefault(require("path"));
 const promises_1 = __importDefault(require("fs/promises"));
 const config_1 = require("../../config");
-const mongoose_1 = require("mongoose");
-const crypto_1 = __importDefault(require("crypto"));
+const uuid_1 = require("uuid");
 class ReceiptService {
     /**
-     * Upload and process receipt
+     * Upload and process a receipt image.
      */
-    async uploadReceipt(userId, file, groupId, expenseId) {
-        // Validate file
+    async uploadReceipt(userId, file, tripId, expenseId) {
         this.validateFile(file);
         try {
-            // Generate unique filename
-            const receiptId = crypto_1.default.randomUUID();
+            const receiptId = (0, uuid_1.v4)();
             const filename = `receipt-${receiptId}-${Date.now()}`;
             const uploadDir = path_1.default.join(config_1.config.UPLOAD_DIR, 'receipts');
             await promises_1.default.mkdir(uploadDir, { recursive: true });
-            // Save original image
+            // Save original
             const originalPath = path_1.default.join(uploadDir, `${filename}.jpg`);
             await (0, sharp_1.default)(file.buffer)
                 .jpeg({ quality: 85 })
@@ -38,11 +36,11 @@ class ReceiptService {
                 .resize(300, 300, { fit: 'inside' })
                 .jpeg({ quality: 60 })
                 .toFile(thumbnailPath);
-            // Create receipt record
+            // Create receipt document
             const receipt = new receipt_model_1.Receipt({
                 receiptId,
-                userId: new mongoose_1.Types.ObjectId(userId),
-                groupId: groupId ? new mongoose_1.Types.ObjectId(groupId) : undefined,
+                userId,
+                tripId: tripId ? new mongoose_1.Types.ObjectId(tripId) : undefined,
                 expenseId: expenseId ? new mongoose_1.Types.ObjectId(expenseId) : undefined,
                 image: {
                     originalUrl: `/uploads/receipts/${filename}.jpg`,
@@ -50,24 +48,21 @@ class ReceiptService {
                     mimeType: file.mimetype,
                     size: file.size,
                     width: metadata.width,
-                    height: metadata.height
+                    height: metadata.height,
                 },
                 status: 'UPLOADED',
                 statusHistory: [{
                         status: 'UPLOADED',
                         timestamp: new Date(),
-                        message: 'Receipt uploaded successfully'
+                        message: 'Receipt uploaded successfully',
                     }],
-                metadata: {
-                    createdBy: new mongoose_1.Types.ObjectId(userId),
-                    isDeleted: false,
-                    version: 1
-                }
+                addedBy: userId,
+                isDeleted: false,
             });
             await receipt.save();
-            // Start OCR processing in background
-            this.processReceiptAsync(receiptId, originalPath).catch(err => {
-                logger_1.logger.error('Background OCR processing failed:', err);
+            // Process OCR in background
+            this.processReceiptAsync(receiptId, originalPath).catch((err) => {
+                logger_1.logger.error('Background OCR failed:', err);
             });
             logger_1.logger.info(`Receipt uploaded: ${receiptId}`);
             return receipt;
@@ -78,197 +73,184 @@ class ReceiptService {
         }
     }
     /**
-     * Get receipt by ID
+     * Get receipt by ID.
      */
     async getReceipt(receiptId, userId) {
-        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-        if (!receipt) {
+        const receipt = await receipt_model_1.Receipt.findOne({
+            receiptId,
+            isDeleted: false,
+        });
+        if (!receipt)
             throw new AppError_1.NotFoundError('Receipt');
-        }
-        if (receipt.userId.toString() !== userId) {
+        if (receipt.userId !== userId) {
             throw new AppError_1.ForbiddenError('You do not have access to this receipt');
         }
         return receipt;
     }
     /**
-     * Get user's receipts
+     * Get user's receipts (paginated).
      */
     async getUserReceipts(userId, options = {}) {
         const { page = 1, limit = 20, status } = options;
         const skip = (page - 1) * limit;
-        const query = {
-            userId: new mongoose_1.Types.ObjectId(userId),
-            'metadata.isDeleted': false
-        };
-        if (status) {
+        const query = { userId, isDeleted: false };
+        if (status)
             query.status = status;
-        }
         const [receipts, total] = await Promise.all([
             receipt_model_1.Receipt.find(query)
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(limit),
-            receipt_model_1.Receipt.countDocuments(query)
+                .limit(limit)
+                .lean(),
+            receipt_model_1.Receipt.countDocuments(query),
         ]);
-        return { receipts, total };
+        return {
+            receipts,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit),
+            },
+        };
     }
     /**
-     * Get group receipts
+     * Get trip receipts.
      */
-    async getGroupReceipts(groupId, userId, options = {}) {
+    async getTripReceipts(tripId, options = {}) {
         const { page = 1, limit = 20 } = options;
         const skip = (page - 1) * limit;
         const query = {
-            groupId: new mongoose_1.Types.ObjectId(groupId),
-            'metadata.isDeleted': false
+            tripId: new mongoose_1.Types.ObjectId(tripId),
+            isDeleted: false,
         };
         const [receipts, total] = await Promise.all([
             receipt_model_1.Receipt.find(query)
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(limit),
-            receipt_model_1.Receipt.countDocuments(query)
+                .limit(limit)
+                .lean(),
+            receipt_model_1.Receipt.countDocuments(query),
         ]);
-        return { receipts, total };
+        return {
+            receipts,
+            pagination: { total, page, limit, pages: Math.ceil(total / limit) },
+        };
     }
     /**
-     * Update receipt with manual corrections
+     * Update receipt (manual corrections).
      */
     async updateReceipt(receiptId, userId, updateData) {
-        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-        if (!receipt) {
+        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, isDeleted: false });
+        if (!receipt)
             throw new AppError_1.NotFoundError('Receipt');
+        if (receipt.userId !== userId) {
+            throw new AppError_1.ForbiddenError('Access denied');
         }
-        if (receipt.userId.toString() !== userId) {
-            throw new AppError_1.ForbiddenError('You do not have access to this receipt');
-        }
-        // Update OCR data
         if (updateData.ocrData) {
-            receipt.ocrData = {
-                ...receipt.ocrData,
-                ...updateData.ocrData
-            };
+            receipt.ocrData = { ...receipt.ocrData.toObject(), ...updateData.ocrData };
         }
         if (updateData.status) {
             receipt.status = updateData.status;
             receipt.statusHistory.push({
                 status: updateData.status,
                 timestamp: new Date(),
-                message: updateData.message || 'Status updated manually'
+                message: updateData.message || 'Status updated',
             });
         }
-        receipt.metadata.version += 1;
+        receipt.markModified('ocrData');
         await receipt.save();
         return receipt;
     }
     /**
-     * Delete receipt
+     * Soft delete receipt.
      */
     async deleteReceipt(receiptId, userId) {
-        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-        if (!receipt) {
+        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, isDeleted: false });
+        if (!receipt)
             throw new AppError_1.NotFoundError('Receipt');
-        }
-        if (receipt.userId.toString() !== userId) {
-            throw new AppError_1.ForbiddenError('You do not have access to this receipt');
-        }
-        receipt.metadata.isDeleted = true;
+        if (receipt.userId !== userId)
+            throw new AppError_1.ForbiddenError('Access denied');
+        receipt.isDeleted = true;
         await receipt.save();
-        // Delete files
+        // Clean up files
         const originalPath = path_1.default.join(config_1.config.UPLOAD_DIR, receipt.image.originalUrl.replace('/uploads/', ''));
         const thumbnailPath = path_1.default.join(config_1.config.UPLOAD_DIR, receipt.image.thumbnailUrl.replace('/uploads/', ''));
         await Promise.all([
             promises_1.default.unlink(originalPath).catch(() => { }),
-            promises_1.default.unlink(thumbnailPath).catch(() => { })
+            promises_1.default.unlink(thumbnailPath).catch(() => { }),
         ]);
         logger_1.logger.info(`Receipt deleted: ${receiptId}`);
     }
     /**
-     * Reprocess receipt OCR
+     * Reprocess OCR.
      */
     async reprocessReceipt(receiptId, userId) {
-        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, 'metadata.isDeleted': false });
-        if (!receipt) {
+        const receipt = await receipt_model_1.Receipt.findOne({ receiptId, isDeleted: false });
+        if (!receipt)
             throw new AppError_1.NotFoundError('Receipt');
-        }
-        if (receipt.userId.toString() !== userId) {
-            throw new AppError_1.ForbiddenError('You do not have access to this receipt');
-        }
-        // Reset OCR data
+        if (receipt.userId !== userId)
+            throw new AppError_1.ForbiddenError('Access denied');
         receipt.ocrData.processed = false;
         receipt.ocrData.confidence = 0;
         receipt.status = 'PROCESSING';
         receipt.statusHistory.push({
             status: 'PROCESSING',
             timestamp: new Date(),
-            message: 'OCR reprocessing started'
+            message: 'OCR reprocessing started',
         });
         await receipt.save();
-        // Start reprocessing
         const imagePath = path_1.default.join(config_1.config.UPLOAD_DIR, receipt.image.originalUrl.replace('/uploads/', ''));
-        this.processReceiptAsync(receiptId, imagePath).catch(err => {
+        this.processReceiptAsync(receiptId, imagePath).catch((err) => {
             logger_1.logger.error('OCR reprocessing failed:', err);
         });
         return receipt;
     }
     /**
-     * Process receipt asynchronously
+     * Convert receipt data to expense input.
      */
-    async processReceiptAsync(receiptId, imagePath) {
-        try {
-            await ocr_processor_1.ocrProcessor.processReceipt(receiptId, imagePath);
-            logger_1.logger.info(`OCR processing completed for receipt: ${receiptId}`);
+    async convertToExpense(receiptId, userId, tripId) {
+        const receipt = await this.getReceipt(receiptId, userId);
+        if (receipt.status !== 'COMPLETED' && receipt.status !== 'REVIEWED') {
+            throw new AppError_1.BadRequestError('Receipt must be processed before converting');
         }
-        catch (error) {
-            logger_1.logger.error(`OCR processing failed for receipt ${receiptId}:`, error);
+        if (!receipt.ocrData.extractedItems?.length) {
+            throw new AppError_1.BadRequestError('No items extracted from receipt');
         }
+        // Return expense-ready data — the frontend/expense service creates the expense
+        return {
+            tripId,
+            title: `Receipt: ${receipt.ocrData.merchantName || 'Unknown'}`,
+            category: 'food', // Can be changed by user
+            amountLocal: receipt.ocrData.totalAmount || receipt.extractedTotal,
+            currency: receipt.ocrData.currency || 'INR',
+            date: receipt.ocrData.date || new Date(),
+            notes: `Auto-generated from receipt ${receiptId}`,
+            extractedItems: receipt.ocrData.extractedItems,
+            merchantName: receipt.ocrData.merchantName,
+        };
     }
-    /**
-     * Validate uploaded file
-     */
+    // ============================================================
+    // PRIVATE HELPERS
+    // ============================================================
     validateFile(file) {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp'];
         const maxSize = 10 * 1024 * 1024; // 10MB
         if (!allowedTypes.includes(file.mimetype)) {
-            throw new AppError_1.BadRequestError('Invalid file type. Allowed: JPEG, PNG, HEIC, WebP');
+            throw new AppError_1.BadRequestError(`Invalid file type: ${file.mimetype}. Allowed: JPEG, PNG, HEIC, WebP`);
         }
         if (file.size > maxSize) {
             throw new AppError_1.BadRequestError('File too large. Maximum size: 10MB');
         }
     }
-    /**
-     * Convert receipt to expense
-     */
-    async convertToExpense(receiptId, userId, groupId) {
-        const receipt = await this.getReceipt(receiptId, userId);
-        if (receipt.status !== 'COMPLETED' && receipt.status !== 'REVIEWED') {
-            throw new AppError_1.BadRequestError('Receipt must be processed before converting to expense');
+    async processReceiptAsync(receiptId, imagePath) {
+        try {
+            await ocr_processor_1.ocrProcessor.processReceipt(receiptId, imagePath);
+            logger_1.logger.info(`OCR completed for receipt: ${receiptId}`);
         }
-        if (!receipt.ocrData.extractedItems || receipt.ocrData.extractedItems.length === 0) {
-            throw new AppError_1.BadRequestError('No items extracted from receipt');
+        catch (error) {
+            logger_1.logger.error(`OCR failed for receipt ${receiptId}:`, error);
         }
-        // Format items for expense creation
-        const lineItems = receipt.ocrData.extractedItems.map((item) => ({
-            name: item.name,
-            category: item.category,
-            basePrice: item.price,
-            quantity: item.quantity || 1,
-            consumers: [{
-                    userId,
-                    consumptionPercentage: 100
-                }]
-        }));
-        const expenseData = {
-            groupId,
-            description: `Receipt from ${receipt.ocrData.merchantName || 'Unknown'}`,
-            category: lineItems[0]?.category || 'Other',
-            currency: receipt.ocrData.currency || 'INR',
-            lineItems,
-            paidBy: userId,
-            paymentMethod: receipt.ocrData.paymentMethod || 'Cash',
-            paymentDate: receipt.ocrData.date || new Date()
-        };
-        return expenseData;
     }
 }
 exports.ReceiptService = ReceiptService;

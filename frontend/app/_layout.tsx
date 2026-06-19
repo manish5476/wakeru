@@ -39,10 +39,10 @@ SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       retry: Platform.OS === 'web' ? 3 : 2,
       refetchOnWindowFocus: Platform.OS === 'web',
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      gcTime: 10 * 60 * 1000,
     },
     mutations: {
       retry: 2,
@@ -58,29 +58,21 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-
-  // Hydrate auth state on mount
   useEffect(() => {
     hydrate();
   }, []);
-
-  // Hide splash screen when fonts are loaded and hydration is done
   useEffect(() => {
     if (fontsLoaded && !isLoading) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, isLoading]);
 
-  // Handle font loading error
   useEffect(() => {
     if (fontError) {
       console.error('Font loading error:', fontError);
-      // Still hide splash screen even if fonts fail
       SplashScreen.hideAsync();
     }
   }, [fontError]);
-
-  // Show nothing while loading
   if (isLoading || !fontsLoaded) {
     return null;
   }

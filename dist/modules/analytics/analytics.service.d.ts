@@ -4,13 +4,13 @@ export declare class AnalyticsService {
      */
     getUserAnalytics(userId: string, timeframe?: 'week' | 'month' | 'year'): Promise<any>;
     /**
-     * Get group analytics
+     * Get trip analytics
      */
-    getGroupAnalytics(groupId: string, userId: string, timeframe?: 'week' | 'month' | 'year'): Promise<any>;
+    getTripAnalytics(tripId: string, userId: string, timeframe?: 'week' | 'month' | 'year'): Promise<any>;
     /**
      * Get predictive analytics
      */
-    getPredictiveAnalytics(userId: string, groupId: string): Promise<any>;
+    getPredictiveAnalytics(userId: string, tripId: string): Promise<any>;
     /**
      * Consumption vs Payment analysis (WAKERU EXCLUSIVE)
      */
@@ -28,29 +28,29 @@ export declare class AnalyticsService {
      */
     private getSettlementEfficiency;
     /**
-     * Group insights
+     * Trip insights
      */
-    private getGroupInsights;
+    private getTripInsights;
     /**
-     * Group overview
+     * Trip overview
      */
-    private getGroupOverview;
+    private getTripOverview;
     /**
      * Member contributions
      */
     private getMemberContributions;
     /**
-     * Group category distribution
+     * Trip category distribution
      */
-    private getGroupCategoryDistribution;
+    private getTripCategoryDistribution;
     /**
      * Expense timeline
      */
     private getExpenseTimeline;
     /**
-     * Group settlement status
+     * Trip settlement status
      */
-    private getGroupSettlementStatus;
+    private getTripSettlementStatus;
     /**
      * Calculate predictions using linear regression
      */

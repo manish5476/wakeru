@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { z } from 'zod';
+import { ZodTypeAny } from 'zod';
 export declare class ValidationMiddleware {
-    static validate(schema: z.ZodObject<any, any>): (req: Request, res: Response, next: NextFunction) => void;
-    static validateQuery(schema: z.ZodObject<any, any>): (req: Request, res: Response, next: NextFunction) => void;
-    static validateParams(schema: z.ZodObject<any, any>): (req: Request, res: Response, next: NextFunction) => void;
+    static validate(schema: ZodTypeAny): (req: Request, res: Response, next: NextFunction) => void;
+    static validateQuery(schema: ZodTypeAny): (req: Request, res: Response, next: NextFunction) => void;
+    static validateParams(schema: ZodTypeAny): (req: Request, res: Response, next: NextFunction) => void;
 }
 //# sourceMappingURL=validation.middleware.d.ts.map

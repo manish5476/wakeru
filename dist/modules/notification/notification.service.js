@@ -3,40 +3,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.notificationService = exports.NotificationService = void 0;
 const notification_model_1 = require("./notification.model");
 const auth_model_1 = require("../auth/auth.model");
-const logger_1 = require("../../config/logger");
-const mongoose_1 = require("mongoose");
-const redis_1 = require("../../config/redis");
-const group_model_1 = require("../group/group.model");
+const trip_model_1 = require("../trips/trip.model");
 const expense_model_1 = require("../expense/expense.model");
+const logger_1 = require("../../config/logger");
+const AppError_1 = require("../../shared/errors/AppError");
+// ============================================================
+// NOTIFICATION SERVICE
+// ============================================================
 class NotificationService {
     /**
-     * Create a notification
+     * Create a notification for a user.
      */
-    async createNotification(userId, type, title, message, options = {}) {
+    async create(userId, type, title, message, options = {}) {
         try {
             const notification = new notification_model_1.Notification({
-                userId: new mongoose_1.Types.ObjectId(userId),
+                userId,
                 type,
                 title,
                 message,
                 data: options.data,
-                isActionable: options.isActionable || false,
+                isActionable: options.isActionable ?? false,
                 actionUrl: options.actionUrl,
-                priority: options.priority || 'medium',
+                priority: options.priority ?? 'medium',
                 channels: {
                     inApp: options.channels?.inApp ?? true,
                     email: options.channels?.email ?? false,
                     push: options.channels?.push ?? false,
-                    sms: options.channels?.sms ?? false
-                }
+                    sms: options.channels?.sms ?? false,
+                },
             });
             await notification.save();
-            // Send through other channels
-            this.sendThroughChannels(notification, userId).catch(err => {
-                logger_1.logger.error('Failed to send notification through channels:', err);
+            // Fire-and-forget: send through other channels
+            this.sendThroughChannels(notification).catch((err) => {
+                logger_1.logger.error('Channel delivery failed:', err);
             });
-            // Invalidate notification cache
-            await redis_1.redisClient.delete(`notifications:${userId}:unread`);
             return notification;
         }
         catch (error) {
@@ -45,206 +45,207 @@ class NotificationService {
         }
     }
     /**
-     * Get user's notifications
+     * Get user's notifications (paginated).
      */
     async getUserNotifications(userId, options = {}) {
         const { page = 1, limit = 20, unreadOnly = false, type } = options;
         const skip = (page - 1) * limit;
-        const query = { userId: new mongoose_1.Types.ObjectId(userId) };
-        if (unreadOnly) {
+        const query = { userId };
+        if (unreadOnly)
             query.isRead = false;
-        }
-        if (type) {
+        if (type)
             query.type = type;
-        }
         const [notifications, total, unreadCount] = await Promise.all([
             notification_model_1.Notification.find(query)
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(limit),
+                .limit(limit)
+                .lean(),
             notification_model_1.Notification.countDocuments(query),
-            notification_model_1.Notification.countDocuments({ userId: new mongoose_1.Types.ObjectId(userId), isRead: false })
+            notification_model_1.Notification.countDocuments({ userId, isRead: false }),
         ]);
         return {
             notifications,
-            total,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit),
+                hasMore: skip + notifications.length < total,
+            },
             unreadCount,
-            page,
-            limit
         };
     }
     /**
-     * Mark notification as read
+     * Mark single notification as read.
      */
     async markAsRead(notificationId, userId) {
-        const notification = await notification_model_1.Notification.findOneAndUpdate({ _id: notificationId, userId: new mongoose_1.Types.ObjectId(userId) }, {
-            $set: {
-                isRead: true,
-                readAt: new Date()
-            }
-        }, { new: true });
-        if (notification) {
-            await redis_1.redisClient.delete(`notifications:${userId}:unread`);
-        }
+        const notification = await notification_model_1.Notification.findOneAndUpdate({ _id: notificationId, userId }, { $set: { isRead: true, readAt: new Date() } }, { new: true });
+        if (!notification)
+            throw new AppError_1.AppError('Notification not found', 404);
         return notification;
     }
     /**
-     * Mark all notifications as read
+     * Mark ALL notifications as read for a user.
      */
     async markAllAsRead(userId) {
-        await notification_model_1.Notification.updateMany({ userId: new mongoose_1.Types.ObjectId(userId), isRead: false }, {
-            $set: {
-                isRead: true,
-                readAt: new Date()
-            }
-        });
-        await redis_1.redisClient.delete(`notifications:${userId}:unread`);
+        await notification_model_1.Notification.updateMany({ userId, isRead: false }, { $set: { isRead: true, readAt: new Date() } });
     }
     /**
-     * Delete notification
+     * Delete a notification.
      */
-    async deleteNotification(notificationId, userId) {
-        await notification_model_1.Notification.findOneAndDelete({
+    async delete(notificationId, userId) {
+        const result = await notification_model_1.Notification.findOneAndDelete({
             _id: notificationId,
-            userId: new mongoose_1.Types.ObjectId(userId)
+            userId,
         });
+        if (!result)
+            throw new AppError_1.AppError('Notification not found', 404);
     }
     /**
-     * Get unread count
+     * Get unread count.
      */
     async getUnreadCount(userId) {
-        const cacheKey = `notifications:${userId}:unread`;
-        const cached = await redis_1.redisClient.get(cacheKey);
-        if (cached) {
-            return parseInt(cached);
-        }
-        const count = await notification_model_1.Notification.countDocuments({
-            userId: new mongoose_1.Types.ObjectId(userId),
-            isRead: false
-        });
-        await redis_1.redisClient.set(cacheKey, count.toString(), 300); // 5 minutes
-        return count;
+        return notification_model_1.Notification.countDocuments({ userId, isRead: false });
     }
+    // ============================================================
+    // TRIPSPLIT-SPECIFIC NOTIFICATIONS
+    // ============================================================
     /**
-     * Send expense notification
+     * Notify all trip members (except the actor) about a new expense.
      */
-    async notifyExpenseAdded(groupId, expenseId, createdBy) {
-        const [group, expense] = await Promise.all([
-            group_model_1.Group.findOne({ groupId }).populate('members.userId', 'userId email preferences'),
-            expense_model_1.Expense.findOne({ expenseId })
-        ]);
-        if (!group || !expense)
+    async notifyExpenseAdded(tripId, expenseId, actorUid) {
+        const trip = await trip_model_1.Trip.findById(tripId).lean();
+        if (!trip)
             return;
-        const creator = group.members.find((m) => m.userId._id.toString() === createdBy);
-        for (const member of group.members) {
-            if (member.userId._id.toString() === createdBy)
+        const expense = await expense_model_1.Expense.findById(expenseId).lean();
+        if (!expense)
+            return;
+        const actor = trip.members.find((m) => m.userId === actorUid);
+        const actorName = actor?.displayName || 'Someone';
+        for (const member of trip.members) {
+            if (member.userId === actorUid || !member.isActive)
                 continue;
-            const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
-            if (!notificationPreferences?.muteExpenses) {
-                await this.createNotification(member.userId._id.toString(), 'EXPENSE_ADDED', 'New Expense Added', `${creator?.userId?.displayName || 'Someone'} added "${expense.title}" - ₹${expense.amountBase}`, {
-                    data: { groupId, expenseId },
-                    isActionable: true,
-                    actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
-                    priority: 'medium',
-                    channels: { email: notificationPreferences?.email }
-                });
-            }
+            await this.create(member.userId, 'EXPENSE_ADDED', 'New Expense Added', `${actorName} added "${expense.title}" — ${expense.amountLocal} ${expense.localCurrency}`, {
+                data: { tripId, expenseId: expense._id.toString(), stopId: expense.stopId.toString() },
+                isActionable: true,
+                actionUrl: `/trips/${tripId}/expenses/${expense._id}`,
+                priority: 'medium',
+            });
         }
     }
     /**
-     * Notify settlement completed
+     * Notify about settlement request.
      */
-    async notifySettlementCompleted(settlement) {
+    async notifySettlementRequest(fromUid, toUid, amount, baseCurrency, tripId) {
         const [fromUser, toUser] = await Promise.all([
-            auth_model_1.User.findById(settlement.fromUser),
-            auth_model_1.User.findById(settlement.toUser)
+            auth_model_1.User.findById(fromUid).lean(),
+            auth_model_1.User.findById(toUid).lean(),
+        ]);
+        await this.create(toUid, 'SETTLEMENT_REQUEST', 'Settlement Request', `${fromUser?.displayName || 'Someone'} requests ₹${amount} ${baseCurrency}`, {
+            data: { tripId, fromUid, amount, baseCurrency },
+            isActionable: true,
+            actionUrl: `/trips/${tripId}/settle`,
+            priority: 'high',
+            channels: { push: true, email: true },
+        });
+    }
+    /**
+     * Notify about completed settlement.
+     */
+    async notifySettlementCompleted(fromUid, toUid, amount, baseCurrency, tripId) {
+        const [fromUser, toUser] = await Promise.all([
+            auth_model_1.User.findById(fromUid).lean(),
+            auth_model_1.User.findById(toUid).lean(),
         ]);
         // Notify payer
-        await this.createNotification(settlement.fromUser.toString(), 'SETTLEMENT_COMPLETED', 'Payment Sent', `You paid ${toUser?.displayName} ₹${settlement.amount}`, {
-            data: { settlementId: settlement.settlementId },
+        await this.create(fromUid, 'SETTLEMENT_COMPLETED', 'Payment Sent', `You paid ${toUser?.displayName || 'Someone'} ₹${amount} ${baseCurrency}`, {
+            data: { tripId, toUid, amount },
             priority: 'high',
-            channels: { push: true }
+            channels: { push: true },
         });
         // Notify recipient
-        await this.createNotification(settlement.toUser.toString(), 'SETTLEMENT_COMPLETED', 'Payment Received', `${fromUser?.displayName} paid you ₹${settlement.amount}`, {
-            data: { settlementId: settlement.settlementId },
+        await this.create(toUid, 'SETTLEMENT_COMPLETED', 'Payment Received', `${fromUser?.displayName || 'Someone'} paid you ₹${amount} ${baseCurrency}`, {
+            data: { tripId, fromUid, amount },
             priority: 'high',
-            channels: { push: true }
+            channels: { push: true },
         });
     }
     /**
-     * Notify payment reminder
+     * Notify user about trip invitation.
      */
-    async notifyPaymentReminder(fromUserId, toUserId, amount) {
-        const [fromUser, toUser] = await Promise.all([
-            auth_model_1.User.findById(fromUserId),
-            auth_model_1.User.findById(toUserId)
-        ]);
-        await this.createNotification(fromUserId, 'PAYMENT_REMINDER', 'Payment Reminder', `Reminder: You owe ${toUser?.displayName} ₹${amount}`, {
-            priority: 'urgent',
-            channels: { push: true, email: true }
+    async notifyTripInvitation(toUid, tripId, tripTitle, inviterName) {
+        await this.create(toUid, 'TRIP_INVITATION', 'Trip Invitation', `${inviterName} invited you to "${tripTitle}"`, {
+            data: { tripId },
+            isActionable: true,
+            actionUrl: `/trips/${tripId}/join`,
+            priority: 'high',
+            channels: { push: true, email: true },
         });
     }
     /**
-     * Send monthly report notification
+     * Notify trip members that someone joined.
      */
-    async notifyMonthlyReport(userId, reportData) {
-        const user = await auth_model_1.User.findById(userId);
-        if (user?.preferences.get('notificationPreferences')?.monthlyReports) {
-            await this.createNotification(userId, 'MONTHLY_REPORT', 'Monthly Spending Report', `Your monthly spending report is ready. Total: ₹${reportData.totalSpent}`, {
-                data: { reportUrl: `/reports/monthly` },
-                isActionable: true,
+    async notifyTripJoined(tripId, joinerUid) {
+        const trip = await trip_model_1.Trip.findById(tripId).lean();
+        if (!trip)
+            return;
+        const joiner = trip.members.find((m) => m.userId === joinerUid);
+        const joinerName = joiner?.displayName || 'Someone';
+        for (const member of trip.members) {
+            if (member.userId === joinerUid || !member.isActive)
+                continue;
+            await this.create(member.userId, 'TRIP_JOINED', 'New Member Joined', `${joinerName} joined "${trip.title}"`, {
+                data: { tripId, joinerUid },
                 priority: 'low',
-                channels: { email: true }
             });
         }
     }
     /**
-     * Send through different channels
+     * Notify user about payment reminder.
      */
-    async sendThroughChannels(notification, userId) {
-        const user = await auth_model_1.User.findById(userId);
+    async notifyPaymentReminder(fromUid, toUid, amount, baseCurrency, tripId) {
+        const toUser = await auth_model_1.User.findById(toUid).lean();
+        await this.create(fromUid, 'PAYMENT_REMINDER', 'Payment Reminder', `Reminder: You owe ${toUser?.displayName || 'Someone'} ₹${amount} ${baseCurrency}`, {
+            data: { tripId, toUid, amount },
+            isActionable: true,
+            actionUrl: `/trips/${tripId}/settle`,
+            priority: 'urgent',
+            channels: { push: true, email: true },
+        });
+    }
+    // ============================================================
+    // CHANNEL DELIVERY (Placeholders)
+    // ============================================================
+    async sendThroughChannels(notification) {
+        const user = await auth_model_1.User.findById(notification.userId).lean();
         if (!user)
             return;
-        // Send push notification
+        const promises = [];
         if (notification.channels.push) {
-            this.sendPushNotification(userId, notification).catch(err => {
-                logger_1.logger.error('Push notification failed:', err);
-            });
+            promises.push(this.sendPush(user, notification));
         }
-        // Send email
         if (notification.channels.email) {
-            this.sendEmailNotification(user.email, notification).catch(err => {
-                logger_1.logger.error('Email notification failed:', err);
-            });
+            promises.push(this.sendEmail(user.email, notification));
         }
-        // Send SMS
         if (notification.channels.sms && user.phoneNumber) {
-            this.sendSMSNotification(user.phoneNumber, notification).catch(err => {
-                logger_1.logger.error('SMS notification failed:', err);
-            });
+            promises.push(this.sendSMS(user.phoneNumber, notification));
         }
+        await Promise.allSettled(promises);
     }
-    /**
-     * Send push notification (placeholder)
-     */
-    async sendPushNotification(userId, notification) {
-        // TODO: Integrate with Firebase Cloud Messaging or APNs
-        logger_1.logger.info(`Push notification sent to user ${userId}: ${notification.title}`);
+    async sendPush(user, notification) {
+        if (!user.fcmToken)
+            return;
+        // TODO: Integrate with Firebase Cloud Messaging
+        logger_1.logger.info(`📱 Push to ${user._id}: ${notification.title}`);
     }
-    /**
-     * Send email notification (placeholder)
-     */
-    async sendEmailNotification(email, notification) {
-        // TODO: Integrate with email service (SendGrid, SES, etc.)
-        logger_1.logger.info(`Email sent to ${email}: ${notification.title}`);
+    async sendEmail(email, notification) {
+        // TODO: Integrate with SendGrid / SES
+        logger_1.logger.info(`📧 Email to ${email}: ${notification.title}`);
     }
-    /**
-     * Send SMS notification (placeholder)
-     */
-    async sendSMSNotification(phone, notification) {
-        // TODO: Integrate with SMS service (Twilio, etc.)
-        logger_1.logger.info(`SMS sent to ${phone}: ${notification.title}`);
+    async sendSMS(phone, notification) {
+        // TODO: Integrate with Twilio
+        logger_1.logger.info(`💬 SMS to ${phone}: ${notification.title}`);
     }
 }
 exports.NotificationService = NotificationService;

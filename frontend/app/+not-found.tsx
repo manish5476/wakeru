@@ -14,14 +14,13 @@ export default function NotFoundScreen() {
           headerShown: false,
         }}
       />
+      {/* 404 Illustration */}
       <View className="flex-1 justify-center items-center bg-surface-0 px-8">
-        {/* 404 Illustration */}
         <View className="items-center gap-6 mb-10">
           {/* Large 404 number */}
           <Text className="text-8xl font-bold text-brand-primary font-display opacity-80">
             404
           </Text>
-
           {/* Decorative element */}
           <View className="w-16 h-1 bg-brand-primary rounded-full" />
 
@@ -40,8 +39,7 @@ export default function NotFoundScreen() {
           <Link href="/" asChild>
             <TouchableOpacity
               className="h-14 bg-brand-primary rounded-full items-center justify-center shadow-lg shadow-brand-primary/25 active:scale-[0.98] transition-transform"
-              accessibilityLabel="Go to home page"
-            >
+              accessibilityLabel="Go to home page" >
               <Text className="text-sm font-bold text-white font-sans tracking-wide">
                 Back to Home
               </Text>
@@ -69,22 +67,4 @@ export default function NotFoundScreen() {
       </View>
     </>
   );
-}// import React from 'react';
-// import { View, Text, TouchableOpacity } from 'react-native';
-// import { Link, Stack } from 'expo-router';
-
-// export default function NotFoundScreen() {
-//   return (
-//     <>
-//       <Stack.Screen options={{ title: 'Oops!' }} />
-//       <View className="flex-1 justify-center items-center bg-background p-4">
-//         <Text className="text-2xl font-bold text-text">This screen doesn't exist.</Text>
-//         <Link href="/" asChild>
-//           <TouchableOpacity className="mt-4 p-4">
-//             <Text className="text-primary font-bold">Go to home screen!</Text>
-//           </TouchableOpacity>
-//         </Link>
-//       </View>
-//     </>
-//   );
-// }
+}

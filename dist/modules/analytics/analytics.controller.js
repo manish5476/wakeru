@@ -33,13 +33,13 @@ class AnalyticsController {
         }
     }
     /**
-     * Get group analytics
+     * Get trip analytics
      */
-    async getGroupAnalytics(req, res, next) {
+    async getTripAnalytics(req, res, next) {
         try {
-            const { groupId } = req.params;
+            const { tripId } = req.params;
             const timeframe = req.query.timeframe || 'month';
-            const analytics = await analytics_service_1.analyticsService.getGroupAnalytics(groupId, req.user.userId, timeframe);
+            const analytics = await analytics_service_1.analyticsService.getTripAnalytics(tripId, req.user.userId, timeframe);
             const response = {
                 success: true,
                 data: analytics,
@@ -57,8 +57,8 @@ class AnalyticsController {
      */
     async getPredictiveAnalytics(req, res, next) {
         try {
-            const { groupId } = req.params;
-            const analytics = await analytics_service_1.analyticsService.getPredictiveAnalytics(req.user.userId, groupId);
+            const { tripId } = req.params;
+            const analytics = await analytics_service_1.analyticsService.getPredictiveAnalytics(req.user.userId, tripId);
             const response = {
                 success: true,
                 data: analytics,
@@ -76,10 +76,10 @@ class AnalyticsController {
      */
     async getSpendingReport(req, res, next) {
         try {
-            const { groupId } = req.params;
+            const { tripId } = req.params;
             const timeframe = req.query.timeframe || 'month';
             // This can generate PDF reports
-            const report = await analytics_service_1.analyticsService.getGroupAnalytics(groupId, req.user.userId, timeframe);
+            const report = await analytics_service_1.analyticsService.getTripAnalytics(tripId, req.user.userId, timeframe);
             const response = {
                 success: true,
                 data: {

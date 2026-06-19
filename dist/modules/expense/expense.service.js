@@ -5,24 +5,25 @@ const mongoose_1 = require("mongoose");
 const expense_model_1 = require("./expense.model");
 const trip_model_1 = require("../trips/trip.model");
 const trip_service_1 = require("../trips/trip.service");
-const AppError_1 = require("@shared/errors/AppError");
-// ─────────────────────────────────────────────────────────────────────────────
-// SPLIT ENGINE
-// The core of TripSplit — computes per-member splits in BOTH currencies
-// ─────────────────────────────────────────────────────────────────────────────
+const AppError_1 = require("../../shared/errors/AppError");
+const settlement_service_1 = require("../settlement/settlement.service");
+// ============================================================
+// SPLIT ENGINE — The Core of TripSplit
+// ============================================================
 /**
- * Compute splits for an expense.
- * Returns the full ISplit array ready to embed in the expense document.
+ * Compute per-member splits in BOTH currencies.
  *
- * All amounts are rounded to 2 decimal places.
- * For 'equal' splits, the remainder (from rounding) is distributed to the
- * first N members to avoid total drift (e.g. ₹0.01 gaps).
+ * For 'equal' splits, the remainder from rounding is distributed
+ * to the first N members (prevents ₹0.01 gaps).
+ *
+ * For 'personal' splits, the payer owns the full cost — no debt created,
+ * the split is marked as paid immediately.
  */
 const computeSplits = (splitInput, amountLocal, amountBase, exchangeRate, paidByUid, allTripMembers) => {
     const memberMap = new Map(allTripMembers.map((m) => [m.userId, m.displayName]));
     switch (splitInput.method) {
+        // ── PERSONAL ─────────────────────────────────────────────
         case 'personal': {
-            // No split — payer owns full cost, no debt created
             const displayName = memberMap.get(paidByUid) ?? 'Unknown';
             return [
                 {
@@ -30,17 +31,21 @@ const computeSplits = (splitInput, amountLocal, amountBase, exchangeRate, paidBy
                     displayName,
                     amountLocal,
                     amountBase,
-                    isPaid: true, // personal expenses are always "settled"
+                    isPaid: true,
                 },
             ];
         }
+        // ── EQUAL ────────────────────────────────────────────────
         case 'equal': {
             const { memberIds } = splitInput;
+            if (memberIds.length === 0) {
+                throw new AppError_1.AppError('At least one member is required for equal split', 400);
+            }
             const n = memberIds.length;
             const basePerPerson = Math.floor((amountLocal / n) * 100) / 100;
-            const remainder = Math.round((amountLocal - basePerPerson * n) * 100);
+            const remainderCents = Math.round((amountLocal - basePerPerson * n) * 100);
             return memberIds.map((uid, i) => {
-                const local = i < remainder
+                const local = i < remainderCents
                     ? parseFloat((basePerPerson + 0.01).toFixed(2))
                     : basePerPerson;
                 const base = parseFloat((local * exchangeRate).toFixed(2));
@@ -49,10 +54,11 @@ const computeSplits = (splitInput, amountLocal, amountBase, exchangeRate, paidBy
                     displayName: memberMap.get(uid) ?? 'Unknown',
                     amountLocal: local,
                     amountBase: base,
-                    isPaid: uid === paidByUid, // payer's own share is pre-paid
+                    isPaid: uid === paidByUid,
                 };
             });
         }
+        // ── PERCENTAGE ───────────────────────────────────────────
         case 'percentage': {
             const totalPct = splitInput.members.reduce((s, m) => s + m.percentage, 0);
             if (Math.abs(totalPct - 100) > 0.01) {
@@ -71,6 +77,7 @@ const computeSplits = (splitInput, amountLocal, amountBase, exchangeRate, paidBy
                 };
             });
         }
+        // ── EXACT ────────────────────────────────────────────────
         case 'exact': {
             const totalExact = splitInput.members.reduce((s, m) => s + m.amountLocal, 0);
             if (Math.abs(totalExact - amountLocal) > 0.01) {
@@ -87,6 +94,7 @@ const computeSplits = (splitInput, amountLocal, amountBase, exchangeRate, paidBy
                 };
             });
         }
+        // ── SHARES ───────────────────────────────────────────────
         case 'shares': {
             const totalShares = splitInput.members.reduce((s, m) => s + m.shares, 0);
             if (totalShares <= 0) {
@@ -110,21 +118,21 @@ const computeSplits = (splitInput, amountLocal, amountBase, exchangeRate, paidBy
     }
 };
 exports.computeSplits = computeSplits;
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // CREATE EXPENSE
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 /**
  * Create an expense inside a trip stop.
  *
  * Flow:
- * 1. Load the trip to get stop details (currency, exchange rate, members)
- * 2. Compute amountBase from amountLocal * currentExchangeRate
+ * 1. Load trip to get stop details (currency, exchange rate, members)
+ * 2. Compute amountBase = amountLocal × currentExchangeRate
  * 3. Compute per-member splits in both currencies
- * 4. Save the expense document
- * 5. Update trip/stop cached totals via $inc (atomic)
+ * 4. Save expense document
+ * 5. Atomically update trip/stop cached totals via $inc
  */
 const createExpense = async (input, adderUid, adderDisplayName) => {
-    // Load trip — we need stop details, base currency, member list
+    // Load trip with the specific stop
     const trip = await trip_model_1.Trip.findOne({
         isArchived: false,
         'stops._id': new mongoose_1.Types.ObjectId(input.stopId),
@@ -135,25 +143,29 @@ const createExpense = async (input, adderUid, adderDisplayName) => {
     if (!trip.isMember(adderUid)) {
         throw new AppError_1.AppError('You are not a member of this trip', 403);
     }
+    if (!trip.canEdit(adderUid)) {
+        throw new AppError_1.AppError('Viewers cannot add expenses', 403);
+    }
+    // Find the stop
     const stop = trip.stops.find((s) => s._id.toString() === input.stopId);
     if (!stop) {
-        throw new AppError_1.AppError('Stop not found', 404);
+        throw new AppError_1.AppError('Stop not found in this trip', 404);
     }
-    // Validate paidBy is an active trip member
+    // Validate payer is an active trip member
     const payer = trip.getMember(input.paidBy);
     if (!payer) {
         throw new AppError_1.AppError('The specified payer is not an active member of this trip', 400);
     }
-    // Compute base amount using the CURRENT exchange rate (locked at creation time)
+    // Compute base amount using CURRENT exchange rate (locked at creation time)
     const exchangeRateUsed = stop.currentExchangeRate;
     const amountBase = parseFloat((input.amountLocal * exchangeRateUsed).toFixed(2));
-    // Get all active trip members for split computation
+    // Get all active members for split computation
     const activeMembers = trip
         .getActiveMembers()
         .map((m) => ({ userId: m.userId, displayName: m.displayName }));
     // Compute splits
     const splits = (0, exports.computeSplits)(input.split, input.amountLocal, amountBase, exchangeRateUsed, input.paidBy, activeMembers);
-    // Create the expense document
+    // Create expense document
     const expense = new expense_model_1.Expense({
         tripId: trip._id,
         stopId: new mongoose_1.Types.ObjectId(input.stopId),
@@ -174,20 +186,20 @@ const createExpense = async (input, adderUid, adderDisplayName) => {
         isSettled: input.split.method === 'personal',
     });
     await expense.save();
-    // Update cached totals on Trip (atomic $inc — no race conditions)
-    // 'personal' expenses still count toward spending totals
+    // Update cached totals on Trip (atomic $inc — safe under concurrency)
     const owedAmounts = splits
-        .filter((s) => s.userId !== input.paidBy) // exclude payer's own share from "owes"
+        .filter((s) => s.userId !== input.paidBy)
         .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
     await (0, trip_service_1.incrementStopTotals)(trip._id.toString(), input.stopId, input.amountLocal, amountBase, input.paidBy, owedAmounts);
+    await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
     return expense;
 };
 exports.createExpense = createExpense;
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // READ EXPENSES
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 /**
- * Get all expenses for a specific stop (paginated).
+ * Get expenses for a specific stop (paginated, filterable).
  */
 const getStopExpenses = async (stopId, query) => {
     const filter = {
@@ -202,16 +214,15 @@ const getStopExpenses = async (stopId, query) => {
     if (query.startDate || query.endDate) {
         filter.date = {};
         if (query.startDate)
-            filter.date.$gte = query.startDate;
+            filter.date.$gte = new Date(query.startDate);
         if (query.endDate)
-            filter.date.$lte = query.endDate;
+            filter.date.$lte = new Date(query.endDate);
     }
     const skip = (query.page - 1) * query.limit;
-    const sortField = query.sortBy;
     const sortDir = query.sortOrder === 'asc' ? 1 : -1;
     const [expenses, total] = await Promise.all([
         expense_model_1.Expense.find(filter)
-            .sort({ [sortField]: sortDir })
+            .sort({ [query.sortBy]: sortDir })
             .skip(skip)
             .limit(query.limit)
             .lean(),
@@ -230,7 +241,7 @@ const getStopExpenses = async (stopId, query) => {
 };
 exports.getStopExpenses = getStopExpenses;
 /**
- * Get all expenses across all stops for a trip (unified view).
+ * Get all expenses across ALL stops for a trip.
  */
 const getTripExpenses = async (tripId, query) => {
     const filter = {
@@ -245,9 +256,9 @@ const getTripExpenses = async (tripId, query) => {
     if (query.startDate || query.endDate) {
         filter.date = {};
         if (query.startDate)
-            filter.date.$gte = query.startDate;
+            filter.date.$gte = new Date(query.startDate);
         if (query.endDate)
-            filter.date.$lte = query.endDate;
+            filter.date.$lte = new Date(query.endDate);
     }
     const skip = (query.page - 1) * query.limit;
     const sortDir = query.sortOrder === 'asc' ? 1 : -1;
@@ -272,10 +283,14 @@ const getTripExpenses = async (tripId, query) => {
 };
 exports.getTripExpenses = getTripExpenses;
 /**
- * Get all expenses paid by the current user across all their trips.
+ * Get all expenses paid by a specific user across all trips.
  */
 const getMyExpenses = async (userId, query) => {
     const filter = { paidBy: userId };
+    if (query.category)
+        filter.category = query.category;
+    if (query.isSettled !== undefined)
+        filter.isSettled = query.isSettled;
     const skip = (query.page - 1) * query.limit;
     const [expenses, total] = await Promise.all([
         expense_model_1.Expense.find(filter)
@@ -305,7 +320,7 @@ const getExpenseById = async (expenseId, requestingUid) => {
     if (!expense) {
         throw new AppError_1.AppError('Expense not found', 404);
     }
-    // Verify membership
+    // Verify trip membership
     const trip = await trip_model_1.Trip.findById(expense.tripId);
     if (!trip || !trip.isMember(requestingUid)) {
         throw new AppError_1.AppError('You are not a member of this trip', 403);
@@ -313,20 +328,18 @@ const getExpenseById = async (expenseId, requestingUid) => {
     return expense;
 };
 exports.getExpenseById = getExpenseById;
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // UPDATE EXPENSE
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 /**
  * Update an expense.
  *
- * If amountLocal or paidBy or split changes, we:
- * 1. Reverse the old cached totals ($inc with negative values)
+ * If amount, payer, or split changes:
+ * 1. Reverse old cached totals (negative $inc)
  * 2. Recompute splits
- * 3. Save the updated expense
- * 4. Apply new cached totals
+ * 3. Apply new cached totals
  *
- * Exchange rate is NOT re-fetched — we keep the rate that was active at
- * original creation time (unless you explicitly want to reset it).
+ * Exchange rate is NOT re-fetched — we keep the rate locked at creation.
  */
 const updateExpense = async (expenseId, input, editorUid) => {
     const expense = await expense_model_1.Expense.findById(expenseId);
@@ -335,9 +348,10 @@ const updateExpense = async (expenseId, input, editorUid) => {
     const trip = await trip_model_1.Trip.findById(expense.tripId);
     if (!trip)
         throw new AppError_1.AppError('Trip not found', 404);
-    if (!trip.canEdit(editorUid))
+    if (!trip.canEdit(editorUid)) {
         throw new AppError_1.AppError('You cannot edit expenses in this trip', 403);
-    // Capture old values before mutation — needed to reverse caches
+    }
+    // Capture old values for cache reversal
     const oldAmountLocal = expense.amountLocal;
     const oldAmountBase = expense.amountBase;
     const oldPaidBy = expense.paidBy;
@@ -388,15 +402,17 @@ const updateExpense = async (expenseId, input, editorUid) => {
     else {
         await expense.save();
     }
+    // Track editor
     expense.editedBy = editorUid;
     expense.editedAt = new Date();
     await expense.save();
+    await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
     return expense;
 };
 exports.updateExpense = updateExpense;
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // DELETE EXPENSE
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 /**
  * Delete an expense and reverse all cached totals.
  * Only the payer or a trip admin can delete.
@@ -417,15 +433,16 @@ const deleteExpense = async (expenseId, requestingUid) => {
         .filter((s) => s.userId !== expense.paidBy)
         .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
     await (0, trip_service_1.decrementStopTotals)(trip._id.toString(), expense.stopId.toString(), expense.amountLocal, expense.amountBase, expense.paidBy, owedAmounts);
+    await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
     await expense.deleteOne();
 };
 exports.deleteExpense = deleteExpense;
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // MARK SPLIT AS PAID
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 /**
- * Mark one member's split as paid (after UPI confirmation or manual confirmation).
- * Updates isSettled on the expense if all splits are now paid.
+ * Mark one member's split as paid (manual or UPI confirmation).
+ * Auto-updates isSettled if all splits are now paid.
  */
 const markSplitPaid = async (expenseId, targetUserId, paymentId) => {
     const expense = await expense_model_1.Expense.findById(expenseId);
@@ -441,59 +458,55 @@ const markSplitPaid = async (expenseId, targetUserId, paymentId) => {
     if (paymentId) {
         split.paymentId = new mongoose_1.Types.ObjectId(paymentId);
     }
-    // isSettled is auto-updated by pre-save hook
     await expense.save();
     return expense;
 };
 exports.markSplitPaid = markSplitPaid;
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // PRIVATE HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 /**
- * Reconstruct a SplitInput from the current expense document.
- * Used when updating an expense without changing the split method.
+ * Reconstruct SplitInput from existing expense for cache reversal.
  */
 function buildCurrentSplitInput(expense) {
     const method = expense.splitMethod;
-    if (method === 'personal') {
-        return { method: 'personal' };
+    switch (method) {
+        case 'personal':
+            return { method: 'personal' };
+        case 'equal':
+            return {
+                method: 'equal',
+                memberIds: expense.splits.map((s) => s.userId),
+            };
+        case 'percentage':
+            return {
+                method: 'percentage',
+                members: expense.splits.map((s) => ({
+                    userId: s.userId,
+                    displayName: s.displayName,
+                    percentage: s.percentage ?? 0,
+                })),
+            };
+        case 'exact':
+            return {
+                method: 'exact',
+                members: expense.splits.map((s) => ({
+                    userId: s.userId,
+                    displayName: s.displayName,
+                    amountLocal: s.amountLocal,
+                })),
+            };
+        case 'shares':
+            return {
+                method: 'shares',
+                members: expense.splits.map((s) => ({
+                    userId: s.userId,
+                    displayName: s.displayName,
+                    shares: s.shares ?? 1,
+                })),
+            };
+        default:
+            throw new AppError_1.AppError('Unknown split method on existing expense', 500);
     }
-    if (method === 'equal') {
-        return {
-            method: 'equal',
-            memberIds: expense.splits.map((s) => s.userId),
-        };
-    }
-    if (method === 'percentage') {
-        return {
-            method: 'percentage',
-            members: expense.splits.map((s) => ({
-                userId: s.userId,
-                displayName: s.displayName,
-                percentage: s.percentage ?? 0,
-            })),
-        };
-    }
-    if (method === 'exact') {
-        return {
-            method: 'exact',
-            members: expense.splits.map((s) => ({
-                userId: s.userId,
-                displayName: s.displayName,
-                amountLocal: s.amountLocal,
-            })),
-        };
-    }
-    if (method === 'shares') {
-        return {
-            method: 'shares',
-            members: expense.splits.map((s) => ({
-                userId: s.userId,
-                displayName: s.displayName,
-                shares: s.shares ?? 1,
-            })),
-        };
-    }
-    throw new AppError_1.AppError('Unknown split method on existing expense', 500);
 }
 //# sourceMappingURL=expense.service.js.map

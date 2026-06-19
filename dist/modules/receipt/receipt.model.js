@@ -32,84 +32,130 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Receipt = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const crypto_1 = __importDefault(require("crypto"));
+const uuid_1 = require("uuid");
+// ============================================================
+// SUB-SCHEMAS
+// ============================================================
+const ExtractedItemSchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
+    category: { type: String, default: 'other' },
+    price: { type: Number, required: true },
+    quantity: { type: Number, default: 1 },
+    confidence: { type: Number, default: 0 },
+}, { _id: false });
+const OCRDataSchema = new mongoose_1.Schema({
+    processed: { type: Boolean, default: false },
+    confidence: { type: Number, default: 0 },
+    rawText: { type: String },
+    extractedItems: { type: [ExtractedItemSchema], default: [] },
+    merchantName: { type: String },
+    merchantAddress: { type: String },
+    date: { type: Date },
+    totalAmount: { type: Number },
+    taxAmount: { type: Number },
+    currency: { type: String },
+    paymentMethod: { type: String },
+    error: { type: String },
+}, { _id: false });
+const ReceiptImageSchema = new mongoose_1.Schema({
+    originalUrl: { type: String, required: true },
+    thumbnailUrl: { type: String, required: true },
+    processedUrl: { type: String },
+    mimeType: {
+        type: String,
+        required: true,
+        enum: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'],
+    },
+    size: { type: Number, required: true },
+    width: { type: Number },
+    height: { type: Number },
+}, { _id: false });
+const StatusHistorySchema = new mongoose_1.Schema({
+    status: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    message: { type: String },
+}, { _id: false });
+// ============================================================
+// MAIN SCHEMA
+// ============================================================
 const ReceiptSchema = new mongoose_1.Schema({
     receiptId: {
         type: String,
         required: true,
         unique: true,
-        default: () => crypto_1.default.randomUUID()
+        default: () => (0, uuid_1.v4)(),
+        index: true,
     },
     userId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        type: String, // ✅ String, not ObjectId
+        required: true,
+        index: true,
     },
-    groupId: {
+    tripId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Group'
+        ref: 'Trip',
+        index: true,
     },
     expenseId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Expense'
+        ref: 'Expense',
     },
     image: {
-        originalUrl: { type: String, required: true },
-        thumbnailUrl: { type: String, required: true },
-        processedUrl: String,
-        mimeType: { type: String, required: true, enum: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'] },
-        size: { type: Number, required: true },
-        width: Number,
-        height: Number
+        type: ReceiptImageSchema,
+        required: true,
     },
     ocrData: {
-        processed: { type: Boolean, default: false },
-        confidence: { type: Number, default: 0 },
-        rawText: String,
-        extractedItems: [{
-                name: String,
-                category: String,
-                price: Number,
-                quantity: Number,
-                confidence: Number
-            }],
-        merchantName: String,
-        merchantAddress: String,
-        date: Date,
-        totalAmount: Number,
-        taxAmount: Number,
-        currency: String,
-        paymentMethod: String,
-        error: String
+        type: OCRDataSchema,
+        default: () => ({
+            processed: false,
+            confidence: 0,
+            extractedItems: [],
+        }),
     },
     status: {
         type: String,
         enum: ['UPLOADED', 'PROCESSING', 'COMPLETED', 'FAILED', 'REVIEWED'],
-        default: 'UPLOADED'
+        default: 'UPLOADED',
     },
-    statusHistory: [{
-            status: String,
-            timestamp: { type: Date, default: Date.now },
-            message: String
-        }],
-    metadata: {
-        createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
-        isDeleted: { type: Boolean, default: false },
-        version: { type: Number, default: 1 }
-    }
+    statusHistory: {
+        type: [StatusHistorySchema],
+        default: [],
+    },
+    addedBy: {
+        type: String, // ✅ String, not ObjectId
+        required: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    versionKey: false,
 });
-// Indexes
+// ============================================================
+// INDEXES
+// ============================================================
 ReceiptSchema.index({ userId: 1, createdAt: -1 });
-ReceiptSchema.index({ groupId: 1, status: 1 });
+ReceiptSchema.index({ tripId: 1, status: 1 });
 ReceiptSchema.index({ expenseId: 1 });
 ReceiptSchema.index({ status: 1, createdAt: -1 });
+// ============================================================
+// VIRTUALS
+// ============================================================
+ReceiptSchema.virtual('hasExpense').get(function () {
+    return !!this.expenseId;
+});
+ReceiptSchema.virtual('extractedTotal').get(function () {
+    return this.ocrData.extractedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+});
+// ============================================================
+// EXPORT
+// ============================================================
 exports.Receipt = mongoose_1.default.model('Receipt', ReceiptSchema);
 //# sourceMappingURL=receipt.model.js.map

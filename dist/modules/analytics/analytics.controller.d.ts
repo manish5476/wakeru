@@ -6,9 +6,9 @@ export declare class AnalyticsController {
      */
     getUserAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
     /**
-     * Get group analytics
+     * Get trip analytics
      */
-    getGroupAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
+    getTripAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
     /**
      * Get predictive analytics
      */

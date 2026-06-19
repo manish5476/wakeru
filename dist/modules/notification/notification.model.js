@@ -35,53 +35,96 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Notification = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const uuid_1 = require("uuid");
+// ============================================================
+// SUB-SCHEMA
+// ============================================================
+const ChannelsSchema = new mongoose_1.Schema({
+    inApp: { type: Boolean, default: true },
+    email: { type: Boolean, default: false },
+    push: { type: Boolean, default: false },
+    sms: { type: Boolean, default: false },
+}, { _id: false });
+// ============================================================
+// MAIN SCHEMA
+// ============================================================
 const NotificationSchema = new mongoose_1.Schema({
     notificationId: {
         type: String,
         required: true,
         unique: true,
-        default: () => `notif-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        default: () => (0, uuid_1.v4)(),
+        index: true,
     },
     userId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String, // ✅ String, not ObjectId
         required: true,
-        index: true
+        index: true,
     },
     type: {
         type: String,
         enum: [
-            'EXPENSE_ADDED', 'EXPENSE_UPDATED', 'EXPENSE_DELETED',
-            'SETTLEMENT_REQUEST', 'SETTLEMENT_COMPLETED',
-            'GROUP_INVITATION', 'GROUP_JOINED',
-            'PAYMENT_REMINDER', 'MONTHLY_REPORT'
+            'EXPENSE_ADDED',
+            'EXPENSE_UPDATED',
+            'EXPENSE_DELETED',
+            'SETTLEMENT_REQUEST',
+            'SETTLEMENT_COMPLETED',
+            'TRIP_INVITATION',
+            'TRIP_JOINED',
+            'PAYMENT_REMINDER',
+            'MONTHLY_REPORT',
+            'STOP_ADDED',
+            'EXCHANGE_RATE_UPDATED',
         ],
-        required: true
+        required: true,
     },
-    title: { type: String, required: true },
-    message: { type: String, required: true },
+    title: { type: String, required: true, maxlength: 200 },
+    message: { type: String, required: true, maxlength: 500 },
     data: { type: mongoose_1.Schema.Types.Mixed },
     isRead: { type: Boolean, default: false },
     isActionable: { type: Boolean, default: false },
-    actionUrl: String,
+    actionUrl: { type: String },
     priority: {
         type: String,
         enum: ['low', 'medium', 'high', 'urgent'],
-        default: 'medium'
+        default: 'medium',
     },
     channels: {
-        inApp: { type: Boolean, default: true },
-        email: { type: Boolean, default: false },
-        push: { type: Boolean, default: false },
-        sms: { type: Boolean, default: false }
+        type: ChannelsSchema,
+        default: () => ({
+            inApp: true,
+            email: false,
+            push: false,
+            sms: false,
+        }),
     },
-    readAt: Date
+    readAt: { type: Date },
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    versionKey: false,
 });
-// Indexes for performance
+// ============================================================
+// INDEXES
+// ============================================================
+// Primary query: user's notifications (unread first)
 NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
-NotificationSchema.index({ type: 1, createdAt: -1 });
-NotificationSchema.index({ createdAt: -1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 }); // Auto-delete after 30 days
+// Filter by type
+NotificationSchema.index({ userId: 1, type: 1, createdAt: -1 });
+// Auto-delete after 30 days (TTL index)
+NotificationSchema.index({ createdAt: -1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
+// ============================================================
+// STATIC METHODS
+// ============================================================
+NotificationSchema.statics.getUnreadCount = async function (userId) {
+    return this.countDocuments({ userId, isRead: false });
+};
+NotificationSchema.statics.markAllAsRead = async function (userId) {
+    return this.updateMany({ userId, isRead: false }, { $set: { isRead: true, readAt: new Date() } });
+};
+// ============================================================
+// EXPORT
+// ============================================================
 exports.Notification = mongoose_1.default.model('Notification', NotificationSchema);
 //# sourceMappingURL=notification.model.js.map

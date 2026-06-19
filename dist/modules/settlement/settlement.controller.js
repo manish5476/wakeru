@@ -1,152 +1,139 @@
 "use strict";
-// import { Request, Response, NextFunction } from 'express';
-// import { settlementService } from './settlement.service';
-// import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
-// import { ValidationError } from '../../shared/errors/AppError';
-// import Joi from 'joi';
-// const createSettlementSchema = Joi.object({
-//   groupId: Joi.string().required(),
-//   toUser: Joi.string().required(),
-//   amount: Joi.number().positive().required(),
-//   paymentMethod: Joi.string().required(),
-//   notes: Joi.string().optional()
-// });
-// const processPaymentSchema = Joi.object({
-//   transactionId: Joi.string().required(),
-//   paymentGateway: Joi.string().required()
-// });
-// export class SettlementController {
-//   /**
-//    * Get simplified debts
-//    */
-//   async getSimplifiedDebts(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { groupId } = req.params;
-//       const debts = await settlementService.getSimplifiedDebts(groupId, req.user!.userId);
-//       const response: ApiResponse = {
-//         success: true,
-//         message: 'Simplified debts retrieved successfully',
-//         data: debts,
-//         timestamp: new Date().toISOString()
-//       };
-//       res.status(200).json(response);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-//   /**
-//    * Get debt summary for user
-//    */
-//   async getDebtSummary(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { groupId } = req.params;
-//       const summary = await settlementService.getDebtSummary(groupId, req.user!.userId);
-//       const response: ApiResponse = {
-//         success: true,
-//         message: 'Debt summary retrieved successfully',
-//         data: summary,
-//         timestamp: new Date().toISOString()
-//       };
-//       res.status(200).json(response);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-//   /**
-//    * Create settlement
-//    */
-//   async createSettlement(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { error, value } = createSettlementSchema.validate(req.body);
-//       if (error) {
-//         throw new ValidationError(error.details[0].message, error.details);
-//       }
-//       const settlement = await settlementService.createSettlement(
-//         value.groupId,
-//         req.user!.userId,
-//         value.toUser,
-//         value.amount,
-//         value.paymentMethod,
-//         req.user!.userId
-//       );
-//       const response: ApiResponse = {
-//         success: true,
-//         message: 'Settlement created successfully',
-//         data: { settlement },
-//         timestamp: new Date().toISOString()
-//       };
-//       res.status(201).json(response);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-//   /**
-//    * Process payment
-//    */
-//   async processPayment(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { settlementId } = req.params;
-//       const { error, value } = processPaymentSchema.validate(req.body);
-//       if (error) {
-//         throw new ValidationError(error.details[0].message, error.details);
-//       }
-//       const settlement = await settlementService.processPayment(
-//         settlementId,
-//         value,
-//         req.user!.userId
-//       );
-//       const response: ApiResponse = {
-//         success: true,
-//         message: 'Payment processed successfully',
-//         data: { settlement },
-//         timestamp: new Date().toISOString()
-//       };
-//       res.status(200).json(response);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-//   /**
-//    * Cancel settlement
-//    */
-//   async cancelSettlement(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { settlementId } = req.params;
-//       const settlement = await settlementService.cancelSettlement(settlementId, req.user!.userId);
-//       const response: ApiResponse = {
-//         success: true,
-//         message: 'Settlement cancelled successfully',
-//         data: { settlement },
-//         timestamp: new Date().toISOString()
-//       };
-//       res.status(200).json(response);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-//   /**
-//    * Get settlement history
-//    */
-//   async getSettlementHistory(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { groupId } = req.params;
-//       const { page, limit } = req.query;
-//       const result = await settlementService.getSettlementHistory(
-//         groupId,
-//         req.user!.userId,
-//         { page: Number(page) || 1, limit: Number(limit) || 20 }
-//       );
-//       const response: ApiResponse = {
-//         success: true,
-//         message: 'Settlement history retrieved successfully',
-//         data: result,
-//         timestamp: new Date().toISOString()
-//       };
-//       res.status(200).json(response);
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// }
-// export const settlementController = new SettlementController();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.disputePayment = exports.confirmPayment = exports.initiatePayment = exports.calculateSettlement = exports.getSettlement = void 0;
+const settlement_service_1 = require("./settlement.service");
+const AppError_1 = require("../../shared/errors/AppError");
+// ============================================================
+// HELPER
+// ============================================================
+const getUser = (req) => {
+    const user = req.user;
+    if (!user?.userId)
+        throw new AppError_1.AppError('Not authenticated', 401);
+    return {
+        uid: user.userId,
+        displayName: user.displayName || 'User',
+    };
+};
+// ============================================================
+// CONTROLLERS
+// ============================================================
+/**
+ * GET /api/v1/settlements/trip/:tripId
+ * Get current settlement plan (auto-calculates if needed).
+ */
+const getSettlement = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { tripId } = req.params;
+        const settlement = await settlement_service_1.settlementService.getSettlement(tripId, user.uid);
+        res.status(200).json({
+            success: true,
+            data: {
+                settlement,
+                summary: {
+                    totalTransactions: settlement.totalTransactions,
+                    totalAmount: settlement.transactions.reduce((s, t) => s + t.amountBase, 0),
+                    pendingCount: settlement.transactions.filter((t) => t.status === 'pending').length,
+                    confirmedCount: settlement.transactions.filter((t) => t.status === 'confirmed').length,
+                    baseCurrency: settlement.baseCurrency,
+                    isStale: settlement.isStale,
+                },
+            },
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.getSettlement = getSettlement;
+/**
+ * POST /api/v1/settlements/trip/:tripId/calculate
+ * Force recalculate settlement.
+ */
+const calculateSettlement = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { tripId } = req.params;
+        const settlement = await settlement_service_1.settlementService.calculateSettlement(tripId, user.uid);
+        res.status(200).json({
+            success: true,
+            message: `Settlement calculated — ${settlement.totalTransactions} transfers needed`,
+            data: { settlement },
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.calculateSettlement = calculateSettlement;
+/**
+ * POST /api/v1/settlements/trip/:tripId/pay
+ * Initiate UPI payment for a settlement transaction.
+ */
+const initiatePayment = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { tripId } = req.params;
+        const { transactionId } = req.body;
+        const result = await settlement_service_1.settlementService.initiatePayment(tripId, transactionId, user.uid);
+        res.status(200).json({
+            success: true,
+            message: 'Payment initiated. Open the UPI link to complete.',
+            data: {
+                transaction: result.transaction,
+                upiDeepLink: result.upiDeepLink,
+            },
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.initiatePayment = initiatePayment;
+/**
+ * POST /api/v1/settlements/trip/:tripId/confirm
+ * Confirm receipt of a payment (recipient only).
+ */
+const confirmPayment = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { tripId } = req.params;
+        const { transactionId } = req.body;
+        const settlement = await settlement_service_1.settlementService.confirmPayment(tripId, transactionId, user.uid);
+        res.status(200).json({
+            success: true,
+            message: 'Payment confirmed. Related expenses updated.',
+            data: {
+                settlement,
+                isFullySettled: settlement.transactions.every((t) => t.status === 'confirmed'),
+            },
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.confirmPayment = confirmPayment;
+/**
+ * POST /api/v1/settlements/trip/:tripId/dispute
+ * Dispute a payment.
+ */
+const disputePayment = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { tripId } = req.params;
+        const { transactionId } = req.body;
+        const settlement = await settlement_service_1.settlementService.disputePayment(tripId, transactionId, user.uid);
+        res.status(200).json({
+            success: true,
+            message: 'Payment disputed. Trip members will be notified.',
+            data: { settlement },
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.disputePayment = disputePayment;
 //# sourceMappingURL=settlement.controller.js.map

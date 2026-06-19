@@ -16,11 +16,10 @@ const rateLimiter_middleware_1 = require("./middleware/rateLimiter.middleware");
 // Import routes
 const auth_1 = require("./modules/auth");
 const user_routes_1 = __importDefault(require("./modules/user/user.routes"));
-const group_routes_1 = __importDefault(require("./modules/group/group.routes"));
 const expense_routes_1 = __importDefault(require("./modules/expense/expense.routes"));
 const analytics_routes_1 = __importDefault(require("./modules/analytics/analytics.routes"));
 const receipt_routes_1 = __importDefault(require("./modules/receipt/receipt.routes"));
-const notification_routes_1 = __importDefault(require("./modules/notification/notification.routes"));
+// import notificationRoutes from './modules/notification/notification.routes';
 const app = (0, express_1.default)();
 // Security middleware
 app.use((0, helmet_1.default)());
@@ -53,11 +52,11 @@ app.get('/health', (req, res) => {
 // API routes with idempotency check
 app.use('/api/v1/auth', rateLimiter_middleware_1.authenticatedRateLimiter, auth_1.authRoutes);
 app.use('/api/v1/users', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, user_routes_1.default);
-app.use('/api/v1/groups', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, group_routes_1.default);
+// app.use('/api/v1/groups', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, groupRoutes);
 app.use('/api/v1/expenses', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, expense_routes_1.default);
 app.use('/api/v1/analytics', rateLimiter_middleware_1.authenticatedRateLimiter, analytics_routes_1.default);
 app.use('/api/v1/receipts', rateLimiter_middleware_1.authenticatedRateLimiter, idempotency_middleware_1.IdempotencyMiddleware.checkIdempotency, receipt_routes_1.default);
-app.use('/api/v1/notifications', rateLimiter_middleware_1.authenticatedRateLimiter, notification_routes_1.default);
+// app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({

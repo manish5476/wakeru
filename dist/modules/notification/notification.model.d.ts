@@ -1,25 +1,29 @@
 import mongoose, { Document } from 'mongoose';
-export interface INotificationDocument extends Document {
+export type NotificationType = 'EXPENSE_ADDED' | 'EXPENSE_UPDATED' | 'EXPENSE_DELETED' | 'SETTLEMENT_REQUEST' | 'SETTLEMENT_COMPLETED' | 'TRIP_INVITATION' | 'TRIP_JOINED' | 'PAYMENT_REMINDER' | 'MONTHLY_REPORT' | 'STOP_ADDED' | 'EXCHANGE_RATE_UPDATED';
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+export interface INotificationChannels {
+    inApp: boolean;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+}
+export interface INotification extends Document {
     notificationId: string;
-    userId: mongoose.Types.ObjectId;
-    type: 'EXPENSE_ADDED' | 'EXPENSE_UPDATED' | 'EXPENSE_DELETED' | 'SETTLEMENT_REQUEST' | 'SETTLEMENT_COMPLETED' | 'GROUP_INVITATION' | 'GROUP_JOINED' | 'PAYMENT_REMINDER' | 'MONTHLY_REPORT';
+    userId: string;
+    type: NotificationType;
     title: string;
     message: string;
-    data?: any;
+    data?: Record<string, any>;
     isRead: boolean;
     isActionable: boolean;
     actionUrl?: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    channels: {
-        inApp: boolean;
-        email: boolean;
-        push: boolean;
-        sms: boolean;
-    };
-    createdAt: Date;
+    priority: NotificationPriority;
+    channels: INotificationChannels;
     readAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
-export declare const Notification: mongoose.Model<INotificationDocument, {}, {}, {}, mongoose.Document<unknown, {}, INotificationDocument, {}, {}> & INotificationDocument & Required<{
+export declare const Notification: mongoose.Model<INotification, {}, {}, {}, mongoose.Document<unknown, {}, INotification, {}, {}> & INotification & Required<{
     _id: mongoose.Types.ObjectId;
 }> & {
     __v: number;

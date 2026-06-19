@@ -49,7 +49,7 @@ class OCRProcessor {
                 processed: true,
                 confidence: ocrResult.confidence,
                 rawText: ocrResult.rawText,
-                extractedItems: ocrResult.extractedItems,
+                extractedItems: ocrResult.extractedItems || [],
                 merchantName: ocrResult.merchantName,
                 merchantAddress: ocrResult.merchantAddress,
                 date: ocrResult.date,

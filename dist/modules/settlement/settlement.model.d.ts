@@ -15,6 +15,7 @@ export interface ISettlementTransaction {
 }
 export interface ISettlement extends Document {
     tripId: Types.ObjectId;
+    baseCurrency: string;
     transactions: ISettlementTransaction[];
     totalTransactions: number;
     calculatedAt: Date;

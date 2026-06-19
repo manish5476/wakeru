@@ -1,4 +1,4 @@
-import { IUser, IUserDocument } from './auth.model';
+import { IUser } from './auth.model';
 interface TokenPair {
     accessToken: string;
     refreshToken: string;
@@ -52,7 +52,7 @@ export declare const AuthService: {
     /**
     * Set user's UPI ID.
     */
-    setUpiId(userId: string, upiId: string): Promise<IUserDocument>;
+    setUpiId(userId: string, upiId: string): Promise<IUser>;
     /**
      * Verify UPI ID (penny drop simulation).
      */

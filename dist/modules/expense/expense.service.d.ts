@@ -15,27 +15,28 @@ interface ComputedSplit {
     isPaid: boolean;
 }
 /**
- * Compute splits for an expense.
- * Returns the full ISplit array ready to embed in the expense document.
+ * Compute per-member splits in BOTH currencies.
  *
- * All amounts are rounded to 2 decimal places.
- * For 'equal' splits, the remainder (from rounding) is distributed to the
- * first N members to avoid total drift (e.g. ₹0.01 gaps).
+ * For 'equal' splits, the remainder from rounding is distributed
+ * to the first N members (prevents ₹0.01 gaps).
+ *
+ * For 'personal' splits, the payer owns the full cost — no debt created,
+ * the split is marked as paid immediately.
  */
 export declare const computeSplits: (splitInput: SplitInput, amountLocal: number, amountBase: number, exchangeRate: number, paidByUid: string, allTripMembers: MemberInfo[]) => ComputedSplit[];
 /**
  * Create an expense inside a trip stop.
  *
  * Flow:
- * 1. Load the trip to get stop details (currency, exchange rate, members)
- * 2. Compute amountBase from amountLocal * currentExchangeRate
+ * 1. Load trip to get stop details (currency, exchange rate, members)
+ * 2. Compute amountBase = amountLocal × currentExchangeRate
  * 3. Compute per-member splits in both currencies
- * 4. Save the expense document
- * 5. Update trip/stop cached totals via $inc (atomic)
+ * 4. Save expense document
+ * 5. Atomically update trip/stop cached totals via $inc
  */
 export declare const createExpense: (input: CreateExpenseInput, adderUid: string, adderDisplayName: string) => Promise<IExpense>;
 /**
- * Get all expenses for a specific stop (paginated).
+ * Get expenses for a specific stop (paginated, filterable).
  */
 export declare const getStopExpenses: (stopId: string, query: ExpenseListQuery) => Promise<{
     expenses: (import("mongoose").FlattenMaps<IExpense> & Required<{
@@ -52,7 +53,7 @@ export declare const getStopExpenses: (stopId: string, query: ExpenseListQuery) 
     };
 }>;
 /**
- * Get all expenses across all stops for a trip (unified view).
+ * Get all expenses across ALL stops for a trip.
  */
 export declare const getTripExpenses: (tripId: string, query: ExpenseListQuery) => Promise<{
     expenses: (import("mongoose").FlattenMaps<IExpense> & Required<{
@@ -69,7 +70,7 @@ export declare const getTripExpenses: (tripId: string, query: ExpenseListQuery) 
     };
 }>;
 /**
- * Get all expenses paid by the current user across all their trips.
+ * Get all expenses paid by a specific user across all trips.
  */
 export declare const getMyExpenses: (userId: string, query: ExpenseListQuery) => Promise<{
     expenses: (import("mongoose").FlattenMaps<IExpense> & Required<{
@@ -92,14 +93,12 @@ export declare const getExpenseById: (expenseId: string, requestingUid: string) 
 /**
  * Update an expense.
  *
- * If amountLocal or paidBy or split changes, we:
- * 1. Reverse the old cached totals ($inc with negative values)
+ * If amount, payer, or split changes:
+ * 1. Reverse old cached totals (negative $inc)
  * 2. Recompute splits
- * 3. Save the updated expense
- * 4. Apply new cached totals
+ * 3. Apply new cached totals
  *
- * Exchange rate is NOT re-fetched — we keep the rate that was active at
- * original creation time (unless you explicitly want to reset it).
+ * Exchange rate is NOT re-fetched — we keep the rate locked at creation.
  */
 export declare const updateExpense: (expenseId: string, input: UpdateExpenseInput, editorUid: string) => Promise<IExpense>;
 /**
@@ -108,8 +107,8 @@ export declare const updateExpense: (expenseId: string, input: UpdateExpenseInpu
  */
 export declare const deleteExpense: (expenseId: string, requestingUid: string) => Promise<void>;
 /**
- * Mark one member's split as paid (after UPI confirmation or manual confirmation).
- * Updates isSettled on the expense if all splits are now paid.
+ * Mark one member's split as paid (manual or UPI confirmation).
+ * Auto-updates isSettled if all splits are now paid.
  */
 export declare const markSplitPaid: (expenseId: string, targetUserId: string, paymentId?: string) => Promise<IExpense>;
 export {};

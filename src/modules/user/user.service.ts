@@ -238,7 +238,7 @@ export class UserService {
       ],
     });
 
-    return { users, total, page, limit };
+    return { users: users as unknown as Partial<IUserDocument>[], total, page, limit };
   }
 
   /**

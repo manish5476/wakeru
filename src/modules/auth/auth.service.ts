@@ -43,7 +43,7 @@ const REFRESH_TOKEN_EXPIRY = config.JWT_REFRESH_EXPIRATION || '7d';
  * Generates access + refresh token pair.
  * Atomically stores refresh token with $slice to limit array size.
  */
-const generateTokens = async (user: IUser): Promise<TokenPair> => {
+const generateTokens = async (user: IUser | IUserDocument): Promise<TokenPair> => {
   const accessToken = jwt.sign(
     {
       userId: user._id,
@@ -156,7 +156,7 @@ export const AuthService = {
     }
 
     const tokens = await generateTokens(user);
-    return { user: user.toObject(), tokens, isNewUser: true };
+    return { user: user.toObject() as unknown as IUser, tokens, isNewUser: true };
   },
 
   /**
@@ -206,7 +206,7 @@ export const AuthService = {
     const tokens = await generateTokens(user);
     logger.info('User logged in', { userId: user._id });
 
-    return { user: user.toObject(), tokens, isNewUser: false };
+    return { user: user.toObject() as unknown as IUser, tokens, isNewUser: false };
   },
 
   /**
@@ -342,82 +342,82 @@ export const AuthService = {
     }
 
     logger.info('User profile updated', { userId });
-    return user.toObject();
+    return user.toObject() as unknown as IUser;
   },
 
   /**
    * Set user's UPI ID.
    */
- /**
- * Set user's UPI ID.
- */
-async setUpiId(userId: string, upiId: string): Promise<IUser> {
-  // Check if UPI ID is already taken by another user
-  const existing = await User.findOne({ 
-    'bankingDetails.upiId': upiId,        // ✅ FIXED
-    _id: { $ne: userId },
-    isActive: true,
-    isDeleted: false,
-  });
+  /**
+  * Set user's UPI ID.
+  */
+  async setUpiId(userId: string, upiId: string): Promise<IUser> {
+    // Check if UPI ID is already taken by another user
+    const existing = await User.findOne({
+      'bankingDetails.upiId': upiId,        // ✅ FIXED
+      _id: { $ne: userId },
+      isActive: true,
+      isDeleted: false,
+    });
 
-  if (existing) {
-    throw new ConflictError('This UPI ID is already associated with another account');
-  }
+    if (existing) {
+      throw new ConflictError('This UPI ID is already associated with another account');
+    }
 
-  const user = await User.findOneAndUpdate(
-    { _id: userId, isActive: true, isDeleted: false },
-    { 
-      $set: { 
-        'bankingDetails.upiId': upiId,        // ✅ FIXED
-        'bankingDetails.upiVerified': false,  // Reset verification when UPI changes
-      } 
-    },
-    { new: true, runValidators: true }
-  );
+    const user = await User.findOneAndUpdate(
+      { _id: userId, isActive: true, isDeleted: false },
+      {
+        $set: {
+          'bankingDetails.upiId': upiId,        // ✅ FIXED
+          'bankingDetails.upiVerified': false,  // Reset verification when UPI changes
+        }
+      },
+      { new: true, runValidators: true }
+    );
 
-  if (!user) {
-    throw new NotFoundError('User not found');
-  }
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
 
-  return user.toObject();
-},
+    return user.toObject() as unknown as IUser;
+  },
 
   /**
    * Verify UPI ID (penny drop simulation).
    */
- /**
- * Verify UPI ID (penny drop simulation).
- */
-async verifyUpi(userId: string): Promise<boolean> {
-  const user = await User.findOne({ 
-    _id: userId,
-    isActive: true,
-    isDeleted: false,
-  });
+  /**
+  * Verify UPI ID (penny drop simulation).
+  */
+  async verifyUpi(userId: string): Promise<boolean> {
+    const user = await User.findOne({
+      _id: userId,
+      isActive: true,
+      isDeleted: false,
+    });
 
-  if (!user) {
-    throw new NotFoundError('User not found');
-  }
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
 
-  // ✅ FIXED: upiId is inside bankingDetails
-  if (!user.bankingDetails?.upiId) {
-    throw new ValidationError('No UPI ID set. Please set your UPI ID first.');
-  }
+    // ✅ FIXED: upiId is inside bankingDetails
+    if (!user.bankingDetails?.upiId) {
+      throw new ValidationError('No UPI ID set. Please set your UPI ID first.');
+    }
 
-  // In production: trigger actual penny drop via UPI gateway
-  // For now: simulate verification
-  const verified = true; // Replace with actual verification logic
+    // In production: trigger actual penny drop via UPI gateway
+    // For now: simulate verification
+    const verified = true; // Replace with actual verification logic
 
-  if (verified) {
-    await User.updateOne(
-      { _id: userId },
-      { $set: { 'bankingDetails.upiVerified': true } }
-    );
-    logger.info('UPI verified', { userId, upiId: user.bankingDetails.upiId });
-  }
+    if (verified) {
+      await User.updateOne(
+        { _id: userId },
+        { $set: { 'bankingDetails.upiVerified': true } }
+      );
+      logger.info('UPI verified', { userId, upiId: user.bankingDetails.upiId });
+    }
 
-  return verified;
-},
+    return verified;
+  },
 
   /**
    * Update FCM token for push notifications.
@@ -475,6 +475,6 @@ async verifyUpi(userId: string): Promise<boolean> {
     }
 
     logger.info('Account reactivated', { userId });
-    return user.toObject();
+    return user.toObject() as unknown as IUser;
   },
 };

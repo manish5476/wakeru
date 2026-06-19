@@ -114,7 +114,7 @@ exports.AuthService = {
             throw error;
         }
         const tokens = await generateTokens(user);
-        return { user, tokens, isNewUser: true };
+        return { user: user.toObject(), tokens, isNewUser: true };
     },
     /**
      * Login existing user with Firebase ID token.
@@ -154,7 +154,7 @@ exports.AuthService = {
         await user.save();
         const tokens = await generateTokens(user);
         logger_1.logger.info('User logged in', { userId: user._id });
-        return { user, tokens, isNewUser: false };
+        return { user: user.toObject(), tokens, isNewUser: false };
     },
     /**
      * Refresh access token using a valid refresh token.
@@ -220,7 +220,7 @@ exports.AuthService = {
                 email: email.toLowerCase(),
                 isActive: true,
                 isDeleted: false,
-            }).lean();
+            });
             if (user) {
                 await (0, auth_1.getAuth)().generatePasswordResetLink(email);
                 logger_1.logger.info('Password reset email sent', { email });
@@ -255,12 +255,12 @@ exports.AuthService = {
                 sanitizedUpdates[key] = updates[key];
             }
         }
-        const user = await auth_model_1.User.findOneAndUpdate({ _id: userId, isActive: true, isDeleted: false }, { $set: sanitizedUpdates }, { new: true, runValidators: true });
+        const user = await auth_model_1.User.findByIdAndUpdate(userId, { $set: sanitizedUpdates }, { new: true, runValidators: true });
         if (!user) {
             throw new AppError_1.NotFoundError('User not found');
         }
         logger_1.logger.info('User profile updated', { userId });
-        return user;
+        return user.toObject();
     },
     /**
      * Set user's UPI ID.
@@ -288,7 +288,7 @@ exports.AuthService = {
         if (!user) {
             throw new AppError_1.NotFoundError('User not found');
         }
-        return user;
+        return user.toObject();
     },
     /**
      * Verify UPI ID (penny drop simulation).
@@ -357,7 +357,7 @@ exports.AuthService = {
             throw new AppError_1.NotFoundError('Deleted account not found');
         }
         logger_1.logger.info('Account reactivated', { userId });
-        return user;
+        return user.toObject();
     },
 };
 //# sourceMappingURL=auth.service.js.map

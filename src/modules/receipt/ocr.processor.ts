@@ -71,7 +71,7 @@ export class OCRProcessor {
         processed: true,
         confidence: ocrResult.confidence,
         rawText: ocrResult.rawText,
-        extractedItems: ocrResult.extractedItems,
+        extractedItems: ocrResult.extractedItems || [],
         merchantName: ocrResult.merchantName,
         merchantAddress: ocrResult.merchantAddress,
         date: ocrResult.date,
@@ -80,7 +80,7 @@ export class OCRProcessor {
         currency: ocrResult.currency,
         paymentMethod: ocrResult.paymentMethod,
         error: ocrResult.error
-      };
+      } as any;
 
       receipt.status = ocrResult.success ? 'COMPLETED' : 'FAILED';
       receipt.statusHistory.push({

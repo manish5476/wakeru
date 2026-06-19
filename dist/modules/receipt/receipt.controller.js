@@ -2,17 +2,29 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.receiptController = exports.ReceiptController = void 0;
 const receipt_service_1 = require("./receipt.service");
+const AppError_1 = require("../../shared/errors/AppError");
+// ============================================================
+// HELPER
+// ============================================================
+const getUser = (req) => {
+    if (!req.user?.userId)
+        throw new AppError_1.AppError('Not authenticated', 401);
+    return req.user.userId;
+};
+// ============================================================
+// CONTROLLER
+// ============================================================
 class ReceiptController {
     async uploadReceipt(req, res, next) {
         try {
-            const receipt = await receipt_service_1.receiptService.uploadReceipt(req.user.userId, req.file);
-            const response = {
+            const userId = getUser(req);
+            const { tripId, expenseId } = req.body;
+            const receipt = await receipt_service_1.receiptService.uploadReceipt(userId, req.file, tripId, expenseId);
+            res.status(201).json({
                 success: true,
-                message: 'Receipt uploaded successfully',
-                data: receipt,
-                timestamp: new Date().toISOString()
-            };
-            res.status(201).json(response);
+                message: 'Receipt uploaded — processing started',
+                data: { receipt },
+            });
         }
         catch (error) {
             next(error);
@@ -20,14 +32,28 @@ class ReceiptController {
     }
     async getUserReceipts(req, res, next) {
         try {
-            const receipts = await receipt_service_1.receiptService.getUserReceipts(req.user.userId);
-            const response = {
-                success: true,
-                message: 'Receipts retrieved successfully',
-                data: receipts,
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            const userId = getUser(req);
+            const { page, limit, status } = req.query;
+            const result = await receipt_service_1.receiptService.getUserReceipts(userId, {
+                page: Number(page) || 1,
+                limit: Number(limit) || 20,
+                status: status,
+            });
+            res.status(200).json({ success: true, data: result });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getTripReceipts(req, res, next) {
+        try {
+            const { tripId } = req.params;
+            const { page, limit } = req.query;
+            const result = await receipt_service_1.receiptService.getTripReceipts(tripId, {
+                page: Number(page) || 1,
+                limit: Number(limit) || 20,
+            });
+            res.status(200).json({ success: true, data: result });
         }
         catch (error) {
             next(error);
@@ -35,14 +61,9 @@ class ReceiptController {
     }
     async getReceipt(req, res, next) {
         try {
-            const receipt = await receipt_service_1.receiptService.getReceipt(req.params.receiptId, req.user.userId);
-            const response = {
-                success: true,
-                message: 'Receipt retrieved successfully',
-                data: receipt,
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            const userId = getUser(req);
+            const receipt = await receipt_service_1.receiptService.getReceipt(req.params.receiptId, userId);
+            res.status(200).json({ success: true, data: { receipt } });
         }
         catch (error) {
             next(error);
@@ -50,14 +71,13 @@ class ReceiptController {
     }
     async updateReceipt(req, res, next) {
         try {
-            const receipt = await receipt_service_1.receiptService.updateReceipt(req.params.receiptId, req.user.userId, req.body);
-            const response = {
+            const userId = getUser(req);
+            const receipt = await receipt_service_1.receiptService.updateReceipt(req.params.receiptId, userId, req.body);
+            res.status(200).json({
                 success: true,
-                message: 'Receipt updated successfully',
-                data: receipt,
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+                message: 'Receipt updated',
+                data: { receipt },
+            });
         }
         catch (error) {
             next(error);
@@ -65,13 +85,12 @@ class ReceiptController {
     }
     async deleteReceipt(req, res, next) {
         try {
-            await receipt_service_1.receiptService.deleteReceipt(req.params.receiptId, req.user.userId);
-            const response = {
+            const userId = getUser(req);
+            await receipt_service_1.receiptService.deleteReceipt(req.params.receiptId, userId);
+            res.status(200).json({
                 success: true,
-                message: 'Receipt deleted successfully',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+                message: 'Receipt deleted',
+            });
         }
         catch (error) {
             next(error);
@@ -79,14 +98,13 @@ class ReceiptController {
     }
     async reprocessReceipt(req, res, next) {
         try {
-            const result = await receipt_service_1.receiptService.reprocessReceipt(req.params.receiptId, req.user.userId);
-            const response = {
+            const userId = getUser(req);
+            const result = await receipt_service_1.receiptService.reprocessReceipt(req.params.receiptId, userId);
+            res.status(202).json({
                 success: true,
-                message: 'Receipt reprocessing started',
-                data: result,
-                timestamp: new Date().toISOString()
-            };
-            res.status(202).json(response);
+                message: 'OCR reprocessing started',
+                data: { receipt: result },
+            });
         }
         catch (error) {
             next(error);
@@ -94,14 +112,14 @@ class ReceiptController {
     }
     async convertToExpense(req, res, next) {
         try {
-            const expense = await receipt_service_1.receiptService.convertToExpense(req.params.receiptId, req.user.userId, req.body.groupId);
-            const response = {
+            const userId = getUser(req);
+            const { tripId } = req.body;
+            const expenseData = await receipt_service_1.receiptService.convertToExpense(req.params.receiptId, userId, tripId);
+            res.status(200).json({
                 success: true,
-                message: 'Receipt converted to expense successfully',
-                data: expense,
-                timestamp: new Date().toISOString()
-            };
-            res.status(201).json(response);
+                message: 'Receipt data ready for expense creation',
+                data: { expenseData },
+            });
         }
         catch (error) {
             next(error);

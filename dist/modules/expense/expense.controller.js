@@ -35,20 +35,26 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.markSplitPaid = exports.deleteExpense = exports.updateExpense = exports.getExpense = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = void 0;
 const expenseService = __importStar(require("./expense.service"));
-const AppError_1 = require("@shared/errors/AppError");
+const AppError_1 = require("../../shared/errors/AppError");
+// ============================================================
+// HELPERS
+// ============================================================
 const getUser = (req) => {
     const user = req.user;
-    if (!user?.uid)
+    if (!user?.userId)
         throw new AppError_1.AppError('Not authenticated', 401);
-    return user;
+    return {
+        uid: user.userId,
+        displayName: user.displayName || 'User',
+        photoURL: user.photoURL,
+    };
 };
-// ─────────────────────────────────────────────────────────────────────────────
-// EXPENSE CONTROLLERS
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// CREATE
+// ============================================================
 /**
  * POST /api/v1/expenses
- * Create a new expense.
- * Body must include stopId — the trip is resolved from the stop.
+ * Create a new expense with split computation.
  */
 const createExpense = async (req, res, next) => {
     try {
@@ -66,10 +72,12 @@ const createExpense = async (req, res, next) => {
     }
 };
 exports.createExpense = createExpense;
+// ============================================================
+// READ
+// ============================================================
 /**
  * GET /api/v1/expenses/stop/:stopId
- * List expenses for a specific stop (paginated, filterable).
- * Query: page, limit, category, paidBy, isSettled, startDate, endDate, sortBy, sortOrder
+ * List expenses for a specific stop.
  */
 const getStopExpenses = async (req, res, next) => {
     try {
@@ -89,7 +97,6 @@ exports.getStopExpenses = getStopExpenses;
 /**
  * GET /api/v1/expenses/trip/:tripId
  * List ALL expenses across all stops for a trip.
- * Used for the unified trip expense view.
  */
 const getTripExpenses = async (req, res, next) => {
     try {
@@ -108,7 +115,7 @@ const getTripExpenses = async (req, res, next) => {
 exports.getTripExpenses = getTripExpenses;
 /**
  * GET /api/v1/expenses/mine
- * All expenses paid by the current user across all trips.
+ * All expenses paid by current user across all trips.
  */
 const getMyExpenses = async (req, res, next) => {
     try {
@@ -144,9 +151,12 @@ const getExpense = async (req, res, next) => {
     }
 };
 exports.getExpense = getExpense;
+// ============================================================
+// UPDATE
+// ============================================================
 /**
  * PATCH /api/v1/expenses/:expenseId
- * Update an expense. Recalculates splits & cached totals if amount/split changes.
+ * Update expense — recalculates splits & cached totals if needed.
  */
 const updateExpense = async (req, res, next) => {
     try {
@@ -165,10 +175,12 @@ const updateExpense = async (req, res, next) => {
     }
 };
 exports.updateExpense = updateExpense;
+// ============================================================
+// DELETE
+// ============================================================
 /**
  * DELETE /api/v1/expenses/:expenseId
  * Delete expense + reverse all cached totals.
- * Only payer or trip admin can delete.
  */
 const deleteExpense = async (req, res, next) => {
     try {
@@ -185,10 +197,12 @@ const deleteExpense = async (req, res, next) => {
     }
 };
 exports.deleteExpense = deleteExpense;
+// ============================================================
+// SETTLEMENT
+// ============================================================
 /**
  * PATCH /api/v1/expenses/:expenseId/splits/:userId/pay
- * Mark one member's split as paid (manual confirmation).
- * Used when UPI is done outside the app, or for cash payments.
+ * Mark one member's split as paid.
  */
 const markSplitPaid = async (req, res, next) => {
     try {

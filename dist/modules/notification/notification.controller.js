@@ -2,97 +2,82 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.notificationController = exports.NotificationController = void 0;
 const notification_service_1 = require("./notification.service");
+const AppError_1 = require("../../shared/errors/AppError");
+// ============================================================
+// HELPER
+// ============================================================
+const getUser = (req) => {
+    if (!req.user?.userId)
+        throw new AppError_1.AppError('Not authenticated', 401);
+    return req.user.userId;
+};
+// ============================================================
+// CONTROLLER
+// ============================================================
 class NotificationController {
-    /**
-     * Get notifications
-     */
     async getNotifications(req, res, next) {
         try {
+            const userId = getUser(req);
             const { page, limit, unreadOnly, type } = req.query;
-            const result = await notification_service_1.notificationService.getUserNotifications(req.user.userId, {
+            const result = await notification_service_1.notificationService.getUserNotifications(userId, {
                 page: Number(page) || 1,
                 limit: Number(limit) || 20,
                 unreadOnly: unreadOnly === 'true',
-                type: type
+                type: type,
             });
-            const response = {
-                success: true,
-                message: 'Notifications retrieved successfully',
-                data: result,
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            res.status(200).json({ success: true, data: result });
         }
         catch (error) {
             next(error);
         }
     }
-    /**
-     * Get unread count
-     */
     async getUnreadCount(req, res, next) {
         try {
-            const count = await notification_service_1.notificationService.getUnreadCount(req.user.userId);
-            const response = {
+            const userId = getUser(req);
+            const count = await notification_service_1.notificationService.getUnreadCount(userId);
+            res.status(200).json({
                 success: true,
-                message: 'Unread count retrieved successfully',
                 data: { unreadCount: count },
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            });
         }
         catch (error) {
             next(error);
         }
     }
-    /**
-     * Mark as read
-     */
     async markAsRead(req, res, next) {
         try {
-            const { notificationId } = req.params;
-            await notification_service_1.notificationService.markAsRead(notificationId, req.user.userId);
-            const response = {
+            const userId = getUser(req);
+            await notification_service_1.notificationService.markAsRead(req.params.notificationId, userId);
+            res.status(200).json({
                 success: true,
                 message: 'Notification marked as read',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            });
         }
         catch (error) {
             next(error);
         }
     }
-    /**
-     * Mark all as read
-     */
     async markAllAsRead(req, res, next) {
         try {
-            await notification_service_1.notificationService.markAllAsRead(req.user.userId);
-            const response = {
+            const userId = getUser(req);
+            await notification_service_1.notificationService.markAllAsRead(userId);
+            res.status(200).json({
                 success: true,
                 message: 'All notifications marked as read',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            });
         }
         catch (error) {
             next(error);
         }
     }
-    /**
-     * Delete notification
-     */
     async deleteNotification(req, res, next) {
         try {
-            const { notificationId } = req.params;
-            await notification_service_1.notificationService.deleteNotification(notificationId, req.user.userId);
-            const response = {
+            const userId = getUser(req);
+            await notification_service_1.notificationService.delete(req.params.notificationId, userId);
+            res.status(200).json({
                 success: true,
                 message: 'Notification deleted',
-                timestamp: new Date().toISOString()
-            };
-            res.status(200).json(response);
+            });
         }
         catch (error) {
             next(error);
