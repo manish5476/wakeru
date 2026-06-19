@@ -21,6 +21,7 @@ import {
   tripIdParamSchema,
   stopIdParamSchema,
   memberParamSchema,
+  addMemberSchema,
 } from './trip.validators';
 import { protect } from '../../middleware/auth.middleware';
 import { z } from 'zod';

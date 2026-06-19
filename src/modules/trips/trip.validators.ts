@@ -154,6 +154,8 @@ export const createTripSchema = z.object({
     .enum(['equal', 'percentage', 'exact', 'shares', 'personal'])
     .default('equal'),
 
+  memberIds: z.array(mongoId).optional(),
+
   // Optionally create the first stop inline during trip creation
   initialStop: createStopSchema.optional(),
 }).refine(
@@ -192,6 +194,11 @@ export const updateMemberRoleSchema = z.object({
   role: z.enum(['admin', 'member', 'viewer'], {
     message: 'Role must be admin, member, or viewer',
   }),
+});
+
+export const addMemberSchema = z.object({
+  userId: mongoId, // Accept UUID via the mongoId alias
+  role: z.enum(['admin', 'member', 'viewer']).default('member'),
 });
 
 export const joinTripSchema = z.object({

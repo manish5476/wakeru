@@ -72,6 +72,12 @@ class Server {
 
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     process.on('SIGINT', () => shutdown('SIGINT'));
+    
+    // For nodemon restarts
+    process.once('SIGUSR2', async () => {
+      await shutdown('SIGUSR2');
+      process.kill(process.pid, 'SIGUSR2');
+    });
     process.on('unhandledRejection', (reason, promise) => {
       logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
     });

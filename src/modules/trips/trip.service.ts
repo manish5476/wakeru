@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Trip, ITrip, IStop, ITripMember } from './trip.model';
+import { User } from '../auth/auth.model';
 
 import {
   CreateTripInput,
@@ -181,6 +182,30 @@ export const createTrip = async (
     stopCount: 0,
     totalSpentBase: 0,
   });
+
+  // ✅ NEW: Handle initial members
+  if (input.memberIds && input.memberIds.length > 0) {
+    const users = await User.find({
+      _id: { $in: input.memberIds },
+      isActive: true,
+      isDeleted: false,
+    });
+    
+    for (const u of users) {
+      if (u._id !== creator.uid) {
+        trip.members.push({
+          userId: u._id,
+          displayName: u.displayName,
+          photoURL: u.photoURL,
+          role: 'member',
+          joinedAt: new Date(),
+          isActive: true,
+          totalPaidBase: 0,
+          totalOwesBase: 0,
+        });
+      }
+    }
+  }
 
   // ✅ NEW: Always ensure at least ONE stop exists
   if (initialStop) {
@@ -638,6 +663,51 @@ export const updateMemberRole = async (
   }
 
   member.role = newRole;
+  await trip.save();
+  return trip;
+};
+
+/**
+ * Add a member directly to a trip (without invite code).
+ */
+export const addMember = async (
+  trip: ITrip,
+  targetUserId: string,
+  role: 'admin' | 'member' | 'viewer'
+): Promise<ITrip> => {
+  if (trip.isMember(targetUserId)) {
+    throw new AppError('User is already a member of this trip', 409);
+  }
+
+  const user = await User.findOne({ _id: targetUserId, isActive: true, isDeleted: false });
+  if (!user) {
+    throw new AppError('User not found or inactive', 404);
+  }
+
+  // Check if previously left — reactivate instead of duplicating
+  const existingMember = trip.members.find(
+    (m) => m.userId === targetUserId && !m.isActive
+  );
+
+  if (existingMember) {
+    existingMember.isActive = true;
+    existingMember.displayName = user.displayName;
+    existingMember.photoURL = user.photoURL;
+    existingMember.role = role;
+    existingMember.joinedAt = new Date();
+  } else {
+    trip.members.push({
+      userId: user._id,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      role: role,
+      joinedAt: new Date(),
+      isActive: true,
+      totalPaidBase: 0,
+      totalOwesBase: 0,
+    });
+  }
+
   await trip.save();
   return trip;
 };

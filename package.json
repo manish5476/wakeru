@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node -r ./tsconfig-paths-bootstrap.js dist/server.js",
-    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
+    "dev": "nodemon",
     "build": "tsc",
     "test": "jest --coverage",
     "test:watch": "jest --watch",

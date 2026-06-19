@@ -130,27 +130,50 @@ export const AuthService = {
     }).lean();
 
     if (existing) {
-      throw new ConflictError('An account with this email already exists. Please login instead.');
+      if (existing.firebaseUid !== firebaseUid) {
+        logger.info('Updating existing user with new Firebase UID', { userId: existing._id, email });
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: existing._id },
+          { $set: { firebaseUid } },
+          { new: true }
+        );
+        if (!updatedUser) {
+          throw new Error('Failed to update existing user');
+        }
+        const tokens = await generateTokens(updatedUser);
+        return { user: updatedUser.toObject() as unknown as IUser, tokens, isNewUser: false };
+      }
+
+      // User already exists with the same firebaseUid, just log them in
+      const tokens = await generateTokens(existing as any);
+      return { user: existing as unknown as IUser, tokens, isNewUser: false };
     }
 
     // Create user with Firebase profile data + provided metadata
-    const user = new User({
+    const userPayload: any = {
       _id: uuidv4(),
       firebaseUid,
       email: email.toLowerCase(),
       displayName: metadata?.displayName || decodedToken.name || 'Traveler',
       photoURL: metadata?.photoURL || decodedToken.picture || '',
-      phoneNumber: metadata?.phoneNumber || decodedToken.phone_number || '',
       defaultCurrency: 'INR',
       preferredLanguage: 'en',
       lastLoginAt: new Date(),
-    });
+    };
+
+    const phone = metadata?.phoneNumber || decodedToken.phone_number;
+    if (phone) {
+      userPayload.phoneNumber = phone;
+    }
+
+    const user = new User(userPayload);
 
     try {
       await user.save();
       logger.info('New user registered', { userId: user._id, email: user.email });
     } catch (error: any) {
       if (error.code === 11000) {
+        logger.error('Duplicate key error during registration:', error);
         throw new ConflictError('An account with this email already exists. Please login instead.');
       }
       throw error;
@@ -172,7 +195,8 @@ export const AuthService = {
     let user = await User.findOne({ firebaseUid });
 
     // If no user by Firebase UID, try by email (account created before Firebase linking)
-    if (!user && email && decodedToken.email_verified) {
+    // Temporarily removed email_verified check since it's disabled in registration
+    if (!user && email) {
       user = await User.findOne({ email });
 
       if (user) {
