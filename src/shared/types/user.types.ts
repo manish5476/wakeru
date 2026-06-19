@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
 
 export interface IUser {
-  _id: Types.ObjectId;
   userId: string;
   email: string;
   password?: string;
@@ -46,6 +45,7 @@ export interface IUser {
   // Banking (optional)
   bankingDetails?: {
     upiId?: string;
+    upiVerified?: boolean;
     bankAccount?: {
       accountNumber: string;
       ifscCode: string;

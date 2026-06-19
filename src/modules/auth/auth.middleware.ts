@@ -1,415 +1,189 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '../config'; // adjust path to your actual config location
-import { User } from '../modules/auth/auth.model'; // adjust path to match your folder structure
-import { UnauthorizedError, ForbiddenError } from '../shared/errors/AppError';
-import { AuthenticatedRequest } from '../shared/types/common.types';
+import { config } from '../../config';
+import { User } from './auth.model';
+import { UnauthorizedError, ForbiddenError } from '../../shared/errors/AppError';
+import { AuthenticatedRequest } from '../../shared/types/common.types';
+import { logger } from '../../config/logger';
+
+// ============================================================
+// Types
+// ============================================================
 
 export interface JwtPayload {
   userId: string;
-  email?: string;
-  role: string;
+  role?: string;
   type: 'access' | 'refresh';
   iat?: number;
   exp?: number;
   iss?: string;
-  sub?: string;
 }
+
+// ============================================================
+// Auth Middleware Class
+// ============================================================
+
 export class AuthMiddleware {
+  /**
+   * Authenticate request using Bearer JWT access token.
+   * Attaches user info to req.user on success.
+   */
   static async authenticate(
     req: AuthenticatedRequest,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
+      // Extract token from Authorization header
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         throw new UnauthorizedError('No authentication token provided');
       }
 
       const token = authHeader.split(' ')[1];
-      if (!token) throw new UnauthorizedError('No authentication token provided');
-
-      const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-
-      if (decoded.type !== 'access') {
-        throw new UnauthorizedError('Invalid token type');
+      if (!token || token === 'null' || token === 'undefined') {
+        throw new UnauthorizedError('Invalid authentication token');
       }
 
-      // CRITICAL FIX: Select only needed fields and use .lean() for performance
-      const user = await User.findOne({ userId: decoded.userId })
-        .select('email isActive isDeleted')
-        .lean();
+      // Verify JWT signature + expiry
+      let decoded: JwtPayload;
+      try {
+        decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
+      } catch (error: any) {
+        if (error.name === 'TokenExpiredError') {
+          throw new UnauthorizedError('Token has expired. Please refresh your token.');
+        }
+        if (error.name === 'JsonWebTokenError') {
+          throw new UnauthorizedError('Invalid token. Please login again.');
+        }
+        throw new UnauthorizedError('Token verification failed');
+      }
 
-      if (!user) throw new UnauthorizedError('User no longer exists');
-      if (!user.isActive) throw new UnauthorizedError('Account is deactivated');
-      if (user.isDeleted) throw new UnauthorizedError('Account has been deleted');
+      // Validate token type — only access tokens allowed for API access
+      if (decoded.type !== 'access') {
+        throw new UnauthorizedError('Invalid token type. Use access token for API requests.');
+      }
+
+      // Read user from DATABASE (not token) to get current role
+      // This ensures role changes take effect immediately
+      // const user = await User.findOne(
+      //   { 
+      //     _id: decoded.userId,
+      //     isActive: true,
+      //     isDeleted: false,
+      //   },
+      //   'email role isActive isDeleted'
+      // ).lean();
+
+      // if (!user) {
+      //   throw new UnauthorizedError('Account not found or has been deactivated');
+      // }
+
+      // // Attach user to request
+      // req.user = {
+      //   userId: decoded.userId,
+      //   email: user.email,
+      //   role: user.role,
+      // };
+      // ✅ UPGRADED:
+      const user = await User.findOne(
+        { _id: decoded.userId, isActive: true, isDeleted: false },
+        'email role displayName photoURL isActive isDeleted'  // ← ADDED
+      ).lean();
+
+      if (!user) {
+        throw new UnauthorizedError('Account not found or has been deactivated');
+      }
 
       req.user = {
         userId: decoded.userId,
         email: user.email,
-        role: decoded.role,
+        role: user.role,
+        displayName: user.displayName || 'User',   // ← ADDED
+        photoURL: user.photoURL || '',             // ← ADDED
       };
 
       next();
     } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        next(new UnauthorizedError('Token has expired'));
-      } else if (error instanceof jwt.JsonWebTokenError) {
-        next(new UnauthorizedError('Invalid token'));
-      } else {
-        next(error);
-      }
+      next(error);
     }
   }
-// export class AuthMiddleware {
-//   /**
-//    * Verify JWT access token and attach the user to the request.
-//    *
-//    * IMPORTANT: your User schema's identity field is the custom `userId`
-//    * string (a UUID), not Mongoose's built-in `_id` ObjectId. Every lookup
-//    * here uses findOne({ userId }) — NOT findById() — because findById()
-//    * queries by `_id` and will fail to find anything when given a UUID.
-//    */
-//   static async authenticate(
-//     req: AuthenticatedRequest,
-//     res: Response,
-//     next: NextFunction
-//   ): Promise<void> {
-//     try {
-//       const authHeader = req.headers.authorization;
-//       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//         throw new UnauthorizedError('No authentication token provided');
-//       }
 
-//       const token = authHeader.split(' ')[1];
-//       if (!token) {
-//         throw new UnauthorizedError('No authentication token provided');
-//       }
+  /**
+   * Role-based authorization guard.
+   * Use after authenticate middleware.
+   */
+  static authorize(...allowedRoles: string[]) {
+    return (req: AuthenticatedRequest, _res: Response, next: NextFunction): void => {
+      try {
+        if (!req.user) {
+          throw new UnauthorizedError('Authentication required');
+        }
 
-//       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
+        if (!allowedRoles.includes(req.user.role)) {
+          throw new ForbiddenError(
+            `Access denied. Required role: ${allowedRoles.join(' or ')}`
+          );
+        }
 
-//       if (decoded.type !== 'access') {
-//         throw new UnauthorizedError('Invalid token type');
-//       }
+        next();
+      } catch (error) {
+        next(error);
+      }
+    };
+  }
 
-//       // FIX: findOne({ userId }) instead of findById(decoded.userId)
-//       const user = await User.findOne({ userId: decoded.userId }).select('-refreshTokens');
+  /**
+   * Optional authentication — attaches user if token present, continues if not.
+   * Useful for public endpoints that behave differently for logged-in users.
+   */
+  static async optional(
+    req: AuthenticatedRequest,
+    _res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return next(); // No token — continue without user
+      }
 
-//       if (!user) {
-//         throw new UnauthorizedError('User no longer exists');
-//       }
+      const token = authHeader.split(' ')[1];
+      if (!token || token === 'null') {
+        return next();
+      }
 
-//       if (!user.isActive) {
-//         throw new UnauthorizedError('Account is deactivated');
-//       }
+      const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
-//       if (user.isDeleted) {
-//         throw new UnauthorizedError('Account has been deleted');
-//       }
+      if (decoded.type !== 'access') {
+        return next(); // Wrong token type — continue without user
+      }
 
-//       req.user = {
-//         userId: decoded.userId,
-//         email: user.email,
-//         role: decoded.role,
-//       };
+      const user = await User.findOne(
+        { _id: decoded.userId, isActive: true, isDeleted: false },
+        'email role'
+      ).lean();
 
-//       next();
-//     } catch (error) {
-//       if (error instanceof jwt.TokenExpiredError) {
-//         next(new UnauthorizedError('Token has expired'));
-//       } else if (error instanceof jwt.JsonWebTokenError) {
-//         next(new UnauthorizedError('Invalid token'));
-//       } else {
-//         next(error);
-//       }
-//     }
-//   }
+      if (user) {
+        req.user = {
+          userId: decoded.userId,
+          email: user.email,
+          role: user.role,
+        };
+      }
 
-//   /**
-//    * Optional authentication — proceeds even if no token is present,
-//    * but attaches req.user if a valid one is found.
-//    */
-//   static async optionalAuth(
-//     req: AuthenticatedRequest,
-//     res: Response,
-//     next: NextFunction
-//   ): Promise<void> {
-//     try {
-//       const authHeader = req.headers.authorization;
-//       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//         return next();
-//       }
+      next();
+    } catch {
+      // Token invalid/expired — continue without user
+      next();
+    }
+  }
+}
 
-//       const token = authHeader.split(' ')[1];
-//       if (!token) {
-//         return next();
-//       }
+// ============================================================
+// Convenience Exports
+// ============================================================
 
-//       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-
-//       // FIX: findOne({ userId }) instead of findById(decoded.userId)
-//       const user = await User.findOne({ userId: decoded.userId });
-
-//       if (user && user.isActive && !user.isDeleted) {
-//         req.user = {
-//           userId: decoded.userId,
-//           email: user.email,
-//           role: decoded.role,
-//         };
-//       }
-
-//       next();
-//     } catch {
-//       // Optional auth — any failure here just means "proceed unauthenticated"
-//       next();
-//     }
-//   }
-
-//   /**
-//    * Role-based authorization. Use after `authenticate`.
-//    */
-//   static authorize(...roles: string[]) {
-//     return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-//       try {
-//         if (!req.user) {
-//           throw new UnauthorizedError('Authentication required');
-//         }
-
-//         if (roles.length > 0 && !roles.includes(req.user.role)) {
-//           throw new ForbiddenError('Insufficient permissions');
-//         }
-
-//         next();
-//       } catch (error) {
-//         next(error);
-//       }
-//     };
-//   }
-
-//   /**
-//    * Premium user check.
-//    */
-//   static async requirePremium(
-//     req: AuthenticatedRequest,
-//     res: Response,
-//     next: NextFunction
-//   ): Promise<void> {
-//     try {
-//       if (!req.user) {
-//         throw new UnauthorizedError('Authentication required');
-//       }
-
-//       // FIX: findOne({ userId }) instead of findById(req.user.userId)
-//       const user = await User.findOne({ userId: req.user.userId });
-
-//       if (!user || !['premium', 'business', 'admin'].includes(user.role)) {
-//         throw new ForbiddenError('Premium subscription required');
-//       }
-
-//       next();
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-
-//   /**
-//    * Business account check.
-//    */
-//   static async requireBusiness(
-//     req: AuthenticatedRequest,
-//     res: Response,
-//     next: NextFunction
-//   ): Promise<void> {
-//     try {
-//       if (!req.user) {
-//         throw new UnauthorizedError('Authentication required');
-//       }
-
-//       // FIX: findOne({ userId }) instead of findById(req.user.userId)
-//       const user = await User.findOne({ userId: req.user.userId });
-
-//       if (!user || !['business', 'admin'].includes(user.role)) {
-//         throw new ForbiddenError('Business account required');
-//       }
-
-//       next();
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// }
-
-// Export a ready-to-use `protect` alias matching your auth.routes.ts import
-export const protect = AuthMiddleware.authenticate;// import { Request, Response, NextFunction } from 'express';
-// import jwt from 'jsonwebtoken';
-// import { config } from '../../config';
-// import { User } from './auth.model';
-// import { UnauthorizedError, ForbiddenError } from '../../shared/errors/AppError';
-// import { AuthenticatedRequest } from '../../shared/types/common.types';
-// import { logger } from '../../config/logger';
-
-// export interface JwtPayload {
-//   userId: string;
-//   email: string;
-//   role: string;
-//   type: 'access' | 'refresh';
-//   iat?: number;
-//   exp?: number;
-//   iss?: string;
-//   sub?: string;
-// }
-
-// export class AuthMiddleware {
-//   /**
-//    * Verify JWT access token
-//    */
-//   static async authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       // Get token from header
-//       const authHeader = req.headers.authorization;
-//       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//         throw new UnauthorizedError('No authentication token provided');
-//       }
-
-//       const token = authHeader.split(' ')[1];
-      
-//       if (!token) {
-//         throw new UnauthorizedError('No authentication token provided');
-//       }
-
-//       // Verify token
-//       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-
-//       // Check token type
-//       if (decoded.type !== 'access') {
-//         throw new UnauthorizedError('Invalid token type');
-//       }
-
-//       // Check if user still exists and is active
-//       const user = await User.findById(decoded.userId).select('-password -refreshTokens');
-      
-//       if (!user) {
-//         throw new UnauthorizedError('User no longer exists');
-//       }
-
-//       if (!user.isActive) {
-//         throw new UnauthorizedError('Account is deactivated');
-//       }
-
-//       if (user.isDeleted) {
-//         throw new UnauthorizedError('Account has been deleted');
-//       }
-
-//       // Attach user info to request
-//       req.user = {
-//         userId: decoded.userId,
-//         email: decoded.email,
-//         role: decoded.role,
-//       };
-
-//       next();
-//     } catch (error) {
-//       if (error instanceof jwt.TokenExpiredError) {
-//         next(new UnauthorizedError('Token has expired'));
-//       } else if (error instanceof jwt.JsonWebTokenError) {
-//         next(new UnauthorizedError('Invalid token'));
-//       } else {
-//         next(error);
-//       }
-//     }
-//   }
-
-//   /**
-//    * Optional authentication - doesn't fail if no token
-//    */
-//   static async optionalAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const authHeader = req.headers.authorization;
-//       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//         return next();
-//       }
-
-//       const token = authHeader.split(' ')[1];
-      
-//       if (!token) {
-//         return next();
-//       }
-
-//       const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-//       const user = await User.findById(decoded.userId);
-
-//       if (user && user.isActive && !user.isDeleted) {
-//         req.user = {
-//           userId: decoded.userId,
-//           email: decoded.email,
-//           role: decoded.role,
-//         };
-//       }
-
-//       next();
-//     } catch (error) {
-//       // Continue without authentication
-//       next();
-//     }
-//   }
-
-//   /**
-//    * Role-based authorization
-//    */
-//   static authorize(...roles: string[]) {
-//     return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-//       if (!req.user) {
-//         throw new UnauthorizedError('Authentication required');
-//       }
-
-//       if (roles.length > 0 && !roles.includes(req.user.role)) {
-//         throw new ForbiddenError('Insufficient permissions');
-//       }
-
-//       next();
-//     };
-//   }
-
-//   /**
-//    * Premium user check
-//    */
-//   static async requirePremium(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       if (!req.user) {
-//         throw new UnauthorizedError('Authentication required');
-//       }
-
-//       const user = await User.findById(req.user.userId);
-      
-//       if (!user || !['premium', 'business', 'admin'].includes(user.role)) {
-//         throw new ForbiddenError('Premium subscription required');
-//       }
-
-//       next();
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-
-//   /**
-//    * Business account check
-//    */
-//   static async requireBusiness(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       if (!req.user) {
-//         throw new UnauthorizedError('Authentication required');
-//       }
-
-//       const user = await User.findById(req.user.userId);
-      
-//       if (!user || !['business', 'admin'].includes(user.role)) {
-//         throw new ForbiddenError('Business account required');
-//       }
-
-//       next();
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// }
+export const protect = AuthMiddleware.authenticate;
+export const authorize = AuthMiddleware.authorize;
+export const optionalAuth = AuthMiddleware.optional;

@@ -33,9 +33,12 @@ export interface AuthenticatedRequest extends Request {
         userId: string;
         email: string;
         role: string;
+        displayName?: string;
+        photoURL?: string;
     };
+    trip?: any;
+    stop?: any;
     idempotencyKey?: string;
-    idempotencyCacheKey?: string;
     requestId?: string;
 }
 export interface DateRange {

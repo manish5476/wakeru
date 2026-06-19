@@ -33,14 +33,18 @@ export interface ApiResponse<T = any> {
   requestId?: string;
 }
 
+// ✅ FIXED: Clean interface without index signatures
 export interface AuthenticatedRequest extends Request {
   user?: {
     userId: string;
     email: string;
     role: string;
+    displayName?: string;
+    photoURL?: string;
   };
+  trip?: any;           // Set by loadTrip middleware
+  stop?: any;           // Set by loadStop middleware
   idempotencyKey?: string;
-  idempotencyCacheKey?: string;
   requestId?: string;
 }
 

@@ -2,34 +2,30 @@ import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../../shared/types/common.types';
 export interface JwtPayload {
     userId: string;
-    email: string;
-    role: string;
+    role?: string;
     type: 'access' | 'refresh';
     iat?: number;
     exp?: number;
     iss?: string;
-    sub?: string;
 }
 export declare class AuthMiddleware {
     /**
-     * Verify JWT access token
+     * Authenticate request using Bearer JWT access token.
+     * Attaches user info to req.user on success.
      */
-    static authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
+    static authenticate(req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void>;
     /**
-     * Optional authentication - doesn't fail if no token
+     * Role-based authorization guard.
+     * Use after authenticate middleware.
      */
-    static optionalAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
+    static authorize(...allowedRoles: string[]): (req: AuthenticatedRequest, _res: Response, next: NextFunction) => void;
     /**
-     * Role-based authorization
+     * Optional authentication — attaches user if token present, continues if not.
+     * Useful for public endpoints that behave differently for logged-in users.
      */
-    static authorize(...roles: string[]): (req: AuthenticatedRequest, res: Response, next: NextFunction) => void;
-    /**
-     * Premium user check
-     */
-    static requirePremium(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Business account check
-     */
-    static requireBusiness(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
+    static optional(req: AuthenticatedRequest, _res: Response, next: NextFunction): Promise<void>;
 }
+export declare const protect: typeof AuthMiddleware.authenticate;
+export declare const authorize: typeof AuthMiddleware.authorize;
+export declare const optionalAuth: typeof AuthMiddleware.optional;
 //# sourceMappingURL=auth.middleware.d.ts.map

@@ -141,7 +141,7 @@ class NotificationService {
                 continue;
             const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
             if (!notificationPreferences?.muteExpenses) {
-                await this.createNotification(member.userId._id.toString(), 'EXPENSE_ADDED', 'New Expense Added', `${creator?.userId?.displayName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`, {
+                await this.createNotification(member.userId._id.toString(), 'EXPENSE_ADDED', 'New Expense Added', `${creator?.userId?.displayName || 'Someone'} added "${expense.title}" - ₹${expense.amountBase}`, {
                     data: { groupId, expenseId },
                     isActionable: true,
                     actionUrl: `/groups/${groupId}/expenses/${expenseId}`,

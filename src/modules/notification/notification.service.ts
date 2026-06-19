@@ -4,7 +4,7 @@ import { logger } from '../../config/logger';
 import { Types } from 'mongoose';
 import { redisClient } from '../../config/redis';
 import { IGroupMember, Group } from '../group/group.model';
-import { Expense } from '../expense/expense.model';
+import { Expense, IExpense } from '../expense/expense.model';
 
 export class NotificationService {
   /**
@@ -176,8 +176,8 @@ export class NotificationService {
    */
   async notifyExpenseAdded(groupId: string, expenseId: string, createdBy: string): Promise<void> {
     const [group, expense] = await Promise.all([
-      Group.findOne({ groupId }).populate('members.userId', 'userId email preferences'),
-      Expense.findOne({ expenseId })
+        Group.findOne({ groupId }).populate('members.userId', 'userId email preferences'),
+        Expense.findOne({ expenseId })
     ]);
 
     if (!group || !expense) return;
@@ -185,26 +185,26 @@ export class NotificationService {
     const creator = group.members.find((m: IGroupMember) => m.userId._id.toString() === createdBy);
     
     for (const member of group.members) {
-      if (member.userId._id.toString() === createdBy) continue;
+        if (member.userId._id.toString() === createdBy) continue;
       
-      const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
-      if (!notificationPreferences?.muteExpenses) {
-        await this.createNotification(
-          member.userId._id.toString(),
-          'EXPENSE_ADDED',
-          'New Expense Added',
-          `${creator?.userId?.displayName || 'Someone'} added "${expense.description}" - ₹${expense.totalAmount}`,
-          {
-            data: { groupId, expenseId },
-            isActionable: true,
-            actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
-            priority: 'medium',
-            channels: { email: notificationPreferences?.email }
-          }
-        );
-      }
+        const notificationPreferences = member.userId.preferences?.get('notificationPreferences');
+        if (!notificationPreferences?.muteExpenses) {
+            await this.createNotification(
+                member.userId._id.toString(),
+                'EXPENSE_ADDED',
+                'New Expense Added',
+                `${creator?.userId?.displayName || 'Someone'} added "${expense.title}" - ₹${expense.amountBase}`,
+                {
+                    data: { groupId, expenseId },
+                    isActionable: true,
+                    actionUrl: `/groups/${groupId}/expenses/${expenseId}`,
+                    priority: 'medium',
+                    channels: { email: notificationPreferences?.email }
+                }
+            );
+        }
     }
-  }
+}
 
   /**
    * Notify settlement completed

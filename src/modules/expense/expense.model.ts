@@ -1,8 +1,8 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // ENUMS & CONSTANTS
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 
 export type ExpenseCategory =
   | 'food'
@@ -28,74 +28,69 @@ const SPLIT_METHODS: SplitMethod[] = [
   'equal', 'percentage', 'exact', 'shares', 'personal',
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SUB-DOCUMENT INTERFACES
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// INTERFACES
+// ============================================================
 
 /**
- * ISplit — per-member breakdown of an expense.
- *
- * amountLocal  = their share in the stop's local currency (what they see in stop view)
- * amountBase   = their share in the trip's base currency (used for settlement)
- *
- * Both are stored so we never re-compute on read. The exchange rate is locked
- * at expense creation time — changing the stop rate doesn't touch existing splits.
+ * Per-member split breakdown.
+ * Both amountLocal and amountBase are stored so we never re-compute on read.
+ * The exchange rate is locked at expense creation time.
  */
 export interface ISplit {
   userId: string;          // Firebase UID
-  displayName: string;     // denormalized for fast rendering
-  amountLocal: number;     // share in stop local currency
-  amountBase: number;      // share in trip base currency
-  percentage?: number;     // for 'percentage' split method
-  shares?: number;         // for 'shares' split method
-  isPaid: boolean;         // has this person settled this split?
+  displayName: string;     // Denormalized for fast rendering
+  amountLocal: number;     // Share in stop's local currency
+  amountBase: number;      // Share in trip's base currency (for settlement)
+  percentage?: number;     // For 'percentage' split method
+  shares?: number;         // For 'shares' split method
+  isPaid: boolean;
   paidAt?: Date;
-  paymentId?: Types.ObjectId; // ref to Payment document when settled via UPI
+  paymentId?: Types.ObjectId;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// EXPENSE DOCUMENT INTERFACE
-// ─────────────────────────────────────────────────────────────────────────────
-
+/**
+ * Expense document — the core transaction record.
+ */
 export interface IExpense extends Document {
   // Location context
-  tripId: Types.ObjectId;   // which trip
-  stopId: Types.ObjectId;   // which stop inside that trip
+  tripId: Types.ObjectId;
+  stopId: Types.ObjectId;
 
   // What was spent
   title: string;
   category: ExpenseCategory;
   notes?: string;
-  receiptImages: string[];  // Cloudinary URLs
+  receiptImages: string[];
   date: Date;
 
-  // Amounts — always stored in BOTH currencies
-  amountLocal: number;      // what user typed — in stop's local currency
-  amountBase: number;       // computed — amountLocal * exchangeRateUsed
-  localCurrency: string;    // denormalized from stop — e.g. "AED"
-  baseCurrency: string;     // denormalized from trip — e.g. "INR"
-  exchangeRateUsed: number; // rate locked at creation time — NEVER changes
+  // Dual currency amounts
+  amountLocal: number;       // In stop's local currency
+  amountBase: number;        // In trip's base currency (computed)
+  localCurrency: string;     // Denormalized from stop (e.g., "AED")
+  baseCurrency: string;      // Denormalized from trip (e.g., "INR")
+  exchangeRateUsed: number;  // LOCKED at creation time
 
-  // Who paid & how it's split
-  paidBy: string;           // Firebase UID
-  paidByName: string;       // denormalized
+  // Who paid & split details
+  paidBy: string;            // Firebase UID
+  paidByName: string;        // Denormalized
   splitMethod: SplitMethod;
   splits: ISplit[];
 
   // Status
-  isSettled: boolean;       // true when ALL splits are paid
+  isSettled: boolean;
 
   // Audit
-  addedBy: string;          // Firebase UID — may differ from paidBy
+  addedBy: string;
   editedBy?: string;
   editedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SUB-SCHEMAS
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// SUB-SCHEMA: Split
+// ============================================================
 
 const splitSchema = new Schema<ISplit>(
   {
@@ -112,12 +107,13 @@ const splitSchema = new Schema<ISplit>(
   { _id: false }
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
-// EXPENSE SCHEMA
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// MAIN SCHEMA: Expense
+// ============================================================
 
 const expenseSchema = new Schema<IExpense>(
   {
+    // Location context
     tripId: {
       type: Schema.Types.ObjectId,
       ref: 'Trip',
@@ -130,6 +126,7 @@ const expenseSchema = new Schema<IExpense>(
       index: true,
     },
 
+    // Expense details
     title: {
       type: String,
       required: [true, 'Expense title is required'],
@@ -141,10 +138,21 @@ const expenseSchema = new Schema<IExpense>(
       enum: { values: EXPENSE_CATEGORIES, message: '{VALUE} is not a valid category' },
       default: 'other',
     },
-    notes: { type: String, maxlength: [500, 'Notes cannot exceed 500 characters'] },
-    receiptImages: { type: [String], default: [] },
-    date: { type: Date, default: Date.now, index: true },
+    notes: {
+      type: String,
+      maxlength: [500, 'Notes cannot exceed 500 characters'],
+    },
+    receiptImages: {
+      type: [String],
+      default: [],
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
 
+    // Dual currency amounts
     amountLocal: {
       type: Number,
       required: [true, 'Amount is required'],
@@ -175,8 +183,16 @@ const expenseSchema = new Schema<IExpense>(
       min: [0.000001, 'Exchange rate must be positive'],
     },
 
-    paidBy: { type: String, required: [true, 'paidBy is required'], index: true },
-    paidByName: { type: String, required: true },
+    // Payer & split
+    paidBy: {
+      type: String,
+      required: [true, 'paidBy is required'],
+      index: true,
+    },
+    paidByName: {
+      type: String,
+      required: true,
+    },
     splitMethod: {
       type: String,
       enum: { values: SPLIT_METHODS, message: '{VALUE} is not a valid split method' },
@@ -191,8 +207,14 @@ const expenseSchema = new Schema<IExpense>(
       },
     },
 
-    isSettled: { type: Boolean, default: false, index: true },
+    // Status
+    isSettled: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
 
+    // Audit
     addedBy: { type: String, required: true },
     editedBy: { type: String },
     editedAt: { type: Date },
@@ -205,31 +227,31 @@ const expenseSchema = new Schema<IExpense>(
   }
 );
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 // INDEXES
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 
-// Primary fetch pattern: "all expenses for a stop"
+// Primary: expenses for a stop
 expenseSchema.index({ stopId: 1, date: -1 });
 
-// Trip-wide expense view (across all stops)
+// Trip-wide view (across all stops)
 expenseSchema.index({ tripId: 1, date: -1 });
 
-// "My expenses across all trips"
+// User's expenses across all trips
 expenseSchema.index({ paidBy: 1, date: -1 });
 
-// Filter by category within a trip
+// Category filter within a trip
 expenseSchema.index({ tripId: 1, category: 1 });
 
-// Settlement queries — find unsettled expenses
+// Settlement queries
 expenseSchema.index({ tripId: 1, isSettled: 1 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PRE-SAVE HOOK — auto-update isSettled
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// PRE-SAVE HOOK
+// ============================================================
 
 expenseSchema.pre('save', function (next) {
-  // 'personal' expenses are always settled — no debt created
+  // Personal expenses are always settled — no debt created
   if (this.splitMethod === 'personal') {
     this.isSettled = true;
   } else {
@@ -238,276 +260,24 @@ expenseSchema.pre('save', function (next) {
   next();
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
+// VIRTUALS
+// ============================================================
+
+expenseSchema.virtual('isForeignCurrency').get(function () {
+  return this.localCurrency !== this.baseCurrency;
+});
+
+expenseSchema.virtual('totalPaidCount').get(function () {
+  return this.splits.filter((s) => s.isPaid).length;
+});
+
+expenseSchema.virtual('totalSplitCount').get(function () {
+  return this.splits.length;
+});
+
+// ============================================================
 // EXPORT
-// ─────────────────────────────────────────────────────────────────────────────
+// ============================================================
 
-export const Expense = model<IExpense>('Expense', expenseSchema);// import mongoose, { Schema, Document } from 'mongoose';
-// import crypto from 'crypto';
-
-// export interface IExpenseDocument extends Document {
-//   expenseId: string;
-//   groupId: mongoose.Types.ObjectId;
-//   description: string;
-//   category: string;
-//   currency: string;
-  
-//   lineItems: Array<{
-//     itemId: string;
-//     name: string;
-//     category: string;
-//     basePrice: mongoose.Types.Decimal128;
-//     quantity: number;
-//     unit?: string;
-//     consumers: Array<{
-//       userId: mongoose.Types.ObjectId;
-//       consumptionPercentage: number;
-//       quantity?: number;
-//       notes?: string;
-//     }>;
-//   }>;
-
-//   taxes: Array<{
-//     name: string;
-//     percentage: number;
-//     amount: mongoose.Types.Decimal128;
-//     applicableTo: 'all' | 'specific';
-//     applicableItems?: string[];
-//     taxCode?: string;
-//   }>;
-
-//   discounts: Array<{
-//     type: 'percentage' | 'fixed';
-//     value: mongoose.Types.Decimal128;
-//     code?: string;
-//     description?: string;
-//     applicableTo: 'all' | 'specific';
-//     applicableItems?: string[];
-//   }>;
-
-//   splits: Array<{
-//     userId: mongoose.Types.ObjectId;
-//     baseAmount: mongoose.Types.Decimal128;
-//     taxAmount: mongoose.Types.Decimal128;
-//     discountAmount: mongoose.Types.Decimal128;
-//     finalAmount: mongoose.Types.Decimal128;
-//     isPayer: boolean;
-//     items: Array<{
-//       itemId: string;
-//       name: string;
-//       category: string;
-//       amount: mongoose.Types.Decimal128;
-//       consumptionPercent: number;
-//     }>;
-//     settlementStatus: 'PENDING' | 'SETTLED' | 'PARTIAL';
-//   }>;
-
-//   paidBy: mongoose.Types.ObjectId;
-//   paymentMethod: string;
-//   paymentDate: Date;
-  
-//   totalAmount: mongoose.Types.Decimal128;
-//   subTotal: mongoose.Types.Decimal128;
-//   taxTotal: mongoose.Types.Decimal128;
-//   discountTotal: mongoose.Types.Decimal128;
-  
-//   analytics: {
-//     categoryBreakdown: Map<string, {
-//       totalAmount: mongoose.Types.Decimal128;
-//       itemCount: number;
-//       consumerCount: number;
-//     }>;
-//     averagePerPerson: mongoose.Types.Decimal128;
-//     mostExpensiveItem?: {
-//       name: string;
-//       amount: mongoose.Types.Decimal128;
-//     };
-//     consumptionDistribution: Array<{
-//       userId: mongoose.Types.ObjectId;
-//       percentage: number;
-//     }>;
-//   };
-  
-//   receipt?: {
-//     imageUrl: string;
-//     thumbnailUrl: string;
-//     ocrProcessed: boolean;
-//     ocrConfidence?: number;
-//     uploadedAt: Date;
-//   };
-  
-//   metadata: {
-//     createdBy: mongoose.Types.ObjectId;
-//     updatedBy?: mongoose.Types.ObjectId;
-//     isDeleted: boolean;
-//     deletedBy?: mongoose.Types.ObjectId;
-//     deletedAt?: Date;
-//     version: number;
-//   };
-  
-//   idempotencyKey: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
-
-// const ExpenseSchema = new Schema<IExpenseDocument>({
-//   expenseId: { 
-//     type: String, 
-//     required: true, 
-//     unique: true,
-//     default: () => crypto.randomUUID()
-//   },
-//   groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
-//   description: { type: String, required: true },
-//   category: { type: String, required: true },
-//   currency: { type: String, required: true, default: 'INR' },
-  
-//   lineItems: [{
-//     itemId: { type: String, required: true },
-//     name: { type: String, required: true },
-//     category: { type: String, required: true },
-//     basePrice: { type: Schema.Types.Decimal128, required: true },
-//     quantity: { type: Number, default: 1 },
-//     unit: String,
-//     consumers: [{
-//       userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-//       consumptionPercentage: { type: Number, required: true },
-//       quantity: Number,
-//       notes: String
-//     }]
-//   }],
-  
-//   taxes: [{
-//     name: String,
-//     percentage: Number,
-//     amount: Schema.Types.Decimal128,
-//     applicableTo: { type: String, enum: ['all', 'specific'] },
-//     applicableItems: [String],
-//     taxCode: String
-//   }],
-  
-//   discounts: [{
-//     type: { type: String, enum: ['percentage','fixed'] },
-//     value: Schema.Types.Decimal128,
-//     code: String,
-//     description: String,
-//     applicableTo: { type: String, enum: ['all', 'specific'] },
-//     applicableItems: [String]
-//   }],
-  
-//   splits: [{
-//     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-//     baseAmount: { type: Schema.Types.Decimal128, required: true },
-//     taxAmount: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
-//     discountAmount: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
-//     finalAmount: { type: Schema.Types.Decimal128, required: true },
-//     isPayer: { type: Boolean, default: false },
-//     items: [{
-//       itemId: String,
-//       name: String,
-//       category: String,
-//       amount: Schema.Types.Decimal128,
-//       consumptionPercent: Number
-//     }],
-//     settlementStatus: { 
-//       type: String, 
-//       enum: ['PENDING', 'SETTLED', 'PARTIAL'],
-//       default: 'PENDING'
-//     }
-//   }],
-  
-//   paidBy: { type: Schema.Types.ObjectId, ref: 'User', required:true },
-//   paymentMethod: { type: String, required: true },
-//   paymentDate: { type: Date, default: Date.now },
-  
-//   totalAmount: { type: Schema.Types.Decimal128, required: true },
-//   subTotal: { type: Schema.Types.Decimal128, required: true },
-//   taxTotal: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
-//   discountTotal: { type: Schema.Types.Decimal128, default: mongoose.Types.Decimal128.fromString('0') },
-  
-//   analytics: {
-//     categoryBreakdown: { type: Map, of: {
-//       totalAmount: Schema.Types.Decimal128,
-//       itemCount: Number,
-//       consumerCount: Number
-//     }},
-//     averagePerPerson: Schema.Types.Decimal128,
-//     mostExpensiveItem: {
-//       name: String,
-//       amount: Schema.Types.Decimal128
-//     },
-//     consumptionDistribution: [{
-//       userId: Schema.Types.ObjectId,
-//       percentage: Number
-//     }]
-//   },
-  
-//   receipt: {
-//     imageUrl: String,
-//     thumbnailUrl: String,
-//     ocrProcessed: { type: Boolean, default: false },
-//     ocrConfidence: Number,
-//     uploadedAt: Date
-//   },
-  
-//   metadata: {
-//     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-//     updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-//     isDeleted: { type: Boolean, default: false },
-//     deletedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-//     deletedAt: Date,
-//     version: { type: Number, default: 1 }
-//   },
-  
-//   idempotencyKey: { type: String, required: true, unique: true }
-// }, {
-//   timestamps: true
-// });
-
-// // Indexes for performance
-// ExpenseSchema.index({ groupId: 1, createdAt: -1 });
-// ExpenseSchema.index({ 'splits.userId': 1, createdAt: -1 });
-// ExpenseSchema.index({ category: 1, 'splits.userId': 1 });
-// ExpenseSchema.index({ idempotencyKey: 1 });
-// ExpenseSchema.index({ 'metadata.isDeleted': 1 });
-// ExpenseSchema.index({ paidBy: 1, createdAt: -1 });
-
-// // Static methods for analytics
-// ExpenseSchema.statics.getUserCategoryAnalytics = async function(
-//   userId: string, 
-//   startDate: Date, 
-//   endDate: Date
-// ) {
-//   return this.aggregate([
-//     {
-//       $match: {
-//         'splits.userId': new mongoose.Types.ObjectId(userId),
-//         'metadata.isDeleted': false,
-//         createdAt: { $gte: startDate, $lte: endDate }
-//       }
-//     },
-//     { $unwind: '$splits' },
-//     { $match: { 'splits.userId': new mongoose.Types.ObjectId(userId) } },
-//     { $unwind: '$splits.items' },
-//     {
-//       $group: {
-//         _id: '$splits.items.category',
-//         totalSpent: { $sum: { $toDouble: '$splits.items.amount' } },
-//         count: { $sum: 1 },
-//         expenses: { $addToSet: '$_id' }
-//       }
-//     },
-//     {
-//       $project: {
-//         category: '$_id',
-//         totalSpent: 1,
-//         count: 1,
-//         uniqueExpenses: { $size: '$expenses' },
-//         averagePerExpense: { $divide: ['$totalSpent', '$count'] }
-//       }
-//     },
-//     { $sort: { totalSpent: -1 } }
-//   ]);
-// };
-
-// export const Expense = mongoose.model<IExpenseDocument>('Expense', ExpenseSchema);
+export const Expense = model<IExpense>('Expense', expenseSchema);

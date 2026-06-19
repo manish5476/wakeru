@@ -1,23 +1,38 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from './auth.service';
+import { User } from './auth.model';
 import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
 import { NotFoundError } from '../../shared/errors/AppError';
-import { User } from './auth.model';
+import { logger } from '../../config/logger';
 
 export class AuthController {
   
+  // ============================================================
+  // Public Endpoints
+  // ============================================================
+
+  /**
+   * POST /api/v1/auth/register
+   * Register new user with Firebase ID token.
+   */
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // req.body is already validated and strongly typed by Zod middleware
       const { idToken, metadata } = req.body;
-      const { user, tokens } = await AuthService.register(idToken, metadata);
+      const { user, tokens, isNewUser } = await AuthService.register(idToken, metadata);
 
       const response: ApiResponse = {
         success: true,
         message: 'Account created successfully',
         data: {
-          user: user.toJSON(), // toJSON safely strips refreshTokens
+          user: {
+            userId: user._id,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            role: user.role,
+          },
           tokens,
+          isNewUser,
         },
         timestamp: new Date().toISOString(),
       };
@@ -28,17 +43,28 @@ export class AuthController {
     }
   }
 
+  /**
+   * POST /api/v1/auth/login
+   * Login with Firebase ID token.
+   */
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { idToken } = req.body;
-      const { user, tokens } = await AuthService.login(idToken);
+      const { user, tokens, isNewUser } = await AuthService.login(idToken);
 
       const response: ApiResponse = {
         success: true,
         message: 'Login successful',
         data: {
-          user: user.toJSON(),
+          user: {
+            userId: user._id,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            role: user.role,
+          },
           tokens,
+          isNewUser,
         },
         timestamp: new Date().toISOString(),
       };
@@ -49,10 +75,15 @@ export class AuthController {
     }
   }
 
+  /**
+   * POST /api/v1/auth/forgot-password
+   * Send password reset email via Firebase.
+   * Always returns 200 to prevent email enumeration.
+   */
   async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // Guaranteed to be a valid email string thanks to Zod
-      const { email } = req.body; 
+      const { email } = req.body;
+      await AuthService.forgotPassword(email);
 
       const response: ApiResponse = {
         success: true,
@@ -66,6 +97,10 @@ export class AuthController {
     }
   }
 
+  /**
+   * POST /api/v1/auth/refresh-token
+   * Refresh access token using valid refresh token.
+   */
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { refreshToken } = req.body;
@@ -84,6 +119,14 @@ export class AuthController {
     }
   }
 
+  // ============================================================
+  // Authenticated Endpoints
+  // ============================================================
+
+  /**
+   * POST /api/v1/auth/logout
+   * Logout current device (remove specific refresh token).
+   */
   async logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { refreshToken } = req.body;
@@ -101,23 +144,152 @@ export class AuthController {
     }
   }
 
+  /**
+   * POST /api/v1/auth/logout-all
+   * Logout from ALL devices.
+   */
+  async logoutAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await AuthService.logoutAll(req.user!.userId);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Logged out from all devices successfully',
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/v1/auth/me
+   * Get current user's full profile.
+   */
   async getProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      // Using .lean() for performance, so we must explicitly exclude refreshTokens
-      // using .select() because Mongoose's toJSON() transform won't run on lean objects.
-      const user = await User.findOne({ userId: req.user!.userId })
-        .select('-refreshTokens -__v -_id') 
-        .lean();
+      const user = await User.findOne({ 
+        _id: req.user!.userId,
+        isActive: true,
+        isDeleted: false,
+      });
 
       if (!user) {
-        throw new NotFoundError('User');
+        throw new NotFoundError('User not found');
       }
 
       const response: ApiResponse = {
         success: true,
-        data: { user },
-        timestamp: new Date().toISOString(),
         message: 'Profile fetched successfully',
+        data: { user: user.toObject() },
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * PATCH /api/v1/auth/me
+   * Update current user's profile.
+   */
+  async updateProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await AuthService.updateProfile(req.user!.userId, req.body);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Profile updated successfully',
+        data: { user: user.toObject() },
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * PUT /api/v1/auth/me/upi
+   * Set/Update UPI ID.
+   */
+  async setUpiId(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { upiId } = req.body;
+      const user = await AuthService.setUpiId(req.user!.userId, upiId);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'UPI ID updated successfully',
+        data: { user: user.toObject() },
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/me/upi/verify
+   * Verify UPI ID.
+   */
+  async verifyUpi(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const verified = await AuthService.verifyUpi(req.user!.userId);
+
+      const response: ApiResponse = {
+        success: true,
+        message: verified ? 'UPI ID verified successfully' : 'UPI verification failed',
+        data: { upiVerified: verified },
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * PUT /api/v1/auth/me/fcm-token
+   * Update FCM token for push notifications.
+   */
+  async updateFcmToken(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { fcmToken } = req.body;
+      await AuthService.updateFcmToken(req.user!.userId, fcmToken);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'FCM token updated',
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/v1/auth/me
+   * Deactivate/delete account.
+   */
+  async deleteAccount(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await AuthService.deactivateAccount(req.user!.userId);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Account deleted successfully',
+        timestamp: new Date().toISOString(),
       };
 
       res.status(200).json(response);

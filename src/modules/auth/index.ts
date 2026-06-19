@@ -1,8 +1,18 @@
-export * from './auth.routes';
-export * from './auth.controller';
-export * from './auth.service';
-export * from './auth.model';
-export * from './auth.validation';// export * from './auth.routes';
-// export * from './auth.controller';
-// export * from './auth.service';
-// export * from './auth.model';
+// Models
+export { User, IUser, IUserPreferences } from './auth.model';
+
+// Services
+export { AuthService } from './auth.service';
+
+// Controllers
+export { authController, AuthController } from './auth.controller';
+
+// Routes
+export { authRoutes } from './auth.routes';
+
+// Middleware
+export { protect, authorize, optionalAuth, AuthMiddleware } from './auth.middleware';
+export type { JwtPayload } from './auth.middleware';
+
+// Validation
+export * from './auth.validation';

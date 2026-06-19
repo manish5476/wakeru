@@ -1,53 +1,108 @@
 import { Router } from 'express';
 import { authController } from './auth.controller';
-import { protect } from '../../middleware/auth.middleware';
-import { validate } from '../../middleware/validate.middleware'; // Import your Zod middleware here
+import { protect } from './auth.middleware';
+import { ValidationMiddleware } from '../../middleware/validation.middleware';
+import { strictRateLimiter } from '../../middleware/rateLimiter.middleware';
 import { 
-  verifyFirebaseTokenSchema, 
-  refreshTokenSchema, 
+  verifyFirebaseTokenSchema,
+  loginSchema,
+  refreshTokenSchema,
   logoutSchema,
-  forgotPasswordSchema
-} from './auth.validators';
+  forgotPasswordSchema,
+  updateProfileSchema,
+  setUpiSchema,
+  verifyUpiSchema,
+  updateFcmTokenSchema,
+} from './auth.validation';
 
 const router = Router();
 
-// Public routes — no auth required
+// ============================================================
+// PUBLIC ROUTES — No Authentication Required
+// Rate limited strictly to prevent abuse
+// ============================================================
+
 router.post(
-  '/register', 
-  validate(verifyFirebaseTokenSchema), 
+  '/register',
+  strictRateLimiter,
+  ValidationMiddleware.validate(verifyFirebaseTokenSchema),
   authController.register.bind(authController)
 );
 
 router.post(
-  '/login', 
-  validate(verifyFirebaseTokenSchema), 
+  '/login',
+  strictRateLimiter,
+  ValidationMiddleware.validate(loginSchema),
   authController.login.bind(authController)
 );
 
 router.post(
-  '/forgot-password', 
-  validate(forgotPasswordSchema), 
+  '/forgot-password',
+  strictRateLimiter,
+  ValidationMiddleware.validate(forgotPasswordSchema),
   authController.forgotPassword.bind(authController)
 );
 
 router.post(
-  '/refresh-token', 
-  validate(refreshTokenSchema), 
+  '/refresh-token',
+  ValidationMiddleware.validate(refreshTokenSchema),
   authController.refreshToken.bind(authController)
 );
 
-// Protected routes — require a valid access token
+// ============================================================
+// PROTECTED ROUTES — Require Valid Access Token
+// ============================================================
+
 router.use(protect);
 
+// Logout
 router.post(
-  '/logout', 
-  validate(logoutSchema), 
+  '/logout',
+  ValidationMiddleware.validate(logoutSchema),
   authController.logout.bind(authController)
 );
 
+router.post(
+  '/logout-all',
+  authController.logoutAll.bind(authController)
+);
+
+// Profile
 router.get(
-  '/profile', 
+  '/me',
   authController.getProfile.bind(authController)
+);
+
+router.patch(
+  '/me',
+  ValidationMiddleware.validate(updateProfileSchema),
+  authController.updateProfile.bind(authController)
+);
+
+// UPI
+router.put(
+  '/me/upi',
+  ValidationMiddleware.validate(setUpiSchema),
+  authController.setUpiId.bind(authController)
+);
+
+router.post(
+  '/me/upi/verify',
+  ValidationMiddleware.validate(verifyUpiSchema),
+  authController.verifyUpi.bind(authController)
+);
+
+// Push Notifications
+router.put(
+  '/me/fcm-token',
+  ValidationMiddleware.validate(updateFcmTokenSchema),
+  authController.updateFcmToken.bind(authController)
+);
+
+// Account Management
+router.delete(
+  '/me',
+  authController.deleteAccount.bind(authController)
 );
 
 export const authRoutes = router;

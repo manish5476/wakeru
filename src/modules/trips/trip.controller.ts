@@ -14,10 +14,20 @@ import {
 
 // Helper to read the authenticated Firebase user off the request
 // (set by your existing Firebase auth middleware)
+// const getUser = (req: Request) => {
+//   const user = (req as any).user;
+//   if (!user?.uid) throw new AppError('Not authenticated', 401);
+//   return user as { uid: string; displayName: string; photoURL?: string };
+// };
+// ✅ UPGRADED:
 const getUser = (req: Request) => {
   const user = (req as any).user;
-  if (!user?.uid) throw new AppError('Not authenticated', 401);
-  return user as { uid: string; displayName: string; photoURL?: string };
+  if (!user?.userId) throw new AppError('Not authenticated', 401);
+  return {
+    uid: user.userId,                          // Map userId → uid for internal use
+    displayName: user.displayName || 'User',
+    photoURL: user.photoURL || '',
+  };
 };
 
 // Helper to read req.trip set by loadTrip middleware
@@ -528,6 +538,60 @@ export const revokeInviteCode = async (
     res.status(200).json({
       success: true,
       message: 'Invite code revoked. No new members can join until a new code is generated.',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+/**
+ * GET /api/v1/trips/templates
+ * Get available trip templates with descriptions.
+ */
+export const getTemplates = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const templates = tripService.getTemplates();
+
+    res.status(200).json({
+      success: true,
+      data: { templates },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/trips/template/:type
+ * Create a trip from a template.
+ */
+export const createTripFromTemplate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { type } = req.params as { type: string };
+    const input = req.body as CreateTripInput;
+
+    const trip = await tripService.createTripFromTemplate(
+      type as 'quick' | 'domestic' | 'international',
+      input,
+      {
+        uid: user.uid,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Trip created using ${type} template`,
+      data: { trip },
     });
   } catch (err) {
     next(err);

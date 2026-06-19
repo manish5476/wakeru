@@ -14,7 +14,7 @@ exports.config = {
     PORT: parseInt(process.env.PORT || '3000', 10),
     API_VERSION: process.env.API_VERSION || 'v1',
     // MongoDB
-    MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/wakeru_local_db',
+    MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb+srv://dummymailme_db_user:ms201426@wareku.mxusxdr.mongodb.net/?appName=wareku',
     MONGO_ROOT_USER: process.env.MONGO_ROOT_USER,
     MONGO_ROOT_PASSWORD: process.env.MONGO_ROOT_PASSWORD,
     // Redis
@@ -22,6 +22,9 @@ exports.config = {
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     // JWT
     JWT_SECRET: process.env.JWT_SECRET || 'default-secret-change-in-production',
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'tripsplit-jwt-refresh-secret-dev-only',
+    JWT_ACCESS_EXPIRATION: process.env.JWT_ACCESS_EXPIRATION || '15m',
+    JWT_REFRESH_EXPIRATION: process.env.JWT_REFRESH_EXPIRATION || '7d',
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
     JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
     // OAuth

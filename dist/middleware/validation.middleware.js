@@ -1,58 +1,64 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidationMiddleware = void 0;
-const AppError_1 = require("../shared/errors/AppError");
+const zod_1 = require("zod");
+const AppError_1 = require("@shared/errors/AppError");
 class ValidationMiddleware {
     static validate(schema) {
         return (req, res, next) => {
-            const { error, value } = schema.validate(req.body, {
-                abortEarly: false,
-                stripUnknown: true,
-                allowUnknown: false
-            });
-            if (error) {
-                const details = error.details.map(detail => ({
-                    field: detail.path.join('.'),
-                    message: detail.message
-                }));
-                throw new AppError_1.ValidationError('Validation failed', details);
+            try {
+                schema.parse(req.body);
+                next();
             }
-            req.body = value;
-            next();
+            catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    const errorMessages = error.issues.map((issue) => ({
+                        message: `${issue.path.join('.')} is ${issue.message}`,
+                    }));
+                    next(new AppError_1.ValidationError('Invalid input', errorMessages));
+                }
+                else {
+                    next(error);
+                }
+            }
         };
     }
     static validateQuery(schema) {
         return (req, res, next) => {
-            const { error, value } = schema.validate(req.query, {
-                abortEarly: false,
-                stripUnknown: true
-            });
-            if (error) {
-                const details = error.details.map(detail => ({
-                    field: detail.path.join('.'),
-                    message: detail.message
-                }));
-                throw new AppError_1.ValidationError('Invalid query parameters', details);
+            try {
+                schema.parse(req.query);
+                next();
             }
-            req.query = value;
-            next();
+            catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    const errorMessages = error.issues.map((issue) => ({
+                        message: `${issue.path.join('.')} is ${issue.message}`,
+                    }));
+                    next(new AppError_1.ValidationError('Invalid query parameters', errorMessages));
+                }
+                else {
+                    next(error);
+                }
+            }
         };
     }
     static validateParams(schema) {
         return (req, res, next) => {
-            const { error, value } = schema.validate(req.params, {
-                abortEarly: false,
-                stripUnknown: true
-            });
-            if (error) {
-                const details = error.details.map(detail => ({
-                    field: detail.path.join('.'),
-                    message: detail.message
-                }));
-                throw new AppError_1.ValidationError('Invalid path parameters', details);
+            try {
+                schema.parse(req.params);
+                next();
             }
-            req.params = value;
-            next();
+            catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    const errorMessages = error.issues.map((issue) => ({
+                        message: `${issue.path.join('.')} is ${issue.message}`,
+                    }));
+                    next(new AppError_1.ValidationError('Invalid path parameters', errorMessages));
+                }
+                else {
+                    next(error);
+                }
+            }
         };
     }
 }
