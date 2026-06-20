@@ -204,7 +204,7 @@ export class AuthController {
       const response: ApiResponse = {
         success: true,
         message: 'Profile updated successfully',
-        data: { user: user.toObject() },
+        data: { user },
         timestamp: new Date().toISOString(),
       };
 
@@ -226,7 +226,7 @@ export class AuthController {
       const response: ApiResponse = {
         success: true,
         message: 'UPI ID updated successfully',
-        data: { user: user.toObject() },
+        data: { user },
         timestamp: new Date().toISOString(),
       };
 

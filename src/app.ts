@@ -19,6 +19,8 @@ import analyticsRoutes from './modules/analytics/analytics.routes';
 import receiptRoutes from './modules/receipt/receipt.routes';
 import notificationRoutes from './modules/notification/notification.routes';
 import invitationRoutes from './modules/trips/invitation.routes';
+import friendsRoutes from './modules/friends/friends.routes';
+
 
 const app = express();
 
@@ -109,6 +111,7 @@ app.use('/api/v1/receipts', authenticatedRateLimiter, IdempotencyMiddleware.chec
 app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
 
 app.use('/api/v1/invitations', authenticatedRateLimiter, invitationRoutes);
+app.use('/api/v1/friends', authenticatedRateLimiter, friendsRoutes);
 
 // ============================================================
 // 404 Handler

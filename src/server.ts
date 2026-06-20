@@ -6,7 +6,7 @@ import { redisClient } from './config/redis';
 import { logger } from './config/logger';
 import { initializeFirebase } from './config/firebase';
 import { socketServer } from './infrastructure/websocket/socket.server';
-
+import { startReminderCron } from './modules/reminders/reminder.cron';
 class Server {
   private httpServer: http.Server | null = null;
 
@@ -32,8 +32,8 @@ class Server {
       socketServer.initialize(this.httpServer);
       logger.info('🔌 WebSocket server initialized');
 
-      // Start HTTP server (NOT app.listen — use httpServer.listen for Socket.IO)
-      this.httpServer.listen(config.PORT, () => {
+      // Start HTTP server
+      this.httpServer.listen(config.PORT, '0.0.0.0', () => {
         logger.info(`🚀 WAKERU API Server running on port ${config.PORT}`);
         logger.info(`🔌 WebSocket server running on port ${config.PORT}`);
         logger.info(`📚 API Documentation: http://localhost:${config.PORT}/api-docs`);
@@ -103,5 +103,7 @@ class Server {
 // Start server
 const server = new Server();
 server.start();
+startReminderCron();
+
 
 export default server;

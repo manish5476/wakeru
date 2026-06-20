@@ -63,6 +63,7 @@ export interface IExpense extends Document {
   notes?: string;
   receiptImages: string[];
   date: Date;
+  tags: string[];
 
   // Dual currency amounts
   amountLocal: number;       // In stop's local currency
@@ -120,6 +121,8 @@ const expenseSchema = new Schema<IExpense>(
       required: [true, 'tripId is required'],
       index: true,
     },
+    tags: { type: [String], default: [], index: true },
+
     stopId: {
       type: Schema.Types.ObjectId,
       required: [true, 'stopId is required'],
