@@ -20,7 +20,8 @@ import receiptRoutes from './modules/receipt/receipt.routes';
 import notificationRoutes from './modules/notification/notification.routes';
 import invitationRoutes from './modules/trips/invitation.routes';
 import friendsRoutes from './modules/friends/friends.routes';
-
+import remindersRoutes from './modules/reminders/reminders.routes';
+import { startReminderCron } from './modules/reminders';
 
 const app = express();
 
@@ -112,6 +113,7 @@ app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
 
 app.use('/api/v1/invitations', authenticatedRateLimiter, invitationRoutes);
 app.use('/api/v1/friends', authenticatedRateLimiter, friendsRoutes);
+app.use('/api/v1/reminders', authenticatedRateLimiter, remindersRoutes);
 
 // ============================================================
 // 404 Handler

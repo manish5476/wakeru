@@ -7,6 +7,7 @@ import { logger } from './config/logger';
 import { initializeFirebase } from './config/firebase';
 import { socketServer } from './infrastructure/websocket/socket.server';
 import { startReminderCron } from './modules/reminders/reminder.cron';
+
 class Server {
   private httpServer: http.Server | null = null;
 

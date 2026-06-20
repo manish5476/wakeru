@@ -47,11 +47,14 @@ class SocketServer {
         // Authentication middleware
         this.io.use(async (socket: AuthenticatedSocket, next) => {
             try {
-                const token = socket.handshake.auth.token || socket.handshake.query.token;
+                let token = socket.handshake.auth.token || socket.handshake.query.token;
 
                 if (!token) {
                     return next(new Error('Authentication token required'));
                 }
+
+                // Strip "Bearer " and any quotes if present
+                token = token.replace(/^Bearer\s+/, '').replace(/^["']|["']$/g, '');
 
                 const decoded = jwt.verify(token, config.JWT_SECRET) as { userId: string };
 
