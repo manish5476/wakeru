@@ -16,7 +16,9 @@ export type NotificationType =
   | 'PAYMENT_REMINDER'
   | 'MONTHLY_REPORT'
   | 'STOP_ADDED'
-  | 'EXCHANGE_RATE_UPDATED';
+  | 'EXCHANGE_RATE_UPDATED'
+  | 'FRIEND_REQUEST'
+  | 'FRIEND_ACCEPTED';
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
@@ -90,6 +92,8 @@ const NotificationSchema = new Schema<INotification>(
         'MONTHLY_REPORT',
         'STOP_ADDED',
         'EXCHANGE_RATE_UPDATED',
+        'FRIEND_REQUEST',
+        'FRIEND_ACCEPTED',
       ],
       required: true,
     },

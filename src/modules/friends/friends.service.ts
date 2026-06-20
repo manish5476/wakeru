@@ -40,14 +40,14 @@ export const friendsService = {
             User.findOne({ _id: toUserId, isActive: true, isDeleted: false }).select('displayName photoURL').lean(),
         ]);
 
-        if (!fromUser) throw new AppError('Your account not found', 404);
-        if (!toUser) throw new AppError('User not found', 404);
-        if (fromUserId === toUserId) throw new AppError('Cannot send friend request to yourself', 400);
+        if (!fromUser) throw new AppError(404, 'Your account not found');
+        if (!toUser) throw new AppError(404, 'User not found');
+        if (fromUserId === toUserId) throw new AppError(400, 'Cannot send friend request to yourself');
 
         // Check if already friends
         const fromUserDoc = await User.findById(fromUserId).select('friendIds').lean();
         if (fromUserDoc?.friendIds?.includes(toUserId)) {
-            throw new AppError('You are already friends', 409);
+            throw new AppError(409, 'You are already friends');
         }
 
         // Check for existing request
@@ -59,7 +59,7 @@ export const friendsService = {
         });
 
         if (existing) {
-            throw new AppError('A friend request already exists between you', 409);
+            throw new AppError(409, 'A friend request already exists between you');
         }
 
         // Create request
@@ -109,9 +109,9 @@ export const friendsService = {
      */
     async acceptRequest(requestId: string, userId: string): Promise<void> {
         const request = await FriendRequest.findById(requestId);
-        if (!request) throw new AppError('Friend request not found', 404);
-        if (request.toUserId !== userId) throw new AppError('This request is not for you', 403);
-        if (request.status !== 'pending') throw new AppError(`Request is already ${request.status}`, 400);
+        if (!request) throw new AppError(404, 'Friend request not found');
+        if (request.toUserId !== userId) throw new AppError(403, 'This request is not for you');
+        if (request.status !== 'pending') throw new AppError(400, `Request is already ${request.status}`);
 
         // Update request status
         request.status = 'accepted';
@@ -146,9 +146,9 @@ export const friendsService = {
      */
     async declineRequest(requestId: string, userId: string): Promise<void> {
         const request = await FriendRequest.findById(requestId);
-        if (!request) throw new AppError('Friend request not found', 404);
-        if (request.toUserId !== userId) throw new AppError('This request is not for you', 403);
-        if (request.status !== 'pending') throw new AppError(`Request is already ${request.status}`, 400);
+        if (!request) throw new AppError(404, 'Friend request not found');
+        if (request.toUserId !== userId) throw new AppError(403, 'This request is not for you');
+        if (request.status !== 'pending') throw new AppError(400, `Request is already ${request.status}`);
 
         request.status = 'declined';
         request.respondedAt = new Date();
@@ -191,7 +191,7 @@ export const friendsService = {
             .populate('friendIds', 'displayName photoURL phoneNumber email bankingDetails.upiId')
             .lean();
 
-        if (!user) throw new AppError('User not found', 404);
+        if (!user) throw new AppError(404, 'User not found');
 
         const friends = (user as any).friendIds || [];
 
@@ -240,7 +240,7 @@ export const friendsService = {
      */
     async searchUsers(userId: string, query: string): Promise<any[]> {
         if (!query || query.length < 2) {
-            throw new AppError('Search query must be at least 2 characters', 400);
+            throw new AppError(400, 'Search query must be at least 2 characters');
         }
 
         const searchRegex = new RegExp(query, 'i');

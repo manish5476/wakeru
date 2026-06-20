@@ -88,7 +88,6 @@ router.put(
 
 router.post(
   '/me/upi/verify',
-  ValidationMiddleware.validate(verifyUpiSchema),
   authController.verifyUpi.bind(authController)
 );
 
