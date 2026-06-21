@@ -23,6 +23,7 @@ import friendsRoutes from './modules/friends/friends.routes';
 import remindersRoutes from './modules/reminders/reminders.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import personRoutes from './modules/person/person.routes';
+import feedbackRoutes from './modules/feedback/feedback.routes';
 const app = express();
 
 // ============================================================
@@ -116,6 +117,7 @@ app.use('/api/v1/friends', authenticatedRateLimiter, friendsRoutes);
 app.use('/api/v1/reminders', authenticatedRateLimiter, remindersRoutes);
 app.use('/api/v1/dashboard', authenticatedRateLimiter, dashboardRoutes);
 app.use('/api/v1/person', authenticatedRateLimiter, personRoutes);
+app.use('/api/v1/feedback', authenticatedRateLimiter, feedbackRoutes);
 
 
 
