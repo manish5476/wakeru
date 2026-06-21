@@ -56,6 +56,11 @@ export interface IExpense extends Document {
   // Location context
   tripId: Types.ObjectId;
   stopId: Types.ObjectId;
+  location?: {
+    latitude: number;
+    longitude: number;
+    name?: string;
+  };
 
   // What was spent
   title: string;
@@ -127,6 +132,11 @@ const expenseSchema = new Schema<IExpense>(
       type: Schema.Types.ObjectId,
       required: [true, 'stopId is required'],
       index: true,
+    },
+    location: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      name: { type: String },
     },
 
     // Expense details

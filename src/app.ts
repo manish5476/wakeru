@@ -21,8 +21,8 @@ import notificationRoutes from './modules/notification/notification.routes';
 import invitationRoutes from './modules/trips/invitation.routes';
 import friendsRoutes from './modules/friends/friends.routes';
 import remindersRoutes from './modules/reminders/reminders.routes';
-import { startReminderCron } from './modules/reminders';
-
+import dashboardRoutes from './modules/dashboard/dashboard.routes';
+import personRoutes from './modules/person/person.routes';
 const app = express();
 
 // ============================================================
@@ -114,6 +114,10 @@ app.use('/api/v1/notifications', authenticatedRateLimiter, notificationRoutes);
 app.use('/api/v1/invitations', authenticatedRateLimiter, invitationRoutes);
 app.use('/api/v1/friends', authenticatedRateLimiter, friendsRoutes);
 app.use('/api/v1/reminders', authenticatedRateLimiter, remindersRoutes);
+app.use('/api/v1/dashboard', authenticatedRateLimiter, dashboardRoutes);
+app.use('/api/v1/person', authenticatedRateLimiter, personRoutes);
+
+
 
 // ============================================================
 // 404 Handler

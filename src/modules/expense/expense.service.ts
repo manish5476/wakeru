@@ -249,6 +249,7 @@ export const createExpense = async (
     date: input.date,
     amountLocal: input.amountLocal,
     amountBase,
+    location: input.location,
     localCurrency: stop.currency,
     baseCurrency: trip.baseCurrency,
     exchangeRateUsed,
@@ -470,6 +471,7 @@ export const updateExpense = async (
   if (input.category !== undefined) expense.category = input.category;
   if (input.notes !== undefined) expense.notes = input.notes;
   if (input.date !== undefined) expense.date = input.date;
+  if (input.location !== undefined) expense.location = input.location;
 
   const needsSplitRecompute =
     input.amountLocal !== undefined ||

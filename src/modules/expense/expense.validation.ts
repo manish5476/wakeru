@@ -105,6 +105,14 @@ export const createExpenseSchema = z.object({
 
   notes: z.string().max(500).optional(),
 
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      name: z.string().optional(),
+    })
+    .optional(),
+
   split: splitInputSchema,
 });
 
@@ -121,6 +129,13 @@ export const updateExpenseSchema = z.object({
   date: z.coerce.date().optional(),
   amountLocal: z.number().positive().optional(),
   paidBy: firebaseUid.optional(),
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      name: z.string().optional(),
+    })
+    .optional(),
   split: splitInputSchema.optional(),
 });
 
