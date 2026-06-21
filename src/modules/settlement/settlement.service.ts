@@ -255,7 +255,7 @@ export const initiatePayment = async (
 
   // Get recipient's UPI ID
   const recipient = await User.findOne({
-    firebaseUid: txn.to,
+    _id: txn.to,
     isActive: true,
     isDeleted: false,
   }).select('bankingDetails.upiId displayName').lean();

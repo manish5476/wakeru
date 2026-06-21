@@ -264,7 +264,6 @@ export const createExpense = async (
 
   // Update cached totals on Trip (atomic $inc — safe under concurrency)
   const owedAmounts = splits
-    .filter((s) => s.userId !== input.paidBy)
     .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
 
   await incrementStopTotals(
@@ -464,7 +463,6 @@ export const updateExpense = async (
   const oldAmountBase = expense.amountBase;
   const oldPaidBy = expense.paidBy;
   const oldOwedAmounts = expense.splits
-    .filter((s) => s.userId !== oldPaidBy)
     .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
 
   // Apply simple field updates
@@ -526,7 +524,6 @@ export const updateExpense = async (
 
     // Apply new caches
     const newOwedAmounts = newSplits
-      .filter((s) => s.userId !== newPaidBy)
       .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
 
     await incrementStopTotals(
@@ -589,7 +586,6 @@ export const deleteExpense = async (
 
   // Reverse cached totals before deletion
   const owedAmounts = expense.splits
-    .filter((s) => s.userId !== expense.paidBy)
     .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
 
   await decrementStopTotals(
