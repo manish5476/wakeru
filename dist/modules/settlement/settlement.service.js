@@ -7,6 +7,7 @@ const expense_model_1 = require("../expense/expense.model");
 const trip_model_1 = require("../trips/trip.model");
 const auth_model_1 = require("../auth/auth.model");
 const AppError_1 = require("../../shared/errors/AppError");
+const socket_server_1 = require("../../infrastructure/websocket/socket.server");
 // ============================================================
 // MINIMUM TRANSACTION ALGORITHM
 // ============================================================
@@ -189,7 +190,7 @@ const initiatePayment = async (tripId, transactionId, fromUid) => {
     }
     // Get recipient's UPI ID
     const recipient = await auth_model_1.User.findOne({
-        firebaseUid: txn.to,
+        _id: txn.to,
         isActive: true,
         isDeleted: false,
     }).select('bankingDetails.upiId displayName').lean();
@@ -208,6 +209,7 @@ const initiatePayment = async (tripId, transactionId, fromUid) => {
     txn.upiDeepLink = upiDeepLink;
     txn.initiatedAt = new Date();
     await settlement.save();
+    socket_server_1.socketServer.notifySettlementRequest(txn.to, txn.fromName, txn.amountBase, txn.baseCurrency, tripId);
     return {
         transaction: txn,
         upiDeepLink,
@@ -281,6 +283,7 @@ const confirmPayment = async (tripId, transactionId, confirmingUid) => {
         }
     }
     await settlement.save();
+    socket_server_1.socketServer.notifySettlementCompleted(txn.from, txn.to, txn.amountBase, txn.baseCurrency, tripId);
     return settlement;
 };
 exports.confirmPayment = confirmPayment;

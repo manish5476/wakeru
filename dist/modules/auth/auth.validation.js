@@ -16,7 +16,7 @@ exports.verifyFirebaseTokenSchema = zod_1.z.object({
     idToken: zod_1.z.string().min(1, 'Firebase ID token is required'),
     metadata: zod_1.z.object({
         displayName: zod_1.z.string().min(1, 'Display name is required').max(100, 'Display name too long').optional(),
-        phoneNumber: zod_1.z.string().regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number format').optional(),
+        phoneNumber: zod_1.z.string().regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number format').optional().or(zod_1.z.literal('')),
         photoURL: zod_1.z.string().url('Invalid photo URL').optional(),
     }).optional(),
 });

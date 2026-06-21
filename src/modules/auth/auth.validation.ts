@@ -18,7 +18,7 @@ export const verifyFirebaseTokenSchema = z.object({
   idToken: z.string().min(1, 'Firebase ID token is required'),
   metadata: z.object({
     displayName: z.string().min(1, 'Display name is required').max(100, 'Display name too long').optional(),
-    phoneNumber: z.string().regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number format'),
+    phoneNumber: z.string().regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number format').optional().or(z.literal('')),
     photoURL: z.string().url('Invalid photo URL').optional(),
   }).optional(),
 });

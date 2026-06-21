@@ -1,5 +1,5 @@
 declare class Server {
-    private server;
+    private httpServer;
     start(): Promise<void>;
     private setupGracefulShutdown;
 }

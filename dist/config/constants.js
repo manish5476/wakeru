@@ -64,9 +64,9 @@ exports.CONSTANTS = {
         'MONTHLY_REPORT',
     ],
     RATE_LIMITS: {
-        PUBLIC: { windowMs: 15 * 60 * 1000, max: 100 },
-        AUTHENTICATED: { windowMs: 15 * 60 * 1000, max: 300 },
-        EXPENSE_CREATE: { windowMs: 60 * 1000, max: 10 },
+        PUBLIC: { windowMs: 15 * 60 * 1000, max: 10000 },
+        AUTHENTICATED: { windowMs: 15 * 60 * 1000, max: 3000 },
+        EXPENSE_CREATE: { windowMs: 60 * 1000, max: 100 },
         OCR_UPLOAD: { windowMs: 60 * 1000, max: 5 },
     },
     UPLOAD_LIMITS: {

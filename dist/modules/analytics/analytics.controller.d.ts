@@ -1,22 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from '../../shared/types/common.types';
-export declare class AnalyticsController {
-    /**
-     * Get user analytics
-     */
-    getUserAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Get trip analytics
-     */
-    getTripAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Get predictive analytics
-     */
-    getPredictiveAnalytics(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
-    /**
-     * Get spending report
-     */
-    getSpendingReport(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;
-}
-export declare const analyticsController: AnalyticsController;
+import { Request, Response, NextFunction } from 'express';
+export declare const analyticsController: {
+    getQuickStats(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getUserAnalytics(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getTripAnalytics(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getYearlySummary(req: Request, res: Response, next: NextFunction): Promise<void>;
+};
 //# sourceMappingURL=analytics.controller.d.ts.map

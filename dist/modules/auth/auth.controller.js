@@ -184,7 +184,7 @@ class AuthController {
             const response = {
                 success: true,
                 message: 'Profile updated successfully',
-                data: { user: user.toObject() },
+                data: { user },
                 timestamp: new Date().toISOString(),
             };
             res.status(200).json(response);
@@ -204,7 +204,7 @@ class AuthController {
             const response = {
                 success: true,
                 message: 'UPI ID updated successfully',
-                data: { user: user.toObject() },
+                data: { user },
                 timestamp: new Date().toISOString(),
             };
             res.status(200).json(response);

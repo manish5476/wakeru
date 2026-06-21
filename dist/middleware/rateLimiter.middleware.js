@@ -46,7 +46,7 @@ exports.authenticatedRateLimiter = (0, express_rate_limit_1.default)({
  */
 exports.strictRateLimiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // 10 attempts per window
+    max: process.env.NODE_ENV === 'production' ? 10 : 1000, // Relax in dev
     message: {
         success: false,
         error: {

@@ -28,7 +28,7 @@ router.get('/me', auth_controller_1.authController.getProfile.bind(auth_controll
 router.patch('/me', validation_middleware_1.ValidationMiddleware.validate(auth_validation_1.updateProfileSchema), auth_controller_1.authController.updateProfile.bind(auth_controller_1.authController));
 // UPI
 router.put('/me/upi', validation_middleware_1.ValidationMiddleware.validate(auth_validation_1.setUpiSchema), auth_controller_1.authController.setUpiId.bind(auth_controller_1.authController));
-router.post('/me/upi/verify', validation_middleware_1.ValidationMiddleware.validate(auth_validation_1.verifyUpiSchema), auth_controller_1.authController.verifyUpi.bind(auth_controller_1.authController));
+router.post('/me/upi/verify', auth_controller_1.authController.verifyUpi.bind(auth_controller_1.authController));
 // Push Notifications
 router.put('/me/fcm-token', validation_middleware_1.ValidationMiddleware.validate(auth_validation_1.updateFcmTokenSchema), auth_controller_1.authController.updateFcmToken.bind(auth_controller_1.authController));
 // Account Management

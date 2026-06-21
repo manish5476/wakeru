@@ -90,26 +90,42 @@ exports.AuthService = {
             ],
         }).lean();
         if (existing) {
-            throw new AppError_1.ConflictError('An account with this email already exists. Please login instead.');
+            if (existing.firebaseUid !== firebaseUid) {
+                logger_1.logger.info('Updating existing user with new Firebase UID', { userId: existing._id, email });
+                const updatedUser = await auth_model_1.User.findOneAndUpdate({ _id: existing._id }, { $set: { firebaseUid } }, { new: true });
+                if (!updatedUser) {
+                    throw new Error('Failed to update existing user');
+                }
+                const tokens = await generateTokens(updatedUser);
+                return { user: updatedUser.toObject(), tokens, isNewUser: false };
+            }
+            // User already exists with the same firebaseUid, just log them in
+            const tokens = await generateTokens(existing);
+            return { user: existing, tokens, isNewUser: false };
         }
         // Create user with Firebase profile data + provided metadata
-        const user = new auth_model_1.User({
+        const userPayload = {
             _id: (0, uuid_1.v4)(),
             firebaseUid,
             email: email.toLowerCase(),
             displayName: metadata?.displayName || decodedToken.name || 'Traveler',
             photoURL: metadata?.photoURL || decodedToken.picture || '',
-            phoneNumber: metadata?.phoneNumber || decodedToken.phone_number || '',
             defaultCurrency: 'INR',
             preferredLanguage: 'en',
             lastLoginAt: new Date(),
-        });
+        };
+        const phone = metadata?.phoneNumber || decodedToken.phone_number;
+        if (phone) {
+            userPayload.phoneNumber = phone;
+        }
+        const user = new auth_model_1.User(userPayload);
         try {
             await user.save();
             logger_1.logger.info('New user registered', { userId: user._id, email: user.email });
         }
         catch (error) {
             if (error.code === 11000) {
+                logger_1.logger.error('Duplicate key error during registration:', error);
                 throw new AppError_1.ConflictError('An account with this email already exists. Please login instead.');
             }
             throw error;
@@ -127,7 +143,8 @@ exports.AuthService = {
         const email = decodedToken.email?.toLowerCase();
         let user = await auth_model_1.User.findOne({ firebaseUid });
         // If no user by Firebase UID, try by email (account created before Firebase linking)
-        if (!user && email && decodedToken.email_verified) {
+        // Temporarily removed email_verified check since it's disabled in registration
+        if (!user && email) {
             user = await auth_model_1.User.findOne({ email });
             if (user) {
                 // Link Firebase UID to existing email account

@@ -3,11 +3,11 @@ export declare const equalSplitInputSchema: z.ZodObject<{
     method: z.ZodLiteral<"equal">;
     memberIds: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    method: "equal";
     memberIds: string[];
+    method: "equal";
 }, {
-    method: "equal";
     memberIds: string[];
+    method: "equal";
 }>;
 export declare const percentageSplitInputSchema: z.ZodObject<{
     method: z.ZodLiteral<"percentage">;
@@ -121,11 +121,11 @@ export declare const splitInputSchema: z.ZodDiscriminatedUnion<"method", [z.ZodO
     method: z.ZodLiteral<"equal">;
     memberIds: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    method: "equal";
     memberIds: string[];
+    method: "equal";
 }, {
-    method: "equal";
     memberIds: string[];
+    method: "equal";
 }>, z.ZodObject<{
     method: z.ZodLiteral<"percentage">;
     members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
@@ -239,15 +239,28 @@ export declare const createExpenseSchema: z.ZodObject<{
     paidBy: z.ZodString;
     date: z.ZodDefault<z.ZodDate>;
     notes: z.ZodOptional<z.ZodString>;
+    location: z.ZodOptional<z.ZodObject<{
+        latitude: z.ZodNumber;
+        longitude: z.ZodNumber;
+        name: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    }, {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    }>>;
     split: z.ZodDiscriminatedUnion<"method", [z.ZodObject<{
         method: z.ZodLiteral<"equal">;
         memberIds: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     }, {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     }>, z.ZodObject<{
         method: z.ZodLiteral<"percentage">;
         members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
@@ -356,8 +369,8 @@ export declare const createExpenseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     date: Date;
     split: {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     } | {
         members: {
             displayName: string;
@@ -387,11 +400,16 @@ export declare const createExpenseSchema: z.ZodObject<{
     amountLocal: number;
     category: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other";
     paidBy: string;
+    location?: {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    } | undefined;
     notes?: string | undefined;
 }, {
     split: {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     } | {
         members: {
             displayName: string;
@@ -421,6 +439,11 @@ export declare const createExpenseSchema: z.ZodObject<{
     amountLocal: number;
     paidBy: string;
     date?: Date | undefined;
+    location?: {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    } | undefined;
     notes?: string | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
 }>;
@@ -431,15 +454,28 @@ export declare const updateExpenseSchema: z.ZodObject<{
     date: z.ZodOptional<z.ZodDate>;
     amountLocal: z.ZodOptional<z.ZodNumber>;
     paidBy: z.ZodOptional<z.ZodString>;
+    location: z.ZodOptional<z.ZodObject<{
+        latitude: z.ZodNumber;
+        longitude: z.ZodNumber;
+        name: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    }, {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    }>>;
     split: z.ZodOptional<z.ZodDiscriminatedUnion<"method", [z.ZodObject<{
         method: z.ZodLiteral<"equal">;
         memberIds: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     }, {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     }>, z.ZodObject<{
         method: z.ZodLiteral<"percentage">;
         members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
@@ -548,8 +584,8 @@ export declare const updateExpenseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     date?: Date | undefined;
     split?: {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     } | {
         members: {
             displayName: string;
@@ -574,6 +610,11 @@ export declare const updateExpenseSchema: z.ZodObject<{
     } | {
         method: "personal";
     } | undefined;
+    location?: {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
+    } | undefined;
     notes?: string | undefined;
     title?: string | undefined;
     amountLocal?: number | undefined;
@@ -582,8 +623,8 @@ export declare const updateExpenseSchema: z.ZodObject<{
 }, {
     date?: Date | undefined;
     split?: {
-        method: "equal";
         memberIds: string[];
+        method: "equal";
     } | {
         members: {
             displayName: string;
@@ -607,6 +648,11 @@ export declare const updateExpenseSchema: z.ZodObject<{
         method: "shares";
     } | {
         method: "personal";
+    } | undefined;
+    location?: {
+        latitude: number;
+        longitude: number;
+        name?: string | undefined;
     } | undefined;
     notes?: string | undefined;
     title?: string | undefined;

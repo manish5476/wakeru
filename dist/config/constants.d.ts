@@ -77,15 +77,15 @@ export declare const CONSTANTS: {
     readonly RATE_LIMITS: {
         readonly PUBLIC: {
             readonly windowMs: number;
-            readonly max: 100;
+            readonly max: 10000;
         };
         readonly AUTHENTICATED: {
             readonly windowMs: number;
-            readonly max: 300;
+            readonly max: 3000;
         };
         readonly EXPENSE_CREATE: {
             readonly windowMs: number;
-            readonly max: 10;
+            readonly max: 100;
         };
         readonly OCR_UPLOAD: {
             readonly windowMs: number;

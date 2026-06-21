@@ -75,6 +75,8 @@ const NotificationSchema = new mongoose_1.Schema({
             'MONTHLY_REPORT',
             'STOP_ADDED',
             'EXCHANGE_RATE_UPDATED',
+            'FRIEND_REQUEST',
+            'FRIEND_ACCEPTED',
         ],
         required: true,
     },

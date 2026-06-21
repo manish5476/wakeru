@@ -33,10 +33,16 @@ const expenseSchema = new mongoose_1.Schema({
         required: [true, 'tripId is required'],
         index: true,
     },
+    tags: { type: [String], default: [], index: true },
     stopId: {
         type: mongoose_1.Schema.Types.ObjectId,
         required: [true, 'stopId is required'],
         index: true,
+    },
+    location: {
+        latitude: { type: Number },
+        longitude: { type: Number },
+        name: { type: String },
     },
     // Expense details
     title: {

@@ -36,13 +36,18 @@ export declare class OCRProcessor {
      */
     private processWithAWSTextract;
     /**
-     * Process with Tesseract.js (fallback)
+     * Process with Tesseract.js — Real OCR implementation
+     * Supports English + Devanagari (Hindi) for Indian receipts
      */
     private processWithTesseract;
     /**
      * Post-process OCR results with AI/ML
      */
     private postProcessResults;
+    /**
+     * Auto-categorize Indian merchant based on name + receipt keywords
+     */
+    private categorizeIndianMerchant;
     /**
      * Extract merchant name from OCR text
      */
@@ -56,7 +61,7 @@ export declare class OCRProcessor {
      */
     private extractTotalAmount;
     /**
-     * Extract tax amount
+     * Extract tax amount — supports Indian GST (CGST, SGST, IGST)
      */
     private extractTaxAmount;
     /**

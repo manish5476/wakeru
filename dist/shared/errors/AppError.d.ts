@@ -3,7 +3,7 @@ export declare class AppError extends Error {
     readonly isOperational: boolean;
     readonly code: string;
     readonly details?: any;
-    constructor(statusCode: any, message: any, code?: any, details?: any, isOperational?: boolean);
+    constructor(message: any, statusCode: any, code?: any, details?: any, isOperational?: boolean);
 }
 export declare class BadRequestError extends AppError {
     constructor(message: string, code?: string, details?: any);

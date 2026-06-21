@@ -23,11 +23,17 @@ export interface ISplit {
 export interface IExpense extends Document {
     tripId: Types.ObjectId;
     stopId: Types.ObjectId;
+    location?: {
+        latitude: number;
+        longitude: number;
+        name?: string;
+    };
     title: string;
     category: ExpenseCategory;
     notes?: string;
     receiptImages: string[];
     date: Date;
+    tags: string[];
     amountLocal: number;
     amountBase: number;
     localCurrency: string;

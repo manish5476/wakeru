@@ -3,7 +3,7 @@ export declare const verifyFirebaseTokenSchema: z.ZodObject<{
     idToken: z.ZodString;
     metadata: z.ZodOptional<z.ZodObject<{
         displayName: z.ZodOptional<z.ZodString>;
-        phoneNumber: z.ZodOptional<z.ZodString>;
+        phoneNumber: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
         photoURL: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         displayName?: string | undefined;

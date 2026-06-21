@@ -7,6 +7,7 @@ const trip_model_1 = require("../trips/trip.model");
 const trip_service_1 = require("../trips/trip.service");
 const AppError_1 = require("../../shared/errors/AppError");
 const settlement_service_1 = require("../settlement/settlement.service");
+const socket_server_1 = require("../../infrastructure/websocket/socket.server");
 // ============================================================
 // SPLIT ENGINE — The Core of TripSplit
 // ============================================================
@@ -132,7 +133,6 @@ exports.computeSplits = computeSplits;
  * 5. Atomically update trip/stop cached totals via $inc
  */
 const createExpense = async (input, adderUid, adderDisplayName) => {
-    // Load trip with the specific stop
     const trip = await trip_model_1.Trip.findOne({
         isArchived: false,
         'stops._id': new mongoose_1.Types.ObjectId(input.stopId),
@@ -175,6 +175,7 @@ const createExpense = async (input, adderUid, adderDisplayName) => {
         date: input.date,
         amountLocal: input.amountLocal,
         amountBase,
+        location: input.location,
         localCurrency: stop.currency,
         baseCurrency: trip.baseCurrency,
         exchangeRateUsed,
@@ -188,10 +189,10 @@ const createExpense = async (input, adderUid, adderDisplayName) => {
     await expense.save();
     // Update cached totals on Trip (atomic $inc — safe under concurrency)
     const owedAmounts = splits
-        .filter((s) => s.userId !== input.paidBy)
         .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
     await (0, trip_service_1.incrementStopTotals)(trip._id.toString(), input.stopId, input.amountLocal, amountBase, input.paidBy, owedAmounts);
     await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
+    socket_server_1.socketServer.notifyExpenseAdded(trip._id.toString(), expense, adderUid);
     return expense;
 };
 exports.createExpense = createExpense;
@@ -356,7 +357,6 @@ const updateExpense = async (expenseId, input, editorUid) => {
     const oldAmountBase = expense.amountBase;
     const oldPaidBy = expense.paidBy;
     const oldOwedAmounts = expense.splits
-        .filter((s) => s.userId !== oldPaidBy)
         .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
     // Apply simple field updates
     if (input.title !== undefined)
@@ -367,6 +367,8 @@ const updateExpense = async (expenseId, input, editorUid) => {
         expense.notes = input.notes;
     if (input.date !== undefined)
         expense.date = input.date;
+    if (input.location !== undefined)
+        expense.location = input.location;
     const needsSplitRecompute = input.amountLocal !== undefined ||
         input.paidBy !== undefined ||
         input.split !== undefined;
@@ -395,7 +397,6 @@ const updateExpense = async (expenseId, input, editorUid) => {
         await expense.save();
         // Apply new caches
         const newOwedAmounts = newSplits
-            .filter((s) => s.userId !== newPaidBy)
             .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
         await (0, trip_service_1.incrementStopTotals)(trip._id.toString(), expense.stopId.toString(), newAmountLocal, newAmountBase, newPaidBy, newOwedAmounts);
     }
@@ -407,6 +408,10 @@ const updateExpense = async (expenseId, input, editorUid) => {
     expense.editedAt = new Date();
     await expense.save();
     await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
+    socket_server_1.socketServer.notifyExpenseUpdated(trip._id.toString(), {
+        _id: expense._id,
+        title: expense.title,
+    }, editorUid);
     return expense;
 };
 exports.updateExpense = updateExpense;
@@ -430,10 +435,10 @@ const deleteExpense = async (expenseId, requestingUid) => {
     }
     // Reverse cached totals before deletion
     const owedAmounts = expense.splits
-        .filter((s) => s.userId !== expense.paidBy)
         .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
     await (0, trip_service_1.decrementStopTotals)(trip._id.toString(), expense.stopId.toString(), expense.amountLocal, expense.amountBase, expense.paidBy, owedAmounts);
     await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
+    socket_server_1.socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
     await expense.deleteOne();
 };
 exports.deleteExpense = deleteExpense;

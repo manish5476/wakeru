@@ -40,7 +40,7 @@ router.get('/linked-accounts', user_controller_1.userController.getLinkedAccount
 // Stats
 router.get('/stats', user_controller_1.userController.getStats.bind(user_controller_1.userController));
 // Search
-router.get('/search', validation_middleware_1.ValidationMiddleware.validate(auth_validation_1.searchUsersSchema), user_controller_1.userController.searchUsers.bind(user_controller_1.userController));
+router.get('/search', validation_middleware_1.ValidationMiddleware.validateQuery(auth_validation_1.searchUsersSchema), user_controller_1.userController.searchUsers.bind(user_controller_1.userController));
 // Public profile (must be after /search to avoid conflict)
 router.get('/:userId', user_controller_1.userController.getPublicProfile.bind(user_controller_1.userController));
 // Admin

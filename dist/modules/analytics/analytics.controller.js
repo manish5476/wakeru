@@ -1,102 +1,55 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.analyticsController = exports.AnalyticsController = void 0;
+exports.analyticsController = void 0;
 const analytics_service_1 = require("./analytics.service");
-const AppError_1 = require("../../shared/errors/AppError");
-const joi_1 = __importDefault(require("joi"));
-const timeframeSchema = joi_1.default.string().valid('week', 'month', 'year').default('month');
-class AnalyticsController {
-    /**
-     * Get user analytics
-     */
+const getUser = (req) => {
+    const user = req.user;
+    if (!user?.userId)
+        throw new Error('Not authenticated');
+    return user.userId;
+};
+exports.analyticsController = {
+    async getQuickStats(req, res, next) {
+        try {
+            const userId = getUser(req);
+            const stats = await analytics_service_1.analyticsService.getQuickStats(userId);
+            res.status(200).json({ success: true, data: stats });
+        }
+        catch (err) {
+            next(err);
+        }
+    },
     async getUserAnalytics(req, res, next) {
         try {
-            const timeframe = req.query.timeframe || 'month';
-            const { error } = timeframeSchema.validate(timeframe);
-            if (error) {
-                throw new AppError_1.ValidationError('Invalid timeframe');
-            }
-            const analytics = await analytics_service_1.analyticsService.getUserAnalytics(req.user.userId, timeframe);
-            const response = {
-                success: true,
-                data: analytics,
-                timestamp: new Date().toISOString(),
-                message: ''
-            };
-            res.status(200).json(response);
+            const userId = getUser(req);
+            const data = await analytics_service_1.analyticsService.getUserAnalytics(userId, req.query);
+            res.status(200).json({ success: true, data });
         }
-        catch (error) {
-            next(error);
+        catch (err) {
+            next(err);
         }
-    }
-    /**
-     * Get trip analytics
-     */
+    },
     async getTripAnalytics(req, res, next) {
         try {
+            const userId = getUser(req);
             const { tripId } = req.params;
-            const timeframe = req.query.timeframe || 'month';
-            const analytics = await analytics_service_1.analyticsService.getTripAnalytics(tripId, req.user.userId, timeframe);
-            const response = {
-                success: true,
-                data: analytics,
-                timestamp: new Date().toISOString(),
-                message: ''
-            };
-            res.status(200).json(response);
+            const data = await analytics_service_1.analyticsService.getTripAnalytics(tripId, userId, req.query);
+            res.status(200).json({ success: true, data });
         }
-        catch (error) {
-            next(error);
+        catch (err) {
+            next(err);
         }
-    }
-    /**
-     * Get predictive analytics
-     */
-    async getPredictiveAnalytics(req, res, next) {
+    },
+    async getYearlySummary(req, res, next) {
         try {
-            const { tripId } = req.params;
-            const analytics = await analytics_service_1.analyticsService.getPredictiveAnalytics(req.user.userId, tripId);
-            const response = {
-                success: true,
-                data: analytics,
-                timestamp: new Date().toISOString(),
-                message: ''
-            };
-            res.status(200).json(response);
+            const userId = getUser(req);
+            const year = parseInt(req.params.year);
+            const data = await analytics_service_1.analyticsService.getYearlySummary(userId, year);
+            res.status(200).json({ success: true, data });
         }
-        catch (error) {
-            next(error);
+        catch (err) {
+            next(err);
         }
-    }
-    /**
-     * Get spending report
-     */
-    async getSpendingReport(req, res, next) {
-        try {
-            const { tripId } = req.params;
-            const timeframe = req.query.timeframe || 'month';
-            // This can generate PDF reports
-            const report = await analytics_service_1.analyticsService.getTripAnalytics(tripId, req.user.userId, timeframe);
-            const response = {
-                success: true,
-                data: {
-                    report,
-                    exportable: true,
-                    formats: ['json', 'csv', 'pdf']
-                },
-                timestamp: new Date().toISOString(),
-                message: ''
-            };
-            res.status(200).json(response);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
-}
-exports.AnalyticsController = AnalyticsController;
-exports.analyticsController = new AnalyticsController();
+    },
+};
 //# sourceMappingURL=analytics.controller.js.map

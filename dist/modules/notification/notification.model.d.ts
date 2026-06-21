@@ -1,5 +1,5 @@
 import mongoose, { Document } from 'mongoose';
-export type NotificationType = 'EXPENSE_ADDED' | 'EXPENSE_UPDATED' | 'EXPENSE_DELETED' | 'SETTLEMENT_REQUEST' | 'SETTLEMENT_COMPLETED' | 'TRIP_INVITATION' | 'TRIP_JOINED' | 'PAYMENT_REMINDER' | 'MONTHLY_REPORT' | 'STOP_ADDED' | 'EXCHANGE_RATE_UPDATED';
+export type NotificationType = 'EXPENSE_ADDED' | 'EXPENSE_UPDATED' | 'EXPENSE_DELETED' | 'SETTLEMENT_REQUEST' | 'SETTLEMENT_COMPLETED' | 'TRIP_INVITATION' | 'TRIP_JOINED' | 'PAYMENT_REMINDER' | 'MONTHLY_REPORT' | 'STOP_ADDED' | 'EXCHANGE_RATE_UPDATED' | 'FRIEND_REQUEST' | 'FRIEND_ACCEPTED';
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 export interface INotificationChannels {
     inApp: boolean;

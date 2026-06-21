@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -171,22 +204,39 @@ class OCRProcessor {
         }
     }
     /**
-     * Process with Tesseract.js (fallback)
+     * Process with Tesseract.js — Real OCR implementation
+     * Supports English + Devanagari (Hindi) for Indian receipts
      */
     async processWithTesseract(imagePath) {
         try {
-            logger_1.logger.info('Processing with Tesseract OCR');
-            // Tesseract.js processing
-            // const worker = await createWorker();
-            // const { data: { text, confidence } } = await worker.recognize(imagePath);
+            logger_1.logger.info('Processing with Tesseract OCR (real)');
+            // Dynamic import to avoid startup cost
+            const { createWorker } = await Promise.resolve().then(() => __importStar(require('tesseract.js')));
+            const worker = await createWorker(['eng'], 1, {
+                logger: (m) => {
+                    if (m.status === 'recognizing text') {
+                        logger_1.logger.debug(`OCR progress: ${Math.round(m.progress * 100)}%`);
+                    }
+                },
+            });
+            // Optimize for receipt text — PSM 6 = uniform block of text
+            await worker.setParameters({
+                tessedit_pageseg_mode: '6',
+                preserve_interword_spaces: '1',
+            });
+            const { data } = await worker.recognize(imagePath);
+            await worker.terminate();
+            const rawText = data.text;
+            const confidence = data.confidence / 100;
+            logger_1.logger.info(`Tesseract OCR complete. Confidence: ${(confidence * 100).toFixed(1)}%`);
             return {
                 success: true,
-                confidence: 0.75,
-                rawText: 'SIMULATED OCR TEXT - Replace with actual Tesseract processing',
+                confidence,
+                rawText,
                 extractedItems: [],
-                merchantName: 'Sample Merchant',
+                merchantName: undefined,
                 totalAmount: 0,
-                taxAmount: 0
+                taxAmount: 0,
             };
         }
         catch (error) {
@@ -195,7 +245,7 @@ class OCRProcessor {
             return {
                 success: false,
                 confidence: 0,
-                error: err.message
+                error: err.message,
             };
         }
     }
@@ -220,7 +270,38 @@ class OCRProcessor {
         ocrResult.currency = this.extractCurrency(lines);
         // Categorize items using ML/semantic analysis
         ocrResult.extractedItems = this.categorizeItems(ocrResult.extractedItems);
+        // Indian-specific: detect merchant type from name + keywords
+        const merchantCategory = this.categorizeIndianMerchant(ocrResult.merchantName || '', lines);
+        if (merchantCategory && ocrResult.extractedItems.length === 0) {
+            // Add the whole bill as a single line item with the detected category
+            ocrResult.extractedItems = [{
+                    name: ocrResult.merchantName || 'Purchase',
+                    category: merchantCategory,
+                    price: ocrResult.totalAmount || 0,
+                    quantity: 1,
+                    confidence: 0.7,
+                }];
+        }
         return ocrResult;
+    }
+    /**
+     * Auto-categorize Indian merchant based on name + receipt keywords
+     */
+    categorizeIndianMerchant(merchantName, lines) {
+        const allText = [merchantName, ...lines].join(' ').toLowerCase();
+        const MERCHANT_CATEGORIES = {
+            'food': ['restaurant', 'cafe', 'hotel', 'dhaba', 'canteen', 'biryani', 'swiggy', 'zomato', 'mcdonalds', 'kfc', 'dominos', 'pizza', 'chai', 'dine'],
+            'transport': ['uber', 'ola', 'rapido', 'taxi', 'cab', 'auto', 'rickshaw', 'bus', 'irctc', 'railway', 'metro', 'fuel', 'petrol', 'diesel', 'toll', 'parking'],
+            'stay': ['lodge', 'inn', 'resort', 'guest house', 'oyo', 'makemytrip', 'airbnb', 'rooms'],
+            'shopping': ['mart', 'store', 'bazaar', 'mall', 'amazon', 'flipkart', 'myntra', 'ajio', 'bigbasket', 'd-mart', 'hypermarket'],
+            'health': ['hospital', 'clinic', 'pharmacy', 'medical', 'diagnostic', 'apollo', 'fortis', 'medplus'],
+            'activity': ['museum', 'zoo', 'park', 'ticket', 'entry', 'show', 'cinema', 'pvr', 'inox', 'bookmyshow'],
+        };
+        for (const [category, keywords] of Object.entries(MERCHANT_CATEGORIES)) {
+            if (keywords.some(kw => allText.includes(kw)))
+                return category;
+        }
+        return null;
     }
     /**
      * Extract merchant name from OCR text
@@ -282,24 +363,33 @@ class OCRProcessor {
         return 0;
     }
     /**
-     * Extract tax amount
+     * Extract tax amount — supports Indian GST (CGST, SGST, IGST)
      */
     extractTaxAmount(lines) {
         const taxPatterns = [
-            /TAX\s*[:=]?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
+            /CGST\s*[:=@]?\s*\d*\.?\d*%?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
+            /SGST\s*[:=@]?\s*\d*\.?\d*%?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
+            /IGST\s*[:=@]?\s*\d*\.?\d*%?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
             /GST\s*[:=]?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
+            /TAX\s*[:=]?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
             /VAT\s*[:=]?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
             /Service\s*Tax\s*[:=]?\s*[$€£₹]?\s*(\d+[\.\,]\d{2})/i,
         ];
+        let totalTax = 0;
+        const taxFound = new Set();
         for (const line of lines) {
             for (const pattern of taxPatterns) {
                 const match = line.match(pattern);
                 if (match) {
-                    return parseFloat(match[1].replace(',', ''));
+                    const key = pattern.source.substring(0, 6);
+                    if (!taxFound.has(key)) {
+                        totalTax += parseFloat(match[1].replace(',', ''));
+                        taxFound.add(key);
+                    }
                 }
             }
         }
-        return 0;
+        return totalTax;
     }
     /**
      * Extract line items from receipt

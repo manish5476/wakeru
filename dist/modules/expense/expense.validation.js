@@ -79,6 +79,13 @@ exports.createExpenseSchema = zod_1.z.object({
     paidBy: firebaseUid,
     date: zod_1.z.coerce.date().default(() => new Date()),
     notes: zod_1.z.string().max(500).optional(),
+    location: zod_1.z
+        .object({
+        latitude: zod_1.z.number(),
+        longitude: zod_1.z.number(),
+        name: zod_1.z.string().optional(),
+    })
+        .optional(),
     split: exports.splitInputSchema,
 });
 // ============================================================
@@ -93,6 +100,13 @@ exports.updateExpenseSchema = zod_1.z.object({
     date: zod_1.z.coerce.date().optional(),
     amountLocal: zod_1.z.number().positive().optional(),
     paidBy: firebaseUid.optional(),
+    location: zod_1.z
+        .object({
+        latitude: zod_1.z.number(),
+        longitude: zod_1.z.number(),
+        name: zod_1.z.string().optional(),
+    })
+        .optional(),
     split: exports.splitInputSchema.optional(),
 });
 // ============================================================
