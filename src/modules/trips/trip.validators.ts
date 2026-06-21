@@ -138,7 +138,7 @@ export const createTripSchema = z.object({
     .max(1000, 'Description cannot exceed 1000 characters')
     .optional(),
 
-  coverImage: z.string().url('Cover image must be a valid URL').optional(),
+  coverImage: z.union([z.string().url('Cover image must be a valid URL'), z.literal('')]).optional(),
 
   startDate: z.coerce.date({ message: 'Start date is required' }),
   endDate: z.coerce.date({ message: 'End date is required' }),
@@ -166,7 +166,7 @@ export const createTripSchema = z.object({
 export const updateTripSchema = z.object({
   title: z.string().trim().min(1).max(150).optional(),
   description: z.string().max(1000).optional(),
-  coverImage: z.string().url().optional(),
+  coverImage: z.union([z.string().url(), z.literal('')]).optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   totalBudget: z.number().nonnegative().optional(),
