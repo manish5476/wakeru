@@ -160,6 +160,14 @@ class SocketServer {
     }
 
     /**
+     * Send to ALL connected clients
+     */
+    broadcastToAll(event: string, payload: any): void {
+        if (!this.io) return;
+        this.io.emit(event, payload);
+    }
+
+    /**
      * Send notification to all members of a trip.
      */
     sendToTrip(tripId: string, event: string, payload: any, excludeUserId?: string): void {

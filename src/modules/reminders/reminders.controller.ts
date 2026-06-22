@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { reminderService } from './reminder.service';
+import { notificationService } from '../notification/notification.service';
+import { socketServer } from '../../infrastructure/websocket/socket.server';
 
 const getUser = (req: Request) => {
     const user = (req as any).user;
@@ -53,4 +55,35 @@ export const remindersController = {
             res.status(200).json({ success: true, message: 'Reminder cancelled' });
         } catch (err) { next(err); }
     },
+
+    /** POST /api/v1/reminders/ping */
+    async pingUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = getUser(req);
+            const { targetUserId, amount, tripName, message, expenseTitle } = req.body;
+
+            // 1. Create a database notification for the target user
+            const dbNotification = await notificationService.create(
+                targetUserId,
+                'SYSTEM',
+                'Pending Settlement Reminder',
+                message || `You owe ₹${amount} for ${tripName}. Please settle soon.`,
+                { data: { senderId: userId, tripName, amount, expenseTitle } }
+            );
+
+            // 2. Send instant websocket push notification
+            socketServer.sendToUser(targetUserId, 'reminder:ping', {
+                notification: dbNotification,
+                senderId: userId,
+                amount,
+                tripName,
+                expenseTitle,
+                message: message || `You owe ₹${amount} for ${tripName}. Please settle soon.`
+            });
+
+            res.status(200).json({ success: true, message: 'Ping sent successfully' });
+        } catch (err) {
+            next(err);
+        }
+    }
 };

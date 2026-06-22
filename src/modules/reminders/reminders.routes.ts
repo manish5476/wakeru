@@ -10,6 +10,9 @@ router.use(protect);
 // Create reminder
 router.post('/', validate(createReminderSchema), remindersController.create);
 
+// Ping User
+router.post('/ping', remindersController.pingUser);
+
 // Get my reminders
 router.get('/', remindersController.getMyReminders);
 

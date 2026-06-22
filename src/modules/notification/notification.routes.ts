@@ -19,6 +19,9 @@ router.post('/read-all', notificationController.markAllAsRead.bind(notificationC
 // Mark single as read
 router.patch('/:notificationId/read', notificationController.markAsRead.bind(notificationController));
 
+// Admin Broadcast
+router.post('/admin/broadcast-update', notificationController.broadcastAppUpdate.bind(notificationController));
+
 // Delete notification
 router.delete('/:notificationId', notificationController.deleteNotification.bind(notificationController));
 

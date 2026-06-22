@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { notificationService } from './notification.service';
+import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { AppError } from '../../shared/errors/AppError';
 
 // ============================================================
@@ -85,6 +86,35 @@ export class NotificationController {
       res.status(200).json({
         success: true,
         message: 'Notification deleted',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async broadcastAppUpdate(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // Basic security check for testing
+      const { password, link } = req.body;
+      if (password !== 'msms5476mmmm') {
+        res.status(403).json({ success: false, message: 'Invalid admin password' });
+        return;
+      }
+      
+      if (!link) {
+        res.status(400).json({ success: false, message: 'Link is required' });
+        return;
+      }
+
+      socketServer.broadcastToAll('app:update_broadcast', {
+        type: 'APP_UPDATE',
+        link,
+        timestamp: new Date().toISOString(),
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'App update broadcasted successfully to all connected users.',
       });
     } catch (error) {
       next(error);
