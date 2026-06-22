@@ -69,7 +69,19 @@ router.patch(
 router.delete(
   '/:expenseId',
   validate(expenseParamSchema, 'params'),
-  expenseController.deleteExpense
+  expenseController.archiveExpense
+);
+
+router.post(
+  '/:expenseId/unarchive',
+  validate(expenseParamSchema, 'params'),
+  expenseController.unarchiveExpense
+);
+
+router.delete(
+  '/:expenseId/permanent',
+  validate(expenseParamSchema, 'params'),
+  expenseController.deleteExpensePermanent
 );
 
 // ============================================================

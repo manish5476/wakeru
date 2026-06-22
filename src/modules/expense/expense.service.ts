@@ -218,6 +218,10 @@ export const createExpense = async (
     throw new AppError('The specified payer is not an active member of this trip', 400);
   }
 
+  if (!trip.allowAnyPayer && input.paidBy !== adderUid) {
+    throw new AppError('Trip settings do not allow selecting other members as the payer', 403);
+  }
+
   // Compute base amount using CURRENT exchange rate (locked at creation time)
   const exchangeRateUsed = stop.currentExchangeRate;
   const amountBase = parseFloat(
@@ -295,6 +299,7 @@ export const getStopExpenses = async (
 ) => {
   const filter: FilterQuery<IExpense> = {
     stopId: new Types.ObjectId(stopId),
+    isArchived: query.isArchived === true,
   };
 
   if (query.category) filter.category = query.category;
@@ -339,6 +344,7 @@ export const getTripExpenses = async (
 ) => {
   const filter: FilterQuery<IExpense> = {
     tripId: new Types.ObjectId(tripId),
+    isArchived: query.isArchived === true,
   };
 
   if (query.category) filter.category = query.category;
@@ -381,7 +387,10 @@ export const getMyExpenses = async (
   userId: string,
   query: ExpenseListQuery
 ) => {
-  const filter: FilterQuery<IExpense> = { paidBy: userId };
+  const filter: FilterQuery<IExpense> = { 
+    paidBy: userId,
+    isArchived: query.isArchived === true,
+  };
 
   if (query.category) filter.category = query.category;
   if (query.isSettled !== undefined) filter.isSettled = query.isSettled;
@@ -487,6 +496,10 @@ export const updateExpense = async (
     const payer = trip.getMember(newPaidBy);
     if (!payer) throw new AppError('Payer is not an active trip member', 400);
 
+    if (!trip.allowAnyPayer && newPaidBy !== editorUid) {
+      throw new AppError('Trip settings do not allow selecting other members as the payer', 403);
+    }
+
     const newAmountBase = parseFloat(
       (newAmountLocal * expense.exchangeRateUsed).toFixed(2)
     );
@@ -563,10 +576,89 @@ export const updateExpense = async (
 // ============================================================
 
 /**
- * Delete an expense and reverse all cached totals.
- * Only the payer or a trip admin can delete.
+ * Soft delete an expense and reverse all cached totals.
  */
-export const deleteExpense = async (
+export const archiveExpense = async (
+  expenseId: string,
+  requestingUid: string
+): Promise<IExpense> => {
+  const expense = await Expense.findById(expenseId);
+  if (!expense) throw new AppError('Expense not found', 404);
+  if (expense.isArchived) return expense;
+
+  const trip = await Trip.findById(expense.tripId);
+  if (!trip) throw new AppError('Trip not found', 404);
+
+  const isPayerOrAdmin =
+    expense.paidBy === requestingUid || trip.isAdmin(requestingUid);
+  if (!isPayerOrAdmin) {
+    throw new AppError('Only the payer or a trip admin can archive this expense', 403);
+  }
+
+  const owedAmounts = expense.splits
+    .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
+
+  await decrementStopTotals(
+    trip._id.toString(),
+    expense.stopId.toString(),
+    expense.amountLocal,
+    expense.amountBase,
+    expense.paidBy,
+    owedAmounts
+  );
+  await markSettlementStale(trip._id.toString());
+
+  expense.isArchived = true;
+  await expense.save();
+
+  socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
+  return expense;
+};
+
+/**
+ * Unarchive an expense and restore all cached totals.
+ */
+export const unarchiveExpense = async (
+  expenseId: string,
+  requestingUid: string
+): Promise<IExpense> => {
+  const expense = await Expense.findById(expenseId);
+  if (!expense) throw new AppError('Expense not found', 404);
+  if (!expense.isArchived) return expense;
+
+  const trip = await Trip.findById(expense.tripId);
+  if (!trip) throw new AppError('Trip not found', 404);
+
+  const isPayerOrAdmin =
+    expense.paidBy === requestingUid || trip.isAdmin(requestingUid);
+  if (!isPayerOrAdmin) {
+    throw new AppError('Only the payer or a trip admin can unarchive this expense', 403);
+  }
+
+  const owedAmounts = expense.splits
+    .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
+
+  await incrementStopTotals(
+    trip._id.toString(),
+    expense.stopId.toString(),
+    expense.amountLocal,
+    expense.amountBase,
+    expense.paidBy,
+    owedAmounts
+  );
+  await markSettlementStale(trip._id.toString());
+
+  expense.isArchived = false;
+  await expense.save();
+
+  socketServer.notifyExpenseAdded(trip._id.toString(), expense, requestingUid);
+  return expense;
+};
+
+/**
+ * Permanently delete an expense.
+ */
+export const deleteExpensePermanent = async (
   expenseId: string,
   requestingUid: string
 ): Promise<void> => {
@@ -581,26 +673,27 @@ export const deleteExpense = async (
 
   if (!isPayerOrAdmin) {
     throw new AppError(
-      'Only the payer or a trip admin can delete this expense',
+      'Only the payer or a trip admin can delete this expense permanently',
       403
     );
   }
 
-  // Reverse cached totals before deletion
-  const owedAmounts = expense.splits
-    .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
+  if (!expense.isArchived) {
+    const owedAmounts = expense.splits
+      .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
 
-  await decrementStopTotals(
-    trip._id.toString(),
-    expense.stopId.toString(),
-    expense.amountLocal,
-    expense.amountBase,
-    expense.paidBy,
-    owedAmounts
-  );
-  await markSettlementStale(trip._id.toString());
+    await decrementStopTotals(
+      trip._id.toString(),
+      expense.stopId.toString(),
+      expense.amountLocal,
+      expense.amountBase,
+      expense.paidBy,
+      owedAmounts
+    );
+    await markSettlementStale(trip._id.toString());
+    socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
+  }
 
-  socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
   await expense.deleteOne();
 };
 
@@ -615,10 +708,15 @@ export const deleteExpense = async (
 export const markSplitPaid = async (
   expenseId: string,
   targetUserId: string,
+  requestingUid: string,
   paymentId?: string
 ): Promise<IExpense> => {
   const expense = await Expense.findById(expenseId);
   if (!expense) throw new AppError('Expense not found', 404);
+
+  if (expense.paidBy !== requestingUid) {
+    throw new AppError('Only the payer can mark this expense as paid', 403);
+  }
 
   const split = expense.splits.find((s) => s.userId === targetUserId);
   if (!split) throw new AppError('Split not found for this user', 404);

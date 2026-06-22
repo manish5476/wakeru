@@ -173,6 +173,8 @@ export const updateTripSchema = z.object({
   defaultSplitMethod: z
     .enum(['equal', 'percentage', 'exact', 'shares', 'personal'])
     .optional(),
+  allowAnyPayer: z.boolean().optional(),
+  allowOthersToArchiveTrip: z.boolean().optional(),
   status: z
     .enum(['planning', 'active', 'completed', 'archived'])
     .optional(),

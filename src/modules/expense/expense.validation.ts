@@ -154,6 +154,10 @@ export const expenseListQuerySchema = z.object({
     .enum(['true', 'false'])
     .transform((v) => v === 'true')
     .optional(),
+  isArchived: z
+    .enum(['true', 'false'])
+    .transform((v) => v === 'true')
+    .optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   sortBy: z.enum(['date', 'amountBase', 'amountLocal', 'createdAt']).default('date'),

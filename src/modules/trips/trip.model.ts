@@ -118,6 +118,8 @@ export interface ITrip extends Document {
 
   // Settings
   defaultSplitMethod: SplitMethod;
+  allowAnyPayer: boolean;
+  allowOthersToArchiveTrip: boolean;
   isArchived: boolean;
 
   // Timestamps (auto via mongoose)
@@ -320,6 +322,16 @@ const tripSchema = new Schema<ITrip>(
       type: String,
       enum: { values: SPLIT_METHODS, message: '{VALUE} is not a valid split method' },
       default: 'equal',
+    },
+
+    allowAnyPayer: {
+      type: Boolean,
+      default: true,
+    },
+    
+    allowOthersToArchiveTrip: {
+      type: Boolean,
+      default: false,
     },
 
     isArchived: {

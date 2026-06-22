@@ -85,6 +85,7 @@ export interface IExpense extends Document {
 
   // Status
   isSettled: boolean;
+  isArchived: boolean;
 
   // Audit
   addedBy: string;
@@ -222,6 +223,11 @@ const expenseSchema = new Schema<IExpense>(
 
     // Status
     isSettled: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    isArchived: {
       type: Boolean,
       default: false,
       index: true,

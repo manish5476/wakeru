@@ -70,6 +70,12 @@ router.post(
   tripController.joinTrip
 );
 
+/**
+ * GET /api/v1/trips/join-requests/all → Get all pending join requests for trips I admin
+ * Used on the home screen. Must be BEFORE /:tripId routes.
+ */
+router.get('/join-requests/all', tripController.getAdminJoinRequests);
+
 // ============================================================
 // TRIP COLLECTION ROUTES
 // ============================================================
@@ -96,7 +102,7 @@ router
   .route('/:tripId')
   .get(
     validate(tripIdParamSchema, 'params'),
-    loadTrip(),
+    loadTrip({ includeArchived: true }),
     requireMember,
     tripController.getTrip
   )
@@ -109,10 +115,26 @@ router
   )
   .delete(
     validate(tripIdParamSchema, 'params'),
-    loadTrip(),
-    requireAdmin,
+    loadTrip({ includeArchived: true }),
+    requireMember,
     tripController.archiveTrip
   );
+
+router.post(
+  '/:tripId/unarchive',
+  validate(tripIdParamSchema, 'params'),
+  loadTrip({ includeArchived: true }),
+  requireMember,
+  tripController.unarchiveTrip
+);
+
+router.delete(
+  '/:tripId/permanent',
+  validate(tripIdParamSchema, 'params'),
+  loadTrip({ includeArchived: true }),
+  requireMember,
+  tripController.deleteTripPermanent
+);
 
 /**
  * GET /api/v1/trips/:tripId/summary → Trip dashboard summary
@@ -120,7 +142,7 @@ router
 router.get(
   '/:tripId/summary',
   validate(tripIdParamSchema, 'params'),
-  loadTrip(),
+  loadTrip({ includeArchived: true }),
   requireMember,
   tripController.getTripSummary
 );
@@ -144,6 +166,28 @@ router.delete(
   loadTrip(),
   requireAdmin,
   tripController.revokeInviteCode
+);
+
+// ============================================================
+// JOIN REQUEST ROUTES
+// ============================================================
+
+router.get(
+  '/:tripId/join-requests',
+  validate(tripIdParamSchema, 'params'),
+  tripController.getPendingJoinRequests
+);
+
+router.post(
+  '/:tripId/join-requests/:requestId/approve',
+  validate(tripIdParamSchema, 'params'),
+  tripController.approveJoinRequest
+);
+
+router.post(
+  '/:tripId/join-requests/:requestId/reject',
+  validate(tripIdParamSchema, 'params'),
+  tripController.rejectJoinRequest
 );
 
 // ============================================================
@@ -202,7 +246,7 @@ router.patch(
 router.get(
   '/:tripId/members',
   validate(tripIdParamSchema, 'params'),
-  loadTrip(),
+  loadTrip({ includeArchived: true }),
   requireMember,
   tripController.getMembers
 );

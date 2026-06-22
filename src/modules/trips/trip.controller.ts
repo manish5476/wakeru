@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as tripService from './trip.service';
+import { invitationService } from './invitation.service';
 import { AppError } from '../../shared/errors/AppError';
 import {
   CreateTripInput,
@@ -183,12 +184,59 @@ export const archiveTrip = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const user = getUser(req);
     const trip = getTripFromReq(req);
-    await tripService.archiveTrip(trip);
+    await tripService.archiveTrip(trip, user.uid);
 
     res.status(200).json({
       success: true,
       message: 'Trip archived successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/trips/:tripId/unarchive
+ * Unarchive a trip. Admin only.
+ */
+export const unarchiveTrip = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const trip = getTripFromReq(req);
+    await tripService.unarchiveTrip(trip, user.uid);
+
+    res.status(200).json({
+      success: true,
+      message: 'Trip unarchived successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * DELETE /api/v1/trips/:tripId/permanent
+ * Permanently delete a trip and all its expenses. Admin only.
+ */
+export const deleteTripPermanent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const trip = getTripFromReq(req);
+    await tripService.deleteTripPermanent(trip, user.uid);
+
+    res.status(200).json({
+      success: true,
+      message: 'Trip permanently deleted',
     });
   } catch (err) {
     next(err);
@@ -476,11 +524,18 @@ export const addMember = async (
     const trip = getTripFromReq(req);
     const { userId: targetUserId, role } = req.body;
 
-    await tripService.addMember(trip, targetUserId, role || 'member');
+    // Send an invitation instead of adding directly
+    const invitation = await invitationService.sendInvitation(
+      trip._id.toString(),
+      targetUserId,
+      user.uid,
+      `You have been invited to join ${trip.title} as a ${role || 'member'}`
+    );
 
     res.status(200).json({
       success: true,
-      message: 'Member added successfully',
+      message: 'Invitation sent successfully',
+      data: { invitation },
     });
   } catch (err) {
     next(err);
@@ -500,7 +555,7 @@ export const joinTrip = async (
     const user = getUser(req);
     const { inviteCode } = req.params;
 
-    const trip = await tripService.joinTripByInviteCode(inviteCode, {
+    const joinRequest = await tripService.joinTripByInviteCode(inviteCode, {
       uid: user.uid,
       displayName: user.displayName,
       photoURL: user.photoURL,
@@ -508,8 +563,8 @@ export const joinTrip = async (
 
     res.status(200).json({
       success: true,
-      message: 'Joined trip successfully',
-      data: { trip },
+      message: 'Join request sent successfully',
+      data: { joinRequest },
     });
   } catch (err) {
     next(err);
@@ -521,6 +576,106 @@ export const joinTrip = async (
  * Generate a new invite code. Admin only.
  * Middleware: loadTrip, requireAdmin
  */
+// ─────────────────────────────────────────────────────────────────────────────
+// JOIN REQUEST CONTROLLERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/v1/trips/:tripId/join-requests
+ * Get all pending join requests for a trip. Admin only.
+ */
+export const getPendingJoinRequests = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+
+    const requests = await tripService.getPendingRequests(tripId, user.uid);
+
+    res.status(200).json({
+      success: true,
+      data: { requests, count: requests.length },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/trips/:tripId/join-requests/:requestId/approve
+ * Approve a join request. Admin only.
+ */
+export const approveJoinRequest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { requestId } = req.params;
+
+    const trip = await tripService.approveJoinRequest(requestId, user.uid);
+
+    res.status(200).json({
+      success: true,
+      message: 'Join request approved. Member added to trip.',
+      data: { trip },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/trips/:tripId/join-requests/:requestId/reject
+ * Reject a join request. Admin only.
+ */
+export const rejectJoinRequest = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { requestId } = req.params;
+
+    await tripService.rejectJoinRequest(requestId, user.uid);
+
+    res.status(200).json({
+      success: true,
+      message: 'Join request rejected.',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/trips/join-requests/all
+ * Get ALL pending join requests across all trips the current user admins.
+ * Used on the home screen dashboard.
+ */
+export const getAdminJoinRequests = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const requests = await tripService.getAdminPendingRequests(user.uid);
+
+    res.status(200).json({
+      success: true,
+      data: { requests, count: requests.length },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const generateInviteCode = async (
   req: Request,
   res: Response,
@@ -683,3 +838,4 @@ export const createTripFromTemplate = async (
     next(err);
   }
 };
+

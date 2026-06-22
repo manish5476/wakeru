@@ -194,9 +194,9 @@ export const updateExpense = async (
 
 /**
  * DELETE /api/v1/expenses/:expenseId
- * Delete expense + reverse all cached totals.
+ * Archive expense + reverse all cached totals.
  */
-export const deleteExpense = async (
+export const archiveExpense = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -205,11 +205,59 @@ export const deleteExpense = async (
     const user = getUser(req);
     const { expenseId } = req.params;
 
-    await expenseService.deleteExpense(expenseId, user.uid);
+    await expenseService.archiveExpense(expenseId, user.uid);
 
     res.status(200).json({
       success: true,
-      message: 'Expense deleted and totals updated',
+      message: 'Expense archived and totals updated',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/expenses/:expenseId/unarchive
+ * Unarchive expense + restore cached totals.
+ */
+export const unarchiveExpense = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { expenseId } = req.params;
+
+    await expenseService.unarchiveExpense(expenseId, user.uid);
+
+    res.status(200).json({
+      success: true,
+      message: 'Expense unarchived and totals restored',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * DELETE /api/v1/expenses/:expenseId/permanent
+ * Permanently delete expense.
+ */
+export const deleteExpensePermanent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { expenseId } = req.params;
+
+    await expenseService.deleteExpensePermanent(expenseId, user.uid);
+
+    res.status(200).json({
+      success: true,
+      message: 'Expense deleted permanently',
     });
   } catch (err) {
     next(err);
@@ -230,12 +278,14 @@ export const markSplitPaid = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const user = getUser(req);
     const { expenseId, userId } = req.params;
     const { paymentId } = req.body;
 
     const expense = await expenseService.markSplitPaid(
       expenseId,
       userId,
+      user.uid,
       paymentId
     );
 

@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { Types } from 'mongoose';
 import { Trip, ITrip, IStop, ITripMember } from './trip.model';
 import { User } from '../auth/auth.model';
+import { JoinRequest, IJoinRequest } from './join_request.model';
+import { invitationService } from './invitation.service';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 
 import {
@@ -184,26 +186,28 @@ export const createTrip = async (
     totalSpentBase: 0,
   });
 
-  // ✅ NEW: Handle initial members
+  // ✅ NEW: Handle initial members — send invitations instead of directly adding
   if (input.memberIds && input.memberIds.length > 0) {
+    await trip.save(); // Must save trip first so it has an _id for the invitation
+
     const users = await User.find({
       _id: { $in: input.memberIds },
       isActive: true,
       isDeleted: false,
     });
-    
+
     for (const u of users) {
-      if (u._id !== creator.uid) {
-        trip.members.push({
-          userId: u._id,
-          displayName: u.displayName,
-          photoURL: u.photoURL,
-          role: 'member',
-          joinedAt: new Date(),
-          isActive: true,
-          totalPaidBase: 0,
-          totalOwesBase: 0,
-        });
+      if ((u._id as string) !== creator.uid) {
+        try {
+          await invitationService.sendInvitation(
+            trip._id.toString(),
+            u._id.toString(),
+            creator.uid,
+            `${creator.displayName} invited you to join ${trip.title}`
+          );
+        } catch (e) {
+          // Ignore duplicate invitation errors silently
+        }
       }
     }
   }
@@ -266,7 +270,7 @@ export const getTripById = async (
   tripId: string,
   userId: string
 ): Promise<ITrip> => {
-  const trip = await Trip.findOne({ _id: tripId, isArchived: false });
+  const trip = await Trip.findOne({ _id: tripId });
 
   if (!trip) {
     throw new AppError('Trip not found', 404);
@@ -312,11 +316,33 @@ export const updateTrip = async (
  * Soft-archive a trip. Data is preserved.
  * Only admins can archive.
  */
-export const archiveTrip = async (trip: ITrip): Promise<ITrip> => {
+export const archiveTrip = async (trip: ITrip, userId: string): Promise<ITrip> => {
+  if (!trip.allowOthersToArchiveTrip && trip.createdBy !== userId) {
+    throw new AppError('Only the trip creator can archive this trip', 403);
+  }
   trip.isArchived = true;
   trip.status = 'archived';
   await trip.save();
   return trip;
+};
+
+export const unarchiveTrip = async (trip: ITrip, userId: string): Promise<ITrip> => {
+  if (!trip.allowOthersToArchiveTrip && trip.createdBy !== userId) {
+    throw new AppError('Only the trip creator can unarchive this trip', 403);
+  }
+  trip.isArchived = false;
+  trip.status = 'active'; // Reset to active when unarchived
+  await trip.save();
+  return trip;
+};
+
+export const deleteTripPermanent = async (trip: ITrip, userId: string): Promise<void> => {
+  if (!trip.allowOthersToArchiveTrip && trip.createdBy !== userId) {
+    throw new AppError('Only the trip creator can delete this trip', 403);
+  }
+  const { Expense } = await import('../expense/expense.model');
+  await Expense.deleteMany({ tripId: trip._id });
+  await Trip.deleteOne({ _id: trip._id });
 };
 
 /**
@@ -597,7 +623,7 @@ export const deleteStop = async (
 export const joinTripByInviteCode = async (
   inviteCode: string,
   joiner: UserInfo
-): Promise<ITrip> => {
+): Promise<IJoinRequest> => {
   const trip = await Trip.findOne({
     inviteCode: inviteCode.toUpperCase(),
     isArchived: false,
@@ -617,21 +643,112 @@ export const joinTripByInviteCode = async (
     throw new AppError('You are already a member of this trip', 409);
   }
 
-  // Check if previously left — reactivate instead of duplicating
+  // Create a join request instead of adding them immediately
+  const existingRequest = await JoinRequest.findOne({ tripId: trip._id, userId: joiner.uid });
+  if (existingRequest && existingRequest.status === 'pending') {
+    throw new AppError('You already have a pending join request for this trip', 409);
+  }
+
+  const joinRequest = new JoinRequest({
+    tripId: trip._id,
+    tripTitle: trip.title,
+    userId: joiner.uid,
+    userName: joiner.displayName,
+    photoURL: joiner.photoURL,
+    status: 'pending',
+  });
+
+  await joinRequest.save();
+
+  // Notify admins
+  const admins = trip.members.filter((m) => m.role === 'admin' && m.isActive);
+  admins.forEach((admin) => {
+    socketServer.sendToUser(admin.userId, 'trip:join_request', {
+      type: 'TRIP_JOIN_REQUEST',
+      title: 'New Join Request',
+      message: `${joiner.displayName} wants to join ${trip.title}`,
+      tripId: trip._id.toString(),
+      requestId: joinRequest._id.toString(),
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  return joinRequest;
+};
+
+/**
+ * Get all pending join requests for a trip (admin only).
+ */
+export const getPendingRequests = async (
+  tripId: string,
+  requestingUserId: string
+): Promise<IJoinRequest[]> => {
+  const trip = await getTripById(tripId, requestingUserId);
+  if (!trip.isAdmin(requestingUserId)) {
+    throw new AppError('Only admins can view join requests', 403);
+  }
+
+  return JoinRequest.find({ tripId: trip._id, status: 'pending' }).sort({ createdAt: -1 });
+};
+
+/**
+ * Get ALL pending join requests across all trips the requesting user admins.
+ * Used on the home screen to surface requests needing attention.
+ */
+export const getAdminPendingRequests = async (
+  adminUserId: string
+): Promise<IJoinRequest[]> => {
+  // Find all trips where the user is an active admin
+  const adminTrips = await Trip.find({
+    members: {
+      $elemMatch: { userId: adminUserId, role: 'admin', isActive: true },
+    },
+    isArchived: false,
+  }).select('_id');
+
+  const tripIds = adminTrips.map((t) => t._id);
+  if (tripIds.length === 0) return [];
+
+  return JoinRequest.find({ tripId: { $in: tripIds }, status: 'pending' }).sort({ createdAt: -1 });
+};
+
+/**
+ * Approve a join request.
+ */
+export const approveJoinRequest = async (
+  requestId: string,
+  requestingUserId: string
+): Promise<ITrip> => {
+  const joinRequest = await JoinRequest.findById(requestId);
+  if (!joinRequest) throw new AppError('Join request not found', 404);
+  if (joinRequest.status !== 'pending') throw new AppError(`Request already ${joinRequest.status}`, 400);
+
+  const trip = await getTripById(joinRequest.tripId.toString(), requestingUserId);
+  if (!trip.isAdmin(requestingUserId)) {
+    throw new AppError('Only admins can approve join requests', 403);
+  }
+
+  // Update request status
+  joinRequest.status = 'approved';
+  joinRequest.respondedAt = new Date();
+  joinRequest.respondedBy = requestingUserId;
+  await joinRequest.save();
+
+  // Add the member
   const existingMember = trip.members.find(
-    (m) => m.userId === joiner.uid && !m.isActive
+    (m) => m.userId === joinRequest.userId && !m.isActive
   );
 
   if (existingMember) {
     existingMember.isActive = true;
-    existingMember.displayName = joiner.displayName;
-    existingMember.photoURL = joiner.photoURL;
+    existingMember.displayName = joinRequest.userName;
+    existingMember.photoURL = joinRequest.photoURL;
     existingMember.joinedAt = new Date();
   } else {
     trip.members.push({
-      userId: joiner.uid,
-      displayName: joiner.displayName,
-      photoURL: joiner.photoURL,
+      userId: joinRequest.userId,
+      displayName: joinRequest.userName,
+      photoURL: joinRequest.photoURL,
       role: 'member',
       joinedAt: new Date(),
       isActive: true,
@@ -641,7 +758,57 @@ export const joinTripByInviteCode = async (
   }
 
   await trip.save();
+
+  // Notify the approved user
+  socketServer.sendToUser(joinRequest.userId, 'trip:join_approved', {
+    type: 'TRIP_JOIN_APPROVED',
+    title: 'Join Request Approved',
+    message: `Your request to join ${trip.title} has been approved!`,
+    tripId: trip._id.toString(),
+    timestamp: new Date().toISOString(),
+  });
+
+  // Notify other members in the trip
+  socketServer.sendToTrip(trip._id.toString(), 'trip:member_joined', {
+    type: 'MEMBER_ADDED',
+    tripId: trip._id.toString(),
+    joinerName: joinRequest.userName,
+    message: `${joinRequest.userName} joined the trip!`,
+    timestamp: new Date().toISOString(),
+  });
+
   return trip;
+};
+
+/**
+ * Reject a join request.
+ */
+export const rejectJoinRequest = async (
+  requestId: string,
+  requestingUserId: string
+): Promise<void> => {
+  const joinRequest = await JoinRequest.findById(requestId);
+  if (!joinRequest) throw new AppError('Join request not found', 404);
+  if (joinRequest.status !== 'pending') throw new AppError(`Request already ${joinRequest.status}`, 400);
+
+  const trip = await getTripById(joinRequest.tripId.toString(), requestingUserId);
+  if (!trip.isAdmin(requestingUserId)) {
+    throw new AppError('Only admins can reject join requests', 403);
+  }
+
+  joinRequest.status = 'rejected';
+  joinRequest.respondedAt = new Date();
+  joinRequest.respondedBy = requestingUserId;
+  await joinRequest.save();
+
+  // Notify the rejected user
+  socketServer.sendToUser(joinRequest.userId, 'trip:join_rejected', {
+    type: 'TRIP_JOIN_REJECTED',
+    title: 'Join Request Rejected',
+    message: `Your request to join ${trip.title} was declined.`,
+    tripId: trip._id.toString(),
+    timestamp: new Date().toISOString(),
+  });
 };
 
 /**
@@ -885,6 +1052,8 @@ export const decrementStopTotals = async (
     );
   }
 };
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PRIVATE HELPERS
