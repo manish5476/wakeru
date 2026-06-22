@@ -919,22 +919,32 @@ export const removeMember = async (
     throw new AppError('Member not found or already inactive', 404);
   }
 
-  // Cannot remove the last admin
-  if (member.role === 'admin') {
-    const adminCount = trip.members.filter(
-      (m) => m.isActive && m.role === 'admin'
-    ).length;
+    // Cannot remove the last admin
+    if (member.role === 'admin') {
+        const adminCount = trip.members.filter(
+            (m) => m.isActive && m.role === 'admin'
+        ).length;
 
-    if (adminCount <= 1) {
-      throw new AppError(
-        'Cannot remove the last admin. Transfer admin role first.',
-        400
-      );
+        if (adminCount <= 1) {
+            throw new AppError(
+                'Cannot remove the last admin. Transfer admin role first.',
+                400
+            );
+        }
     }
-  }
 
-  member.isActive = false;
-  await trip.save();
+    if (member.totalPaidBase === 0 && member.totalOwesBase === 0) {
+        // Hard Removal: No financial history, so completely delete them from the members array
+        // @ts-ignore - mongoose array method
+        trip.members.pull({ _id: member._id });
+    } else {
+        // Soft Deactivation: They have financial history, so we must keep them for historical splits
+        member.isActive = false;
+        // Also demote to viewer to be safe
+        member.role = 'viewer';
+    }
+
+    await trip.save();
   return trip;
 };
 
