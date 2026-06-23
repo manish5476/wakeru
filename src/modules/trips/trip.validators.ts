@@ -157,6 +157,7 @@ export const createTripSchema = z.object({
   memberIds: z.array(mongoId).optional(),
   initialStop: createStopSchema.optional(),
   allowAnyPayer: z.boolean().optional(),
+  status: z.enum(['planning', 'active', 'completed', 'archived']).optional(),
 }).refine(
   (data) => data.endDate >= data.startDate,
   { message: 'End date must be on or after start date', path: ['endDate'] }

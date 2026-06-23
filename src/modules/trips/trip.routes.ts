@@ -277,6 +277,10 @@ router.delete(
   tripController.removeMember
 );
 
+import travelPlanRoutes from './travelPlan.routes';
+
+router.use('/:tripId/plan', travelPlanRoutes);
+
 export default router;
 
 // import { Router, Request, Response, NextFunction } from 'express';

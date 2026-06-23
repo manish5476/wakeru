@@ -96,6 +96,7 @@ export const dashboardService = {
 
         // Group expenses by person (who you owe)
         const oweMap: Record<string, { userId: string; name: string; amount: number; expenses: any[] }> = {};
+        let dynamicTotalOwed = 0;
         youOweExpenses.forEach((exp: any) => {
             const mySplit = exp.splits?.find((s: any) => s.userId === userId);
             if (mySplit && !mySplit.isPaid) {
@@ -103,6 +104,7 @@ export const dashboardService = {
                     oweMap[exp.paidBy] = { userId: exp.paidBy, name: exp.paidByName, amount: 0, expenses: [] };
                 }
                 oweMap[exp.paidBy].amount += mySplit.amountBase;
+                dynamicTotalOwed += mySplit.amountBase;
                 oweMap[exp.paidBy].expenses.push({
                     expenseId: exp._id,
                     title: exp.title,
@@ -117,6 +119,7 @@ export const dashboardService = {
 
         // Group expenses by person (who owes you)
         const owedMap: Record<string, { userId: string; name: string; amount: number; expenses: any[] }> = {};
+        let dynamicTotalLent = 0;
         youAreOwedExpenses.forEach((exp: any) => {
             exp.splits?.forEach((s: any) => {
                 if (!s.isPaid && s.userId !== userId) {
@@ -124,6 +127,7 @@ export const dashboardService = {
                         owedMap[s.userId] = { userId: s.userId, name: s.displayName, amount: 0, expenses: [] };
                     }
                     owedMap[s.userId].amount += s.amountBase;
+                    dynamicTotalLent += s.amountBase;
                     owedMap[s.userId].expenses.push({
                         expenseId: exp._id,
                         title: exp.title,
@@ -153,9 +157,9 @@ export const dashboardService = {
                 pendingSettlements,
             },
             balances: {
-                totalLent: userBalances?.totalLentAcrossTrips || 0,
-                totalOwed: userBalances?.totalOwedAcrossTrips || 0,
-                netBalance: (userBalances?.totalLentAcrossTrips || 0) - (userBalances?.totalOwedAcrossTrips || 0),
+                totalLent: dynamicTotalLent,
+                totalOwed: dynamicTotalOwed,
+                netBalance: dynamicTotalLent - dynamicTotalOwed,
             },
             categories: categoryBreakdown.map((c: any) => ({
                 category: c._id,

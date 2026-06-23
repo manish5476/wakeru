@@ -4,7 +4,6 @@ exports.analyticsService = void 0;
 const mongoose_1 = require("mongoose");
 const expense_model_1 = require("../expense/expense.model");
 const trip_model_1 = require("../trips/trip.model");
-const auth_model_1 = require("../auth/auth.model");
 const AppError_1 = require("../../shared/errors/AppError");
 const analytics_types_1 = require("./analytics.types");
 // ============================================================
@@ -51,7 +50,7 @@ exports.analyticsService = {
         lastWeekStart.setDate(lastWeekStart.getDate() - 7);
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const userFilter = { $or: [{ paidBy: userId }, { 'splits.userId': userId }] };
-        const [thisMonth, lastMonth, thisWeek, lastWeek, today, activeTrips, pendingSettlements, topCategory, topTrip, recentExpenses, spendingTrend,] = await Promise.all([
+        const [thisMonth, lastMonth, thisWeek, lastWeek, today, activeTrips, pendingSettlements, topCategory, topTrip, recentExpenses, spendingTrend, totalOwedAgg, totalLentAgg] = await Promise.all([
             expense_model_1.Expense.aggregate([{ $match: { ...userFilter, date: { $gte: thisMonthStart } } }, { $group: { _id: null, total: { $sum: '$amountBase' }, count: { $sum: 1 } } }]),
             expense_model_1.Expense.aggregate([{ $match: { ...userFilter, date: { $gte: lastMonthStart, $lt: thisMonthStart } } }, { $group: { _id: null, total: { $sum: '$amountBase' }, count: { $sum: 1 } } }]),
             expense_model_1.Expense.aggregate([{ $match: { ...userFilter, date: { $gte: thisWeekStart } } }, { $group: { _id: null, total: { $sum: '$amountBase' }, count: { $sum: 1 } } }]),
@@ -63,13 +62,25 @@ exports.analyticsService = {
             expense_model_1.Expense.aggregate([{ $match: { ...userFilter, date: { $gte: thisMonthStart } } }, { $group: { _id: '$tripId', total: { $sum: '$amountBase' } } }, { $sort: { total: -1 } }, { $limit: 1 }, { $lookup: { from: 'trips', localField: '_id', foreignField: '_id', as: 'trip' } }, { $unwind: { path: '$trip', preserveNullAndEmptyArrays: true } }, { $project: { tripId: '$_id', tripTitle: { $ifNull: ['$trip.title', 'Unknown'] }, total: 1 } }]),
             expense_model_1.Expense.find(userFilter).sort({ date: -1 }).limit(5).select('title amountBase amountLocal localCurrency date category paidByName').lean(),
             expense_model_1.Expense.aggregate([{ $match: { ...userFilter, date: { $gte: new Date(Date.now() - 7 * 86400000) } } }, { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }, amount: { $sum: '$amountBase' }, count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
+            expense_model_1.Expense.aggregate([
+                { $match: { paidBy: { $ne: userId }, 'splits.userId': userId, 'splits.isPaid': false } },
+                { $unwind: '$splits' },
+                { $match: { 'splits.userId': userId, 'splits.isPaid': false } },
+                { $group: { _id: null, total: { $sum: '$splits.amountBase' } } }
+            ]),
+            expense_model_1.Expense.aggregate([
+                { $match: { paidBy: userId, 'splits.userId': { $ne: userId }, 'splits.isPaid': false } },
+                { $unwind: '$splits' },
+                { $match: { 'splits.userId': { $ne: userId }, 'splits.isPaid': false } },
+                { $group: { _id: null, total: { $sum: '$splits.amountBase' } } }
+            ])
         ]);
-        // Get user balances
-        const user = await auth_model_1.User.findById(userId).select('totalLentAcrossTrips totalOwedAcrossTrips').lean();
         const thisMonthTotal = thisMonth[0]?.total || 0;
         const lastMonthTotal = lastMonth[0]?.total || 0;
         const thisWeekTotal = thisWeek[0]?.total || 0;
         const lastWeekTotal = lastWeek[0]?.total || 0;
+        const dynamicTotalOwed = totalOwedAgg[0]?.total || 0;
+        const dynamicTotalLent = totalLentAgg[0]?.total || 0;
         return {
             thisMonth: { total: thisMonthTotal, count: thisMonth[0]?.count || 0 },
             lastMonth: { total: lastMonthTotal, count: lastMonth[0]?.count || 0 },
@@ -79,9 +90,9 @@ exports.analyticsService = {
             weeklyChange: lastWeekTotal > 0 ? parseFloat((((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100).toFixed(1)) : thisWeekTotal > 0 ? 100 : 0,
             activeTrips,
             pendingSettlements,
-            totalLent: user?.totalLentAcrossTrips || 0,
-            totalOwed: user?.totalOwedAcrossTrips || 0,
-            netBalance: (user?.totalLentAcrossTrips || 0) - (user?.totalOwedAcrossTrips || 0),
+            totalLent: dynamicTotalLent,
+            totalOwed: dynamicTotalOwed,
+            netBalance: dynamicTotalLent - dynamicTotalOwed,
             topCategory: topCategory[0] ? { category: topCategory[0]._id, total: topCategory[0].total } : null,
             topTrip: topTrip[0] ? { tripId: topTrip[0].tripId.toString(), tripTitle: topTrip[0].tripTitle, total: topTrip[0].total } : null,
             recentExpenses: recentExpenses.map((e) => ({
