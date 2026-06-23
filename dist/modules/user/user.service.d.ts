@@ -31,7 +31,7 @@ export declare class UserService {
      */
     uploadProfilePicture(userId: string, file: Express.Multer.File): Promise<string>;
     /**
-     * Delete account (soft delete)
+     * Delete account (soft delete and remove from Firebase)
      */
     deleteAccount(userId: string): Promise<void>;
     /**

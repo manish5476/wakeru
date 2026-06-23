@@ -66,12 +66,16 @@ export const dashboardService = {
             Expense.find({
                 paidBy: { $ne: userId },
                 splits: { $elemMatch: { userId: userId, isPaid: false } },
-            }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId').lean(),
+            }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId')
+              .populate('tripId', 'title')
+              .lean(),
             // Expenses where user IS OWED money: user paid, and at least one other person's split is unpaid
             Expense.find({
                 paidBy: userId,
                 splits: { $elemMatch: { userId: { $ne: userId }, isPaid: false } },
-            }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId').lean(),
+            }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId')
+              .populate('tripId', 'title')
+              .lean(),
             // Active trips
             Trip.countDocuments({ 'members.userId': userId, 'members.isActive': true, status: { $in: ['active', 'planning'] }, isArchived: false }),
             // Pending settlements
@@ -105,7 +109,8 @@ export const dashboardService = {
                     amount: mySplit.amountBase,
                     category: exp.category,
                     date: exp.date,
-                    tripId: exp.tripId,
+                    tripId: exp.tripId?._id || exp.tripId,
+                    tripTitle: exp.tripId?.title || 'Unknown Trip',
                 });
             }
         });
@@ -125,7 +130,8 @@ export const dashboardService = {
                         amount: s.amountBase,
                         category: exp.category,
                         date: exp.date,
-                        tripId: exp.tripId,
+                        tripId: exp.tripId?._id || exp.tripId,
+                        tripTitle: exp.tripId?.title || 'Unknown Trip',
                     });
                 }
             });

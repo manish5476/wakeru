@@ -87,6 +87,10 @@ export declare class NotificationService {
      * Notify user about payment reminder.
      */
     notifyPaymentReminder(fromUid: string, toUid: string, amount: number, baseCurrency: string, tripId: string): Promise<void>;
+    /**
+     * Broadcast an app update / system notification to all active users.
+     */
+    broadcastSystemUpdate(link: string): Promise<void>;
     private sendThroughChannels;
     private sendPush;
     private sendEmail;

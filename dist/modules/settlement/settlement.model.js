@@ -67,6 +67,8 @@ const settlementSchema = new mongoose_1.Schema({
 // ============================================================
 settlementSchema.virtual('totalAmount').get(function () {
     return this.transactions.reduce((sum, t) => sum + t.amountBase, 0);
+});
+settlementSchema.virtual('pendingCount').get(function () {
     return this.transactions.filter((t) => t.status === 'pending').length;
 });
 settlementSchema.virtual('confirmedCount').get(function () {

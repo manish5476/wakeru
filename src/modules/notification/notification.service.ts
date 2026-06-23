@@ -345,6 +345,32 @@ export class NotificationService {
     );
   }
 
+  /**
+   * Broadcast an app update / system notification to all active users.
+   */
+  async broadcastSystemUpdate(link: string): Promise<void> {
+    const activeUsers = await User.find({ isActive: true, isDeleted: false }).select('_id').lean();
+    if (!activeUsers.length) return;
+
+    const notifications = activeUsers.map((u) => ({
+      userId: u._id.toString(),
+      type: 'SYSTEM_UPDATE',
+      title: '🚀 New Update Available!',
+      message: 'A new version of the app has been released. Please download it now for the best experience.',
+      isActionable: true,
+      actionUrl: link,
+      priority: 'high',
+      channels: {
+        inApp: true,
+        email: false,
+        push: false,
+        sms: false,
+      },
+    }));
+
+    await Notification.insertMany(notifications);
+  }
+
   // ============================================================
   // CHANNEL DELIVERY (Placeholders)
   // ============================================================

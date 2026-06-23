@@ -112,6 +112,9 @@ export class NotificationController {
         timestamp: new Date().toISOString(),
       });
 
+      // Also persist it for all active users
+      await notificationService.broadcastSystemUpdate(link);
+
       res.status(200).json({
         success: true,
         message: 'App update broadcasted successfully to all connected users.',

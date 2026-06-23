@@ -123,6 +123,10 @@ exports.expenseListQuerySchema = zod_1.z.object({
         .enum(['true', 'false'])
         .transform((v) => v === 'true')
         .optional(),
+    isArchived: zod_1.z
+        .enum(['true', 'false'])
+        .transform((v) => v === 'true')
+        .optional(),
     startDate: zod_1.z.coerce.date().optional(),
     endDate: zod_1.z.coerce.date().optional(),
     sortBy: zod_1.z.enum(['date', 'amountBase', 'amountLocal', 'createdAt']).default('date'),

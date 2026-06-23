@@ -128,6 +128,11 @@ const expenseSchema = new mongoose_1.Schema({
         default: false,
         index: true,
     },
+    isArchived: {
+        type: Boolean,
+        default: false,
+        index: true,
+    },
     // Audit
     addedBy: { type: String, required: true },
     editedBy: { type: String },

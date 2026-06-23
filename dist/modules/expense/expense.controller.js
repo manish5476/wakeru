@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.markSplitPaid = exports.deleteExpense = exports.updateExpense = exports.getExpense = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = void 0;
+exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getExpense = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = void 0;
 const expenseService = __importStar(require("./expense.service"));
 const AppError_1 = require("../../shared/errors/AppError");
 // ============================================================
@@ -180,23 +180,61 @@ exports.updateExpense = updateExpense;
 // ============================================================
 /**
  * DELETE /api/v1/expenses/:expenseId
- * Delete expense + reverse all cached totals.
+ * Archive expense + reverse all cached totals.
  */
-const deleteExpense = async (req, res, next) => {
+const archiveExpense = async (req, res, next) => {
     try {
         const user = getUser(req);
         const { expenseId } = req.params;
-        await expenseService.deleteExpense(expenseId, user.uid);
+        await expenseService.archiveExpense(expenseId, user.uid);
         res.status(200).json({
             success: true,
-            message: 'Expense deleted and totals updated',
+            message: 'Expense archived and totals updated',
         });
     }
     catch (err) {
         next(err);
     }
 };
-exports.deleteExpense = deleteExpense;
+exports.archiveExpense = archiveExpense;
+/**
+ * POST /api/v1/expenses/:expenseId/unarchive
+ * Unarchive expense + restore cached totals.
+ */
+const unarchiveExpense = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { expenseId } = req.params;
+        await expenseService.unarchiveExpense(expenseId, user.uid);
+        res.status(200).json({
+            success: true,
+            message: 'Expense unarchived and totals restored',
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.unarchiveExpense = unarchiveExpense;
+/**
+ * DELETE /api/v1/expenses/:expenseId/permanent
+ * Permanently delete expense.
+ */
+const deleteExpensePermanent = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { expenseId } = req.params;
+        await expenseService.deleteExpensePermanent(expenseId, user.uid);
+        res.status(200).json({
+            success: true,
+            message: 'Expense deleted permanently',
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.deleteExpensePermanent = deleteExpensePermanent;
 // ============================================================
 // SETTLEMENT
 // ============================================================
@@ -206,9 +244,10 @@ exports.deleteExpense = deleteExpense;
  */
 const markSplitPaid = async (req, res, next) => {
     try {
+        const user = getUser(req);
         const { expenseId, userId } = req.params;
         const { paymentId } = req.body;
-        const expense = await expenseService.markSplitPaid(expenseId, userId, paymentId);
+        const expense = await expenseService.markSplitPaid(expenseId, userId, user.uid, paymentId);
         res.status(200).json({
             success: true,
             message: 'Split marked as paid',

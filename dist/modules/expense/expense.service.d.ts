@@ -102,14 +102,21 @@ export declare const getExpenseById: (expenseId: string, requestingUid: string) 
  */
 export declare const updateExpense: (expenseId: string, input: UpdateExpenseInput, editorUid: string) => Promise<IExpense>;
 /**
- * Delete an expense and reverse all cached totals.
- * Only the payer or a trip admin can delete.
+ * Soft delete an expense and reverse all cached totals.
  */
-export declare const deleteExpense: (expenseId: string, requestingUid: string) => Promise<void>;
+export declare const archiveExpense: (expenseId: string, requestingUid: string) => Promise<IExpense>;
+/**
+ * Unarchive an expense and restore all cached totals.
+ */
+export declare const unarchiveExpense: (expenseId: string, requestingUid: string) => Promise<IExpense>;
+/**
+ * Permanently delete an expense.
+ */
+export declare const deleteExpensePermanent: (expenseId: string, requestingUid: string) => Promise<void>;
 /**
  * Mark one member's split as paid (manual or UPI confirmation).
  * Auto-updates isSettled if all splits are now paid.
  */
-export declare const markSplitPaid: (expenseId: string, targetUserId: string, paymentId?: string) => Promise<IExpense>;
+export declare const markSplitPaid: (expenseId: string, targetUserId: string, requestingUid: string, paymentId?: string) => Promise<IExpense>;
 export {};
 //# sourceMappingURL=expense.service.d.ts.map

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.markSplitPaid = exports.deleteExpense = exports.updateExpense = exports.getExpenseById = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = exports.computeSplits = void 0;
+exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getExpenseById = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = exports.computeSplits = void 0;
 const mongoose_1 = require("mongoose");
 const expense_model_1 = require("./expense.model");
 const trip_model_1 = require("../trips/trip.model");
@@ -156,6 +156,10 @@ const createExpense = async (input, adderUid, adderDisplayName) => {
     if (!payer) {
         throw new AppError_1.AppError('The specified payer is not an active member of this trip', 400);
     }
+    const isAdderAdmin = trip.isAdmin(adderUid);
+    if (!trip.allowAnyPayer && input.paidBy !== adderUid && !isAdderAdmin) {
+        throw new AppError_1.AppError('Trip settings do not allow selecting other members as the payer', 403);
+    }
     // Compute base amount using CURRENT exchange rate (locked at creation time)
     const exchangeRateUsed = stop.currentExchangeRate;
     const amountBase = parseFloat((input.amountLocal * exchangeRateUsed).toFixed(2));
@@ -205,6 +209,7 @@ exports.createExpense = createExpense;
 const getStopExpenses = async (stopId, query) => {
     const filter = {
         stopId: new mongoose_1.Types.ObjectId(stopId),
+        isArchived: query.isArchived === true,
     };
     if (query.category)
         filter.category = query.category;
@@ -247,6 +252,7 @@ exports.getStopExpenses = getStopExpenses;
 const getTripExpenses = async (tripId, query) => {
     const filter = {
         tripId: new mongoose_1.Types.ObjectId(tripId),
+        isArchived: query.isArchived === true,
     };
     if (query.category)
         filter.category = query.category;
@@ -287,7 +293,13 @@ exports.getTripExpenses = getTripExpenses;
  * Get all expenses paid by a specific user across all trips.
  */
 const getMyExpenses = async (userId, query) => {
-    const filter = { paidBy: userId };
+    const filter = {
+        $or: [
+            { paidBy: userId },
+            { 'splits.userId': userId }
+        ],
+        isArchived: query.isArchived === true,
+    };
     if (query.category)
         filter.category = query.category;
     if (query.isSettled !== undefined)
@@ -380,6 +392,10 @@ const updateExpense = async (expenseId, input, editorUid) => {
         const payer = trip.getMember(newPaidBy);
         if (!payer)
             throw new AppError_1.AppError('Payer is not an active trip member', 400);
+        const isEditorAdmin = trip.isAdmin(editorUid);
+        if (!trip.allowAnyPayer && newPaidBy !== editorUid && !isEditorAdmin) {
+            throw new AppError_1.AppError('Trip settings do not allow selecting other members as the payer', 403);
+        }
         const newAmountBase = parseFloat((newAmountLocal * expense.exchangeRateUsed).toFixed(2));
         const activeMembers = trip
             .getActiveMembers()
@@ -419,10 +435,61 @@ exports.updateExpense = updateExpense;
 // DELETE EXPENSE
 // ============================================================
 /**
- * Delete an expense and reverse all cached totals.
- * Only the payer or a trip admin can delete.
+ * Soft delete an expense and reverse all cached totals.
  */
-const deleteExpense = async (expenseId, requestingUid) => {
+const archiveExpense = async (expenseId, requestingUid) => {
+    const expense = await expense_model_1.Expense.findById(expenseId);
+    if (!expense)
+        throw new AppError_1.AppError('Expense not found', 404);
+    if (expense.isArchived)
+        return expense;
+    const trip = await trip_model_1.Trip.findById(expense.tripId);
+    if (!trip)
+        throw new AppError_1.AppError('Trip not found', 404);
+    const isPayerOrAdmin = expense.paidBy === requestingUid || trip.isAdmin(requestingUid);
+    if (!isPayerOrAdmin) {
+        throw new AppError_1.AppError('Only the payer or a trip admin can archive this expense', 403);
+    }
+    const owedAmounts = expense.splits
+        .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
+    await (0, trip_service_1.decrementStopTotals)(trip._id.toString(), expense.stopId.toString(), expense.amountLocal, expense.amountBase, expense.paidBy, owedAmounts);
+    await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
+    expense.isArchived = true;
+    await expense.save();
+    socket_server_1.socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
+    return expense;
+};
+exports.archiveExpense = archiveExpense;
+/**
+ * Unarchive an expense and restore all cached totals.
+ */
+const unarchiveExpense = async (expenseId, requestingUid) => {
+    const expense = await expense_model_1.Expense.findById(expenseId);
+    if (!expense)
+        throw new AppError_1.AppError('Expense not found', 404);
+    if (!expense.isArchived)
+        return expense;
+    const trip = await trip_model_1.Trip.findById(expense.tripId);
+    if (!trip)
+        throw new AppError_1.AppError('Trip not found', 404);
+    const isPayerOrAdmin = expense.paidBy === requestingUid || trip.isAdmin(requestingUid);
+    if (!isPayerOrAdmin) {
+        throw new AppError_1.AppError('Only the payer or a trip admin can unarchive this expense', 403);
+    }
+    const owedAmounts = expense.splits
+        .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
+    await (0, trip_service_1.incrementStopTotals)(trip._id.toString(), expense.stopId.toString(), expense.amountLocal, expense.amountBase, expense.paidBy, owedAmounts);
+    await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
+    expense.isArchived = false;
+    await expense.save();
+    socket_server_1.socketServer.notifyExpenseAdded(trip._id.toString(), expense, requestingUid);
+    return expense;
+};
+exports.unarchiveExpense = unarchiveExpense;
+/**
+ * Permanently delete an expense.
+ */
+const deleteExpensePermanent = async (expenseId, requestingUid) => {
     const expense = await expense_model_1.Expense.findById(expenseId);
     if (!expense)
         throw new AppError_1.AppError('Expense not found', 404);
@@ -431,17 +498,18 @@ const deleteExpense = async (expenseId, requestingUid) => {
         throw new AppError_1.AppError('Trip not found', 404);
     const isPayerOrAdmin = expense.paidBy === requestingUid || trip.isAdmin(requestingUid);
     if (!isPayerOrAdmin) {
-        throw new AppError_1.AppError('Only the payer or a trip admin can delete this expense', 403);
+        throw new AppError_1.AppError('Only the payer or a trip admin can delete this expense permanently', 403);
     }
-    // Reverse cached totals before deletion
-    const owedAmounts = expense.splits
-        .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
-    await (0, trip_service_1.decrementStopTotals)(trip._id.toString(), expense.stopId.toString(), expense.amountLocal, expense.amountBase, expense.paidBy, owedAmounts);
-    await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
-    socket_server_1.socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
+    if (!expense.isArchived) {
+        const owedAmounts = expense.splits
+            .map((s) => ({ userId: s.userId, amountBase: s.amountBase }));
+        await (0, trip_service_1.decrementStopTotals)(trip._id.toString(), expense.stopId.toString(), expense.amountLocal, expense.amountBase, expense.paidBy, owedAmounts);
+        await (0, settlement_service_1.markSettlementStale)(trip._id.toString());
+        socket_server_1.socketServer.notifyExpenseDeleted(trip._id.toString(), expense.title, requestingUid);
+    }
     await expense.deleteOne();
 };
-exports.deleteExpense = deleteExpense;
+exports.deleteExpensePermanent = deleteExpensePermanent;
 // ============================================================
 // MARK SPLIT AS PAID
 // ============================================================
@@ -449,10 +517,13 @@ exports.deleteExpense = deleteExpense;
  * Mark one member's split as paid (manual or UPI confirmation).
  * Auto-updates isSettled if all splits are now paid.
  */
-const markSplitPaid = async (expenseId, targetUserId, paymentId) => {
+const markSplitPaid = async (expenseId, targetUserId, requestingUid, paymentId) => {
     const expense = await expense_model_1.Expense.findById(expenseId);
     if (!expense)
         throw new AppError_1.AppError('Expense not found', 404);
+    if (expense.paidBy !== requestingUid) {
+        throw new AppError_1.AppError('Only the payer can mark this expense as paid', 403);
+    }
     const split = expense.splits.find((s) => s.userId === targetUserId);
     if (!split)
         throw new AppError_1.AppError('Split not found for this user', 404);

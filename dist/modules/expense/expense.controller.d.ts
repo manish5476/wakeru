@@ -31,9 +31,19 @@ export declare const getExpense: (req: Request, res: Response, next: NextFunctio
 export declare const updateExpense: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 /**
  * DELETE /api/v1/expenses/:expenseId
- * Delete expense + reverse all cached totals.
+ * Archive expense + reverse all cached totals.
  */
-export declare const deleteExpense: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+export declare const archiveExpense: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+/**
+ * POST /api/v1/expenses/:expenseId/unarchive
+ * Unarchive expense + restore cached totals.
+ */
+export declare const unarchiveExpense: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+/**
+ * DELETE /api/v1/expenses/:expenseId/permanent
+ * Permanently delete expense.
+ */
+export declare const deleteExpensePermanent: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 /**
  * PATCH /api/v1/expenses/:expenseId/splits/:userId/pay
  * Mark one member's split as paid.

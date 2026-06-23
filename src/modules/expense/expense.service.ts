@@ -218,7 +218,8 @@ export const createExpense = async (
     throw new AppError('The specified payer is not an active member of this trip', 400);
   }
 
-  if (!trip.allowAnyPayer && input.paidBy !== adderUid) {
+  const isAdderAdmin = trip.isAdmin(adderUid);
+  if (!trip.allowAnyPayer && input.paidBy !== adderUid && !isAdderAdmin) {
     throw new AppError('Trip settings do not allow selecting other members as the payer', 403);
   }
 
@@ -388,7 +389,10 @@ export const getMyExpenses = async (
   query: ExpenseListQuery
 ) => {
   const filter: FilterQuery<IExpense> = { 
-    paidBy: userId,
+    $or: [
+      { paidBy: userId },
+      { 'splits.userId': userId }
+    ],
     isArchived: query.isArchived === true,
   };
 
@@ -496,7 +500,8 @@ export const updateExpense = async (
     const payer = trip.getMember(newPaidBy);
     if (!payer) throw new AppError('Payer is not an active trip member', 400);
 
-    if (!trip.allowAnyPayer && newPaidBy !== editorUid) {
+    const isEditorAdmin = trip.isAdmin(editorUid);
+    if (!trip.allowAnyPayer && newPaidBy !== editorUid && !isEditorAdmin) {
       throw new AppError('Trip settings do not allow selecting other members as the payer', 403);
     }
 

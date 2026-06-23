@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.notificationController = exports.NotificationController = void 0;
 const notification_service_1 = require("./notification.service");
+const socket_server_1 = require("../../infrastructure/websocket/socket.server");
 const AppError_1 = require("../../shared/errors/AppError");
 // ============================================================
 // HELPER
@@ -77,6 +78,34 @@ class NotificationController {
             res.status(200).json({
                 success: true,
                 message: 'Notification deleted',
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async broadcastAppUpdate(req, res, next) {
+        try {
+            // Basic security check for testing
+            const { password, link } = req.body;
+            if (password !== 'msms5476mmmm') {
+                res.status(403).json({ success: false, message: 'Invalid admin password' });
+                return;
+            }
+            if (!link) {
+                res.status(400).json({ success: false, message: 'Link is required' });
+                return;
+            }
+            socket_server_1.socketServer.broadcastToAll('app:update_broadcast', {
+                type: 'APP_UPDATE',
+                link,
+                timestamp: new Date().toISOString(),
+            });
+            // Also persist it for all active users
+            await notification_service_1.notificationService.broadcastSystemUpdate(link);
+            res.status(200).json({
+                success: true,
+                message: 'App update broadcasted successfully to all connected users.',
             });
         }
         catch (error) {

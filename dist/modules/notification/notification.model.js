@@ -77,6 +77,7 @@ const NotificationSchema = new mongoose_1.Schema({
             'EXCHANGE_RATE_UPDATED',
             'FRIEND_REQUEST',
             'FRIEND_ACCEPTED',
+            'SYSTEM_UPDATE',
         ],
         required: true,
     },

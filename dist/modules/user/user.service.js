@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = exports.UserService = void 0;
 const auth_model_1 = require("../auth/auth.model");
+const auth_1 = require("firebase-admin/auth");
 const AppError_1 = require("../../shared/errors/AppError");
 const logger_1 = require("../../config/logger");
 const sharp_1 = __importDefault(require("sharp"));
@@ -128,10 +129,10 @@ class UserService {
         return photoURL;
     }
     /**
-     * Delete account (soft delete)
+     * Delete account (soft delete and remove from Firebase)
      */
     async deleteAccount(userId) {
-        await auth_model_1.User.findOneAndUpdate({ _id: userId }, {
+        const user = await auth_model_1.User.findOneAndUpdate({ _id: userId }, {
             $set: {
                 isDeleted: true,
                 isActive: false,
@@ -140,6 +141,15 @@ class UserService {
                 fcmToken: null,
             }
         });
+        if (user && user.firebaseUid) {
+            try {
+                await (0, auth_1.getAuth)().deleteUser(user.firebaseUid);
+                logger_1.logger.info(`Firebase user deleted: ${user.firebaseUid}`);
+            }
+            catch (error) {
+                logger_1.logger.error(`Failed to delete Firebase user: ${user.firebaseUid}`, error);
+            }
+        }
         logger_1.logger.info(`Account deleted: ${userId}`);
     }
     /**

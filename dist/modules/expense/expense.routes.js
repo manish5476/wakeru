@@ -55,7 +55,9 @@ router.get('/trip/:tripId', (0, trip_middleware_1.validate)(expense_validation_1
 router.post('/', (0, trip_middleware_1.validate)(expense_validation_1.createExpenseSchema), expenseController.createExpense);
 router.get('/:expenseId', (0, trip_middleware_1.validate)(expense_validation_1.expenseParamSchema, 'params'), expenseController.getExpense);
 router.patch('/:expenseId', (0, trip_middleware_1.validate)(expense_validation_1.expenseParamSchema, 'params'), (0, trip_middleware_1.validate)(expense_validation_1.updateExpenseSchema), expenseController.updateExpense);
-router.delete('/:expenseId', (0, trip_middleware_1.validate)(expense_validation_1.expenseParamSchema, 'params'), expenseController.deleteExpense);
+router.delete('/:expenseId', (0, trip_middleware_1.validate)(expense_validation_1.expenseParamSchema, 'params'), expenseController.archiveExpense);
+router.post('/:expenseId/unarchive', (0, trip_middleware_1.validate)(expense_validation_1.expenseParamSchema, 'params'), expenseController.unarchiveExpense);
+router.delete('/:expenseId/permanent', (0, trip_middleware_1.validate)(expense_validation_1.expenseParamSchema, 'params'), expenseController.deleteExpensePermanent);
 // ============================================================
 // SETTLEMENT ROUTE
 // ============================================================

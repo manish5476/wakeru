@@ -3,11 +3,11 @@ export declare const equalSplitInputSchema: z.ZodObject<{
     method: z.ZodLiteral<"equal">;
     memberIds: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }>;
 export declare const percentageSplitInputSchema: z.ZodObject<{
     method: z.ZodLiteral<"percentage">;
@@ -121,11 +121,11 @@ export declare const splitInputSchema: z.ZodDiscriminatedUnion<"method", [z.ZodO
     method: z.ZodLiteral<"equal">;
     memberIds: z.ZodArray<z.ZodString, "many">;
 }, "strip", z.ZodTypeAny, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }, {
-    memberIds: string[];
     method: "equal";
+    memberIds: string[];
 }>, z.ZodObject<{
     method: z.ZodLiteral<"percentage">;
     members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
@@ -256,11 +256,11 @@ export declare const createExpenseSchema: z.ZodObject<{
         method: z.ZodLiteral<"equal">;
         memberIds: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }>, z.ZodObject<{
         method: z.ZodLiteral<"percentage">;
         members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
@@ -369,8 +369,8 @@ export declare const createExpenseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     date: Date;
     split: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -396,8 +396,8 @@ export declare const createExpenseSchema: z.ZodObject<{
         method: "personal";
     };
     title: string;
-    stopId: string;
     amountLocal: number;
+    stopId: string;
     category: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other";
     paidBy: string;
     location?: {
@@ -408,8 +408,8 @@ export declare const createExpenseSchema: z.ZodObject<{
     notes?: string | undefined;
 }, {
     split: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -435,8 +435,8 @@ export declare const createExpenseSchema: z.ZodObject<{
         method: "personal";
     };
     title: string;
-    stopId: string;
     amountLocal: number;
+    stopId: string;
     paidBy: string;
     date?: Date | undefined;
     location?: {
@@ -471,11 +471,11 @@ export declare const updateExpenseSchema: z.ZodObject<{
         method: z.ZodLiteral<"equal">;
         memberIds: z.ZodArray<z.ZodString, "many">;
     }, "strip", z.ZodTypeAny, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }, {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     }>, z.ZodObject<{
         method: z.ZodLiteral<"percentage">;
         members: z.ZodEffects<z.ZodArray<z.ZodObject<z.objectUtil.extendShape<{
@@ -584,8 +584,8 @@ export declare const updateExpenseSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     date?: Date | undefined;
     split?: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -623,8 +623,8 @@ export declare const updateExpenseSchema: z.ZodObject<{
 }, {
     date?: Date | undefined;
     split?: {
-        memberIds: string[];
         method: "equal";
+        memberIds: string[];
     } | {
         members: {
             displayName: string;
@@ -666,6 +666,7 @@ export declare const expenseListQuerySchema: z.ZodObject<{
     category: z.ZodOptional<z.ZodEnum<["food", "stay", "transport", "activity", "shopping", "health", "other"]>>;
     paidBy: z.ZodOptional<z.ZodString>;
     isSettled: z.ZodOptional<z.ZodEffects<z.ZodEnum<["true", "false"]>, boolean, "true" | "false">>;
+    isArchived: z.ZodOptional<z.ZodEffects<z.ZodEnum<["true", "false"]>, boolean, "true" | "false">>;
     startDate: z.ZodOptional<z.ZodDate>;
     endDate: z.ZodOptional<z.ZodDate>;
     sortBy: z.ZodDefault<z.ZodEnum<["date", "amountBase", "amountLocal", "createdAt"]>>;
@@ -673,10 +674,11 @@ export declare const expenseListQuerySchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     limit: number;
     page: number;
-    sortBy: "createdAt" | "date" | "amountBase" | "amountLocal";
+    sortBy: "createdAt" | "date" | "amountLocal" | "amountBase";
     sortOrder: "asc" | "desc";
     startDate?: Date | undefined;
     endDate?: Date | undefined;
+    isArchived?: boolean | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
     isSettled?: boolean | undefined;
@@ -685,10 +687,11 @@ export declare const expenseListQuerySchema: z.ZodObject<{
     page?: number | undefined;
     startDate?: Date | undefined;
     endDate?: Date | undefined;
+    isArchived?: "true" | "false" | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
     isSettled?: "true" | "false" | undefined;
-    sortBy?: "createdAt" | "date" | "amountBase" | "amountLocal" | undefined;
+    sortBy?: "createdAt" | "date" | "amountLocal" | "amountBase" | undefined;
     sortOrder?: "asc" | "desc" | undefined;
 }>;
 export declare const expenseParamSchema: z.ZodObject<{

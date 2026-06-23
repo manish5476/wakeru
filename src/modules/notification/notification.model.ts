@@ -18,7 +18,8 @@ export type NotificationType =
   | 'STOP_ADDED'
   | 'EXCHANGE_RATE_UPDATED'
   | 'FRIEND_REQUEST'
-  | 'FRIEND_ACCEPTED';
+  | 'FRIEND_ACCEPTED'
+  | 'SYSTEM_UPDATE';
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
@@ -94,6 +95,7 @@ const NotificationSchema = new Schema<INotification>(
         'EXCHANGE_RATE_UPDATED',
         'FRIEND_REQUEST',
         'FRIEND_ACCEPTED',
+        'SYSTEM_UPDATE',
       ],
       required: true,
     },

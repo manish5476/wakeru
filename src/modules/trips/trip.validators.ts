@@ -13,7 +13,7 @@ const mongoId = z
   .string()
   .min(1, 'ID is required')
   .max(128, 'ID too long');
-  // Accepts both MongoDB ObjectId (24 hex) and UUID v4 strings
+// Accepts both MongoDB ObjectId (24 hex) and UUID v4 strings
 
 const firebaseUid = z
   .string()
@@ -155,9 +155,8 @@ export const createTripSchema = z.object({
     .default('equal'),
 
   memberIds: z.array(mongoId).optional(),
-
-  // Optionally create the first stop inline during trip creation
   initialStop: createStopSchema.optional(),
+  allowAnyPayer: z.boolean().optional(),
 }).refine(
   (data) => data.endDate >= data.startDate,
   { message: 'End date must be on or after start date', path: ['endDate'] }

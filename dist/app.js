@@ -27,6 +27,7 @@ const friends_routes_1 = __importDefault(require("./modules/friends/friends.rout
 const reminders_routes_1 = __importDefault(require("./modules/reminders/reminders.routes"));
 const dashboard_routes_1 = __importDefault(require("./modules/dashboard/dashboard.routes"));
 const person_routes_1 = __importDefault(require("./modules/person/person.routes"));
+const feedback_routes_1 = __importDefault(require("./modules/feedback/feedback.routes"));
 const app = (0, express_1.default)();
 // ============================================================
 // Security Middleware
@@ -103,6 +104,7 @@ app.use('/api/v1/friends', rateLimiter_middleware_1.authenticatedRateLimiter, fr
 app.use('/api/v1/reminders', rateLimiter_middleware_1.authenticatedRateLimiter, reminders_routes_1.default);
 app.use('/api/v1/dashboard', rateLimiter_middleware_1.authenticatedRateLimiter, dashboard_routes_1.default);
 app.use('/api/v1/person', rateLimiter_middleware_1.authenticatedRateLimiter, person_routes_1.default);
+app.use('/api/v1/feedback', rateLimiter_middleware_1.authenticatedRateLimiter, feedback_routes_1.default);
 // ============================================================
 // 404 Handler
 // ============================================================

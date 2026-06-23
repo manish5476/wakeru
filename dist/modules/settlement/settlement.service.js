@@ -93,16 +93,18 @@ const calculateSettlement = async (tripId, requestingUid) => {
     // Initialize all active members at 0
     trip.getActiveMembers().forEach((m) => balanceMap.set(m.userId, 0));
     for (const expense of expenses) {
-        // Payer gets credit for the full amount
-        const currentPayer = balanceMap.get(expense.paidBy) ?? 0;
-        balanceMap.set(expense.paidBy, currentPayer + expense.amountBase);
+        let unpaidAmount = 0;
         // Each unpaid split debits the member
         for (const split of expense.splits) {
             if (!split.isPaid) {
                 const current = balanceMap.get(split.userId) ?? 0;
                 balanceMap.set(split.userId, current - split.amountBase);
+                unpaidAmount += split.amountBase;
             }
         }
+        // Payer gets credit ONLY for the total unpaid splits
+        const currentPayer = balanceMap.get(expense.paidBy) ?? 0;
+        balanceMap.set(expense.paidBy, currentPayer + unpaidAmount);
     }
     // Convert to NetBalance array
     const netBalances = Array.from(balanceMap.entries()).map(([userId, amount]) => ({
@@ -112,16 +114,34 @@ const calculateSettlement = async (tripId, requestingUid) => {
     }));
     // Run minimum transaction algorithm
     const minTransactions = (0, exports.computeMinimumTransactions)(netBalances);
+    // Fetch recipients to get upiId for direct payup link
+    const receiverIds = minTransactions.map((t) => t.to);
+    const receivers = await auth_model_1.User.find({ _id: { $in: receiverIds } })
+        .select('_id bankingDetails.upiId')
+        .lean();
+    const upiMap = new Map(receivers.map((r) => [r._id.toString(), r.bankingDetails?.upiId]));
     // Build settlement transaction documents
-    const settlementTransactions = minTransactions.map((t) => ({
-        from: t.from,
-        fromName: t.fromName,
-        to: t.to,
-        toName: t.toName,
-        amountBase: t.amount,
-        baseCurrency: trip.baseCurrency,
-        status: 'pending',
-    }));
+    const settlementTransactions = minTransactions.map((t) => {
+        let upiDeepLink;
+        const pa = upiMap.get(t.to);
+        if (pa) {
+            const pn = encodeURIComponent(t.toName);
+            const am = t.amount.toFixed(2);
+            const cu = trip.baseCurrency;
+            const tn = encodeURIComponent('TripSplit Settlement');
+            upiDeepLink = `upi://pay?pa=${encodeURIComponent(pa)}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
+        }
+        return {
+            from: t.from,
+            fromName: t.fromName,
+            to: t.to,
+            toName: t.toName,
+            amountBase: t.amount,
+            baseCurrency: trip.baseCurrency,
+            status: 'pending',
+            upiDeepLink,
+        };
+    });
     // Upsert settlement (one per trip)
     const settlement = await settlement_model_1.Settlement.findOneAndUpdate({ tripId: new mongoose_1.Types.ObjectId(tripId) }, {
         tripId: new mongoose_1.Types.ObjectId(tripId),

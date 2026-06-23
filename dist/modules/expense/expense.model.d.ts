@@ -44,6 +44,7 @@ export interface IExpense extends Document {
     splitMethod: SplitMethod;
     splits: ISplit[];
     isSettled: boolean;
+    isArchived: boolean;
     addedBy: string;
     editedBy?: string;
     editedAt?: Date;

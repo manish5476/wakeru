@@ -106,6 +106,9 @@ const settlementSchema = new Schema<ISettlement>(
 
 settlementSchema.virtual('totalAmount').get(function () {
   return this.transactions.reduce((sum, t) => sum + t.amountBase, 0);
+});
+
+settlementSchema.virtual('pendingCount').get(function () {
   return this.transactions.filter((t) => t.status === 'pending').length;
 });
 

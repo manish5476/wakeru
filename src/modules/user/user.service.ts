@@ -1,4 +1,5 @@
 import { User, IUserDocument } from '../auth/auth.model';
+import { getAuth } from 'firebase-admin/auth';
 import { NotFoundError, BadRequestError, ConflictError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
 import sharp from 'sharp';
@@ -163,10 +164,10 @@ export class UserService {
   }
 
   /**
-   * Delete account (soft delete)
+   * Delete account (soft delete and remove from Firebase)
    */
   async deleteAccount(userId: string): Promise<void> {
-    await User.findOneAndUpdate(
+    const user = await User.findOneAndUpdate(
       { _id: userId },
       { 
         $set: { 
@@ -178,6 +179,16 @@ export class UserService {
         } 
       }
     );
+
+    if (user && user.firebaseUid) {
+      try {
+        await getAuth().deleteUser(user.firebaseUid);
+        logger.info(`Firebase user deleted: ${user.firebaseUid}`);
+      } catch (error: any) {
+        logger.error(`Failed to delete Firebase user: ${user.firebaseUid}`, error);
+      }
+    }
+
     logger.info(`Account deleted: ${userId}`);
   }
 
