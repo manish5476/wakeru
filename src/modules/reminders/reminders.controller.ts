@@ -62,6 +62,14 @@ export const remindersController = {
             const userId = getUser(req);
             const { targetUserId, amount, tripName, message, expenseTitle } = req.body;
 
+            const reminder = await reminderService.create(userId, {
+                targetUserId,
+                type: 'payment',
+                title: expenseTitle ? `Payment: ${expenseTitle}` : `Payment for ${tripName}`,
+                message: message || `Reminder sent to settle ₹${amount} for ${tripName}.`,
+                frequency: 'once'
+            });
+
             // 1. Create a database notification for the target user
             const dbNotification = await notificationService.create(
                 targetUserId,
@@ -81,7 +89,7 @@ export const remindersController = {
                 message: message || `You owe ₹${amount} for ${tripName}. Please settle soon.`
             });
 
-            res.status(200).json({ success: true, message: 'Ping sent successfully' });
+            res.status(200).json({ success: true, message: 'Ping sent successfully', data: { reminder } });
         } catch (err) {
             next(err);
         }
