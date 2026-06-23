@@ -5,8 +5,8 @@ import { Trip } from './trip.model';
 
 const getUser = (req: Request) => {
   const user = (req as any).user;
-  if (!user?.uid) throw new AppError('Not authenticated', 401);
-  return user as { uid: string; displayName: string; photoURL?: string };
+  if (!user?.userId) throw new AppError('Not authenticated', 401);
+  return user as { userId: string; displayName: string; photoURL?: string };
 };
 
 export const getTravelPlan = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +18,7 @@ export const getTravelPlan = async (req: Request, res: Response, next: NextFunct
     const trip = await Trip.findById(tripId);
     if (!trip) throw new AppError('Trip not found', 404);
     
-    const isMember = trip.members.some(m => m.userId === user.uid && m.isActive);
+    const isMember = trip.members.some(m => m.userId === user.userId && m.isActive);
     if (!isMember) throw new AppError('Not authorized to view this trip plan', 403);
 
     let plan = await TravelPlan.findOne({ tripId });
@@ -42,7 +42,7 @@ export const updateTravelPlan = async (req: Request, res: Response, next: NextFu
     if (!trip) throw new AppError('Trip not found', 404);
     
     // Only admins or members can edit. Viewers cannot edit.
-    const member = trip.members.find(m => m.userId === user.uid && m.isActive);
+    const member = trip.members.find(m => m.userId === user.userId && m.isActive);
     if (!member) throw new AppError('Not authorized to edit this trip plan', 403);
     if (member.role === 'viewer') throw new AppError('Viewers cannot edit the travel plan', 403);
 
@@ -66,7 +66,7 @@ export const activateTrip = async (req: Request, res: Response, next: NextFuncti
     const trip = await Trip.findById(tripId);
     if (!trip) throw new AppError('Trip not found', 404);
     
-    const member = trip.members.find(m => m.userId === user.uid && m.isActive);
+    const member = trip.members.find(m => m.userId === user.userId && m.isActive);
     if (!member || member.role === 'viewer') throw new AppError('Not authorized to activate this trip', 403);
 
     if (trip.status === 'planning') {

@@ -38,6 +38,17 @@ export interface IAccommodationDetail {
   notes: string;
 }
 
+export interface ITransportDetail {
+  type: 'train' | 'bus' | 'taxi' | 'ferry' | 'cab' | 'other';
+  operator: string;
+  pnr: string;
+  from: string;
+  to: string;
+  date: string;
+  time: string;
+  notes: string;
+}
+
 export interface IPackingItem {
   name: string;
   checked: boolean;
@@ -64,6 +75,7 @@ export interface ITravelPlan extends Document {
   itinerary: IItineraryDay[];
   flightDetails: IFlightDetail[];
   accommodationDetails: IAccommodationDetail[];
+  transportDetails: ITransportDetail[];
   packingList: IPackingCategory[];
   importantContacts: {
     emergencyContact: string;
@@ -129,6 +141,18 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
         checkOut: { type: String, default: '' },
         confirmationNo: { type: String, default: '' },
         contact: { type: String, default: '' },
+        notes: { type: String, default: '' },
+      },
+    ],
+    transportDetails: [
+      {
+        type: { type: String, enum: ['train', 'bus', 'taxi', 'ferry', 'cab', 'other'], required: true },
+        operator: { type: String, default: '' },
+        pnr: { type: String, default: '' },
+        from: { type: String, default: '' },
+        to: { type: String, default: '' },
+        date: { type: String, default: '' },
+        time: { type: String, default: '' },
         notes: { type: String, default: '' },
       },
     ],
