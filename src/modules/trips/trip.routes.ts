@@ -20,6 +20,7 @@ import {
   generateInviteSchema,
   tripIdParamSchema,
   stopIdParamSchema,
+  joinRequestParamSchema,
   memberParamSchema,
   addMemberSchema,
 } from './trip.validators';
@@ -180,13 +181,13 @@ router.get(
 
 router.post(
   '/:tripId/join-requests/:requestId/approve',
-  validate(tripIdParamSchema, 'params'),
+  validate(joinRequestParamSchema, 'params'),
   tripController.approveJoinRequest
 );
 
 router.post(
   '/:tripId/join-requests/:requestId/reject',
-  validate(tripIdParamSchema, 'params'),
+  validate(joinRequestParamSchema, 'params'),
   tripController.rejectJoinRequest
 );
 

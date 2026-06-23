@@ -232,6 +232,11 @@ export const stopIdParamSchema = z.object({
   stopId: mongoId,
 });
 
+export const joinRequestParamSchema = z.object({
+  tripId: mongoId,
+  requestId: mongoId,
+});
+
 export const memberParamSchema = z.object({
   tripId: mongoId,
   userId: firebaseUid,
