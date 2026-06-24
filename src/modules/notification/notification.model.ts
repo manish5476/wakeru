@@ -20,6 +20,7 @@ export type NotificationType =
   | 'FRIEND_REQUEST'
   | 'FRIEND_ACCEPTED'
   | 'SYSTEM_UPDATE';
+  | 'SYSTEM';
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
