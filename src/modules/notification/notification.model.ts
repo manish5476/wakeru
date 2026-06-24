@@ -97,6 +97,7 @@ const NotificationSchema = new Schema<INotification>(
         'FRIEND_REQUEST',
         'FRIEND_ACCEPTED',
         'SYSTEM_UPDATE',
+        'SYSTEM',
       ],
       required: true,
     },
