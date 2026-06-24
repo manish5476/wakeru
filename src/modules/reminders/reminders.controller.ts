@@ -73,7 +73,7 @@ export const remindersController = {
             // 1. Create a database notification for the target user
             const dbNotification = await notificationService.create(
                 targetUserId,
-                'PAYMENT_REMINDER',
+                'SYSTEM',
                 'Pending Settlement Reminder',
                 message || `You owe ₹${amount} for ${tripName}. Please settle soon.`,
                 { data: { senderId: userId, tripName, amount, expenseTitle } }
