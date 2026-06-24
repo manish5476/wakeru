@@ -19,7 +19,7 @@ export type NotificationType =
   | 'EXCHANGE_RATE_UPDATED'
   | 'FRIEND_REQUEST'
   | 'FRIEND_ACCEPTED'
-  | 'SYSTEM_UPDATE';
+  | 'SYSTEM_UPDATE'
   | 'SYSTEM';
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
