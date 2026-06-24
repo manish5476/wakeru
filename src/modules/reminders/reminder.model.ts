@@ -29,7 +29,7 @@ const reminderSchema = new Schema<IReminder>(
         tripId: { type: Schema.Types.ObjectId, ref: 'Trip', index: true },
         type: {
             type: String,
-            enum: ['settlement', 'payment', 'budget', 'custom'],
+            enum: ['settlement', 'payment', 'budget', 'custom',''],
             required: true,
         },
         title: { type: String, required: true },
