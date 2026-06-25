@@ -150,6 +150,9 @@ export const expenseListQuerySchema = z.object({
     .enum(['food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other'])
     .optional(),
   paidBy: firebaseUid.optional(),
+  tripId: mongoId.optional(),
+  personId: firebaseUid.optional(),
+  type: z.enum(['you_owe', 'you_paid', 'unsettled', 'settled', 'all']).optional(),
   isSettled: z
     .enum(['true', 'false'])
     .transform((v) => v === 'true')
@@ -160,7 +163,7 @@ export const expenseListQuerySchema = z.object({
     .optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
-  sortBy: z.enum(['date', 'amountBase', 'amountLocal', 'createdAt']).default('date'),
+  sortBy: z.enum(['date', 'amountBase', 'amountLocal', 'createdAt', 'tripId', 'paidBy']).default('date'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 

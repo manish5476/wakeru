@@ -91,6 +91,11 @@ export interface IUser {
   bankingDetails: IBankingDetails;
   stats: IUserStats;
   
+  passwordResetStats?: {
+    count: number;
+    lastRequestAt: Date;
+  };
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -311,6 +316,16 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
     stats: { 
       type: UserStatsSchema, 
       default: () => ({}) 
+    },
+    passwordResetStats: {
+      type: new Schema(
+        {
+          count: { type: Number, default: 0 },
+          lastRequestAt: { type: Date, default: new Date() },
+        },
+        { _id: false }
+      ),
+      default: () => ({ count: 0, lastRequestAt: new Date() }),
     },
   },
   {

@@ -310,8 +310,8 @@ export const AuthService = {
   },
 
   /**
-   * Send password reset email via Firebase.
-   * Always returns success to prevent email enumeration.
+   * Check rate limit and generate password reset token (link generation skipped).
+   * Returns success to client to trigger the actual Firebase email.
    */
   async forgotPassword(email: string): Promise<void> {
     try {
@@ -322,14 +322,32 @@ export const AuthService = {
       });
 
       if (user) {
-        await getAuth().generatePasswordResetLink(email);
-        logger.info('Password reset email sent', { email });
+        // Enforce rate limit: max 2 requests per day
+        const now = new Date();
+        const stats = user.passwordResetStats || { count: 0, lastRequestAt: new Date(0) };
+        
+        // Check if the last request was today
+        const isSameDay = stats.lastRequestAt.toDateString() === now.toDateString();
+
+        if (isSameDay && stats.count >= 2) {
+          throw new AppError(429, 'Maximum 2 requests per day allowed for password reset.');
+        }
+
+        // Update stats
+        user.passwordResetStats = {
+          count: isSameDay ? stats.count + 1 : 1,
+          lastRequestAt: now,
+        };
+        await user.save();
+        
+        logger.info('Password reset authorized', { email });
       } else {
         // Log but don't reveal that email doesn't exist
         logger.info('Password reset attempted for non-existent email', { email });
       }
-    } catch (error) {
-      // Always succeed from the client's perspective
+    } catch (error: any) {
+      if (error instanceof AppError) throw error;
+      // Always succeed from the client's perspective for other errors
       logger.warn('Password reset flow error', { email, error });
     }
   },

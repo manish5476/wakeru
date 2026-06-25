@@ -78,6 +78,7 @@ const NotificationSchema = new mongoose_1.Schema({
             'FRIEND_REQUEST',
             'FRIEND_ACCEPTED',
             'SYSTEM_UPDATE',
+            'SYSTEM',
         ],
         required: true,
     },

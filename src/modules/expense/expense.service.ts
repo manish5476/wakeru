@@ -1,5 +1,6 @@
-import { Types, FilterQuery } from 'mongoose';
+import { Types, FilterQuery, PipelineStage } from 'mongoose';
 import { Expense, IExpense, ISplit } from './expense.model';
+import { Stop } from '../trips/stop.model';
 import { Trip } from '../trips/trip.model';
 import { incrementStopTotals, decrementStopTotals } from '../trips/trip.service';
 import { AppError } from '../../shared/errors/AppError';
@@ -186,13 +187,15 @@ export const createExpense = async (
   adderUid: string,
   adderDisplayName: string
 ): Promise<IExpense> => {
-  const trip = await Trip.findOne({
-    isArchived: false,
-    'stops._id': new Types.ObjectId(input.stopId),
-  });
+  const stop = await Stop.findById(input.stopId);
+  if (!stop) {
+    throw new AppError('Stop not found', 404);
+  }
 
-  if (!trip) {
-    throw new AppError('Trip or stop not found', 404);
+  const trip = await Trip.findById(stop.tripId);
+  
+  if (!trip || trip.isArchived) {
+    throw new AppError('Trip not found or archived', 404);
   }
 
   if (!trip.isMember(adderUid)) {
@@ -201,15 +204,6 @@ export const createExpense = async (
 
   if (!trip.canEdit(adderUid)) {
     throw new AppError('Viewers cannot add expenses', 403);
-  }
-
-  // Find the stop
-  const stop = trip.stops.find(
-    (s) => s._id.toString() === input.stopId
-  );
-
-  if (!stop) {
-    throw new AppError('Stop not found in this trip', 404);
   }
 
   // Validate payer is an active trip member
@@ -389,34 +383,93 @@ export const getMyExpenses = async (
   query: ExpenseListQuery
 ) => {
   const filter: FilterQuery<IExpense> = { 
-    $or: [
-      { paidBy: userId },
-      { 'splits.userId': userId }
-    ],
     isArchived: query.isArchived === true,
   };
 
+  // Base user filter: user paid it, or user is in the splits
+  const userInvolvedFilter = {
+    $or: [
+      { paidBy: userId },
+      { 'splits.userId': userId }
+    ]
+  };
+
+  if (query.tripId) filter.tripId = query.tripId;
+  if (query.paidBy) filter.paidBy = query.paidBy;
   if (query.category) filter.category = query.category;
   if (query.isSettled !== undefined) filter.isSettled = query.isSettled;
 
+  // Advanced filters (type)
+  if (query.type) {
+    if (query.type === 'you_owe') {
+      filter.paidBy = { $ne: userId };
+      filter.splits = { $elemMatch: { userId: userId, isPaid: false } };
+    } else if (query.type === 'you_paid') {
+      filter.paidBy = userId;
+    } else if (query.type === 'unsettled') {
+      filter.isSettled = false;
+      Object.assign(filter, userInvolvedFilter);
+    } else if (query.type === 'settled') {
+      filter.isSettled = true;
+      Object.assign(filter, userInvolvedFilter);
+    } else {
+      Object.assign(filter, userInvolvedFilter);
+    }
+  } else {
+    Object.assign(filter, userInvolvedFilter);
+  }
+
+  // Handle personId filter (who you owe or who owes you)
+  if (query.personId) {
+    filter.$and = filter.$and || [];
+    filter.$and.push({
+      $or: [
+        { paidBy: query.personId, 'splits.userId': userId }, // I owe them
+        { paidBy: userId, 'splits.userId': query.personId }  // They owe me
+      ]
+    });
+  }
+
+  const sort: Record<string, 1 | -1> = {};
+  const order = query.sortOrder === 'asc' ? 1 : -1;
+  
+  if (query.sortBy === 'tripId') {
+    sort.tripId = order;
+    sort.date = -1; // Tie-breaker
+  } else if (query.sortBy === 'paidBy') {
+    sort.paidBy = order;
+    sort.date = -1;
+  } else {
+    sort[query.sortBy || 'date'] = order;
+  }
+
   const skip = (query.page - 1) * query.limit;
 
-  const [expenses, total] = await Promise.all([
+  const [expenses, total, stats] = await Promise.all([
     Expense.find(filter)
-      .sort({ date: -1 })
+      .sort(sort)
       .skip(skip)
       .limit(query.limit)
+      .populate('tripId', 'title')
       .lean(),
     Expense.countDocuments(filter),
+    Expense.aggregate([
+      { $match: filter },
+      { $group: { _id: null, totalAmount: { $sum: '$amountBase' } } }
+    ]),
   ]);
+
+  const totalAmountFiltered = stats.length > 0 ? stats[0].totalAmount : 0;
 
   return {
     expenses,
+    totalAmount: totalAmountFiltered,
     pagination: {
       total,
       page: query.page,
       limit: query.limit,
       pages: Math.ceil(total / query.limit),
+      hasMore: query.page * query.limit < total,
     },
   };
 };
@@ -442,6 +495,63 @@ export const getExpenseById = async (
   }
 
   return expense;
+};
+
+/**
+ * Get aggregated summary of expenses for a stop (category breakdown and payer breakdown).
+ */
+export const getStopExpenseSummary = async (
+  stopId: string,
+  requestingUid: string
+) => {
+  const stop = await Stop.findById(stopId);
+  if (!stop) {
+    throw new AppError('Stop not found', 404);
+  }
+
+  // Verify trip membership
+  const trip = await Trip.findById(stop.tripId);
+  if (!trip || !trip.isMember(requestingUid)) {
+    throw new AppError('You are not a member of this trip', 403);
+  }
+
+  const pipeline: PipelineStage[] = [
+    { $match: { stopId: new Types.ObjectId(stopId), isArchived: false } },
+    {
+      $facet: {
+        byCategory: [
+          {
+            $group: {
+              _id: '$category',
+              totalLocal: { $sum: '$amountLocal' },
+              totalBase: { $sum: '$amountBase' },
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { totalLocal: -1 } }
+        ],
+        byPayer: [
+          {
+            $group: {
+              _id: '$paidBy',
+              paidByName: { $first: '$paidByName' },
+              totalPaidLocal: { $sum: '$amountLocal' },
+              totalPaidBase: { $sum: '$amountBase' },
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { totalPaidLocal: -1 } }
+        ]
+      }
+    }
+  ];
+
+  const result = await Expense.aggregate(pipeline);
+
+  return {
+    categoryBreakdown: result[0]?.byCategory || [],
+    payerBreakdown: result[0]?.byPayer || []
+  };
 };
 
 // ============================================================

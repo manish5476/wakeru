@@ -30,6 +30,12 @@ router.get(
 );
 
 router.get(
+  '/stop/:stopId/summary',
+  validate(stopExpenseParamSchema, 'params'),
+  expenseController.getStopExpenseSummary
+);
+
+router.get(
   '/stop/:stopId',
   validate(stopExpenseParamSchema, 'params'),
   validate(expenseListQuerySchema, 'query'),

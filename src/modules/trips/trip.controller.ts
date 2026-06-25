@@ -60,6 +60,7 @@ export const createTrip = async (
       displayName: user.displayName,
       photoURL: user.photoURL,
     });
+    await trip.populate('stops');
 
     res.status(201).json({
       success: true,
@@ -83,18 +84,32 @@ export const getMyTrips = async (
 ): Promise<void> => {
   try {
     const user = getUser(req);
-    const { status, includeArchived } = req.query;
+    const { status, includeArchived, page, limit, searchName, searchUser, dateRange } = req.query;
 
-    const trips = await tripService.getUserTrips(user.uid, {
-      status: status as string | undefined,
-      includeArchived: includeArchived === 'true',
-    });
+    const [paginatedData, stats] = await Promise.all([
+      tripService.getUserTrips(user.uid, {
+        status: status as string | undefined,
+        includeArchived: includeArchived === 'true',
+        page: page ? parseInt(page as string, 10) : undefined,
+        limit: limit ? parseInt(limit as string, 10) : undefined,
+        searchName: searchName as string | undefined,
+        searchUser: searchUser as string | undefined,
+        dateRange: dateRange as string | undefined,
+      }),
+      tripService.getUserTripStats(user.uid)
+    ]);
 
     res.status(200).json({
       success: true,
       data: {
-        trips,
-        count: trips.length,
+        trips: paginatedData.trips,
+        pagination: {
+          totalCount: paginatedData.totalCount,
+          totalPages: paginatedData.totalPages,
+          page: page ? parseInt(page as string, 10) : 1,
+          limit: limit ? parseInt(limit as string, 10) : 10,
+        },
+        stats
       },
     });
   } catch (err) {
@@ -114,6 +129,7 @@ export const getTrip = async (
 ): Promise<void> => {
   try {
     const trip = getTripFromReq(req);
+    await trip.populate('stops');
 
     res.status(200).json({
       success: true,
@@ -162,6 +178,7 @@ export const updateTrip = async (
     const input = req.body as UpdateTripInput;
 
     const updated = await tripService.updateTrip(trip, input);
+    await updated.populate('stops');
 
     res.status(200).json({
       success: true,
@@ -263,6 +280,7 @@ export const addStop = async (
     const input = req.body as CreateStopInput;
 
     const updated = await tripService.addStop(trip, input, user.uid);
+    await updated.populate('stops');
 
     // Return the newly added stop (last one in the sorted array)
     const newStop = updated.stops[updated.stops.length - 1];
@@ -293,6 +311,7 @@ export const updateStop = async (
     const input = req.body as UpdateStopInput;
 
     const updated = await tripService.updateStop(trip, stopId, input);
+    await updated.populate('stops');
     const stop = updated.stops.find((s) => s._id.toString() === stopId);
 
     res.status(200).json({
@@ -326,6 +345,7 @@ export const updateStopRate = async (
       stopId,
       input
     );
+    await updated.populate('stops');
     const stop = updated.stops.find((s) => s._id.toString() === stopId);
 
     res.status(200).json({
@@ -357,6 +377,7 @@ export const reorderStops = async (
     const input = req.body as ReorderStopsInput;
 
     const updated = await tripService.reorderStops(trip, input);
+    await updated.populate('stops');
 
     res.status(200).json({
       success: true,
@@ -838,4 +859,4 @@ export const createTripFromTemplate = async (
     next(err);
   }
 };
-
+

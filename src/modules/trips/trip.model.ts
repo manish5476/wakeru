@@ -39,47 +39,7 @@ export interface ITripMember {
   totalOwesBase: number;   // cached — sum of all splits owed by this member (in baseCurrency)
 }
 
-/**
- * Stop — embedded in trip.stops[]
- *
- * A Stop is a geographic location within a trip (city, country, region).
- * Each stop has its own local currency and exchange rate to the trip's baseCurrency.
- *
- * WHY EMBEDDED (MVP decision):
- * For an MVP with ≤20 stops per trip, embedding is simpler — no extra collection,
- * no cross-collection joins for the trip dashboard view.
- * If you later need stop-level pagination or separate CRUD, extract to a Stop collection.
- *
- * Stops have their own _id (Types.ObjectId) so that expenses, exchange rate logs,
- * and other documents can reference them as stopId.
- */
-export interface IStop {
-  _id: Types.ObjectId;
-  name: string;                  // e.g. "Dubai", "Paris 2nd Arrondissement"
-  emoji?: string;                // flag emoji — e.g. "🇦🇪"
-  country?: string;              // ISO country code — e.g. "AE", "FR", "IN"
-  location?: {
-    lat: number;
-    lng: number;
-    formattedAddress: string;
-  };
-  currency: string;              // ISO 4217 — e.g. "AED", "EUR". Must be UPPERCASE.
-  currentExchangeRate: number;   // rate to trip.baseCurrency. 1.0 if same currency.
-  rateLastUpdated?: Date;        // when currentExchangeRate was last changed
-  budget?: number;               // optional budget in stop's LOCAL currency
-  budgetBase?: number;           // computed: budget * currentExchangeRate (in baseCurrency)
-  order: number;                 // display order — user can drag to reorder
-  startDate?: Date;              // when group arrived at this stop
-  endDate?: Date;                // when group left
-  notes?: string;                // e.g. "Stayed at Marina district"
-  coverImage?: string;           // Cloudinary URL
-  totalSpentLocal: number;       // cached — sum of expenses in stop's local currency
-  totalSpentBase: number;        // cached — sum of expenses converted to baseCurrency
-  expenseCount: number;          // cached — shown on stop card
-  createdBy: string;             // Firebase UID of who created this stop
-  createdAt: Date;
-  updatedAt: Date;               // important: updated whenever totals/rate change
-}
+import { IStop } from './stop.model';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TRIP DOCUMENT INTERFACE
@@ -105,7 +65,7 @@ export interface ITrip extends Document {
   createdBy: string;       // Firebase UID of the creator (auto-added as admin)
   members: ITripMember[];
 
-  // Stops — embedded geographic locations
+  // Stops — referenced
   stops: IStop[];
 
   // Cached aggregates (kept in sync by Expense service via $inc — never compute here)
@@ -169,74 +129,6 @@ const tripMemberSchema = new Schema<ITripMember>(
   }
 );
 
-const stopSchema = new Schema<IStop>(
-  {
-    name: {
-      type: String,
-      required: [true, 'Stop name is required'],
-      trim: true,
-      maxlength: [100, 'Stop name cannot exceed 100 characters'],
-    },
-    emoji: { type: String },
-    country: {
-      type: String,
-      uppercase: true,
-      maxlength: 3,
-    },
-    location: {
-      lat: { type: Number },
-      lng: { type: Number },
-      formattedAddress: { type: String },
-    },
-    currency: {
-      type: String,
-      required: [true, 'Stop currency is required'],
-      uppercase: true,
-      minlength: 3,
-      maxlength: 3,
-    },
-    currentExchangeRate: {
-      type: Number,
-      required: [true, 'Exchange rate is required'],
-      default: 1.0,
-      min: [0.000001, 'Exchange rate must be positive'],
-    },
-    rateLastUpdated: { type: Date },
-    budget: { type: Number, min: 0 },
-    budgetBase: { type: Number, min: 0 },  // computed on save, not user-supplied
-    order: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    startDate: { type: Date },
-    endDate: { type: Date },
-    notes: {
-      type: String,
-      maxlength: [1000, 'Notes cannot exceed 1000 characters'],
-    },
-    coverImage: { type: String, default: 'https://i.pinimg.com/736x/68/11/6b/68116be5b8fcd754b7f811625bd51223.jpg' },
-    totalSpentLocal: { type: Number, default: 0 },
-    totalSpentBase: { type: Number, default: 0 },
-    expenseCount: { type: Number, default: 0, min: 0 },
-    createdBy: {
-      type: String,
-      required: [true, 'Stop createdBy is required'],
-    },
-  },
-  {
-    _id: true,       // stops NEED their own _id — expenses reference stopId
-    timestamps: true, // gives createdAt + updatedAt on each stop
-  }
-);
-
-// Auto-compute budgetBase whenever budget or exchange rate changes
-stopSchema.pre('save', function (next) {
-  if (this.budget !== undefined && this.currentExchangeRate) {
-    this.budgetBase = parseFloat((this.budget * this.currentExchangeRate).toFixed(2));
-  }
-  next();
-});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TRIP SCHEMA
@@ -272,7 +164,7 @@ const tripSchema = new Schema<ITrip>(
     status: {
       type: String,
       enum: { values: TRIP_STATUSES, message: '{VALUE} is not a valid status' },
-      default: 'planning',
+      default: 'active',
       index: true,
     },
 
@@ -297,10 +189,12 @@ const tripSchema = new Schema<ITrip>(
       default: [],
     },
 
-    stops: {
-      type: [stopSchema],
-      default: [],
-    },
+    stops: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Stop',
+      },
+    ],
 
     // Cached aggregates — NEVER set these directly from app code.
     // Always update via:
@@ -452,7 +346,14 @@ tripSchema.methods.canEdit = function (userId: string): boolean {
  * Returns undefined if stop not found
  */
 tripSchema.methods.getStop = function (stopId: string): IStop | undefined {
-  return this.stops.find((s: IStop) => s._id.toString() === stopId);
+  return this.stops.find((s: IStop | Types.ObjectId) => {
+    // If stops are populated, s._id exists
+    if (s && typeof s === 'object' && '_id' in s) {
+      return (s as IStop)._id.toString() === stopId;
+    }
+    // If stops are not populated, s is just the ObjectId
+    return (s as any).toString() === stopId;
+  }) as IStop | undefined;
 };
 
 /**

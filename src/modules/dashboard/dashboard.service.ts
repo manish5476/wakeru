@@ -14,15 +14,35 @@ export const dashboardService = {
      * Get complete dashboard data for a user.
      * Single API call that returns everything the dashboard needs.
      */
-    async getDashboard(userId: string) {
+    async getDashboard(userId: string, type?: string) {
         const now = new Date();
         const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
-        const userFilter = {
+        let userFilter: any = {
             $or: [{ paidBy: userId }, { 'splits.userId': userId }],
         };
+
+        if (type) {
+            if (type === 'you_owe') {
+                userFilter = {
+                    paidBy: { $ne: userId },
+                    splits: { $elemMatch: { userId: userId, isPaid: false } },
+                };
+            } else if (type === 'you_paid') {
+                userFilter = { paidBy: userId };
+            } else if (type === 'unsettled') {
+                userFilter.isSettled = false;
+                userFilter.$or = [{ paidBy: userId }, { 'splits.userId': userId }];
+            } else if (type === 'settled') {
+                userFilter.isSettled = true;
+                userFilter.$or = [{ paidBy: userId }, { 'splits.userId': userId }];
+            } else if (type === 'archived') {
+                userFilter.isArchived = true;
+                userFilter.$or = [{ paidBy: userId }, { 'splits.userId': userId }];
+            }
+        }
 
         // Run ALL queries in parallel for speed
         const [
@@ -40,23 +60,23 @@ export const dashboardService = {
         ] = await Promise.all([
             // This month summary
             Expense.aggregate([
-                { $match: { ...userFilter, date: { $gte: thisMonthStart } } },
+                { $match: { $and: [userFilter, { date: { $gte: thisMonthStart } }] } },
                 { $group: { _id: null, total: { $sum: '$amountBase' }, count: { $sum: 1 }, avg: { $avg: '$amountBase' } } },
             ]),
             // Last month summary
             Expense.aggregate([
-                { $match: { ...userFilter, date: { $gte: lastMonthStart, $lt: thisMonthStart } } },
+                { $match: { $and: [userFilter, { date: { $gte: lastMonthStart, $lt: thisMonthStart } }] } },
                 { $group: { _id: null, total: { $sum: '$amountBase' }, count: { $sum: 1 } } },
             ]),
             // Category breakdown
             Expense.aggregate([
-                { $match: { ...userFilter, date: { $gte: thisMonthStart } } },
+                { $match: { $and: [userFilter, { date: { $gte: thisMonthStart } }] } },
                 { $group: { _id: '$category', total: { $sum: '$amountBase' }, count: { $sum: 1 } } },
                 { $sort: { total: -1 } },
             ]),
             // Monthly trend (6 months)
             Expense.aggregate([
-                { $match: { ...userFilter, date: { $gte: sixMonthsAgo } } },
+                { $match: { $and: [userFilter, { date: { $gte: sixMonthsAgo } }] } },
                 { $group: { _id: { year: { $year: '$date' }, month: { $month: '$date' } }, total: { $sum: '$amountBase' }, count: { $sum: 1 } } },
                 { $sort: { '_id.year': 1, '_id.month': 1 } },
             ]),
@@ -64,22 +84,32 @@ export const dashboardService = {
             Expense.find(userFilter).select('title amountBase amountLocal localCurrency baseCurrency date category paidBy paidByName splits.isPaid splits.userId splits.displayName splits.amountBase tripId').lean(),
             // Expenses where USER owes money: someone else paid, and user's own split is still unpaid
             Expense.find({
-                paidBy: { $ne: userId },
-                splits: { $elemMatch: { userId: userId, isPaid: false } },
+                $and: [
+                    userFilter,
+                    {
+                        paidBy: { $ne: userId },
+                        splits: { $elemMatch: { userId: userId, isPaid: false } },
+                    }
+                ]
             }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId')
               .populate('tripId', 'title')
               .lean(),
             // Expenses where user IS OWED money: user paid, and at least one other person's split is unpaid
             Expense.find({
-                paidBy: userId,
-                splits: { $elemMatch: { userId: { $ne: userId }, isPaid: false } },
+                $and: [
+                    userFilter,
+                    {
+                        paidBy: userId,
+                        splits: { $elemMatch: { userId: { $ne: userId }, isPaid: false } },
+                    }
+                ]
             }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId')
               .populate('tripId', 'title')
               .lean(),
             // Active trips
             Trip.countDocuments({ 'members.userId': userId, 'members.isActive': true, status: { $in: ['active', 'planning'] }, isArchived: false }),
             // Pending settlements
-            Expense.countDocuments({ ...userFilter, isSettled: false }),
+            Expense.countDocuments({ $and: [userFilter, { isSettled: false }] }),
             // User balances
             User.findById(userId).select('totalLentAcrossTrips totalOwedAcrossTrips displayName photoURL').lean(),
             // Recent expenses (last 5)

@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { Types } from 'mongoose';
-import { Trip, ITrip, IStop, ITripMember } from './trip.model';
+import { Trip, ITrip, ITripMember } from './trip.model';
+import { Stop, IStop } from './stop.model';
 import { User } from '../auth/auth.model';
 import { JoinRequest, IJoinRequest } from './join_request.model';
 import { invitationService } from './invitation.service';
@@ -113,6 +114,17 @@ interface UserInfo {
 interface TripFilters {
   status?: string;
   includeArchived?: boolean;
+  page?: number;
+  limit?: number;
+  searchName?: string;
+  searchUser?: string;
+  dateRange?: string;
+}
+
+interface PaginatedTrips {
+  trips: ITrip[];
+  totalCount: number;
+  totalPages: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -215,7 +227,8 @@ export const createTrip = async (
   // ✅ NEW: Always ensure at least ONE stop exists
   if (initialStop) {
     const stop = buildStopSubdoc(initialStop, creator.uid, 0);
-    trip.stops.push(stop as any);
+    const newStop = await Stop.create({ ...stop, tripId: trip._id });
+    trip.stops.push(newStop._id as any);
   } else {
     // Auto-create a default stop matching the trip
     // This makes the trip work like a simple expense group for basic users
@@ -230,7 +243,8 @@ export const createTrip = async (
       creator.uid,
       0
     );
-    trip.stops.push(defaultStop as any);
+    const newStop = await Stop.create({ ...defaultStop, tripId: trip._id });
+    trip.stops.push(newStop._id as any);
   }
 
   trip.stopCount = trip.stops.length;
@@ -244,7 +258,13 @@ export const createTrip = async (
 export const getUserTrips = async (
   userId: string,
   filters: TripFilters = {}
-): Promise<ITrip[]> => {
+): Promise<PaginatedTrips> => {
+  // Auto-Complete Automation
+  await Trip.updateMany(
+    { 'members.userId': userId, status: { $in: ['active', 'planning'] }, endDate: { $lt: new Date() } },
+    { $set: { status: 'completed' } }
+  );
+
   const query: Record<string, unknown> = {
     'members.userId': userId,
     'members.isActive': true,
@@ -257,9 +277,76 @@ export const getUserTrips = async (
   if (filters.status) {
     query.status = filters.status;
   }
+  
+  if (filters.searchName) {
+    query.title = { $regex: filters.searchName, $options: 'i' };
+  }
+  
+  if (filters.searchUser) {
+    query['members.displayName'] = { $regex: filters.searchUser, $options: 'i' };
+  }
+  
+  if (filters.dateRange && filters.dateRange !== 'all') {
+    const now = new Date();
+    if (filters.dateRange === 'upcoming') {
+      query.startDate = { $gte: now };
+    } else if (filters.dateRange === 'past') {
+      query.endDate = { $lt: now };
+    } else if (filters.dateRange === 'this_month') {
+      const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      query.startDate = { $gte: thisMonthStart, $lt: nextMonthStart };
+    }
+  }
 
-  const trips = await Trip.find(query).sort({ startDate: -1 }).lean().exec();
-  return trips as unknown as ITrip[];
+  const page = filters.page ? Number(filters.page) : 1;
+  const limit = filters.limit ? Number(filters.limit) : 10;
+  const skip = (page - 1) * limit;
+
+  const totalCount = await Trip.countDocuments(query);
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const trips = await Trip.find(query)
+    .sort({ startDate: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate('stops')
+    .lean()
+    .exec();
+
+  return { trips: trips as unknown as ITrip[], totalCount, totalPages };
+};
+
+/**
+ * Get aggregated stats across all active trips for a user.
+ */
+export const getUserTripStats = async (userId: string) => {
+  const query = {
+    'members.userId': userId,
+    'members.isActive': true,
+    isArchived: false,
+  };
+
+  const trips = await Trip.find(query).lean().exec();
+
+  let activeTripsCount = 0;
+  let totalSpentBase = 0;
+  let totalTravelers = 0;
+
+  for (const trip of trips) {
+    if (trip.status === 'active' || trip.status === 'planning') {
+      activeTripsCount++;
+    }
+    totalSpentBase += trip.totalSpentBase || 0;
+    totalTravelers += trip.members?.length || 0;
+  }
+
+  return {
+    activeTripsCount,
+    totalSpentBase,
+    totalCountries: 4, // Placeholder matching frontend
+    totalTravelers
+  };
 };
 
 /**
@@ -270,7 +357,7 @@ export const getTripById = async (
   tripId: string,
   userId: string
 ): Promise<ITrip> => {
-  const trip = await Trip.findOne({ _id: tripId });
+  const trip = await Trip.findOne({ _id: tripId }).populate('stops');
 
   if (!trip) {
     throw new AppError('Trip not found', 404);
@@ -350,7 +437,7 @@ export const deleteTripPermanent = async (trip: ITrip, userId: string): Promise<
  * Used for the main trip dashboard view.
  */
 export const getTripSummary = async (tripId: string) => {
-  const trip = await Trip.findById(tripId).lean();
+  const trip = await Trip.findById(tripId).populate('stops').lean();
 
   if (!trip) {
     throw new AppError('Trip not found', 404);
@@ -429,11 +516,14 @@ export const addStop = async (
   const order =
     input.order !== undefined ? input.order : trip.stops.length;
 
-  const newStop = buildStopSubdoc(input, creatorUid, order);
-  trip.stops.push(newStop as any);
+  const newStopData = buildStopSubdoc(input, creatorUid, order);
+  const newStop = await Stop.create({ ...newStopData, tripId: trip._id });
+  
+  trip.stops.push(newStop._id as any);
   trip.stopCount = trip.stops.length;
 
   await trip.save();
+  await trip.populate('stops'); // Populate to return full objects if needed
 
   socketServer.notifyStopAdded(
     trip._id.toString(),
@@ -453,15 +543,11 @@ export const updateStop = async (
   stopId: string,
   input: UpdateStopInput
 ): Promise<ITrip> => {
-  const stopIndex = trip.stops.findIndex(
-    (s) => s._id.toString() === stopId
-  );
+  const stop = await Stop.findById(stopId);
 
-  if (stopIndex === -1) {
-    throw new AppError('Stop not found', 404);
+  if (!stop || stop.tripId.toString() !== trip._id.toString()) {
+    throw new AppError('Stop not found in this trip', 404);
   }
-
-  const stop = trip.stops[stopIndex];
 
   // Track when exchange rate changes
   if (
@@ -498,7 +584,8 @@ export const updateStop = async (
     );
   }
 
-  await trip.save();
+  await stop.save();
+  await trip.populate('stops');
   return trip;
 };
 
@@ -513,9 +600,9 @@ export const updateStopExchangeRate = async (
   stopId: string,
   input: UpdateExchangeRateInput
 ): Promise<ITrip> => {
-  const stop = trip.stops.find((s) => s._id.toString() === stopId);
+  const stop = await Stop.findById(stopId);
 
-  if (!stop) {
+  if (!stop || stop.tripId.toString() !== trip._id.toString()) {
     throw new AppError('Stop not found', 404);
   }
 
@@ -529,7 +616,8 @@ export const updateStopExchangeRate = async (
     );
   }
 
-  await trip.save();
+  await stop.save();
+  await trip.populate('stops');
 
   socketServer.notifyExchangeRateUpdated(
     trip._id.toString(),
@@ -552,7 +640,7 @@ export const reorderStops = async (
   const { stopIds } = input;
 
   // Validate all provided IDs exist in this trip
-  const existingIds = trip.stops.map((s) => s._id.toString());
+  const existingIds = trip.stops.map((s: any) => s._id ? s._id.toString() : s.toString());
   const allValid = stopIds.every((id: string) => existingIds.includes(id));
 
   if (!allValid || stopIds.length !== trip.stops.length) {
@@ -562,16 +650,22 @@ export const reorderStops = async (
     );
   }
 
-  // Assign new order values based on position in the input array
-  stopIds.forEach((stopId: string, index: number) => {
-    const stop = trip.stops.find((s) => s._id.toString() === stopId);
-    if (stop) stop.order = index;
+  // Update order in Stop collection
+  await Promise.all(
+    stopIds.map((stopId: string, index: number) =>
+      Stop.findByIdAndUpdate(stopId, { order: index })
+    )
+  );
+
+  // Update trip.stops array order
+  trip.stops.sort((a: any, b: any) => {
+    const aId = a._id ? a._id.toString() : a.toString();
+    const bId = b._id ? b._id.toString() : b.toString();
+    return stopIds.indexOf(aId) - stopIds.indexOf(bId);
   });
 
-  // Sort the embedded array by new order
-  trip.stops.sort((a, b) => a.order - b.order);
-
   await trip.save();
+  await trip.populate('stops');
   return trip;
 };
 
@@ -592,22 +686,31 @@ export const deleteStop = async (
   }
 
   const stopIndex = trip.stops.findIndex(
-    (s) => s._id.toString() === stopId
+    (s: any) => (s._id ? s._id.toString() : s.toString()) === stopId
   );
 
   if (stopIndex === -1) {
-    throw new AppError('Stop not found', 404);
+    throw new AppError('Stop not found in this trip', 404);
   }
+
+  await Stop.findByIdAndDelete(stopId);
 
   trip.stops.splice(stopIndex, 1);
   trip.stopCount = trip.stops.length;
 
-  // Re-normalize order values after deletion
-  trip.stops.forEach((s, i) => {
-    s.order = i;
-  });
-
   await trip.save();
+  
+  // Re-normalize order values after deletion
+  if (trip.stops.length > 0) {
+    await Promise.all(
+      trip.stops.map((s: any, i) => {
+        const id = s._id ? s._id : s;
+        return Stop.findByIdAndUpdate(id, { order: i });
+      })
+    );
+  }
+
+  await trip.populate('stops');
   return trip;
 };
 
@@ -998,18 +1101,19 @@ export const incrementStopTotals = async (
   payerUid: string,
   owedAmounts: { userId: string; amountBase: number }[]
 ): Promise<void> => {
-  // Update stop totals + trip total
-  await Trip.findOneAndUpdate(
-    { _id: tripId, 'stops._id': new Types.ObjectId(stopId) },
-    {
-      $inc: {
-        totalSpentBase: amountBase,
-        'stops.$.totalSpentBase': amountBase,
-        'stops.$.totalSpentLocal': amountLocal,
-        'stops.$.expenseCount': 1,
-      },
-    }
-  );
+  // 1. Update Trip totalSpentBase
+  await Trip.findByIdAndUpdate(tripId, {
+    $inc: { totalSpentBase: amountBase },
+  });
+
+  // 2. Update Stop totals
+  await Stop.findByIdAndUpdate(stopId, {
+    $inc: {
+      totalSpentBase: amountBase,
+      totalSpentLocal: amountLocal,
+      expenseCount: 1,
+    },
+  });
 
   // Update payer's totalPaidBase
   await Trip.findOneAndUpdate(
@@ -1038,17 +1142,19 @@ export const decrementStopTotals = async (
   payerUid: string,
   owedAmounts: { userId: string; amountBase: number }[]
 ): Promise<void> => {
-  await Trip.findOneAndUpdate(
-    { _id: tripId, 'stops._id': new Types.ObjectId(stopId) },
-    {
-      $inc: {
-        totalSpentBase: -amountBase,
-        'stops.$.totalSpentBase': -amountBase,
-        'stops.$.totalSpentLocal': -amountLocal,
-        'stops.$.expenseCount': -1,
-      },
-    }
-  );
+  // 1. Update Trip totalSpentBase
+  await Trip.findByIdAndUpdate(tripId, {
+    $inc: { totalSpentBase: -amountBase },
+  });
+
+  // 2. Update Stop totals
+  await Stop.findByIdAndUpdate(stopId, {
+    $inc: {
+      totalSpentBase: -amountBase,
+      totalSpentLocal: -amountLocal,
+      expenseCount: -1,
+    },
+  });
 
   await Trip.findOneAndUpdate(
     { _id: tripId, 'members.userId': payerUid },

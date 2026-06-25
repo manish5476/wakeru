@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getExpenseById = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = exports.computeSplits = void 0;
 const mongoose_1 = require("mongoose");
 const expense_model_1 = require("./expense.model");
+const stop_model_1 = require("../trips/stop.model");
 const trip_model_1 = require("../trips/trip.model");
 const trip_service_1 = require("../trips/trip.service");
 const AppError_1 = require("../../shared/errors/AppError");
@@ -133,23 +134,19 @@ exports.computeSplits = computeSplits;
  * 5. Atomically update trip/stop cached totals via $inc
  */
 const createExpense = async (input, adderUid, adderDisplayName) => {
-    const trip = await trip_model_1.Trip.findOne({
-        isArchived: false,
-        'stops._id': new mongoose_1.Types.ObjectId(input.stopId),
-    });
-    if (!trip) {
-        throw new AppError_1.AppError('Trip or stop not found', 404);
+    const stop = await stop_model_1.Stop.findById(input.stopId);
+    if (!stop) {
+        throw new AppError_1.AppError('Stop not found', 404);
+    }
+    const trip = await trip_model_1.Trip.findById(stop.tripId);
+    if (!trip || trip.isArchived) {
+        throw new AppError_1.AppError('Trip not found or archived', 404);
     }
     if (!trip.isMember(adderUid)) {
         throw new AppError_1.AppError('You are not a member of this trip', 403);
     }
     if (!trip.canEdit(adderUid)) {
         throw new AppError_1.AppError('Viewers cannot add expenses', 403);
-    }
-    // Find the stop
-    const stop = trip.stops.find((s) => s._id.toString() === input.stopId);
-    if (!stop) {
-        throw new AppError_1.AppError('Stop not found in this trip', 404);
     }
     // Validate payer is an active trip member
     const payer = trip.getMember(input.paidBy);

@@ -83,6 +83,30 @@ export const getStopExpenses = async (
 };
 
 /**
+ * GET /api/v1/expenses/stop/:stopId/summary
+ * Get expense summary for a specific stop.
+ */
+export const getStopExpenseSummary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { stopId } = req.params;
+
+    const result = await expenseService.getStopExpenseSummary(stopId, user.uid);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * GET /api/v1/expenses/trip/:tripId
  * List ALL expenses across all stops for a trip.
  */
