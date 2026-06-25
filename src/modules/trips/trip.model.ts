@@ -215,7 +215,7 @@ const stopSchema = new Schema<IStop>(
       type: String,
       maxlength: [1000, 'Notes cannot exceed 1000 characters'],
     },
-    coverImage: { type: String },
+    coverImage: { type: String, default: 'https://i.pinimg.com/736x/68/11/6b/68116be5b8fcd754b7f811625bd51223.jpg' },
     totalSpentLocal: { type: Number, default: 0 },
     totalSpentBase: { type: Number, default: 0 },
     expenseCount: { type: Number, default: 0, min: 0 },
@@ -254,7 +254,7 @@ const tripSchema = new Schema<ITrip>(
       type: String,
       maxlength: [1000, 'Description cannot exceed 1000 characters'],
     },
-    coverImage: { type: String },
+    coverImage: { type: String, default: 'https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg' },
     template: {
       type: String,
       enum: ['quick', 'domestic', 'international'],
