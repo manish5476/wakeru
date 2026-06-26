@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getExpense = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = void 0;
+exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getExpense = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenseSummary = exports.getStopExpenses = exports.createExpense = void 0;
 const expenseService = __importStar(require("./expense.service"));
 const AppError_1 = require("../../shared/errors/AppError");
 // ============================================================
@@ -94,6 +94,25 @@ const getStopExpenses = async (req, res, next) => {
     }
 };
 exports.getStopExpenses = getStopExpenses;
+/**
+ * GET /api/v1/expenses/stop/:stopId/summary
+ * Get expense summary for a specific stop.
+ */
+const getStopExpenseSummary = async (req, res, next) => {
+    try {
+        const user = getUser(req);
+        const { stopId } = req.params;
+        const result = await expenseService.getStopExpenseSummary(stopId, user.uid);
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.getStopExpenseSummary = getStopExpenseSummary;
 /**
  * GET /api/v1/expenses/trip/:tripId
  * List ALL expenses across all stops for a trip.

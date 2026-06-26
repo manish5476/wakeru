@@ -156,6 +156,10 @@ expenseSchema.index({ paidBy: 1, date: -1 });
 expenseSchema.index({ tripId: 1, category: 1 });
 // Settlement queries
 expenseSchema.index({ tripId: 1, isSettled: 1 });
+// User involved in splits
+expenseSchema.index({ 'splits.userId': 1, date: -1 });
+// User involved in splits for a specific trip
+expenseSchema.index({ tripId: 1, 'splits.userId': 1 });
 // ============================================================
 // PRE-SAVE HOOK
 // ============================================================

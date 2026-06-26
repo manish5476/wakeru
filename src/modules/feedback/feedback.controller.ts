@@ -68,12 +68,27 @@ export const feedbackController = {
   /** GET /api/v1/feedback */
   async list(req: Request, res: Response, next: NextFunction) {
     try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 50;
+      const skip = (page - 1) * limit;
+
       // Find all feedbacks, sort newest first
-      const feedbacks = await Feedback.find({}).sort({ createdAt: -1 }).lean();
+      const [feedbacks, total] = await Promise.all([
+        Feedback.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+        Feedback.countDocuments({}),
+      ]);
 
       res.status(200).json({
         success: true,
-        data: { feedbacks },
+        data: {
+          feedbacks,
+          pagination: {
+            total,
+            page,
+            limit,
+            pages: Math.ceil(total / limit),
+          }
+        },
       });
     } catch (err) {
       next(err);

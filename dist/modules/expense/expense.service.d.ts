@@ -78,11 +78,13 @@ export declare const getMyExpenses: (userId: string, query: ExpenseListQuery) =>
     }> & {
         __v: number;
     })[];
+    totalAmount: any;
     pagination: {
         total: number;
         page: number;
         limit: number;
         pages: number;
+        hasMore: boolean;
     };
 }>;
 /**
@@ -90,6 +92,13 @@ export declare const getMyExpenses: (userId: string, query: ExpenseListQuery) =>
  * Validates the requester is a member of the trip.
  */
 export declare const getExpenseById: (expenseId: string, requestingUid: string) => Promise<IExpense>;
+/**
+ * Get aggregated summary of expenses for a stop (category breakdown and payer breakdown).
+ */
+export declare const getStopExpenseSummary: (stopId: string, requestingUid: string) => Promise<{
+    categoryBreakdown: any;
+    payerBreakdown: any;
+}>;
 /**
  * Update an expense.
  *

@@ -47,6 +47,7 @@ router.use(auth_middleware_1.protect);
 // SPECIFIC ROUTES (before /:expenseId to avoid conflicts)
 // ============================================================
 router.get('/mine', (0, trip_middleware_1.validate)(expense_validation_1.expenseListQuerySchema, 'query'), expenseController.getMyExpenses);
+router.get('/stop/:stopId/summary', (0, trip_middleware_1.validate)(expense_validation_1.stopExpenseParamSchema, 'params'), expenseController.getStopExpenseSummary);
 router.get('/stop/:stopId', (0, trip_middleware_1.validate)(expense_validation_1.stopExpenseParamSchema, 'params'), (0, trip_middleware_1.validate)(expense_validation_1.expenseListQuerySchema, 'query'), expenseController.getStopExpenses);
 router.get('/trip/:tripId', (0, trip_middleware_1.validate)(expense_validation_1.tripExpenseParamSchema, 'params'), (0, trip_middleware_1.validate)(expense_validation_1.expenseListQuerySchema, 'query'), expenseController.getTripExpenses);
 // ============================================================

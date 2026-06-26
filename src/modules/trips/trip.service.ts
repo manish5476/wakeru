@@ -791,7 +791,7 @@ export const getPendingRequests = async (
     throw new AppError('Only admins can view join requests', 403);
   }
 
-  return JoinRequest.find({ tripId: trip._id, status: 'pending' }).sort({ createdAt: -1 });
+  return JoinRequest.find({ tripId: trip._id, status: 'pending' }).sort({ createdAt: -1 }).lean() as unknown as IJoinRequest[];
 };
 
 /**
@@ -807,12 +807,12 @@ export const getAdminPendingRequests = async (
       $elemMatch: { userId: adminUserId, role: 'admin', isActive: true },
     },
     isArchived: false,
-  }).select('_id');
+  }).select('_id').lean();
 
   const tripIds = adminTrips.map((t) => t._id);
   if (tripIds.length === 0) return [];
 
-  return JoinRequest.find({ tripId: { $in: tripIds }, status: 'pending' }).sort({ createdAt: -1 });
+  return JoinRequest.find({ tripId: { $in: tripIds }, status: 'pending' }).sort({ createdAt: -1 }).lean() as unknown as IJoinRequest[];
 };
 
 /**

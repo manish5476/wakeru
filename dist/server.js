@@ -92,5 +92,5 @@ class Server {
 const server = new Server();
 server.start();
 (0, reminder_cron_1.startReminderCron)();
-exports.default = server;
+exports.default = server; // server restarted
 //# sourceMappingURL=server.js.map

@@ -148,6 +148,13 @@ export class NotificationService {
   }
 
   /**
+   * Clear ALL notifications.
+   */
+  async clearAll(userId: string): Promise<void> {
+    await Notification.deleteMany({ userId });
+  }
+
+  /**
    * Get unread count.
    */
   async getUnreadCount(userId: string): Promise<number> {

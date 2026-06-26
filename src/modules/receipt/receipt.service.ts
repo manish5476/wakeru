@@ -88,7 +88,7 @@ export class ReceiptService {
     const receipt = await Receipt.findOne({
       receiptId,
       isDeleted: false,
-    });
+    }).lean();
 
     if (!receipt) throw new NotFoundError('Receipt');
     if (receipt.userId !== userId) {

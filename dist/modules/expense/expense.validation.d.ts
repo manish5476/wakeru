@@ -665,33 +665,42 @@ export declare const expenseListQuerySchema: z.ZodObject<{
     limit: z.ZodDefault<z.ZodNumber>;
     category: z.ZodOptional<z.ZodEnum<["food", "stay", "transport", "activity", "shopping", "health", "other"]>>;
     paidBy: z.ZodOptional<z.ZodString>;
+    tripId: z.ZodOptional<z.ZodString>;
+    personId: z.ZodOptional<z.ZodString>;
+    type: z.ZodOptional<z.ZodEnum<["you_owe", "you_paid", "unsettled", "settled", "all"]>>;
     isSettled: z.ZodOptional<z.ZodEffects<z.ZodEnum<["true", "false"]>, boolean, "true" | "false">>;
     isArchived: z.ZodOptional<z.ZodEffects<z.ZodEnum<["true", "false"]>, boolean, "true" | "false">>;
     startDate: z.ZodOptional<z.ZodDate>;
     endDate: z.ZodOptional<z.ZodDate>;
-    sortBy: z.ZodDefault<z.ZodEnum<["date", "amountBase", "amountLocal", "createdAt"]>>;
+    sortBy: z.ZodDefault<z.ZodEnum<["date", "amountBase", "amountLocal", "createdAt", "tripId", "paidBy"]>>;
     sortOrder: z.ZodDefault<z.ZodEnum<["asc", "desc"]>>;
 }, "strip", z.ZodTypeAny, {
     limit: number;
     page: number;
-    sortBy: "createdAt" | "date" | "amountLocal" | "amountBase";
+    sortBy: "createdAt" | "date" | "tripId" | "amountLocal" | "amountBase" | "paidBy";
     sortOrder: "asc" | "desc";
+    type?: "all" | "you_owe" | "you_paid" | "unsettled" | "settled" | undefined;
+    tripId?: string | undefined;
     startDate?: Date | undefined;
     endDate?: Date | undefined;
     isArchived?: boolean | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
     isSettled?: boolean | undefined;
+    personId?: string | undefined;
 }, {
     limit?: number | undefined;
+    type?: "all" | "you_owe" | "you_paid" | "unsettled" | "settled" | undefined;
     page?: number | undefined;
+    tripId?: string | undefined;
     startDate?: Date | undefined;
     endDate?: Date | undefined;
     isArchived?: "true" | "false" | undefined;
     category?: "food" | "stay" | "transport" | "activity" | "shopping" | "health" | "other" | undefined;
     paidBy?: string | undefined;
     isSettled?: "true" | "false" | undefined;
-    sortBy?: "createdAt" | "date" | "amountLocal" | "amountBase" | undefined;
+    personId?: string | undefined;
+    sortBy?: "createdAt" | "date" | "tripId" | "amountLocal" | "amountBase" | "paidBy" | undefined;
     sortOrder?: "asc" | "desc" | undefined;
 }>;
 export declare const expenseParamSchema: z.ZodObject<{

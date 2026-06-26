@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getExpenseById = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = exports.computeSplits = void 0;
+exports.markSplitPaid = exports.deleteExpensePermanent = exports.unarchiveExpense = exports.archiveExpense = exports.updateExpense = exports.getStopExpenseSummary = exports.getExpenseById = exports.getMyExpenses = exports.getTripExpenses = exports.getStopExpenses = exports.createExpense = exports.computeSplits = void 0;
 const mongoose_1 = require("mongoose");
 const expense_model_1 = require("./expense.model");
 const stop_model_1 = require("../trips/stop.model");
@@ -291,32 +291,94 @@ exports.getTripExpenses = getTripExpenses;
  */
 const getMyExpenses = async (userId, query) => {
     const filter = {
+        isArchived: query.isArchived === true,
+    };
+    // Base user filter: user paid it, or user is in the splits
+    const userInvolvedFilter = {
         $or: [
             { paidBy: userId },
             { 'splits.userId': userId }
-        ],
-        isArchived: query.isArchived === true,
+        ]
     };
+    if (query.tripId)
+        filter.tripId = query.tripId;
+    if (query.paidBy)
+        filter.paidBy = query.paidBy;
     if (query.category)
         filter.category = query.category;
     if (query.isSettled !== undefined)
         filter.isSettled = query.isSettled;
+    // Advanced filters (type)
+    if (query.type) {
+        if (query.type === 'you_owe') {
+            filter.paidBy = { $ne: userId };
+            filter.splits = { $elemMatch: { userId: userId, isPaid: false } };
+        }
+        else if (query.type === 'you_paid') {
+            filter.paidBy = userId;
+        }
+        else if (query.type === 'unsettled') {
+            filter.isSettled = false;
+            Object.assign(filter, userInvolvedFilter);
+        }
+        else if (query.type === 'settled') {
+            filter.isSettled = true;
+            Object.assign(filter, userInvolvedFilter);
+        }
+        else {
+            Object.assign(filter, userInvolvedFilter);
+        }
+    }
+    else {
+        Object.assign(filter, userInvolvedFilter);
+    }
+    // Handle personId filter (who you owe or who owes you)
+    if (query.personId) {
+        filter.$and = filter.$and || [];
+        filter.$and.push({
+            $or: [
+                { paidBy: query.personId, 'splits.userId': userId }, // I owe them
+                { paidBy: userId, 'splits.userId': query.personId } // They owe me
+            ]
+        });
+    }
+    const sort = {};
+    const order = query.sortOrder === 'asc' ? 1 : -1;
+    if (query.sortBy === 'tripId') {
+        sort.tripId = order;
+        sort.date = -1; // Tie-breaker
+    }
+    else if (query.sortBy === 'paidBy') {
+        sort.paidBy = order;
+        sort.date = -1;
+    }
+    else {
+        sort[query.sortBy || 'date'] = order;
+    }
     const skip = (query.page - 1) * query.limit;
-    const [expenses, total] = await Promise.all([
+    const [expenses, total, stats] = await Promise.all([
         expense_model_1.Expense.find(filter)
-            .sort({ date: -1 })
+            .sort(sort)
             .skip(skip)
             .limit(query.limit)
+            .populate('tripId', 'title')
             .lean(),
         expense_model_1.Expense.countDocuments(filter),
+        expense_model_1.Expense.aggregate([
+            { $match: filter },
+            { $group: { _id: null, totalAmount: { $sum: '$amountBase' } } }
+        ]),
     ]);
+    const totalAmountFiltered = stats.length > 0 ? stats[0].totalAmount : 0;
     return {
         expenses,
+        totalAmount: totalAmountFiltered,
         pagination: {
             total,
             page: query.page,
             limit: query.limit,
             pages: Math.ceil(total / query.limit),
+            hasMore: query.page * query.limit < total,
         },
     };
 };
@@ -338,6 +400,56 @@ const getExpenseById = async (expenseId, requestingUid) => {
     return expense;
 };
 exports.getExpenseById = getExpenseById;
+/**
+ * Get aggregated summary of expenses for a stop (category breakdown and payer breakdown).
+ */
+const getStopExpenseSummary = async (stopId, requestingUid) => {
+    const stop = await stop_model_1.Stop.findById(stopId);
+    if (!stop) {
+        throw new AppError_1.AppError('Stop not found', 404);
+    }
+    // Verify trip membership
+    const trip = await trip_model_1.Trip.findById(stop.tripId);
+    if (!trip || !trip.isMember(requestingUid)) {
+        throw new AppError_1.AppError('You are not a member of this trip', 403);
+    }
+    const pipeline = [
+        { $match: { stopId: new mongoose_1.Types.ObjectId(stopId), isArchived: false } },
+        {
+            $facet: {
+                byCategory: [
+                    {
+                        $group: {
+                            _id: '$category',
+                            totalLocal: { $sum: '$amountLocal' },
+                            totalBase: { $sum: '$amountBase' },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { totalLocal: -1 } }
+                ],
+                byPayer: [
+                    {
+                        $group: {
+                            _id: '$paidBy',
+                            paidByName: { $first: '$paidByName' },
+                            totalPaidLocal: { $sum: '$amountLocal' },
+                            totalPaidBase: { $sum: '$amountBase' },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { totalPaidLocal: -1 } }
+                ]
+            }
+        }
+    ];
+    const result = await expense_model_1.Expense.aggregate(pipeline);
+    return {
+        categoryBreakdown: result[0]?.byCategory || [],
+        payerBreakdown: result[0]?.byPayer || []
+    };
+};
+exports.getStopExpenseSummary = getStopExpenseSummary;
 // ============================================================
 // UPDATE EXPENSE
 // ============================================================

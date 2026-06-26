@@ -252,6 +252,9 @@ tripSchema.index({ 'members.userId': 1, isArchived: 1 });
 // SECONDARY — "fetch active trips for a user" — home screen query
 tripSchema.index({ 'members.userId': 1, status: 1, isArchived: 1 });
 
+// OPTIMIZED for getUserTrips list endpoint
+tripSchema.index({ 'members.userId': 1, 'members.isActive': 1, startDate: -1 });
+
 // DATE SORTING — trips list ordered by most recent
 tripSchema.index({ startDate: -1 });
 

@@ -92,6 +92,20 @@ export class NotificationController {
     }
   }
 
+  async clearAll(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = getUser(req);
+      await notificationService.clearAll(userId);
+
+      res.status(200).json({
+        success: true,
+        message: 'All notifications cleared',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async broadcastAppUpdate(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
       // Basic security check for testing

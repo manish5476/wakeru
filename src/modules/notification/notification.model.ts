@@ -141,10 +141,10 @@ NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
 // Filter by type
 NotificationSchema.index({ userId: 1, type: 1, createdAt: -1 });
 
-// Auto-delete read notifications after 3 days (TTL index)
+// Auto-delete read notifications after 24 hours (TTL index)
 NotificationSchema.index(
   { readAt: 1 },
-  { expireAfterSeconds: 3 * 24 * 60 * 60 }
+  { expireAfterSeconds: 24 * 60 * 60 }
 );
 
 // ============================================================

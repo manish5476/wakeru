@@ -38,8 +38,8 @@ export declare const AuthService: {
      */
     logoutAll(userId: string): Promise<void>;
     /**
-     * Send password reset email via Firebase.
-     * Always returns success to prevent email enumeration.
+     * Check rate limit and generate password reset token (link generation skipped).
+     * Returns success to client to trigger the actual Firebase email.
      */
     forgotPassword(email: string): Promise<void>;
     /**

@@ -119,6 +119,9 @@ exports.expenseListQuerySchema = zod_1.z.object({
         .enum(['food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other'])
         .optional(),
     paidBy: firebaseUid.optional(),
+    tripId: mongoId.optional(),
+    personId: firebaseUid.optional(),
+    type: zod_1.z.enum(['you_owe', 'you_paid', 'unsettled', 'settled', 'all']).optional(),
     isSettled: zod_1.z
         .enum(['true', 'false'])
         .transform((v) => v === 'true')
@@ -129,7 +132,7 @@ exports.expenseListQuerySchema = zod_1.z.object({
         .optional(),
     startDate: zod_1.z.coerce.date().optional(),
     endDate: zod_1.z.coerce.date().optional(),
-    sortBy: zod_1.z.enum(['date', 'amountBase', 'amountLocal', 'createdAt']).default('date'),
+    sortBy: zod_1.z.enum(['date', 'amountBase', 'amountLocal', 'createdAt', 'tripId', 'paidBy']).default('date'),
     sortOrder: zod_1.z.enum(['asc', 'desc']).default('desc'),
 });
 // ============================================================

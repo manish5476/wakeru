@@ -56,7 +56,7 @@ export const friendsService = {
                 { fromUserId, toUserId, status: 'pending' },
                 { fromUserId: toUserId, toUserId: fromUserId, status: 'pending' },
             ],
-        });
+        }).lean();
 
         if (existing) {
             throw new AppError(409, 'A friend request already exists between you');

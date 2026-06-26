@@ -10,6 +10,11 @@ export declare const createExpense: (req: Request, res: Response, next: NextFunc
  */
 export declare const getStopExpenses: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 /**
+ * GET /api/v1/expenses/stop/:stopId/summary
+ * Get expense summary for a specific stop.
+ */
+export declare const getStopExpenseSummary: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+/**
  * GET /api/v1/expenses/trip/:tripId
  * List ALL expenses across all stops for a trip.
  */

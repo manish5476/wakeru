@@ -74,6 +74,10 @@ export interface IUser {
     preferences: IUserPreferences;
     bankingDetails: IBankingDetails;
     stats: IUserStats;
+    passwordResetStats?: {
+        count: number;
+        lastRequestAt: Date;
+    };
     createdAt: Date;
     updatedAt: Date;
 }

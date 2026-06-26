@@ -22,6 +22,9 @@ router.patch('/:notificationId/read', notificationController.markAsRead.bind(not
 // Admin Broadcast
 router.post('/admin/broadcast-update', notificationController.broadcastAppUpdate.bind(notificationController));
 
+// Clear all notifications
+router.delete('/clear-all', notificationController.clearAll.bind(notificationController));
+
 // Delete notification
 router.delete('/:notificationId', notificationController.deleteNotification.bind(notificationController));
 

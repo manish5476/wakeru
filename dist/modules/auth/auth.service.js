@@ -229,8 +229,8 @@ exports.AuthService = {
         logger_1.logger.info('User logged out from all devices', { userId });
     },
     /**
-     * Send password reset email via Firebase.
-     * Always returns success to prevent email enumeration.
+     * Check rate limit and generate password reset token (link generation skipped).
+     * Returns success to client to trigger the actual Firebase email.
      */
     async forgotPassword(email) {
         try {
@@ -240,8 +240,21 @@ exports.AuthService = {
                 isDeleted: false,
             });
             if (user) {
-                await (0, auth_1.getAuth)().generatePasswordResetLink(email);
-                logger_1.logger.info('Password reset email sent', { email });
+                // Enforce rate limit: max 2 requests per day
+                const now = new Date();
+                const stats = user.passwordResetStats || { count: 0, lastRequestAt: new Date(0) };
+                // Check if the last request was today
+                const isSameDay = stats.lastRequestAt.toDateString() === now.toDateString();
+                if (isSameDay && stats.count >= 2) {
+                    throw new AppError_1.AppError(429, 'Maximum 2 requests per day allowed for password reset.');
+                }
+                // Update stats
+                user.passwordResetStats = {
+                    count: isSameDay ? stats.count + 1 : 1,
+                    lastRequestAt: now,
+                };
+                await user.save();
+                logger_1.logger.info('Password reset authorized', { email });
             }
             else {
                 // Log but don't reveal that email doesn't exist
@@ -249,7 +262,9 @@ exports.AuthService = {
             }
         }
         catch (error) {
-            // Always succeed from the client's perspective
+            if (error instanceof AppError_1.AppError)
+                throw error;
+            // Always succeed from the client's perspective for other errors
             logger_1.logger.warn('Password reset flow error', { email, error });
         }
     },

@@ -196,6 +196,13 @@ const UserSchema = new mongoose_1.Schema({
         type: UserStatsSchema,
         default: () => ({})
     },
+    passwordResetStats: {
+        type: new mongoose_1.Schema({
+            count: { type: Number, default: 0 },
+            lastRequestAt: { type: Date, default: new Date() },
+        }, { _id: false }),
+        default: () => ({ count: 0, lastRequestAt: new Date() }),
+    },
 }, {
     timestamps: true,
     toJSON: {

@@ -79,7 +79,7 @@ class ReceiptService {
         const receipt = await receipt_model_1.Receipt.findOne({
             receiptId,
             isDeleted: false,
-        });
+        }).lean();
         if (!receipt)
             throw new AppError_1.NotFoundError('Receipt');
         if (receipt.userId !== userId) {
