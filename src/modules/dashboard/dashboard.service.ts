@@ -92,8 +92,8 @@ export const dashboardService = {
                     }
                 ]
             }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId')
-              .populate('tripId', 'title')
-              .lean(),
+                .populate('tripId', 'title')
+                .lean(),
             // Expenses where user IS OWED money: user paid, and at least one other person's split is unpaid
             Expense.find({
                 $and: [
@@ -104,8 +104,8 @@ export const dashboardService = {
                     }
                 ]
             }).select('title amountBase amountLocal localCurrency date category paidBy paidByName splits tripId')
-              .populate('tripId', 'title')
-              .lean(),
+                .populate('tripId', 'title')
+                .lean(),
             // Active trips
             Trip.countDocuments({ 'members.userId': userId, 'members.isActive': true, status: { $in: ['active', 'planning'] }, isArchived: false }),
             // Pending settlements
@@ -133,12 +133,12 @@ export const dashboardService = {
                 if (!oweMap[exp.paidBy]) {
                     oweMap[exp.paidBy] = { userId: exp.paidBy, name: exp.paidByName, amount: 0, expenses: [] };
                 }
-                oweMap[exp.paidBy].amount += mySplit.amountBase;
-                dynamicTotalOwed += mySplit.amountBase;
+                oweMap[exp.paidBy].amount += (mySplit.amountBase || mySplit.amountLocal || 0);
+                dynamicTotalOwed += (mySplit.amountBase || mySplit.amountLocal || 0);
                 oweMap[exp.paidBy].expenses.push({
                     expenseId: exp._id,
                     title: exp.title,
-                    amount: mySplit.amountBase,
+                    amount: (mySplit.amountBase || mySplit.amountLocal || 0),
                     category: exp.category,
                     date: exp.date,
                     tripId: exp.tripId?._id || exp.tripId,
@@ -156,12 +156,12 @@ export const dashboardService = {
                     if (!owedMap[s.userId]) {
                         owedMap[s.userId] = { userId: s.userId, name: s.displayName, amount: 0, expenses: [] };
                     }
-                    owedMap[s.userId].amount += s.amountBase;
-                    dynamicTotalLent += s.amountBase;
+                    owedMap[s.userId].amount += (s.amountBase || s.amountLocal || 0);
+                    dynamicTotalLent += (s.amountBase || s.amountLocal || 0);
                     owedMap[s.userId].expenses.push({
                         expenseId: exp._id,
                         title: exp.title,
-                        amount: s.amountBase,
+                        amount: (s.amountBase || s.amountLocal || 0),
                         category: exp.category,
                         date: exp.date,
                         tripId: exp.tripId?._id || exp.tripId,
