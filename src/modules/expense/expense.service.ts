@@ -14,6 +14,7 @@ import {
 } from './expense.validation';
 import { markSettlementStale } from '../settlement/settlement.service';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
+import { User } from '../auth';
 
 // ============================================================
 // TYPES
