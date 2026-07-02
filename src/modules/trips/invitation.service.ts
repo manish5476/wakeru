@@ -114,7 +114,7 @@ export const invitationService = {
         // Get user info
         // userId here is the Firebase UID (req.user.userId) — findByFirebaseUid
         // keeps this consistent with how toUserId is now stored.
-        const user = await User.findByFirebaseUid(userId).select('displayName photoURL').lean();
+        const user = await User.findOne({ firebaseUid: userId }).select('displayName photoURL').lean();
         if (!user) throw new AppError('User not found', 404);
 
         // Add member to trip
@@ -176,7 +176,7 @@ export const invitationService = {
         await invitation.save();
 
         // Notify sender
-        const user = await User.findByFirebaseUid(userId).select('displayName').lean();
+        const user = await User.findOne({ firebaseUid: userId }).select('displayName').lean();
         socketServer.sendToUser(invitation.fromUserId, 'invitation:declined', {
             type: 'INVITATION_DECLINED',
             tripId: invitation.tripId.toString(),
