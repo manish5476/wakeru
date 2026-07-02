@@ -3,7 +3,7 @@ import { Expense, IExpense, ISplit } from './expense.model';
 import { Stop } from '../trips/stop.model';
 import { Trip } from '../trips/trip.model';
 // NOTE: adjust this import path to wherever your User model actually lives
-import { User } from '../users/user.model';
+// import { User } from '../users/user.model';
 import { incrementStopTotals, decrementStopTotals } from '../trips/trip.service';
 import { AppError } from '../../shared/errors/AppError';
 import {
