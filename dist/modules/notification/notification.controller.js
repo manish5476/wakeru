@@ -84,6 +84,19 @@ class NotificationController {
             next(error);
         }
     }
+    async clearAll(req, res, next) {
+        try {
+            const userId = getUser(req);
+            await notification_service_1.notificationService.clearAll(userId);
+            res.status(200).json({
+                success: true,
+                message: 'All notifications cleared',
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
     async broadcastAppUpdate(req, res, next) {
         try {
             // Basic security check for testing

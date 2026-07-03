@@ -70,14 +70,21 @@ export declare const getTripExpenses: (tripId: string, query: ExpenseListQuery) 
     };
 }>;
 /**
- * Get all expenses paid by a specific user across all trips.
+ * Get all expenses paid by / involving a specific user across all trips.
+ *
+ * FIXES vs previous version:
+ * 1. `type` no longer silently clobbers an explicit `paidBy` query param —
+ *    all conditions are combined with `$and` instead of overwriting the
+ *    same object key.
+ * 2. Each returned expense is enriched with:
+ *      - `payer`: { userId, displayName, photoURL, bio } for whoever paid
+ *      - `splits[].user`: same summary for each split participant
+ *      - `youArePayer`: boolean — did the requesting user pay this?
+ *      - `yourShare`: the requesting user's own split entry (or null if
+ *        they're not part of this expense's splits)
  */
 export declare const getMyExpenses: (userId: string, query: ExpenseListQuery) => Promise<{
-    expenses: (import("mongoose").FlattenMaps<IExpense> & Required<{
-        _id: Types.ObjectId;
-    }> & {
-        __v: number;
-    })[];
+    expenses: any[];
     totalAmount: any;
     pagination: {
         total: number;

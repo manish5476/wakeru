@@ -5,6 +5,7 @@ export declare class NotificationController {
     markAsRead(req: any, res: Response, next: NextFunction): Promise<void>;
     markAllAsRead(req: any, res: Response, next: NextFunction): Promise<void>;
     deleteNotification(req: any, res: Response, next: NextFunction): Promise<void>;
+    clearAll(req: any, res: Response, next: NextFunction): Promise<void>;
     broadcastAppUpdate(req: any, res: Response, next: NextFunction): Promise<void>;
 }
 export declare const notificationController: NotificationController;

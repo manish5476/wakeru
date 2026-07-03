@@ -16,6 +16,8 @@ router.post('/read-all', notification_controller_1.notificationController.markAl
 router.patch('/:notificationId/read', notification_controller_1.notificationController.markAsRead.bind(notification_controller_1.notificationController));
 // Admin Broadcast
 router.post('/admin/broadcast-update', notification_controller_1.notificationController.broadcastAppUpdate.bind(notification_controller_1.notificationController));
+// Clear all notifications
+router.delete('/clear-all', notification_controller_1.notificationController.clearAll.bind(notification_controller_1.notificationController));
 // Delete notification
 router.delete('/:notificationId', notification_controller_1.notificationController.deleteNotification.bind(notification_controller_1.notificationController));
 exports.default = router;

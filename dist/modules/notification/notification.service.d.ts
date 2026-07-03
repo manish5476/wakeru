@@ -60,6 +60,10 @@ export declare class NotificationService {
      */
     delete(notificationId: string, userId: string): Promise<void>;
     /**
+     * Clear ALL notifications.
+     */
+    clearAll(userId: string): Promise<void>;
+    /**
      * Get unread count.
      */
     getUnreadCount(userId: string): Promise<number>;

@@ -27,10 +27,13 @@ export declare const computeMinimumTransactions: (balances: NetBalance[]) => Min
  * Calculate the current settlement plan for a trip.
  *
  * Flow:
- * 1. Load all unsettled expenses for the trip
+ * 1. Load all unsettled, non-archived expenses for the trip
  * 2. Compute net balance per member (in baseCurrency)
  * 3. Run min-transaction algorithm
- * 4. Upsert Settlement document
+ * 4. Upsert Settlement document — preserving in-flight transaction status
+ *    for any (from, to) pair that already exists, so an unrelated new
+ *    expense elsewhere in the trip doesn't wipe out someone's already-
+ *    initiated or confirmed payment.
  */
 export declare const calculateSettlement: (tripId: string, requestingUid: string) => Promise<ISettlement>;
 /**
@@ -58,6 +61,20 @@ export declare const initiatePayment: (tripId: string, transactionId: string, fr
  * Confirm receipt of a payment.
  * Only the recipient can confirm.
  * Marks all relevant expense splits as paid.
+ *
+ * KNOWN LIMITATION: this settlement transaction is a *netted* transfer
+ * from the minimum-transaction algorithm, not necessarily a direct debt
+ * from an original expense. If the algorithm rerouted debt through a third
+ * person (A owes B, B owes C → a single A→C transfer), there may be no
+ * expense where `paidBy: to` and `splits.userId: from` (or vice versa)
+ * exist at all — the updateMany calls below will simply match nothing,
+ * and the underlying Expense.isSettled state will drift from the
+ * Settlement's view of "confirmed". This works correctly for the common
+ * 2-person-debt case but isn't a full reconciliation. A more robust fix is
+ * to record confirmed settlement payments as their own ledger entries that
+ * offset future balance calculations, rather than retroactively mutating
+ * old expense splits — worth doing as a follow-up if multi-hop netting is
+ * common in your trips.
  */
 export declare const confirmPayment: (tripId: string, transactionId: string, confirmingUid: string) => Promise<ISettlement>;
 /**
