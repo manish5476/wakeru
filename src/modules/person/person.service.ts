@@ -9,18 +9,19 @@ import { AppError } from '../../shared/errors/AppError';
 // SHARED HELPERS
 // ============================================================
 
-const getUserById = async (firebaseUid: string, selectFields: string) => {
+const getUserById = async (userId: string, selectFields: string) => {
+    // ✅ FIX: Query by _id (UUID), not firebaseUid
     const user = await User.findOne({
-        firebaseUid,
+        _id: userId,           // ← Query by Mongo _id (UUID)
         isActive: true,
         isDeleted: false,
     }).select(selectFields).lean();
+
     if (!user) throw new AppError('User not found', 404);
     return user;
 };
 
 const getSharedExpenseFilter = (userId1: string, userId2: string, extraFilters: any = {}) => {
-    // When viewing self (userId1 === userId2), this becomes "all my expenses"
     const baseFilter: any = {
         isArchived: false,
         ...extraFilters,
@@ -44,13 +45,13 @@ const getSharedExpenseFilter = (userId1: string, userId2: string, extraFilters: 
 };
 
 // ============================================================
-// PERSON SERVICE (Self + Friend Compatible)
+// PERSON SERVICE (UUID Compatible)
 // ============================================================
 
 export const personService = {
 
     // ============================================================
-    // 1. PROFILE (Works for self + friends)
+    // 1. PROFILE
     // ============================================================
 
     async getPersonProfile(currentUserId: string, personUserId: string) {
@@ -59,7 +60,7 @@ export const personService = {
         const [person, friendshipInfo, balanceResult] = await Promise.all([
             getUserById(
                 personUserId,
-                'firebaseUid displayName photoURL email phoneNumber bankingDetails.upiId bio stats totalTrips createdAt'
+                'displayName photoURL email phoneNumber bankingDetails.upiId bio stats totalTrips createdAt'
             ),
             this._getFriendshipStatus(currentUserId, personUserId),
             this._getBalanceAggregate(currentUserId, personUserId),
@@ -94,7 +95,7 @@ export const personService = {
         return {
             person: {
                 userId: personUserId,
-                displayName: personData.displayName,
+                displayName: personData.displayName || 'Unknown',
                 photoURL: personData.photoURL,
                 email: personData.email,
                 phoneNumber: personData.phoneNumber,
@@ -126,25 +127,20 @@ export const personService = {
     },
 
     // ============================================================
-    // 2. SHARED EXPENSES (Works for self + friends)
+    // 2. SHARED EXPENSES (PAGINATED)
     // ============================================================
 
     async getSharedExpenses(
         currentUserId: string,
         personUserId: string,
         options: {
-            page?: number;
-            limit?: number;
-            status?: string;
-            category?: string;
-            tripId?: string;
-            sortBy?: string;
-            sortOrder?: 'asc' | 'desc';
+            page?: number; limit?: number; status?: string;
+            category?: string; tripId?: string;
+            sortBy?: string; sortOrder?: 'asc' | 'desc';
         } = {}
     ) {
         const { page = 1, limit = 20, status, category, tripId, sortBy = 'date', sortOrder = 'desc' } = options;
 
-        // Build filter
         const extraFilters: any = {};
         if (status === 'pending') extraFilters.isSettled = false;
         if (status === 'settled') extraFilters.isSettled = true;
@@ -164,7 +160,6 @@ export const personService = {
                 .lean(),
         ]);
 
-        // Get trip names
         const tripIds = [...new Set(expenses.map((e: any) => e.tripId?.toString()).filter(Boolean))];
         const trips = tripIds.length > 0
             ? await Trip.find({ _id: { $in: tripIds.map(id => new Types.ObjectId(id)) } })
@@ -175,7 +170,6 @@ export const personService = {
 
         const isSelf = currentUserId === personUserId;
 
-        // Format expenses
         const formattedExpenses = expenses.map((e: any) => {
             const yourSplit = e.splits?.find((s: any) => s.userId === currentUserId);
             const theirSplit = !isSelf
@@ -217,7 +211,7 @@ export const personService = {
     },
 
     // ============================================================
-    // 3. SHARED TRIPS (Works for self + friends)
+    // 3. SHARED TRIPS
     // ============================================================
 
     async getSharedTrips(
@@ -301,8 +295,6 @@ export const personService = {
 
             const agg = tripExpenses[0] || { youPaid: 0, personPaid: 0, count: 0 };
             const yourMember = trip.members?.find((m: any) => m.userId === currentUserId);
-
-            // Destination from first stop
             const destination = trip.stops?.[0]?.name || trip.title;
 
             return {
@@ -337,7 +329,7 @@ export const personService = {
     },
 
     // ============================================================
-    // 4. RECENT ACTIVITY (Works for self + friends)
+    // 4. RECENT ACTIVITY
     // ============================================================
 
     async getRecentActivity(currentUserId: string, personUserId: string, limit: number = 10) {
@@ -373,11 +365,10 @@ export const personService = {
     },
 
     // ============================================================
-    // 5. SETTLEMENT OPTIONS (Hidden for self)
+    // 5. SETTLEMENT OPTIONS
     // ============================================================
 
     async getSettlementOptions(currentUserId: string, personUserId: string) {
-        // Self-view: no settlement options needed
         if (currentUserId === personUserId) {
             return {
                 balance: { youOwe: 0, theyOwe: 0, netBalance: 0, baseCurrency: 'INR' },
@@ -443,7 +434,7 @@ export const personService = {
     },
 
     // ============================================================
-    // 6. FULL DETAIL (Export — Works for self + friends)
+    // 6. FULL DETAIL
     // ============================================================
 
     async getFullDetail(currentUserId: string, personUserId: string) {
@@ -484,7 +475,6 @@ export const personService = {
     // ============================================================
 
     async _getFriendshipStatus(userId: string, otherId: string) {
-        // Self-view
         if (userId === otherId) {
             return { status: 'self' as const, since: undefined };
         }
@@ -505,16 +495,13 @@ export const personService = {
         }).lean();
 
         if (pending) {
-            const status: 'pending_sent' | 'pending_received' =
-                pending.fromUserId === userId ? 'pending_sent' : 'pending_received';
-            return { status };
+            return { status: pending.fromUserId === userId ? 'pending_sent' as const : 'pending_received' as const };
         }
 
         return { status: 'none' as const };
     },
 
     async _getBalanceAggregate(userId1: string, userId2: string) {
-        // Self-view: no balance
         if (userId1 === userId2) {
             return { youOwe: 0, theyOwe: 0, pendingCount: 0, baseCurrency: 'INR' };
         }
@@ -569,4 +556,3 @@ export const personService = {
         };
     },
 };
-
