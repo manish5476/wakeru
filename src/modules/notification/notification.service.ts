@@ -5,6 +5,7 @@ import { Expense } from '../expense/expense.model';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { logger } from '../../config/logger';
 import { AppError } from '../../shared/errors/AppError';
+import { getMessaging } from 'firebase-admin/messaging';
 
 // ============================================================
 // TYPES
@@ -1165,13 +1166,13 @@ export class NotificationService {
 
   private async sendThroughChannels(notification: any): Promise<void> {
     const user = await User.findOne({ firebaseUid: notification.userId })
-      .select('firebaseUid email phoneNumber fcmToken')
+      .select('firebaseUid email phoneNumber fcmTokens')
       .lean();
     if (!user) return;
 
     const promises: Promise<void>[] = [];
 
-    if (notification.channels?.push && (user as any).fcmToken) {
+    if (notification.channels?.push && (user as any).fcmTokens?.length > 0) {
       promises.push(this.sendPush(user, notification));
     }
     if (notification.channels?.email && (user as any).email) {
@@ -1185,8 +1186,46 @@ export class NotificationService {
   }
 
   private async sendPush(user: any, notification: any): Promise<void> {
-    // TODO: Integrate with Firebase Cloud Messaging
-    logger.info(`📱 Push to ${user.firebaseUid}: ${notification.title}`);
+    try {
+      const message = {
+        notification: {
+          title: notification.title,
+          body: notification.message || notification.body,
+        },
+        data: notification.options?.data ? Object.fromEntries(
+          Object.entries(notification.options.data).map(([k, v]) => [k, String(v)])
+        ) : {},
+        tokens: user.fcmTokens,
+      };
+
+      const response = await getMessaging().sendEachForMulticast(message);
+      
+      // Cleanup invalid tokens
+      const failedTokens: string[] = [];
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          const errorCode = resp.error?.code;
+          if (
+            errorCode === 'messaging/invalid-registration-token' ||
+            errorCode === 'messaging/registration-token-not-registered'
+          ) {
+            failedTokens.push(user.fcmTokens[idx]);
+          }
+        }
+      });
+
+      if (failedTokens.length > 0) {
+        await User.updateOne(
+          { firebaseUid: user.firebaseUid },
+          { $pull: { fcmTokens: { $in: failedTokens } } }
+        );
+        logger.info(`Removed ${failedTokens.length} invalid FCM tokens for user ${user.firebaseUid}`);
+      }
+      
+      logger.info(`📱 Push sent to ${user.firebaseUid} (${response.successCount} successful, ${response.failureCount} failed): ${notification.title}`);
+    } catch (error) {
+      logger.error(`Failed to send push notification to ${user.firebaseUid}:`, error);
+    }
   }
 
   private async sendEmail(email: string, notification: any): Promise<void> {

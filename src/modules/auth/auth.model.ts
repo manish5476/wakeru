@@ -90,7 +90,7 @@ export interface IUser {
   totalLentAcrossTrips: number;
 
   friendIds: string[];
-  fcmToken?: string;
+  fcmTokens: string[];
 
   preferences: IUserPreferences;
   bankingDetails: IBankingDetails;
@@ -317,9 +317,9 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
       index: true,
     },
     // Push Notifications
-    fcmToken: {
-      type: String,
-      default: null
+    fcmTokens: {
+      type: [String],
+      default: []
     },
 
     // Preferences & Banking
