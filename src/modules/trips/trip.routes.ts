@@ -137,6 +137,22 @@ router.delete(
   tripController.deleteTripPermanent
 );
 
+router.get(
+  '/:tripId/insights',
+  validate(tripIdParamSchema, 'params'),
+  loadTrip(),
+  requireMember,
+  tripController.getTripInsights
+);
+
+router.get(
+  '/:tripId/story',
+  validate(tripIdParamSchema, 'params'),
+  loadTrip(),
+  requireMember,
+  tripController.getTripStory
+);
+
 /**
  * GET /api/v1/trips/:tripId/summary → Trip dashboard summary
  */

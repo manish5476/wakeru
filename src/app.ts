@@ -25,6 +25,10 @@ import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import personRoutes from './modules/person/person.routes';
 import feedbackRoutes from './modules/feedback/feedback.routes';
 import { financeRoutes } from './modules/finance';
+
+import { cronJobs } from './infrastructure/cron-jobs.service';
+
+
 const app = express();
 
 // ============================================================

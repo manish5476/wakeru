@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as tripService from './trip.service';
+import { tripInsightsService } from './trip-insights.service';
+import * as tripStoryService from './trip-story.service';
 import { invitationService } from './invitation.service';
 import { AppError } from '../../shared/errors/AppError';
 import {
@@ -860,3 +862,43 @@ export const createTripFromTemplate = async (
   }
 };
 
+/**
+ * GET /api/v1/trips/:tripId/insights
+ * Get smart insights for a trip.
+ */
+export const getTripInsights = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { userId } = getUser(req);
+    const { tripId } = req.params;
+    const insights = await tripInsightsService.getTripInsights(tripId, userId);
+    res.status(200).json({ success: true, data: insights });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/trips/:tripId/story
+ * Generate a trip story timeline and stats.
+ */
+export const getTripStory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const trip = getTripFromReq(req);
+    const story = await tripStoryService.generateTripStory(trip._id as string);
+
+    res.status(200).json({
+      success: true,
+      data: { story },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

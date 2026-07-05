@@ -5,6 +5,7 @@ import { Trip } from '../trips/trip.model';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
+import { achievementService } from '../achievement/achievement.service';
 import { logger } from '../../config/logger';
 
 // ============================================================
@@ -180,6 +181,8 @@ export const friendsService = {
             userName: accepter?.displayName || 'Someone',
             timestamp: new Date().toISOString(),
         });
+
+        await achievementService.onFriendshipCreated(request.fromUserId, request.toUserId);
 
         logger.info(`Friendship created: ${request.fromUserId} ↔ ${request.toUserId}`);
     },

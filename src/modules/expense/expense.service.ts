@@ -13,6 +13,7 @@ import {
 } from './expense.validation';
 import { markSettlementStale } from '../settlement/settlement.service';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
+import { achievementService } from '../achievement/achievement.service';
 
 // ============================================================
 // TYPES
@@ -39,6 +40,69 @@ interface PublicUserSummary {
   photoURL?: string;
   bio?: string;
 }
+// Add to expense.service.ts
+
+interface ExpenseAchievement {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+    unlockedAt?: Date;
+    progress: number; // 0-100
+}
+
+const ACHIEVEMENTS = {
+    FIRST_EXPENSE: {
+        id: 'first_expense',
+        title: 'Budget Beginner',
+        description: 'Add your first expense',
+        icon: '🌱',
+    },
+    BUDGET_MASTER: {
+        id: 'budget_master',
+        title: 'Budget Master',
+        description: 'Stay under budget for entire trip',
+        icon: '💰',
+    },
+    SPLIT_KING: {
+        id: 'split_king',
+        title: 'Split King',
+        description: 'Split 50 expenses equally',
+        icon: '👑',
+    },
+    GLOBETROTTER: {
+        id: 'globetrotter',
+        title: 'Globetrotter',
+        description: 'Add expenses in 5+ currencies',
+        icon: '🌍',
+    },
+    SPEED_SETTLER: {
+        id: 'speed_settler',
+        title: 'Speed Settler',
+        description: 'Settle all debts within 24 hours of trip end',
+        icon: '⚡',
+    },
+    PHOTOGRAPHER: {
+        id: 'photographer',
+        title: 'Receipt Photographer',
+        description: 'Upload 20 receipt photos',
+        icon: '📸',
+    },
+    SOCIAL_BUTTERFLY: {
+        id: 'social_butterfly',
+        title: 'Social Butterfly',
+        description: 'Invite 10 friends to trips',
+        icon: '🦋',
+    },
+};
+
+// Check and award achievements after each expense
+// async checkAchievements(tripId: string, userId: string): Promise<ExpenseAchievement[]> {
+//     // Calculate progress for each achievement
+//     // Award new ones
+//     // Return updated list
+// }
+
 
 // ============================================================
 // SPLIT ENGINE — The Core of TripSplit
@@ -382,6 +446,7 @@ export const createExpense = async (
   }
 
   socketServer.notifyExpenseAdded(trip._id.toString(), expense, adderUid);
+  await achievementService.onExpenseCreated(expense, adderUid);
 
   return expense;
 };

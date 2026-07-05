@@ -9,6 +9,7 @@ import { Trip } from '../trips/trip.model';
 import { User } from '../auth/auth.model';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
+import { achievementService } from '../achievement/achievement.service';
 
 // ============================================================
 // TYPES
@@ -573,6 +574,8 @@ export const confirmPayment = async (
   if (settlement.isFullySettled) {
     socketServer.notifyTripFullySettled(tripId);
   }
+  
+  await achievementService.onSettlementConfirmed(tripId, txn.from, txn.to);
 
   return settlement;
 };
