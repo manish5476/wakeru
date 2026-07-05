@@ -60,5 +60,6 @@ const joinRequestSchema = new Schema<IJoinRequest>(
 
 // One pending request per user per trip
 joinRequestSchema.index({ tripId: 1, userId: 1 }, { unique: true });
+joinRequestSchema.index({ userId: 1, status: 1 }); // For "my pending requests"
 
 export const JoinRequest = model<IJoinRequest>('JoinRequest', joinRequestSchema);

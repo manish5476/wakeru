@@ -154,7 +154,7 @@ export const createTripSchema = z.object({
     .enum(['equal', 'percentage', 'exact', 'shares', 'personal'])
     .default('equal'),
 
-  memberIds: z.array(mongoId).optional(),
+  memberIds: z.array(firebaseUid).optional(),
   initialStop: createStopSchema.optional(),
   allowAnyPayer: z.boolean().optional(),
   status: z.enum(['planning', 'active', 'completed', 'archived']).optional(),
@@ -199,7 +199,7 @@ export const updateMemberRoleSchema = z.object({
 });
 
 export const addMemberSchema = z.object({
-  userId: mongoId, // Accept UUID via the mongoId alias
+  userId: firebaseUid, // Firebase UID
   role: z.enum(['admin', 'member', 'viewer']).default('member'),
 });
 

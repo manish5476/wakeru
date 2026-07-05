@@ -161,7 +161,7 @@ export class AuthMiddleware {
 
       const user = await User.findOne(
         { _id: decoded.userId, isActive: true, isDeleted: false },
-        'email role'
+        'email role displayName photoURL'
       ).lean();
 
       if (user) {
@@ -169,6 +169,8 @@ export class AuthMiddleware {
           userId: decoded.userId,
           email: user.email,
           role: user.role,
+          displayName: user.displayName || 'User',
+          photoURL: user.photoURL || '',
         };
       }
 

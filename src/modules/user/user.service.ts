@@ -295,6 +295,19 @@ export class UserService {
   }
 
   /**
+   * Register FCM token for push notifications
+   */
+  async registerFCMToken(userId: string, token: string): Promise<void> {
+    const user = await User.findOneAndUpdate(
+      { _id: userId, isDeleted: false },
+      { $addToSet: { fcmTokens: token } },
+      { new: true }
+    );
+    if (!user) throw new NotFoundError('User');
+    logger.info(`FCM token registered for user: ${userId}`);
+  }
+
+  /**
    * Upgrade user role (admin only)
    */
   async upgradeRole(userId: string, newRole: string): Promise<IUserDocument> {

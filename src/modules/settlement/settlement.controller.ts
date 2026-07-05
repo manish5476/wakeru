@@ -21,7 +21,7 @@ const getUser = (req: Request) => {
 
 /**
  * GET /api/v1/settlements/trip/:tripId
- * Get current settlement plan (auto-calculates if needed).
+ * Get current settlement plan.
  */
 export const getSettlement = async (
   req: Request,
@@ -32,7 +32,10 @@ export const getSettlement = async (
     const user = getUser(req);
     const { tripId } = req.params;
 
-    const settlement = await settlementService.getSettlement(tripId, user.uid);
+    const settlement = await settlementService.getSettlement(
+      tripId,
+      user.uid
+    );
 
     res.status(200).json({
       success: true,
@@ -40,13 +43,44 @@ export const getSettlement = async (
         settlement,
         summary: {
           totalTransactions: settlement.totalTransactions,
-          totalAmount: settlement.transactions.reduce((s, t) => s + t.amountBase, 0),
-          pendingCount: settlement.transactions.filter((t) => t.status === 'pending').length,
-          confirmedCount: settlement.transactions.filter((t) => t.status === 'confirmed').length,
+          totalAmount: settlement.totalAmount,
+          pendingCount: settlement.pendingCount,
+          initiatedCount: settlement.initiatedCount,
+          confirmedCount: settlement.confirmedCount,
+          disputedCount: settlement.disputedCount,
           baseCurrency: settlement.baseCurrency,
           isStale: settlement.isStale,
+          isFullySettled: settlement.isFullySettled,
+          settlementProgress: settlement.settlementProgress,
         },
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/settlements/trip/:tripId/summary
+ * Get settlement summary (dashboard widget).
+ */
+export const getSettlementSummary = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+
+    const summary = await settlementService.getSettlementSummary(
+      tripId,
+      user.uid
+    );
+
+    res.status(200).json({
+      success: true,
+      data: summary,
     });
   } catch (err) {
     next(err);
@@ -66,7 +100,10 @@ export const calculateSettlement = async (
     const user = getUser(req);
     const { tripId } = req.params;
 
-    const settlement = await settlementService.calculateSettlement(tripId, user.uid);
+    const settlement = await settlementService.calculateSettlement(
+      tripId,
+      user.uid
+    );
 
     res.status(200).json({
       success: true,
@@ -90,12 +127,13 @@ export const initiatePayment = async (
   try {
     const user = getUser(req);
     const { tripId } = req.params;
-    const { transactionId } = req.body;
+    const { transactionId, partialAmount } = req.body;
 
     const result = await settlementService.initiatePayment(
       tripId,
       transactionId,
-      user.uid
+      user.uid,
+      partialAmount
     );
 
     res.status(200).json({
@@ -112,10 +150,10 @@ export const initiatePayment = async (
 };
 
 /**
- * POST /api/v1/settlements/trip/:tripId/confirm
- * Confirm receipt of a payment (recipient only).
+ * POST /api/v1/settlements/trip/:tripId/retry
+ * Retry a failed/disputed payment.
  */
-export const confirmPayment = async (
+export const retryPayment = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -125,7 +163,7 @@ export const confirmPayment = async (
     const { tripId } = req.params;
     const { transactionId } = req.body;
 
-    const settlement = await settlementService.confirmPayment(
+    const result = await settlementService.retryPayment(
       tripId,
       transactionId,
       user.uid
@@ -133,10 +171,44 @@ export const confirmPayment = async (
 
     res.status(200).json({
       success: true,
+      message: 'Payment retried. New UPI link generated.',
+      data: {
+        transaction: result.transaction,
+        upiDeepLink: result.upiDeepLink,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/confirm
+ * Confirm receipt of a payment.
+ */
+export const confirmPayment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+    const { transactionId, notes } = req.body;
+
+    const settlement = await settlementService.confirmPayment(
+      tripId,
+      transactionId,
+      user.uid,
+      notes
+    );
+
+    res.status(200).json({
+      success: true,
       message: 'Payment confirmed. Related expenses updated.',
       data: {
         settlement,
-        isFullySettled: settlement.transactions.every((t) => t.status === 'confirmed'),
+        isFullySettled: settlement.isFullySettled,
       },
     });
   } catch (err) {
@@ -156,19 +228,112 @@ export const disputePayment = async (
   try {
     const user = getUser(req);
     const { tripId } = req.params;
-    const { transactionId } = req.body;
+    const { transactionId, reason } = req.body;
 
     const settlement = await settlementService.disputePayment(
       tripId,
       transactionId,
+      user.uid,
+      reason
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment disputed. The other party has been notified.',
+      data: { settlement },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/settlements/mine
+ * Get all my settlements across all trips.
+ */
+export const getMySettlements = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { status } = req.query;
+
+    const result = await settlementService.getMySettlements(
+      user.uid,
+      status as string | undefined
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/settlements/trip/:tripId/history
+ * Get settlement history for a trip.
+ */
+export const getSettlementHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+
+    const history = await settlementService.getSettlementHistory(
+      tripId,
       user.uid
     );
 
     res.status(200).json({
       success: true,
-      message: 'Payment disputed. Trip members will be notified.',
-      data: { settlement },
+      data: history,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/settlements/trip/:tripId/export
+ * Export settlement as JSON or CSV.
+ */
+export const exportSettlement = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+    const format = (req.query.format as 'json' | 'csv') || 'json';
+
+    const data = await settlementService.exportSettlement(
+      tripId,
+      user.uid,
+      format
+    );
+
+    if (format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=settlement-${tripId}.csv`
+      );
+      res.status(200).send(data);
+    } else {
+      res.status(200).json({
+        success: true,
+        data,
+      });
+    }
   } catch (err) {
     next(err);
   }

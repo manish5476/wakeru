@@ -72,25 +72,30 @@ export interface IUser {
   photoURL?: string;
   phoneNumber?: string;
   bio?: string;
-  
+
   role: 'user' | 'premium' | 'business' | 'admin';
   authProviders: IAuthProviders;
-  refreshTokens: string[];
+  refreshTokens: {
+    token: string;
+    device: string;
+    ip: string;
+    lastActive: Date;
+  }[];
   lastLoginAt?: Date;
   isActive: boolean;
   isDeleted: boolean;
   deletedAt?: Date;
-  
+
   totalOwedAcrossTrips: number;
   totalLentAcrossTrips: number;
-  
+
   friendIds: string[];
-  fcmToken?: string;
-  
+  fcmTokens: string[];
+
   preferences: IUserPreferences;
   bankingDetails: IBankingDetails;
   stats: IUserStats;
-  
+
   passwordResetStats?: {
     count: number;
     lastRequestAt: Date;
@@ -136,8 +141,8 @@ const UserPreferencesSchema = new Schema<IUserPreferences>(
     language: { type: String, default: 'en' },
     theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
     timezone: { type: String, default: 'Asia/Kolkata' },
-    notifications: { 
-      type: NotificationPreferencesSchema, 
+    notifications: {
+      type: NotificationPreferencesSchema,
       default: () => ({
         push: true,
         email: true,
@@ -198,9 +203,9 @@ const BankingDetailsSchema = new Schema<IBankingDetails>(
     walletDetails: {
       type: new Schema(
         {
-          provider: { 
-            type: String, 
-            enum: ['paytm', 'phonepe', 'googlepay', 'amazonpay'] 
+          provider: {
+            type: String,
+            enum: ['paytm', 'phonepe', 'googlepay', 'amazonpay']
           },
           walletId: String,
         },
@@ -223,21 +228,31 @@ const UserStatsSchema = new Schema<IUserStats>(
   { _id: false }
 );
 
+const SessionSchema = new Schema(
+  {
+    token: { type: String, required: true },
+    device: { type: String, default: 'Unknown Device' },
+    ip: { type: String, default: 'Unknown IP' },
+    lastActive: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 // ============================================================
 // Main User Schema
 // ============================================================
 
 const UserSchema = new Schema<IUserDocument, IUserModel>(
   {
-    _id: { 
-      type: String, 
+    _id: {
+      type: String,
       default: () => uuidv4() // Use function to generate new UUID each time
     },
-    firebaseUid: { 
-      type: String, 
-      required: true, 
-      unique: true, 
-      index: true 
+    firebaseUid: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true
     },
     email: {
       type: String,
@@ -247,21 +262,21 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
       trim: true,
       index: true,
     },
-    displayName: { 
-      type: String, 
-      required: true, 
-      trim: true, 
-      maxlength: 100 
+    displayName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100
     },
     photoURL: { type: String },
-    phoneNumber: { 
-      type: String, 
-      index: true, 
-      sparse: true 
+    phoneNumber: {
+      type: String,
+      index: true,
+      sparse: true
     },
-    bio: { 
-      type: String, 
-      maxlength: 500 
+    bio: {
+      type: String,
+      maxlength: 500
     },
 
     // Role & Auth
@@ -270,52 +285,55 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
       enum: ['user', 'premium', 'business', 'admin'],
       default: 'user',
     },
-    authProviders: { 
-      type: AuthProvidersSchema, 
-      default: () => ({}) 
+    authProviders: {
+      type: AuthProvidersSchema,
+      default: () => ({})
     },
-    refreshTokens: [{ type: String }],
+    refreshTokens: {
+      type: [SessionSchema],
+      default: () => []
+    },
     lastLoginAt: { type: Date },
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
 
     // TripSplit — Cross-Trip Aggregates
-    totalOwedAcrossTrips: { 
-      type: Number, 
-      default: 0, 
-      min: 0 
+    totalOwedAcrossTrips: {
+      type: Number,
+      default: 0,
+      min: 0
     },
-    totalLentAcrossTrips: { 
-      type: Number, 
-      default: 0, 
-      min: 0 
+    totalLentAcrossTrips: {
+      type: Number,
+      default: 0,
+      min: 0
     },
 
     // Social
-    friendIds: [{ 
-      type: String, 
-      ref: 'User' 
-    }],
-
+    friendIds: {
+      type: [{ type: String }],
+      default: [],
+      index: true,
+    },
     // Push Notifications
-    fcmToken: { 
-      type: String, 
-      default: null 
+    fcmTokens: {
+      type: [String],
+      default: []
     },
 
     // Preferences & Banking
-    preferences: { 
-      type: UserPreferencesSchema, 
-      default: () => ({}) 
+    preferences: {
+      type: UserPreferencesSchema,
+      default: () => ({})
     },
-    bankingDetails: { 
-      type: BankingDetailsSchema, 
-      default: () => ({}) 
+    bankingDetails: {
+      type: BankingDetailsSchema,
+      default: () => ({})
     },
-    stats: { 
-      type: UserStatsSchema, 
-      default: () => ({}) 
+    stats: {
+      type: UserStatsSchema,
+      default: () => ({})
     },
     passwordResetStats: {
       type: new Schema(
@@ -345,7 +363,7 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
         return safeRet;
       },
     },
-    toObject: { 
+    toObject: {
       virtuals: true,
       transform: (_doc: any, ret: Record<string, any>) => {
         const {
@@ -440,16 +458,16 @@ UserSchema.statics.findActive = function (identifier: string) {
 };
 
 UserSchema.statics.findByFirebaseUid = function (uid: string) {
-  return this.findOne({ 
-    firebaseUid: uid, 
-    isDeleted: false 
+  return this.findOne({
+    firebaseUid: uid,
+    isDeleted: false
   });
 };
 
 UserSchema.statics.findByEmail = function (email: string) {
-  return this.findOne({ 
-    email: email.toLowerCase(), 
-    isDeleted: false 
+  return this.findOne({
+    email: email.toLowerCase(),
+    isDeleted: false
   });
 };
 
@@ -463,7 +481,7 @@ UserSchema.statics.findByEmail = function (email: string) {
 
 // Use double-cast through unknown to resolve type mismatch
 // mongoose.models.User is a generic Model at runtime but has our static methods
-const UserModel = mongoose.models.User 
+const UserModel = mongoose.models.User
   ? (mongoose.models.User as unknown as IUserModel)
   : mongoose.model<IUserDocument, IUserModel>('User', UserSchema);
 

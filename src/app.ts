@@ -25,6 +25,12 @@ import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import personRoutes from './modules/person/person.routes';
 import feedbackRoutes from './modules/feedback/feedback.routes';
 import { financeRoutes } from './modules/finance';
+import achievementRoutes from './modules/achievement/achievement.routes';
+import locationRoutes from './modules/location/location.routes';
+
+import { cronJobs } from './infrastructure/cron-jobs.service';
+
+
 const app = express();
 
 // ============================================================
@@ -100,6 +106,7 @@ app.use('/api/v1/trips', authenticatedRateLimiter, IdempotencyMiddleware.checkId
 
 // Expense routes
 app.use('/api/v1/expenses', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, expenseRoutes);
+app.use('/api/v1/location', authenticatedRateLimiter, locationRoutes);
 
 // Settlement routes
 app.use('/api/v1/settlements', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, settlementRoutes);
@@ -120,8 +127,7 @@ app.use('/api/v1/dashboard', authenticatedRateLimiter, dashboardRoutes);
 app.use('/api/v1/person', authenticatedRateLimiter, personRoutes);
 app.use('/api/v1/feedback', authenticatedRateLimiter, feedbackRoutes);
 app.use('/api/v1/finance', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, financeRoutes);
-
-
+app.use('/api/v1/achievements', authenticatedRateLimiter, achievementRoutes);
 
 // ============================================================
 // 404 Handler

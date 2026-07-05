@@ -41,6 +41,7 @@ router.delete('/account', userController.deleteAccount.bind(userController));
 router.post('/deactivate', userController.deactivateAccount.bind(userController));
 router.post('/reactivate', userController.reactivateAccount.bind(userController));
 router.get('/linked-accounts', userController.getLinkedAccounts.bind(userController));
+router.post('/fcm-token', userController.registerFCMToken.bind(userController));
 
 // Stats
 router.get('/stats', userController.getStats.bind(userController));

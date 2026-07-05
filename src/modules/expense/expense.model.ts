@@ -50,6 +50,38 @@ export interface ISplit {
 }
 
 /**
+ * Comment on an expense for discussion
+ */
+export interface IExpenseComment {
+  userId: string;
+  displayName: string;
+  text: string;
+  createdAt: Date;
+  editedAt?: Date;
+}
+
+/**
+ * Recurring expense configuration
+ */
+export interface IRepeatConfig {
+  frequency: 'daily' | 'weekly' | 'monthly';
+  interval: number;        // every 1 day, every 2 weeks, etc.
+  endDate?: Date;          // stop repeating after this date
+  parentExpenseId?: Types.ObjectId; // for child expenses
+}
+
+/**
+ * Attachment for expense (receipts, tickets, etc.)
+ */
+export interface IAttachment {
+  url: string;
+  type: 'image' | 'pdf' | 'other';
+  name: string;
+  uploadedBy: string;
+  uploadedAt: Date;
+}
+
+/**
  * Expense document — the core transaction record.
  */
 export interface IExpense extends Document {
@@ -83,6 +115,11 @@ export interface IExpense extends Document {
   splitMethod: SplitMethod;
   splits: ISplit[];
 
+  // Enhanced features
+  comments: IExpenseComment[];
+  repeatConfig?: IRepeatConfig;
+  attachments: IAttachment[];
+
   // Status
   isSettled: boolean;
   isArchived: boolean;
@@ -91,12 +128,21 @@ export interface IExpense extends Document {
   addedBy: string;
   editedBy?: string;
   editedAt?: Date;
+  expenseHistory: {
+    changedBy: string;
+    changedAt: Date;
+    changes: {
+      field: string;
+      oldValue: any;
+      newValue: any;
+    }[];
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 // ============================================================
-// SUB-SCHEMA: Split
+// SUB-SCHEMAS
 // ============================================================
 
 const splitSchema = new Schema<ISplit>(
@@ -114,6 +160,61 @@ const splitSchema = new Schema<ISplit>(
   { _id: false }
 );
 
+const commentSchema = new Schema<IExpenseComment>(
+  {
+    userId: { type: String, required: true },
+    displayName: { type: String, required: true },
+    text: { type: String, required: true, maxlength: 500 },
+    createdAt: { type: Date, default: Date.now },
+    editedAt: { type: Date },
+  },
+  { _id: true }
+);
+
+const repeatConfigSchema = new Schema<IRepeatConfig>(
+  {
+    frequency: {
+      type: String,
+      enum: ['daily', 'weekly', 'monthly'],
+      required: true,
+    },
+    interval: { type: Number, required: true, min: 1, default: 1 },
+    endDate: { type: Date },
+    parentExpenseId: { type: Schema.Types.ObjectId, ref: 'Expense' },
+  },
+  { _id: false }
+);
+
+const attachmentSchema = new Schema<IAttachment>(
+  {
+    url: { type: String, required: true },
+    type: {
+      type: String,
+      enum: ['image', 'pdf', 'other'],
+      required: true,
+    },
+    name: { type: String, required: true },
+    uploadedBy: { type: String, required: true },
+    uploadedAt: { type: Date, default: Date.now },
+  },
+  { _id: true }
+);
+
+const expenseHistorySchema = new Schema(
+  {
+    changedBy: { type: String, required: true },
+    changedAt: { type: Date, default: Date.now },
+    changes: [
+      {
+        field: { type: String, required: true },
+        oldValue: { type: Schema.Types.Mixed },
+        newValue: { type: Schema.Types.Mixed },
+      },
+    ],
+  },
+  { _id: false }
+);
+
 // ============================================================
 // MAIN SCHEMA: Expense
 // ============================================================
@@ -127,8 +228,6 @@ const expenseSchema = new Schema<IExpense>(
       required: [true, 'tripId is required'],
       index: true,
     },
-    tags: { type: [String], default: [], index: true },
-
     stopId: {
       type: Schema.Types.ObjectId,
       required: [true, 'stopId is required'],
@@ -138,6 +237,11 @@ const expenseSchema = new Schema<IExpense>(
       latitude: { type: Number },
       longitude: { type: Number },
       name: { type: String },
+    },
+    tags: {
+      type: [String],
+      default: [],
+      index: true,
     },
 
     // Expense details
@@ -149,7 +253,10 @@ const expenseSchema = new Schema<IExpense>(
     },
     category: {
       type: String,
-      enum: { values: EXPENSE_CATEGORIES, message: '{VALUE} is not a valid category' },
+      enum: {
+        values: EXPENSE_CATEGORIES,
+        message: '{VALUE} is not a valid category',
+      },
       default: 'other',
     },
     notes: {
@@ -209,7 +316,10 @@ const expenseSchema = new Schema<IExpense>(
     },
     splitMethod: {
       type: String,
-      enum: { values: SPLIT_METHODS, message: '{VALUE} is not a valid split method' },
+      enum: {
+        values: SPLIT_METHODS,
+        message: '{VALUE} is not a valid split method',
+      },
       required: true,
     },
     splits: {
@@ -219,6 +329,19 @@ const expenseSchema = new Schema<IExpense>(
         validator: (splits: ISplit[]) => splits.length > 0,
         message: 'Expense must have at least one split',
       },
+    },
+
+    // Enhanced features
+    comments: {
+      type: [commentSchema],
+      default: [],
+    },
+    repeatConfig: {
+      type: repeatConfigSchema,
+    },
+    attachments: {
+      type: [attachmentSchema],
+      default: [],
     },
 
     // Status
@@ -237,6 +360,10 @@ const expenseSchema = new Schema<IExpense>(
     addedBy: { type: String, required: true },
     editedBy: { type: String },
     editedAt: { type: Date },
+    expenseHistory: {
+      type: [expenseHistorySchema],
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -271,8 +398,14 @@ expenseSchema.index({ 'splits.userId': 1, date: -1 });
 // User involved in splits for a specific trip
 expenseSchema.index({ tripId: 1, 'splits.userId': 1 });
 
+// Tag search
+expenseSchema.index({ tripId: 1, tags: 1 });
+
+// Recurring expense parent lookup
+expenseSchema.index({ 'repeatConfig.parentExpenseId': 1 });
+
 // ============================================================
-// PRE-SAVE HOOK
+// PRE-SAVE HOOKS
 // ============================================================
 
 expenseSchema.pre('save', function (next) {
@@ -299,6 +432,26 @@ expenseSchema.virtual('totalPaidCount').get(function () {
 
 expenseSchema.virtual('totalSplitCount').get(function () {
   return this.splits.length;
+});
+
+expenseSchema.virtual('unpaidAmount').get(function () {
+  return this.splits
+    .filter((s) => !s.isPaid)
+    .reduce((sum, s) => sum + s.amountBase, 0);
+});
+
+expenseSchema.virtual('exchangeRateWarning').get(function () {
+  if (this.localCurrency === this.baseCurrency) return null;
+  const daysSinceCreation =
+    (Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+  if (daysSinceCreation > 7) {
+    return {
+      warning: true,
+      message: 'Exchange rate is over 7 days old. Consider updating the stop rate.',
+      daysOld: Math.floor(daysSinceCreation),
+    };
+  }
+  return { warning: false };
 });
 
 // ============================================================

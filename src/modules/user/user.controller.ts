@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { userService } from './user.service';
 import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
-import { NotFoundError, ForbiddenError } from '../../shared/errors/AppError';
+import { NotFoundError, ForbiddenError, BadRequestError } from '../../shared/errors/AppError';
 
 export class UserController {
   
@@ -38,6 +38,21 @@ export class UserController {
         success: true,
         message: 'Profile updated successfully',
         data: { user: user.toFullProfile() },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async registerFCMToken(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { token } = req.body;
+      if (!token) throw new BadRequestError('Token is required');
+      await userService.registerFCMToken(req.user!.userId, token);
+      res.status(200).json({
+        success: true,
+        message: 'FCM token registered successfully',
         timestamp: new Date().toISOString(),
       });
     } catch (error) {

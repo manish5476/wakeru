@@ -43,7 +43,11 @@ const REFRESH_TOKEN_EXPIRY = config.JWT_REFRESH_EXPIRATION || '7d';
  * Generates access + refresh token pair.
  * Atomically stores refresh token with $slice to limit array size.
  */
-const generateTokens = async (user: IUser | IUserDocument): Promise<TokenPair> => {
+const generateTokens = async (
+  user: IUser | IUserDocument,
+  deviceInfo: string = 'Unknown Device',
+  ipAddress: string = 'Unknown IP'
+): Promise<TokenPair> => {
   const accessToken = jwt.sign(
     {
       userId: user._id,
@@ -72,7 +76,12 @@ const generateTokens = async (user: IUser | IUserDocument): Promise<TokenPair> =
     {
       $push: {
         refreshTokens: {
-          $each: [refreshToken],
+          $each: [{
+            token: refreshToken,
+            device: deviceInfo,
+            ip: ipAddress,
+            lastActive: new Date()
+          }],
           $slice: -MAX_REFRESH_TOKENS_PER_USER,
         },
       },
@@ -106,7 +115,12 @@ export const AuthService = {
    * Register a new user using Firebase ID token.
    * Creates user document + returns JWT pair.
    */
-  async register(idToken: string, metadata?: { displayName?: string; phoneNumber?: string; photoURL?: string }): Promise<AuthResult> {
+  async register(
+    idToken: string,
+    metadata?: { displayName?: string; phoneNumber?: string; photoURL?: string },
+    deviceInfo?: string,
+    ipAddress?: string
+  ): Promise<AuthResult> {
     const decodedToken = await verifyFirebaseToken(idToken);
 
     const firebaseUid = decodedToken.uid;
@@ -140,12 +154,12 @@ export const AuthService = {
         if (!updatedUser) {
           throw new Error('Failed to update existing user');
         }
-        const tokens = await generateTokens(updatedUser);
+        const tokens = await generateTokens(updatedUser, deviceInfo, ipAddress);
         return { user: updatedUser.toObject() as unknown as IUser, tokens, isNewUser: false };
       }
 
       // User already exists with the same firebaseUid, just log them in
-      const tokens = await generateTokens(existing as any);
+      const tokens = await generateTokens(existing as any, deviceInfo, ipAddress);
       return { user: existing as unknown as IUser, tokens, isNewUser: false };
     }
 
@@ -179,7 +193,7 @@ export const AuthService = {
       throw error;
     }
 
-    const tokens = await generateTokens(user);
+    const tokens = await generateTokens(user, deviceInfo, ipAddress);
     return { user: user.toObject() as unknown as IUser, tokens, isNewUser: true };
   },
 
@@ -187,7 +201,7 @@ export const AuthService = {
    * Login existing user with Firebase ID token.
    * Links Firebase UID to email-based account if not already linked.
    */
-  async login(idToken: string): Promise<AuthResult> {
+  async login(idToken: string, deviceInfo?: string, ipAddress?: string): Promise<AuthResult> {
     const decodedToken = await verifyFirebaseToken(idToken);
     const firebaseUid = decodedToken.uid;
     const email = decodedToken.email?.toLowerCase();
@@ -228,7 +242,7 @@ export const AuthService = {
     user.lastLoginAt = new Date();
     await user.save();
 
-    const tokens = await generateTokens(user);
+    const tokens = await generateTokens(user, deviceInfo, ipAddress);
     logger.info('User logged in', { userId: user._id });
 
     return { user: user.toObject() as unknown as IUser, tokens, isNewUser: false };
@@ -238,7 +252,7 @@ export const AuthService = {
    * Refresh access token using a valid refresh token.
    * Implements token rotation: old token is consumed, new pair issued.
    */
-  async refreshToken(oldRefreshToken: string): Promise<TokenPair> {
+  async refreshToken(oldRefreshToken: string, deviceInfo?: string, ipAddress?: string): Promise<TokenPair> {
     let decoded: { userId: string; type: string };
 
     try {
@@ -257,8 +271,8 @@ export const AuthService = {
 
     // Atomically remove the old token (prevents replay attacks)
     const result = await User.updateOne(
-      { _id: decoded.userId, refreshTokens: oldRefreshToken },
-      { $pull: { refreshTokens: oldRefreshToken } }
+      { _id: decoded.userId, 'refreshTokens.token': oldRefreshToken },
+      { $pull: { refreshTokens: { token: oldRefreshToken } } }
     );
 
     if (result.modifiedCount === 0) {
@@ -284,7 +298,25 @@ export const AuthService = {
     }
 
     // Issue new token pair
-    return generateTokens(user);
+    return generateTokens(user, deviceInfo, ipAddress);
+  },
+
+  /**
+   * Get active sessions for a user.
+   */
+  async getSessions(userId: string) {
+    const user = await User.findById(userId).lean();
+    if (!user) throw new NotFoundError('User not found');
+
+    return (user.refreshTokens || [])
+      .filter((session: any) => typeof session === 'object' && session.token)
+      .map((session: any) => ({
+        token: session.token,
+        device: session.device || 'Unknown Device',
+        ip: session.ip || 'Unknown IP',
+        lastActive: session.lastActive || new Date()
+      }))
+      .sort((a: any, b: any) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
   },
 
   /**
@@ -294,7 +326,7 @@ export const AuthService = {
   async logout(userId: string, refreshToken: string): Promise<void> {
     await User.updateOne(
       { _id: userId },
-      { $pull: { refreshTokens: refreshToken } }
+      { $pull: { refreshTokens: { token: refreshToken } } }
     );
   },
 
@@ -325,7 +357,7 @@ export const AuthService = {
         // Enforce rate limit: max 2 requests per day
         const now = new Date();
         const stats = user.passwordResetStats || { count: 0, lastRequestAt: new Date(0) };
-        
+
         // Check if the last request was today
         const isSameDay = stats.lastRequestAt.toDateString() === now.toDateString();
 
@@ -339,7 +371,7 @@ export const AuthService = {
           lastRequestAt: now,
         };
         await user.save();
-        
+
         logger.info('Password reset authorized', { email });
       } else {
         // Log but don't reveal that email doesn't exist

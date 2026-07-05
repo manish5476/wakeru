@@ -79,6 +79,16 @@ export const splitInputSchema = z.discriminatedUnion('method', [
 ]);
 
 // ============================================================
+// REPEAT CONFIG
+// ============================================================
+
+export const repeatConfigSchema = z.object({
+  frequency: z.enum(['daily', 'weekly', 'monthly']),
+  interval: z.number().int().min(1).default(1),
+  endDate: z.coerce.date().optional(),
+});
+
+// ============================================================
 // CREATE EXPENSE SCHEMA
 // ============================================================
 
@@ -92,9 +102,10 @@ export const createExpenseSchema = z.object({
     .max(200, 'Title cannot exceed 200 characters'),
 
   category: z
-    .enum(['food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other'], {
-      message: 'Invalid category',
-    })
+    .enum(
+      ['food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other'],
+      { message: 'Invalid category' }
+    )
     .default('other'),
 
   amountLocal: z.number().positive('Amount must be greater than 0'),
@@ -105,6 +116,8 @@ export const createExpenseSchema = z.object({
 
   notes: z.string().max(500).optional(),
 
+  tags: z.array(z.string().max(50)).max(10).default([]),
+
   location: z
     .object({
       latitude: z.number(),
@@ -114,6 +127,19 @@ export const createExpenseSchema = z.object({
     .optional(),
 
   split: splitInputSchema,
+
+  repeatConfig: repeatConfigSchema.optional(),
+
+  attachments: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        type: z.enum(['image', 'pdf', 'other']),
+        name: z.string().min(1),
+      })
+    )
+    .max(10)
+    .optional(),
 });
 
 // ============================================================
@@ -123,12 +149,15 @@ export const createExpenseSchema = z.object({
 export const updateExpenseSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
   category: z
-    .enum(['food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other'])
+    .enum([
+      'food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other',
+    ])
     .optional(),
   notes: z.string().max(500).optional(),
   date: z.coerce.date().optional(),
   amountLocal: z.number().positive().optional(),
   paidBy: firebaseUid.optional(),
+  tags: z.array(z.string().max(50)).max(10).optional(),
   location: z
     .object({
       latitude: z.number(),
@@ -140,6 +169,14 @@ export const updateExpenseSchema = z.object({
 });
 
 // ============================================================
+// ADD COMMENT SCHEMA
+// ============================================================
+
+export const addCommentSchema = z.object({
+  text: z.string().min(1, 'Comment cannot be empty').max(500, 'Comment too long'),
+});
+
+// ============================================================
 // QUERY SCHEMA
 // ============================================================
 
@@ -147,12 +184,16 @@ export const expenseListQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   category: z
-    .enum(['food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other'])
+    .enum([
+      'food', 'stay', 'transport', 'activity', 'shopping', 'health', 'other',
+    ])
     .optional(),
   paidBy: firebaseUid.optional(),
   tripId: mongoId.optional(),
   personId: firebaseUid.optional(),
-  type: z.enum(['you_owe', 'you_paid', 'unsettled', 'settled', 'all']).optional(),
+  type: z
+    .enum(['you_owe', 'you_paid', 'unsettled', 'settled', 'all'])
+    .optional(),
   isSettled: z
     .enum(['true', 'false'])
     .transform((v) => v === 'true')
@@ -163,7 +204,20 @@ export const expenseListQuerySchema = z.object({
     .optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
-  sortBy: z.enum(['date', 'amountBase', 'amountLocal', 'createdAt', 'tripId', 'paidBy']).default('date'),
+  tags: z
+    .string()
+    .transform((v) => v.split(',').map((t) => t.trim()))
+    .optional(),
+  sortBy: z
+    .enum([
+      'date',
+      'amountBase',
+      'amountLocal',
+      'createdAt',
+      'tripId',
+      'paidBy',
+    ])
+    .default('date'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 
@@ -188,6 +242,11 @@ export const markSplitPaidParamSchema = z.object({
   userId: firebaseUid,
 });
 
+export const commentParamSchema = z.object({
+  expenseId: mongoId,
+  commentId: mongoId,
+});
+
 // ============================================================
 // INFERRED TYPES
 // ============================================================
@@ -196,3 +255,6 @@ export type CreateExpenseInput = z.infer<typeof createExpenseSchema>;
 export type UpdateExpenseInput = z.infer<typeof updateExpenseSchema>;
 export type ExpenseListQuery = z.infer<typeof expenseListQuerySchema>;
 export type SplitInput = z.infer<typeof splitInputSchema>;
+export type RepeatConfig = z.infer<typeof repeatConfigSchema>;
+export type AddCommentInput = z.infer<typeof addCommentSchema>;
+
