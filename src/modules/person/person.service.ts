@@ -495,7 +495,11 @@ export const personService = {
         }).lean();
 
         if (pending) {
-            return { status: pending.fromUserId === userId ? 'pending_sent' as const : 'pending_received' as const };
+            if (pending.fromUserId === userId) {
+                return { status: 'pending_sent' as const };
+            } else {
+                return { status: 'pending_received' as const };
+            }
         }
 
         return { status: 'none' as const };

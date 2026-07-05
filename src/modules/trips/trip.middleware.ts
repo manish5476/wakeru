@@ -70,6 +70,11 @@ export const loadTrip = (opts: { includeArchived?: boolean } = {}) =>
         return next(new AppError('Trip not found', 404));
       }
 
+      if (trip.endDate && new Date(trip.endDate) < new Date() && trip.status !== 'completed' && trip.status !== 'archived') {
+        trip.status = 'completed';
+        await trip.save();
+      }
+
       (req as any).trip = trip;
       next();
     } catch (err) {

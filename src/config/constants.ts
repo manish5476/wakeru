@@ -72,7 +72,7 @@ export const CONSTANTS = {
   },
   UPLOAD_LIMITS: {
     RECEIPT_IMAGE: { maxSize: 10 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png', 'image/heic'] },
-    PROFILE_IMAGE: { maxSize: 5 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
+    PROFILE_IMAGE: { maxSize: 1 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
     GROUP_AVATAR: { maxSize: 2 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
   },
   CACHE_TTL: {
