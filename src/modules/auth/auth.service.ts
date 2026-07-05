@@ -308,12 +308,15 @@ export const AuthService = {
     const user = await User.findById(userId).lean();
     if (!user) throw new NotFoundError('User not found');
 
-    return (user.refreshTokens || []).map((session: any) => ({
-      token: session.token,
-      device: session.device,
-      ip: session.ip,
-      lastActive: session.lastActive
-    })).sort((a: any, b: any) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
+    return (user.refreshTokens || [])
+      .filter((session: any) => typeof session === 'object' && session.token)
+      .map((session: any) => ({
+        token: session.token,
+        device: session.device || 'Unknown Device',
+        ip: session.ip || 'Unknown IP',
+        lastActive: session.lastActive || new Date()
+      }))
+      .sort((a: any, b: any) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime());
   },
 
   /**

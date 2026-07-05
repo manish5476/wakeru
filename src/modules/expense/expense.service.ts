@@ -14,6 +14,8 @@ import {
 import { markSettlementStale } from '../settlement/settlement.service';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { achievementService } from '../achievement/achievement.service';
+import { logger } from '../../config/logger';
+import { notificationService } from '../notification/notification.service';
 
 // ============================================================
 // TYPES
@@ -446,7 +448,9 @@ export const createExpense = async (
   }
 
   socketServer.notifyExpenseAdded(trip._id.toString(), expense, adderUid);
-  await achievementService.onExpenseCreated(expense, adderUid);
+  achievementService.onExpenseCreated(expense, adderUid).catch(err => {
+    logger.error('Failed to process achievements on expense creation:', err);
+  });
 
   return expense;
 };
@@ -1111,6 +1115,33 @@ export const addComment = async (
   });
 
   await expense.save();
+
+  // Notify socket clients
+  socketServer.notifyExpenseCommentAdded(
+    trip._id.toString(),
+    expense._id.toString(),
+    expense.title,
+    displayName,
+    userId
+  );
+
+  // Send push/in-app notifications to other trip members
+  const otherMembers = trip.members.filter((m) => m.userId !== userId);
+  const notificationPromises = otherMembers.map((member) =>
+    notificationService.create(
+      member.userId,
+      'EXPENSE_COMMENT_ADDED',
+      'New Comment on Expense',
+      `${displayName} commented on "${expense.title}": "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`,
+      {
+        isActionable: true,
+        actionUrl: `/(app)/expenses/${expense._id.toString()}`,
+        priority: 'low',
+      }
+    )
+  );
+  await Promise.allSettled(notificationPromises);
+
   return expense;
 };
 

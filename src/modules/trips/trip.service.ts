@@ -7,6 +7,7 @@ import { JoinRequest, IJoinRequest } from './join_request.model';
 import { invitationService } from './invitation.service';
 import { achievementService } from '../achievement/achievement.service';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
+import { logger } from '../../config/logger';
 
 import {
   CreateTripInput,
@@ -369,7 +370,9 @@ export const updateTrip = async (
   await trip.save();
   
   if (!wasCompleted && trip.status === 'completed') {
-    await achievementService.onTripCompleted(trip._id.toString());
+    achievementService.onTripCompleted(trip._id.toString()).catch(err => {
+      logger.error('Failed to process achievements on trip completed:', err);
+    });
   }
   
   return trip;

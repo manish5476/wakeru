@@ -90,6 +90,12 @@ router.get(
   settlementController.exportSettlement
 );
 
+router.get(
+  '/trip/:tripId/history',
+  validate(tripSettlementParamSchema, 'params'),
+  settlementController.getSettlementHistory
+);
+
 export default router;
 
 

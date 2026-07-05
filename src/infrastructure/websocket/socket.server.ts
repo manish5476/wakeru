@@ -464,6 +464,17 @@ class SocketServer {
         }, actorUid);
     }
 
+    notifyExpenseCommentAdded(tripId: string, expenseId: string, expenseTitle: string, authorName: string, actorUid: string): void {
+        this.sendToTrip(tripId, 'expense:comment_added', {
+            type: 'EXPENSE_COMMENT_ADDED',
+            tripId,
+            expenseId,
+            title: expenseTitle,
+            authorName,
+            timestamp: new Date().toISOString(),
+        }, actorUid);
+    }
+
     // ── BUDGET ───────────────────────────────────────────────
 
     notifyBudgetAlert(tripId: string, stopName: string, currency: string, pctUsed: number): void {

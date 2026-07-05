@@ -275,6 +275,33 @@ export const getMySettlements = async (
 };
 
 /**
+ * GET /api/v1/settlements/trip/:tripId/history
+ * Get settlement history for a trip.
+ */
+export const getSettlementHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+
+    const history = await settlementService.getSettlementHistory(
+      tripId,
+      user.uid
+    );
+
+    res.status(200).json({
+      success: true,
+      data: history,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * GET /api/v1/settlements/trip/:tripId/export
  * Export settlement as JSON or CSV.
  */

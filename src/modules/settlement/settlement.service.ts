@@ -10,6 +10,7 @@ import { User } from '../auth/auth.model';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { achievementService } from '../achievement/achievement.service';
+import { logger } from '../../config/logger';
 
 // ============================================================
 // TYPES
@@ -575,7 +576,9 @@ export const confirmPayment = async (
     socketServer.notifyTripFullySettled(tripId);
   }
   
-  await achievementService.onSettlementConfirmed(tripId, txn.from, txn.to);
+  achievementService.onSettlementConfirmed(tripId, txn.from, txn.to).catch(err => {
+    logger.error('Failed to process achievements on settlement confirmed:', err);
+  });
 
   return settlement;
 };
@@ -827,6 +830,21 @@ export const exportSettlement = async (
 };
 
 // ============================================================
+// GET SETTLEMENT HISTORY
+// ============================================================
+
+export const getSettlementHistory = async (
+  tripId: string,
+  requestingUid: string
+) => {
+  const settlement = await getSettlement(tripId, requestingUid);
+  
+  return [...settlement.history].sort(
+    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+  );
+};
+
+// ============================================================
 // PRIVATE HELPERS
 // ============================================================
 
@@ -893,6 +911,7 @@ export const settlementService = {
   getMySettlements,
   exportSettlement,
   computeMinimumTransactions,
+  getSettlementHistory,
 };
 
 
