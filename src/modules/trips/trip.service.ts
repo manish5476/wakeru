@@ -22,8 +22,6 @@ import { AppError } from '../../shared/errors/AppError';
 // TEMPLATE SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
 
-// export type TripTemplate = 'quick' | 'domestic' | 'international';
-
 interface TemplateConfig {
   autoCreateStop: boolean;
   stopCurrency?: string;
@@ -31,75 +29,6 @@ interface TemplateConfig {
   description: string;
 }
 
-// const TEMPLATE_CONFIGS: Record<TripTemplate, TemplateConfig> = {
-//   quick: {
-//     autoCreateStop: true,
-//     allowMultiCurrency: false,
-//     description: 'One stop, one currency — perfect for a single destination trip',
-//   },
-//   domestic: {
-//     autoCreateStop: false,
-//     allowMultiCurrency: false,
-//     description: 'Multiple stops within one country — all expenses in one currency',
-//   },
-//   international: {
-//     autoCreateStop: false,
-//     allowMultiCurrency: true,
-//     description: 'Multiple countries with different currencies and exchange rates',
-//   },
-// };
-
-// /**
-//  * Create a trip using a template.
-//  * Templates pre-configure the trip for common travel scenarios.
-//  *
-//  * @param template - 'quick' | 'domestic' | 'international'
-//  * @param input - Trip creation data
-//  * @param creator - The user creating the trip
-//  */
-// export const createTripFromTemplate = async (
-//   template: TripTemplate,
-//   input: CreateTripInput,
-//   creator: UserInfo
-// ): Promise<ITrip> => {
-//   const config = TEMPLATE_CONFIGS[template];
-
-//   if (!config) {
-//     throw new AppError(
-//       `Invalid template: ${template}. Must be quick, domestic, or international`,
-//       400
-//     );
-//   }
-
-//   // For Quick Trip: auto-create a matching stop
-//   if (config.autoCreateStop && !input.initialStop) {
-//     input.initialStop = {
-//       name: input.title,
-//       currency: input.baseCurrency,
-//       currentExchangeRate: 1.0,
-//       startDate: input.startDate,
-//       endDate: input.endDate,
-//     };
-//   }
-
-//   const trip = await createTrip(input, creator);
-
-//   return trip;
-// };
-
-// /**
-//  * Get available templates with descriptions.
-//  * Useful for the frontend template picker screen.
-//  */
-// export const getTemplates = () => {
-//   return Object.entries(TEMPLATE_CONFIGS).map(([key, config]) => ({
-//     id: key as TripTemplate,
-//     name: key === 'quick' ? 'Quick Trip'
-//       : key === 'domestic' ? 'Domestic Multi-City'
-//         : 'International Tour',
-//     ...config,
-//   }));
-// };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -110,6 +39,39 @@ interface UserInfo {
   displayName: string;
   photoURL?: string;
 }
+
+// Add to trip.service.ts
+
+interface TripInsights {
+  spendingPatterns: {
+    mostExpensiveDay: { date: Date; amount: number };
+    cheapestDay: { date: Date; amount: number };
+    averageDailySpend: number;
+    weekendVsWeekday: { weekend: number; weekday: number };
+  };
+  categoryInsights: {
+    topCategory: string;
+    topCategoryPercent: number;
+    unusualSpikes: { category: string; date: Date; amount: number; percentAboveAverage: number }[];
+  };
+  memberInsights: {
+    biggestSpender: { userId: string; displayName: string; amount: number };
+    mostFrugal: { userId: string; displayName: string; amount: number };
+    splitEquality: number; // 0-100, how evenly expenses are distributed
+  };
+  predictions: {
+    estimatedFinalCost: number;
+    budgetStatus: 'under' | 'on_track' | 'over';
+    projectedOverspend: number;
+  };
+  recommendations: {
+    type: 'save_money' | 'balance_splits' | 'budget_warning';
+    message: string;
+    potentialSavings?: number;
+  }[];
+}
+
+
 
 interface TripFilters {
   status?: string;
@@ -225,14 +187,13 @@ export const createTrip = async (
   }
 
   // ✅ NEW: Always ensure at least ONE stop exists
+  let stopData: Partial<IStop>;
   if (initialStop) {
-    const stop = buildStopSubdoc(initialStop, creator.uid, 0);
-    const newStop = await Stop.create({ ...stop, tripId: trip._id });
-    trip.stops.push(newStop._id as any);
+    stopData = buildStopSubdoc(initialStop, creator.uid, 0);
   } else {
     // Auto-create a default stop matching the trip
     // This makes the trip work like a simple expense group for basic users
-    const defaultStop = buildStopSubdoc(
+    stopData = buildStopSubdoc(
       {
         name: tripData.title,
         currency: tripData.baseCurrency,
@@ -243,12 +204,15 @@ export const createTrip = async (
       creator.uid,
       0
     );
-    const newStop = await Stop.create({ ...defaultStop, tripId: trip._id });
-    trip.stops.push(newStop._id as any);
   }
 
-  trip.stopCount = trip.stops.length;
-  await trip.save();
+  trip.stopCount = 1;
+  await trip.save(); // Save trip first before creating stop to avoid orphans
+
+  const newStop = await Stop.create({ ...stopData, tripId: trip._id });
+  await Trip.findByIdAndUpdate(trip._id, { $push: { stops: newStop._id } });
+
+  trip.stops.push(newStop._id as any);
   return trip;
 };
 /**
@@ -277,15 +241,15 @@ export const getUserTrips = async (
   if (filters.status) {
     query.status = filters.status;
   }
-  
+
   if (filters.searchName) {
     query.title = { $regex: filters.searchName, $options: 'i' };
   }
-  
+
   if (filters.searchUser) {
     query['members.displayName'] = { $regex: filters.searchUser, $options: 'i' };
   }
-  
+
   if (filters.dateRange && filters.dateRange !== 'all') {
     const now = new Date();
     if (filters.dateRange === 'upcoming') {
@@ -341,10 +305,14 @@ export const getUserTripStats = async (userId: string) => {
     totalTravelers += trip.members?.length || 0;
   }
 
+  const tripIds = trips.map(t => t._id);
+  const distinctCountries = await Stop.distinct('country', { tripId: { $in: tripIds } });
+  const validCountries = distinctCountries.filter(c => c && c.trim() !== '');
+
   return {
     activeTripsCount,
     totalSpentBase,
-    totalCountries: 4, // Placeholder matching frontend
+    totalCountries: validCountries.length,
     totalTravelers
   };
 };
@@ -518,7 +486,7 @@ export const addStop = async (
 
   const newStopData = buildStopSubdoc(input, creatorUid, order);
   const newStop = await Stop.create({ ...newStopData, tripId: trip._id });
-  
+
   trip.stops.push(newStop._id as any);
   trip.stopCount = trip.stops.length;
 
@@ -699,7 +667,7 @@ export const deleteStop = async (
   trip.stopCount = trip.stops.length;
 
   await trip.save();
-  
+
   // Re-normalize order values after deletion
   if (trip.stops.length > 0) {
     await Promise.all(
@@ -1022,32 +990,32 @@ export const removeMember = async (
     throw new AppError('Member not found or already inactive', 404);
   }
 
-    // Cannot remove the last admin
-    if (member.role === 'admin') {
-        const adminCount = trip.members.filter(
-            (m) => m.isActive && m.role === 'admin'
-        ).length;
+  // Cannot remove the last admin
+  if (member.role === 'admin') {
+    const adminCount = trip.members.filter(
+      (m) => m.isActive && m.role === 'admin'
+    ).length;
 
-        if (adminCount <= 1) {
-            throw new AppError(
-                'Cannot remove the last admin. Transfer admin role first.',
-                400
-            );
-        }
+    if (adminCount <= 1) {
+      throw new AppError(
+        'Cannot remove the last admin. Transfer admin role first.',
+        400
+      );
     }
+  }
 
-    if (member.totalPaidBase === 0 && member.totalOwesBase === 0) {
-        // Hard Removal: No financial history, so completely delete them from the members array
-        // @ts-ignore - mongoose array method
-        trip.members.pull({ _id: member._id });
-    } else {
-        // Soft Deactivation: They have financial history, so we must keep them for historical splits
-        member.isActive = false;
-        // Also demote to viewer to be safe
-        member.role = 'viewer';
-    }
+  if (member.totalPaidBase === 0 && member.totalOwesBase === 0) {
+    // Hard Removal: No financial history, so completely delete them from the members array
+    // @ts-ignore - mongoose array method
+    trip.members.pull({ userId: member.userId });
+  } else {
+    // Soft Deactivation: They have financial history, so we must keep them for historical splits
+    member.isActive = false;
+    // Also demote to viewer to be safe
+    member.role = 'viewer';
+  }
 
-    await trip.save();
+  await trip.save();
   return trip;
 };
 

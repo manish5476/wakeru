@@ -25,7 +25,7 @@ const getUser = (req: Request) => {
   const user = (req as any).user;
   if (!user?.userId) throw new AppError('Not authenticated', 401);
   return {
-    uid: user.userId,                          // Map userId → uid for internal use
+    userId: user.userId,
     displayName: user.displayName || 'User',
     photoURL: user.photoURL || '',
   };
@@ -56,7 +56,7 @@ export const createTrip = async (
     const input = req.body as CreateTripInput;
 
     const trip = await tripService.createTrip(input, {
-      uid: user.uid,
+      uid: user.userId,
       displayName: user.displayName,
       photoURL: user.photoURL,
     });
@@ -87,7 +87,7 @@ export const getMyTrips = async (
     const { status, includeArchived, page, limit, searchName, searchUser, dateRange } = req.query;
 
     const [paginatedData, stats] = await Promise.all([
-      tripService.getUserTrips(user.uid, {
+      tripService.getUserTrips(user.userId, {
         status: status as string | undefined,
         includeArchived: includeArchived === 'true',
         page: page ? parseInt(page as string, 10) : undefined,
@@ -96,7 +96,7 @@ export const getMyTrips = async (
         searchUser: searchUser as string | undefined,
         dateRange: dateRange as string | undefined,
       }),
-      tripService.getUserTripStats(user.uid)
+      tripService.getUserTripStats(user.userId)
     ]);
 
     res.status(200).json({
@@ -203,7 +203,7 @@ export const archiveTrip = async (
   try {
     const user = getUser(req);
     const trip = getTripFromReq(req);
-    await tripService.archiveTrip(trip, user.uid);
+    await tripService.archiveTrip(trip, user.userId);
 
     res.status(200).json({
       success: true,
@@ -226,7 +226,7 @@ export const unarchiveTrip = async (
   try {
     const user = getUser(req);
     const trip = getTripFromReq(req);
-    await tripService.unarchiveTrip(trip, user.uid);
+    await tripService.unarchiveTrip(trip, user.userId);
 
     res.status(200).json({
       success: true,
@@ -249,7 +249,7 @@ export const deleteTripPermanent = async (
   try {
     const user = getUser(req);
     const trip = getTripFromReq(req);
-    await tripService.deleteTripPermanent(trip, user.uid);
+    await tripService.deleteTripPermanent(trip, user.userId);
 
     res.status(200).json({
       success: true,
@@ -279,7 +279,7 @@ export const addStop = async (
     const trip = getTripFromReq(req);
     const input = req.body as CreateStopInput;
 
-    const updated = await tripService.addStop(trip, input, user.uid);
+    const updated = await tripService.addStop(trip, input, user.userId);
     await updated.populate('stops');
 
     // Return the newly added stop (last one in the sorted array)
@@ -482,7 +482,7 @@ export const updateMemberRole = async (
       trip,
       targetUserId,
       role,
-      user.uid
+      user.userId
     );
 
     res.status(200).json({
@@ -513,11 +513,11 @@ export const removeMember = async (
     await tripService.removeMember(
       trip,
       targetUserId,
-      user.uid,
-      trip.isAdmin(user.uid)
+      user.userId,
+      trip.isAdmin(user.userId)
     );
 
-    const isSelf = targetUserId === user.uid;
+    const isSelf = targetUserId === user.userId;
     res.status(200).json({
       success: true,
       message: isSelf ? 'You have left the trip' : 'Member removed from trip',
@@ -549,7 +549,7 @@ export const addMember = async (
     const invitation = await invitationService.sendInvitation(
       trip._id.toString(),
       targetUserId,
-      user.uid,
+      user.userId,
       `You have been invited to join ${trip.title} as a ${role || 'member'}`
     );
 
@@ -577,7 +577,7 @@ export const joinTrip = async (
     const { inviteCode } = req.params;
 
     const joinRequest = await tripService.joinTripByInviteCode(inviteCode, {
-      uid: user.uid,
+      uid: user.userId,
       displayName: user.displayName,
       photoURL: user.photoURL,
     });
@@ -614,7 +614,7 @@ export const getPendingJoinRequests = async (
     const user = getUser(req);
     const { tripId } = req.params;
 
-    const requests = await tripService.getPendingRequests(tripId, user.uid);
+    const requests = await tripService.getPendingRequests(tripId, user.userId);
 
     res.status(200).json({
       success: true,
@@ -638,7 +638,7 @@ export const approveJoinRequest = async (
     const user = getUser(req);
     const { requestId } = req.params;
 
-    const trip = await tripService.approveJoinRequest(requestId, user.uid);
+    const trip = await tripService.approveJoinRequest(requestId, user.userId);
 
     res.status(200).json({
       success: true,
@@ -663,7 +663,7 @@ export const rejectJoinRequest = async (
     const user = getUser(req);
     const { requestId } = req.params;
 
-    await tripService.rejectJoinRequest(requestId, user.uid);
+    await tripService.rejectJoinRequest(requestId, user.userId);
 
     res.status(200).json({
       success: true,
@@ -686,7 +686,7 @@ export const getAdminJoinRequests = async (
 ): Promise<void> => {
   try {
     const user = getUser(req);
-    const requests = await tripService.getAdminPendingRequests(user.uid);
+    const requests = await tripService.getAdminPendingRequests(user.userId);
 
     res.status(200).json({
       success: true,
@@ -844,7 +844,7 @@ export const createTripFromTemplate = async (
       type as 'quick' | 'domestic' | 'international',
       input,
       {
-        uid: user.uid,
+        uid: user.userId,
         displayName: user.displayName,
         photoURL: user.photoURL,
       }

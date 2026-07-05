@@ -251,6 +251,20 @@ class SocketServer {
     }
 
     /**
+     * Notify trip members about a budget alert.
+     */
+    notifyBudgetAlert(tripId: string, stopName: string, currency: string, pctUsed: number): void {
+        this.sendToTrip(tripId, 'budget:alert', {
+            type: 'BUDGET_ALERT',
+            tripId,
+            stopName,
+            currency,
+            pctUsed,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    /**
      * Notify about settlement request.
      */
     notifySettlementRequest(toUid: string, fromName: string, amount: number, currency: string, tripId: string): void {
@@ -285,6 +299,44 @@ class SocketServer {
             amount,
             currency,
             tripId,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    /**
+     * Notify that a settlement was disputed.
+     */
+    notifySettlementDisputed(userId: string, tripId: string, amount: number, currency: string, reason: string): void {
+        this.sendToUser(userId, 'settlement:disputed', {
+            type: 'SETTLEMENT_DISPUTED',
+            tripId,
+            amount,
+            currency,
+            reason,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    /**
+     * Notify trip members that the trip is fully settled.
+     */
+    notifyTripFullySettled(tripId: string): void {
+        this.sendToTrip(tripId, 'trip:fully_settled', {
+            type: 'TRIP_FULLY_SETTLED',
+            tripId,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    /**
+     * Notify trip members that settlements were calculated.
+     */
+    notifySettlementCalculated(tripId: string, transactionCount: number, baseCurrency: string): void {
+        this.sendToTrip(tripId, 'settlement:calculated', {
+            type: 'SETTLEMENT_CALCULATED',
+            tripId,
+            transactionCount,
+            baseCurrency,
             timestamp: new Date().toISOString(),
         });
     }

@@ -67,6 +67,12 @@ router.post(
   authController.logoutAll.bind(authController)
 );
 
+// Sessions
+router.get(
+  '/sessions',
+  authController.getSessions.bind(authController)
+);
+
 // Profile
 router.get(
   '/me',

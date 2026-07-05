@@ -19,6 +19,9 @@ export interface IInvitation extends Document {
 const invitationSchema = new Schema<IInvitation>(
     {
         tripId: {
+            // Note: tripId is an ObjectId because it references the Trip document in MongoDB.
+            // toUserId and fromUserId use strings (Firebase UID) because Firebase UID is the 
+            // canonical identity for users across the system.
             type: Schema.Types.ObjectId,
             ref: 'Trip',
             required: true,

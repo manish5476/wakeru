@@ -18,7 +18,9 @@ export class AuthController {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { idToken, metadata } = req.body;
-      const { user, tokens, isNewUser } = await AuthService.register(idToken, metadata);
+      const userAgent = req.headers['user-agent'] || 'Unknown Device';
+      const ip = req.ip || 'Unknown IP';
+      const { user, tokens, isNewUser } = await AuthService.register(idToken, metadata, userAgent, ip);
 
       const response: ApiResponse = {
         success: true,
@@ -50,7 +52,9 @@ export class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { idToken } = req.body;
-      const { user, tokens, isNewUser } = await AuthService.login(idToken);
+      const userAgent = req.headers['user-agent'] || 'Unknown Device';
+      const ip = req.ip || 'Unknown IP';
+      const { user, tokens, isNewUser } = await AuthService.login(idToken, userAgent, ip);
 
       const response: ApiResponse = {
         success: true,
@@ -104,7 +108,9 @@ export class AuthController {
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { refreshToken } = req.body;
-      const tokens = await AuthService.refreshToken(refreshToken);
+      const userAgent = req.headers['user-agent'] || 'Unknown Device';
+      const ip = req.ip || 'Unknown IP';
+      const tokens = await AuthService.refreshToken(refreshToken, userAgent, ip);
 
       const response: ApiResponse = {
         success: true,
@@ -155,6 +161,27 @@ export class AuthController {
       const response: ApiResponse = {
         success: true,
         message: 'Logged out from all devices successfully',
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/v1/auth/sessions
+   * Get all active sessions for current user.
+   */
+  async getSessions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const sessions = await AuthService.getSessions(req.user!.userId);
+
+      const response: ApiResponse = {
+        success: true,
+        message: 'Sessions fetched successfully',
+        data: { sessions },
         timestamp: new Date().toISOString(),
       };
 

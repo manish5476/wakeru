@@ -14,6 +14,7 @@ interface CreateNotificationOptions {
   isActionable?: boolean;
   actionUrl?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
+  expiryInDays?: number;
   channels?: Partial<{
     inApp: boolean;
     email: boolean;
