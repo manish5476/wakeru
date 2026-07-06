@@ -110,7 +110,7 @@ router
   .patch(
     validate(tripIdParamSchema, 'params'),
     loadTrip(),
-    requireAdmin,
+    requireMember,
     validate(updateTripSchema),
     tripController.updateTrip
   )

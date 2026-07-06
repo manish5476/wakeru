@@ -357,6 +357,8 @@ export const updateTrip = async (
     'totalBudget',
     'defaultSplitMethod',
     'status',
+    'allowAnyPayer',
+    'allowOthersToArchiveTrip',
   ];
 
   const wasCompleted = trip.status === 'completed';

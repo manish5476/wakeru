@@ -7,6 +7,9 @@ import path from 'path';
 import fs from 'fs/promises';
 import { config } from '../../config';
 import { CONSTANTS } from '../../config/constants';
+import streamifier from 'streamifier';
+import cloudinary from '../../config/cloudinary.config';
+import { Media } from '../media/media.model';
 
 interface PaginatedUserSearchResult {
   users: Partial<IUserDocument>[];
@@ -140,26 +143,41 @@ export class UserService {
     }
 
     if (file.size > CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.maxSize) {
-      throw new BadRequestError('File too large. Maximum 5MB');
+      throw new BadRequestError(`File too large. Maximum ${Math.round(CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.maxSize / (1024 * 1024))}MB`);
     }
 
-    const filename = `profile-${userId}-${Date.now()}.webp`;
-    const uploadDir = path.join(config.UPLOAD_DIR, 'profiles');
-    await fs.mkdir(uploadDir, { recursive: true });
+    const result = await new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'profiles',
+          public_id: `profile-${userId}-${Date.now()}`,
+          transformation: [{ width: 400, height: 400, crop: 'fill' }, { fetch_format: 'webp', quality: 80 }],
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        }
+      );
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
 
-    const outputPath = path.join(uploadDir, filename);
-    await sharp(file.buffer)
-      .resize(400, 400, { fit: 'cover' })
-      .webp({ quality: 80 })
-      .toFile(outputPath);
+    const photoURL = result.secure_url;
 
-    const photoURL = `/uploads/profiles/${filename}`;
+    await Media.create({
+      url: photoURL,
+      publicId: result.public_id,
+      uploadedBy: userId,
+      purpose: 'profile_picture',
+      size: file.size,
+      format: result.format || 'webp',
+    });
+
     await User.findOneAndUpdate(
       { _id: userId },
       { $set: { photoURL } }
     );
 
-    logger.info(`Profile picture uploaded: ${userId}`);
+    logger.info(`Profile picture uploaded to Cloudinary: ${userId}`);
     return photoURL;
   }
 
