@@ -4,9 +4,9 @@ import { Schema, model, Document, Types } from 'mongoose';
 // INTERFACES
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface ICoordinates { 
-  lat: number; 
-  lng: number; 
+export interface ICoordinates {
+  lat: number;
+  lng: number;
 }
 
 export interface IContact {
@@ -152,11 +152,11 @@ export interface IDocumentDetail {
 
 export interface ITravelPlan extends Document {
   tripId: Types.ObjectId;
-  
+
   purpose: string;
   travelStyle: 'budget' | 'comfort' | 'luxury' | 'backpacking' | 'business';
   groupSize: number;
-  
+
   budgetOverview: {
     total: number;
     flights: number;
@@ -170,7 +170,7 @@ export interface ITravelPlan extends Document {
     spent: number;
     remaining: number;
   };
-  
+
   // Strongly typing Mongoose Arrays enables the .id() method natively
   checklist: Types.DocumentArray<IChecklistItem>;
   itinerary: Types.DocumentArray<IItineraryDay>;
@@ -179,13 +179,13 @@ export interface ITravelPlan extends Document {
   transportDetails: Types.DocumentArray<ITransportDetail>;
   packingList: Types.DocumentArray<IPackingCategory>;
   documents: Types.DocumentArray<IDocumentDetail>;
-  
+
   importantContacts: Types.DocumentArray<IContact>;
 
-  
+
   notes: string;
   travelGoals: string[];
-  
+
   planningProgress: {
     overall: number;
     checklist: number;
@@ -193,7 +193,7 @@ export interface ITravelPlan extends Document {
     bookings: number;
     documents: number;
   };
-  
+
   createdAt: Date;
   updatedAt: Date;
 
@@ -234,7 +234,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       default: 'comfort',
     },
     groupSize: { type: Number, default: 1, min: 1 },
-    
+
     budgetOverview: {
       total: { type: Number, default: 0, min: 0 },
       flights: { type: Number, default: 0, min: 0 },
@@ -248,7 +248,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       spent: { type: Number, default: 0, min: 0 },
       remaining: { type: Number, default: 0 },
     },
-    
+
     checklist: [{
       item: { type: String, required: true, trim: true, maxlength: 200 },
       checked: { type: Boolean, default: false },
@@ -257,7 +257,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
       category: { type: String, enum: ['before-trip', 'during-trip', 'after-trip'], default: 'before-trip' },
     }],
-    
+
     itinerary: [{
       date: { type: Date, default: null },
       day: { type: String, default: '' },
@@ -278,7 +278,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       meals: { breakfast: String, lunch: String, dinner: String },
       notes: { type: String, default: '' },
     }],
-    
+
     flightDetails: [{
       type: { type: String, enum: ['departure', 'return', 'connecting'], required: true },
       airline: { type: String, default: '' },
@@ -297,7 +297,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       currency: { type: String, default: 'USD', uppercase: true, length: 3 },
       status: { type: String, enum: ['confirmed', 'pending', 'cancelled'], default: 'pending' },
     }],
-    
+
     accommodationDetails: [{
       stopId: { type: Schema.Types.ObjectId, ref: 'Stop' },
       hotelName: { type: String, default: '' },
@@ -308,7 +308,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
         type: Date,
         default: null,
         validate: {
-          validator: function(this: any, value: Date) {
+          validator: function (this: any, value: Date) {
             if (!this.checkIn || !value) return true;
             return value >= this.checkIn;
           },
@@ -323,7 +323,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       rating: { type: Number, min: 1, max: 5 },
       notes: { type: String, default: '' },
     }],
-    
+
     transportDetails: [{
       type: { type: String, enum: ['train', 'bus', 'taxi', 'ferry', 'cab', 'car rental', 'other'], required: true },
       operator: { type: String, default: '' },
@@ -340,7 +340,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       bookingRef: String,
       notes: { type: String, default: '' },
     }],
-    
+
     packingList: [{
       category: { type: String, required: true, trim: true },
       icon: String,
@@ -351,7 +351,7 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
         priority: { type: String, enum: ['essential', 'recommended', 'optional'], default: 'recommended' },
       }],
     }],
-    
+
     documents: [{
       name: { type: String, required: true },
       type: { type: String, enum: ['passport', 'visa', 'insurance', 'ticket', 'reservation', 'vaccination', 'other'], required: true },
@@ -363,16 +363,26 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       notes: String,
       verified: { type: Boolean, default: false },
     }],
-    
+
+    // travelPlan.model.ts - Update importantContacts schema
+
     importantContacts: [{
       type: {
-          type: String,
-          enum: ['emergency', 'insurance', 'hotel', 'embassy', 'localEmergency'],
-          required: true,
+        type: String,
+        enum: ['emergency', 'insurance', 'hotel', 'embassy', 'localEmergency'],
+        required: true,
       },
-      
-      name: { type: String, required: true, trim: true },
-      phone: { type: String, required: true, trim: true },
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      phone: {
+        type: String,
+        trim: true,
+        default: ''  // ← Remove required: true, add default
+        // Remove: required: true
+      },
       email: { type: String, trim: true, lowercase: true },
       address: { type: String, trim: true },
       relation: { type: String, trim: true },
@@ -383,10 +393,10 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       workingHours: { type: String, trim: true },
       notes: { type: String, trim: true },
       isPrimary: { type: Boolean, default: false },
-  }],
+    }],
     notes: { type: String, default: '', maxlength: 5000 },
     travelGoals: [{ type: String, maxlength: 200 }],
-    
+
     planningProgress: {
       overall: { type: Number, default: 0, min: 0, max: 100 },
       checklist: { type: Number, default: 0, min: 0, max: 100 },
@@ -406,25 +416,25 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
 // VIRTUALS & HOOKS
 // ─────────────────────────────────────────────────────────────────────────────
 
-TravelPlanSchema.virtual('estimatedTotalBudget').get(function() {
+TravelPlanSchema.virtual('estimatedTotalBudget').get(function () {
   const b = this.budgetOverview;
   return b.flights + b.accommodation + b.transport + b.food + b.activities + b.shopping + b.miscellaneous;
 });
 
-TravelPlanSchema.virtual('budgetUtilization').get(function() {
+TravelPlanSchema.virtual('budgetUtilization').get(function () {
   const total = this.budgetOverview.total || (this as any).estimatedTotalBudget;
   if (total === 0) return 0;
   return Math.round((this.budgetOverview.spent / total) * 100);
 });
 
-TravelPlanSchema.virtual('totalDays').get(function() { return this.itinerary.length; });
-TravelPlanSchema.virtual('bookedFlights').get(function() { return this.flightDetails.filter(f => f.status === 'confirmed').length; });
-TravelPlanSchema.virtual('essentialDocumentsVerified').get(function() {
+TravelPlanSchema.virtual('totalDays').get(function () { return this.itinerary.length; });
+TravelPlanSchema.virtual('bookedFlights').get(function () { return this.flightDetails.filter(f => f.status === 'confirmed').length; });
+TravelPlanSchema.virtual('essentialDocumentsVerified').get(function () {
   const essentialDocs = this.documents.filter(d => ['passport', 'visa', 'insurance'].includes(d.type));
   return essentialDocs.length > 0 && essentialDocs.every(d => d.verified);
 });
 
-TravelPlanSchema.pre('save', function(next) {
+TravelPlanSchema.pre('save', function (next) {
   // Checklist
   const checklistTotal = this.checklist.length;
   const checklistDone = this.checklist.filter(item => item.checked).length;
@@ -453,8 +463,8 @@ TravelPlanSchema.pre('save', function(next) {
 
   // Overall
   this.planningProgress.overall = Math.round(
-    (this.planningProgress.checklist + this.planningProgress.packing + 
-     this.planningProgress.bookings + this.planningProgress.documents) / 4
+    (this.planningProgress.checklist + this.planningProgress.packing +
+      this.planningProgress.bookings + this.planningProgress.documents) / 4
   );
 
   this.budgetOverview.remaining = this.budgetOverview.total - this.budgetOverview.spent;
