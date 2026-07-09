@@ -294,7 +294,7 @@ router.delete(
   tripController.removeMember
 );
 
-import travelPlanRoutes from './travelPlan.routes';
+import travelPlanRoutes from '../travelPlan/travelPlan.routes';
 
 router.use('/:tripId/plan', travelPlanRoutes);
 
