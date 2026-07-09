@@ -18,9 +18,7 @@ export class AuthController {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { idToken, metadata } = req.body;
-      const userAgent = req.headers['user-agent'] || 'Unknown Device';
-      const ip = req.ip || 'Unknown IP';
-      const { user, tokens, isNewUser } = await AuthService.register(idToken, metadata, userAgent, ip);
+      const { user, tokens, isNewUser } = await AuthService.register(idToken, metadata);
 
       const response: ApiResponse = {
         success: true,
@@ -52,9 +50,7 @@ export class AuthController {
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { idToken } = req.body;
-      const userAgent = req.headers['user-agent'] || 'Unknown Device';
-      const ip = req.ip || 'Unknown IP';
-      const { user, tokens, isNewUser } = await AuthService.login(idToken, userAgent, ip);
+      const { user, tokens, isNewUser } = await AuthService.login(idToken);
 
       const response: ApiResponse = {
         success: true,
@@ -108,9 +104,7 @@ export class AuthController {
   async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { refreshToken } = req.body;
-      const userAgent = req.headers['user-agent'] || 'Unknown Device';
-      const ip = req.ip || 'Unknown IP';
-      const tokens = await AuthService.refreshToken(refreshToken, userAgent, ip);
+      const tokens = await AuthService.refreshToken(refreshToken);
 
       const response: ApiResponse = {
         success: true,
@@ -176,7 +170,8 @@ export class AuthController {
    */
   async getSessions(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const sessions = await AuthService.getSessions(req.user!.userId);
+      const user = await User.findById(req.user!.userId).select('refreshTokens');
+      const sessions = user?.refreshTokens?.map((token: string) => ({ token })) || [];
 
       const response: ApiResponse = {
         success: true,

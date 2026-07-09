@@ -11,12 +11,12 @@ export class IdempotencyMiddleware {
       const idempotencyKey = req.headers['idempotency-key'] as string;
 
       if (!idempotencyKey) {
-        throw new AppError(400, 'Idempotency-Key header is required for mutation operations', 'IDEMPOTENCY_KEY_MISSING');
+        throw new AppError('Idempotency-Key header is required for mutation operations', 400, 'IDEMPOTENCY_KEY_MISSING');
       }
 
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(idempotencyKey)) {
-        throw new AppError(400, 'Invalid Idempotency-Key format. Must be UUID v4', 'INVALID_IDEMPOTENCY_KEY');
+        throw new AppError('Invalid Idempotency-Key format. Must be UUID v4', 400, 'INVALID_IDEMPOTENCY_KEY');
       }
 
       const cacheKey = `idempotency:${idempotencyKey}`;

@@ -71,7 +71,12 @@ const generateTokens = async (user: IUser | IUserDocument): Promise<TokenPair> =
     {
       $push: {
         refreshTokens: {
-          $each: [refreshToken],
+          $each: [{
+            token: refreshToken,
+            device: 'Unknown Device',
+            ip: 'Unknown IP',
+            lastActive: new Date()
+          }],
           $slice: -MAX_REFRESH_TOKENS_PER_USER,
         },
       },
@@ -254,8 +259,8 @@ export const AuthService = {
     }
 
     const result = await User.updateOne(
-      { _id: decoded.userId, refreshTokens: oldRefreshToken },
-      { $pull: { refreshTokens: oldRefreshToken } }
+      { _id: decoded.userId, "refreshTokens.token": oldRefreshToken },
+      { $pull: { refreshTokens: { token: oldRefreshToken } } }
     );
 
     if (result.modifiedCount === 0) {
@@ -286,7 +291,7 @@ export const AuthService = {
   async logout(userId: string, refreshToken: string): Promise<void> {
     await User.updateOne(
       { _id: userId },
-      { $pull: { refreshTokens: refreshToken } }
+      { $pull: { refreshTokens: { token: refreshToken } } }
     );
   },
 
