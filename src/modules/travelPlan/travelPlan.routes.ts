@@ -116,4 +116,20 @@ router.patch('/:tripId/contacts/:contactId', travelPlanController.updateContact)
 router.delete('/:tripId/contacts/:contactId', travelPlanController.deleteContact);
 router.patch('/:tripId/contacts/:contactId/primary', travelPlanController.setPrimaryContact);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// TRANSPORT
+// ─────────────────────────────────────────────────────────────────────────────
+
+router.post('/:tripId/transport', travelPlanController.addTransport);
+router.delete('/:tripId/transport/:transportId', travelPlanController.deleteTransport);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PACKING LIST
+// ─────────────────────────────────────────────────────────────────────────────
+
+router.post('/:tripId/packing/init', travelPlanController.initializeDefaultPackingList);
+router.post('/:tripId/packing', travelPlanController.addPackingItem);
+router.patch('/:tripId/packing/:categoryId/items/:itemId/toggle', travelPlanController.togglePackingItem);
+router.delete('/:tripId/packing/:categoryId/items/:itemId', travelPlanController.deletePackingItem);
+
 export default router;

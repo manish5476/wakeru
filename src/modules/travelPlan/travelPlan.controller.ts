@@ -290,7 +290,23 @@ export const travelPlanController = {
     const { tripId } = req.params;
     const result = await travelPlanService.completeTrip(tripId);
     res.status(200).json({ status: 'success', data: result });
-  })
+  }),
+
+  deleteTransport: catchAsync(async (req: Request, res: Response) => {
+    const { tripId, transportId } = req.params;
+    const plan = await travelPlanService.deleteTransport(tripId, transportId);
+    res.status(200).json({ status: 'success', data: plan });
+  }),
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // PACKING LIST MANAGEMENT
+  // ───────────────────────────────────────────────────────────────────────────
+
+  deletePackingItem: catchAsync(async (req: Request, res: Response) => {
+    const { tripId, categoryId, itemId } = req.params;
+    const plan = await travelPlanService.deletePackingItem(tripId, categoryId, itemId);
+    res.status(200).json({ status: 'success', data: plan });
+  }),
 };
 
 // import { Request, Response, NextFunction } from 'express';
