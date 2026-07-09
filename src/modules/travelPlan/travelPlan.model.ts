@@ -9,6 +9,24 @@ export interface ICoordinates {
   lng: number; 
 }
 
+export interface IContact {
+  _id?: Types.ObjectId;
+  type: 'emergency' | 'insurance' | 'hotel' | 'embassy' | 'localEmergency';
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  relation?: string; // For emergency contacts
+  provider?: string; // For insurance
+  policyNo?: string; // For insurance
+  coverage?: string; // For insurance
+  country?: string; // For embassy
+  workingHours?: string; // For embassy
+  notes?: string;
+  isPrimary?: boolean;
+}
+
+
 export interface IChecklistItem {
   _id?: Types.ObjectId;
   item: string;
@@ -162,13 +180,8 @@ export interface ITravelPlan extends Document {
   packingList: Types.DocumentArray<IPackingCategory>;
   documents: Types.DocumentArray<IDocumentDetail>;
   
-  importantContacts: {
-    emergencyContact: { name: string; phone: string; relation: string; email?: string; };
-    travelInsurance: { provider: string; policyNo: string; phone: string; coverage: string; };
-    hotelContact: { name: string; phone: string; address: string; };
-    localEmbassy: { country: string; address: string; phone: string; email: string; workingHours: string; };
-    localEmergency: { police: string; ambulance: string; fire: string; };
-  };
+  importantContacts: Types.DocumentArray<IContact>;
+
   
   notes: string;
   travelGoals: string[];
@@ -351,14 +364,26 @@ const TravelPlanSchema = new Schema<ITravelPlan>(
       verified: { type: Boolean, default: false },
     }],
     
-    importantContacts: {
-      emergencyContact: { name: { type: String, default: '' }, phone: { type: String, default: '' }, relation: { type: String, default: '' }, email: String },
-      travelInsurance: { provider: { type: String, default: '' }, policyNo: { type: String, default: '' }, phone: { type: String, default: '' }, coverage: { type: String, default: '' } },
-      hotelContact: { name: { type: String, default: '' }, phone: { type: String, default: '' }, address: { type: String, default: '' } },
-      localEmbassy: { country: { type: String, default: '' }, address: { type: String, default: '' }, phone: { type: String, default: '' }, email: { type: String, default: '' }, workingHours: { type: String, default: '' } },
-      localEmergency: { police: { type: String, default: '' }, ambulance: { type: String, default: '' }, fire: { type: String, default: '' } },
-    },
-    
+    importantContacts: [{
+      type: {
+          type: String,
+          enum: ['emergency', 'insurance', 'hotel', 'embassy', 'localEmergency'],
+          required: true,
+      },
+      
+      name: { type: String, required: true, trim: true },
+      phone: { type: String, required: true, trim: true },
+      email: { type: String, trim: true, lowercase: true },
+      address: { type: String, trim: true },
+      relation: { type: String, trim: true },
+      provider: { type: String, trim: true },
+      policyNo: { type: String, trim: true },
+      coverage: { type: String, trim: true },
+      country: { type: String, trim: true },
+      workingHours: { type: String, trim: true },
+      notes: { type: String, trim: true },
+      isPrimary: { type: Boolean, default: false },
+  }],
     notes: { type: String, default: '', maxlength: 5000 },
     travelGoals: [{ type: String, maxlength: 200 }],
     
@@ -446,6 +471,8 @@ TravelPlanSchema.pre('save', function(next) {
 // INDEXES
 // ─────────────────────────────────────────────────────────────────────────────
 TravelPlanSchema.index({ tripId: 1 });
+TravelPlanSchema.index({ 'importantContacts.type': 1 });
+TravelPlanSchema.index({ 'importantContacts.isPrimary': 1 });
 TravelPlanSchema.index({ 'itinerary.date': 1 });
 TravelPlanSchema.index({ 'flightDetails.date': 1, 'flightDetails.status': 1 });
 TravelPlanSchema.index({ 'documents.expiryDate': 1 });

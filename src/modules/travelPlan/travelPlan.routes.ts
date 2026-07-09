@@ -104,4 +104,16 @@ router.get('/:tripId/validate-activation', travelPlanController.validateTripRead
 router.post('/:tripId/activate', travelPlanController.activateTrip);
 router.post('/:tripId/complete', travelPlanController.completeTrip);
 
+// travelPlan.routes.ts
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTACTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+router.get('/:tripId/contacts', travelPlanController.getContacts);
+router.post('/:tripId/contacts', travelPlanController.addContact);
+router.patch('/:tripId/contacts/:contactId', travelPlanController.updateContact);
+router.delete('/:tripId/contacts/:contactId', travelPlanController.deleteContact);
+router.patch('/:tripId/contacts/:contactId/primary', travelPlanController.setPrimaryContact);
+
 export default router;
