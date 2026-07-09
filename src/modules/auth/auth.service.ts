@@ -209,8 +209,8 @@ export const AuthService = {
       user = await User.findOne({ email });
 
       if (user) {
+        await User.updateOne({ _id: user._id }, { $set: { firebaseUid } });
         user.firebaseUid = firebaseUid;
-        await user.save();
         logger.info('Linked Firebase UID to existing account', {
           userId: user._id,
           email: user.email
@@ -230,8 +230,8 @@ export const AuthService = {
       throw new ForbiddenError('This account has been deactivated. Contact support.');
     }
 
-    user.lastLoginAt = new Date();
-    await user.save();
+    // Bypass full document validation to avoid errors with stale refreshTokens
+    await User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
 
     const tokens = await generateTokens(user);
     logger.info('User logged in', { userId: user._id });
@@ -350,30 +350,7 @@ export const AuthService = {
         throw new AppError(429, 'Too many password reset requests. Please try again tomorrow.');
       }
 
-      // ✅ THE FIX: Actually send the reset email via Firebase
-      try {
-        await getAuth().generatePasswordResetLink(email.toLowerCase());
-        logger.info('Password reset email sent via Firebase', { 
-          userId: user._id, 
-          email: user.email 
-        });
-      } catch (firebaseError: any) {
-        logger.error('Firebase password reset failed', { 
-          userId: user._id, 
-          email: user.email,
-          error: firebaseError.message,
-          code: firebaseError.code 
-        });
-        
-        // If Firebase doesn't know this user, create them in Firebase first
-        if (firebaseError.code === 'auth/user-not-found') {
-          logger.info('User not found in Firebase, skipping reset email', {
-            userId: user._id,
-            email: user.email
-          });
-          // Still count this as a request for rate limiting
-        }
-      }
+      // The actual email sending is handled by the frontend client using sendPasswordResetEmail()
 
       // Update rate limit stats
       user.passwordResetStats = {

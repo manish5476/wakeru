@@ -28,7 +28,7 @@ export const invitationService = {
         // Check receiver exists
         // NOTE: `toUserId` as passed in by callers might be the internal _id or the Firebase UID.
         const receiver = await User.findOne({
-            $or: [{ _id: toUserId }, { firebaseUid: toUserId }],
+            $or: [{ _id: toUserId }, { firebaseUid: toUserId }, { email: toUserId.toLowerCase() }],
             isActive: true,
             isDeleted: false,
         });
