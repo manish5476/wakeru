@@ -74,6 +74,17 @@ export const updatePreferencesSchema = z.object({
     settlementReminder: z.boolean().optional(),
     monthlyReport: z.boolean().optional(),
   }).optional(),
+  appearance: z.object({
+    backgroundType: z.enum(['color', 'image']).optional(),
+    backgroundColor: z.string().nullable().optional(),
+    backgroundImage: z.string().nullable().optional(),
+    backgroundBlur: z.number().min(0).max(100).optional(),
+    backgroundImagePosition: z.object({
+      x: z.number(),
+      y: z.number(),
+      scale: z.number()
+    }).optional()
+  }).optional()
 }).refine(atLeastOne('At least one preference must be provided'), {
   message: 'At least one preference must be provided',
 });

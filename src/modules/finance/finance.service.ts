@@ -602,7 +602,6 @@ export class FinanceService {
       query.dueDate = { $gte: new Date() };
       query.isPaid = false;
     }
-
     return Bill.find(query).sort({ dueDate: 1 }).lean();
   }
 
