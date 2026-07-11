@@ -19,16 +19,33 @@ interface DashboardFilters {
 }
 
 interface TransactionFilters {
+  // Basic filters1
   type?: string;
   category?: string;
-  month?: string;
+  tripId?: string;
+  tags?: string[];
+  search?: string;
+  
+  // Date filters (choose one approach)
+  day?: string;              // YYYY-MM-DD
+  month?: string;            // 1-12 (uses current year)
+  year?: number;             // YYYY
+  monthAndYear?: {           // OR use both together
+    month: string;           // 1-12
+    year: number;            // YYYY
+  };
+  dateRange?: {              // Custom range (highest priority)
+    startDate?: string;      // ISO date string
+    endDate?: string;        // ISO date string
+  };
+  
+  // Legacy (backward compatibility)
   startDate?: string;
   endDate?: string;
-  tripId?: string;
-  search?: string;
-  tags?: string[];
-  limit?: number;
+  
+  // Pagination & sorting
   page?: number;
+  limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
@@ -260,14 +277,16 @@ export class FinanceService {
     logger.info(`Transaction created: ${userId} - ${data.title}`);
     return transaction;
   }
-
   static async getTransactions(userId: string, filters: TransactionFilters = {}) {
     const query: any = { userId, isDeleted: false };
 
+    // Basic filters
     if (filters.type) query.type = filters.type;
     if (filters.category) query.category = filters.category;
     if (filters.tripId) query.tripId = new Types.ObjectId(filters.tripId);
     if (filters.tags && filters.tags.length > 0) query.tags = { $in: filters.tags };
+    
+    // Search filter
     if (filters.search) {
       query.$or = [
         { title: { $regex: filters.search, $options: 'i' } },
@@ -275,22 +294,58 @@ export class FinanceService {
       ];
     }
 
-    if (filters.month) {
-      const startDate = new Date(`${filters.month}-01T00:00:00.000Z`);
-      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999);
+    // Date filtering with multiple options
+    if (filters.dateRange) {
+      // Custom date range (highest priority)
+      query.date = {};
+      if (filters.dateRange.startDate) {
+        query.date.$gte = new Date(filters.dateRange.startDate);
+      }
+      if (filters.dateRange.endDate) {
+        query.date.$lte = new Date(filters.dateRange.endDate);
+      }
+    } else if (filters.day) {
+      // Filter by specific day: YYYY-MM-DD
+      const startDate = new Date(`${filters.day}T00:00:00.000Z`);
+      const endDate = new Date(`${filters.day}T23:59:59.999Z`);
+      query.date = { $gte: startDate, $lte: endDate };
+    } else if (filters.month && filters.year) {
+      // Filter by specific month and year: YYYY-MM
+      const monthNum = parseInt(filters.month) - 1; // 0-indexed month
+      const startDate = new Date(filters.year, monthNum, 1, 0, 0, 0, 0);
+      const endDate = new Date(filters.year, monthNum + 1, 0, 23, 59, 59, 999);
+      query.date = { $gte: startDate, $lte: endDate };
+    } else if (filters.month) {
+      // Filter by month (year defaults to current year)
+      const currentYear = new Date().getFullYear();
+      const monthNum = parseInt(filters.month) - 1;
+      const startDate = new Date(currentYear, monthNum, 1, 0, 0, 0, 0);
+      const endDate = new Date(currentYear, monthNum + 1, 0, 23, 59, 59, 999);
+      query.date = { $gte: startDate, $lte: endDate };
+    } else if (filters.year) {
+      // Filter by specific year
+      const startDate = new Date(filters.year, 0, 1, 0, 0, 0, 0);
+      const endDate = new Date(filters.year, 11, 31, 23, 59, 59, 999);
       query.date = { $gte: startDate, $lte: endDate };
     } else if (filters.startDate || filters.endDate) {
+      // Legacy date range filter (backward compatibility)
       query.date = {};
-      if (filters.startDate) query.date.$gte = new Date(filters.startDate);
-      if (filters.endDate) query.date.$lte = new Date(filters.endDate);
+      if (filters.startDate) {
+        query.date.$gte = new Date(filters.startDate);
+      }
+      if (filters.endDate) {
+        query.date.$lte = new Date(filters.endDate);
+      }
     }
 
+    // Pagination
     const limit = Math.min(filters.limit || 50, 100);
     const page = Math.max(filters.page || 1, 1);
     const skip = (page - 1) * limit;
     const sortField = filters.sortBy || 'date';
     const sortOrder = filters.sortOrder === 'asc' ? 1 : -1;
 
+    // Execute queries
     const [transactions, total, summary] = await Promise.all([
       Transaction.find(query)
         .sort({ [sortField]: sortOrder, createdAt: -1 })
@@ -304,8 +359,16 @@ export class FinanceService {
         {
           $group: {
             _id: null,
-            totalExpense: { $sum: { $cond: [{ $in: ['$type', ['expense', 'trip_expense', 'settlement_paid']] }, '$amount', 0] } },
-            totalIncome: { $sum: { $cond: [{ $in: ['$type', ['income', 'settlement_received']] }, '$amount', 0] } },
+            totalExpense: { 
+              $sum: { 
+                $cond: [{ $in: ['$type', ['expense', 'trip_expense', 'settlement_paid']] }, '$amount', 0] 
+              } 
+            },
+            totalIncome: { 
+              $sum: { 
+                $cond: [{ $in: ['$type', ['income', 'settlement_received']] }, '$amount', 0] 
+              } 
+            },
           },
         },
       ]),
@@ -327,6 +390,73 @@ export class FinanceService {
       },
     };
   }
+  
+  // static async getTransactions(userId: string, filters: TransactionFilters = {}) {
+  //   const query: any = { userId, isDeleted: false };
+
+  //   if (filters.type) query.type = filters.type;
+  //   if (filters.category) query.category = filters.category;
+  //   if (filters.tripId) query.tripId = new Types.ObjectId(filters.tripId);
+  //   if (filters.tags && filters.tags.length > 0) query.tags = { $in: filters.tags };
+  //   if (filters.search) {
+  //     query.$or = [
+  //       { title: { $regex: filters.search, $options: 'i' } },
+  //       { notes: { $regex: filters.search, $options: 'i' } },
+  //     ];
+  //   }
+
+  //   if (filters.month) {
+  //     const startDate = new Date(`${filters.month}-01T00:00:00.000Z`);
+  //     const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999);
+  //     query.date = { $gte: startDate, $lte: endDate };
+  //   } else if (filters.startDate || filters.endDate) {
+  //     query.date = {};
+  //     if (filters.startDate) query.date.$gte = new Date(filters.startDate);
+  //     if (filters.endDate) query.date.$lte = new Date(filters.endDate);
+  //   }
+
+  //   const limit = Math.min(filters.limit || 50, 100);
+  //   const page = Math.max(filters.page || 1, 1);
+  //   const skip = (page - 1) * limit;
+  //   const sortField = filters.sortBy || 'date';
+  //   const sortOrder = filters.sortOrder === 'asc' ? 1 : -1;
+
+  //   const [transactions, total, summary] = await Promise.all([
+  //     Transaction.find(query)
+  //       .sort({ [sortField]: sortOrder, createdAt: -1 })
+  //       .skip(skip)
+  //       .limit(limit)
+  //       .populate('tripId', 'title coverImage')
+  //       .lean(),
+  //     Transaction.countDocuments(query),
+  //     Transaction.aggregate([
+  //       { $match: query },
+  //       {
+  //         $group: {
+  //           _id: null,
+  //           totalExpense: { $sum: { $cond: [{ $in: ['$type', ['expense', 'trip_expense', 'settlement_paid']] }, '$amount', 0] } },
+  //           totalIncome: { $sum: { $cond: [{ $in: ['$type', ['income', 'settlement_received']] }, '$amount', 0] } },
+  //         },
+  //       },
+  //     ]),
+  //   ]);
+
+  //   return {
+  //     transactions,
+  //     summary: {
+  //       totalExpense: summary[0]?.totalExpense || 0,
+  //       totalIncome: summary[0]?.totalIncome || 0,
+  //       netAmount: (summary[0]?.totalIncome || 0) - (summary[0]?.totalExpense || 0),
+  //     },
+  //     pagination: {
+  //       page,
+  //       limit,
+  //       total,
+  //       totalPages: Math.ceil(total / limit),
+  //       hasMore: skip + transactions.length < total,
+  //     },
+  //   };
+  // }
 
   static async getTransactionById(userId: string, transactionId: string) {
     const transaction = await Transaction.findOne({
