@@ -120,6 +120,24 @@ export interface IGoal extends Document {
 }
 
 // ============================================================
+// DEBT
+// ============================================================
+
+export interface IDebt extends Document {
+  userId: string;
+  type: 'lent' | 'borrowed';
+  amount: number;
+  currency: string;
+  friendUserId?: string;
+  name?: string;
+  reason: string;
+  status: 'pending' | 'settled';
+  date: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================
 // FINANCIAL SUMMARY (Aggregated View)
 // ============================================================
 
@@ -305,6 +323,23 @@ goalSchema.pre('save', function (next) {
   next();
 });
 
+const debtSchema = new Schema<IDebt>(
+  {
+    userId: { type: String, required: true, index: true },
+    type: { type: String, enum: ['lent', 'borrowed'], required: true },
+    amount: { type: Number, required: true, min: 0 },
+    currency: { type: String, default: 'INR', uppercase: true },
+    friendUserId: { type: String },
+    name: { type: String },
+    reason: { type: String, required: true },
+    status: { type: String, enum: ['pending', 'settled'], default: 'pending' },
+    date: { type: Date, default: Date.now },
+  },
+  { timestamps: true, versionKey: false }
+);
+
+debtSchema.index({ userId: 1, status: 1 });
+
 // ============================================================
 // MODELS
 // ============================================================
@@ -313,3 +348,4 @@ export const Transaction = model<ITransaction>('Transaction', transactionSchema)
 export const Budget = model<IBudget>('Budget', budgetSchema);
 export const Bill = model<IBill>('Bill', billSchema);
 export const Goal = model<IGoal>('Goal', goalSchema);
+export const Debt = model<IDebt>('Debt', debtSchema);

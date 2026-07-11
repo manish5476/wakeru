@@ -1,6 +1,6 @@
 // finance.service.ts
 
-import { Transaction, Budget, Bill, Goal, ITransaction, IGoal, IBill, IBudget } from './finance.model';
+import { Transaction, Budget, Bill, Goal, Debt, ITransaction, IGoal, IBill, IBudget } from './finance.model';
 import { Expense } from '../expense/expense.model';
 import { Trip } from '../trips/trip.model';
 import { Settlement } from '../settlement/settlement.model';
@@ -1434,14 +1434,23 @@ export class FinanceService {
     };
   }
 
-  static async getDebtSummary(userId: string) {
-    const settlements = await Settlement.find({
-      $or: [
-        { 'transactions.from': userId },
-        { 'transactions.to': userId },
-      ],
-    }).populate('tripId', 'title baseCurrency');
+  static async createDebt(userId: string, data: any) {
+    const debt = new Debt({ ...data, userId });
+    await debt.save();
+    return debt;
+  }
 
+  static async settleDebt(userId: string, debtId: string) {
+    const debt = await Debt.findOneAndUpdate(
+      { _id: debtId, $or: [{ userId }, { friendUserId: userId }] },
+      { status: 'settled' },
+      { new: true }
+    );
+    if (!debt) throw new Error('Debt not found');
+    return debt;
+  }
+
+  static async getDebtSummary(userId: string, includeTrips: boolean = true) {
     const summary = {
       totalOwed: 0,
       totalOwing: 0,
@@ -1453,55 +1462,103 @@ export class FinanceService {
 
     const userMap = new Map<string, { name: string; owes: number; owed: number }>();
 
-    settlements.forEach(settlement => {
-      const tripSummary = {
-        tripId: (settlement.tripId as any)._id,
-        tripName: (settlement.tripId as any).title,
-        owed: 0,
-        owing: 0,
-        pendingOwed: 0,
-        pendingOwing: 0,
-      };
+    // 1. Independent Debts
+    const independentDebts = await Debt.find({
+      $or: [{ userId }, { friendUserId: userId }],
+    });
 
-      settlement.transactions.forEach((tx: any) => {
-        if (tx.from === userId) {
-          const amount = tx.amountBase;
-          tripSummary.owing += amount;
-          summary.totalOwing += amount;
-          if (tx.status === 'pending') {
-            tripSummary.pendingOwing += amount;
-            summary.pendingOwing += amount;
-          }
+    independentDebts.forEach(debt => {
+      const isOwner = debt.userId === userId;
+      let iOwe = false;
+      let iAmOwed = false;
+      let otherUserId = isOwner ? debt.friendUserId : debt.userId;
+      let otherUserName = isOwner ? debt.name || 'Unknown' : 'User'; 
 
-          if (!userMap.has(tx.to)) {
-            userMap.set(tx.to, { name: tx.toName, owes: 0, owed: 0 });
-          }
-          userMap.get(tx.to)!.owed += amount;
+      if (isOwner && debt.type === 'lent') iAmOwed = true;
+      else if (isOwner && debt.type === 'borrowed') iOwe = true;
+      else if (!isOwner && debt.type === 'lent') iOwe = true;
+      else if (!isOwner && debt.type === 'borrowed') iAmOwed = true;
+
+      if (iAmOwed) {
+        summary.totalOwed += debt.amount;
+        if (debt.status === 'pending') summary.pendingOwed += debt.amount;
+
+        if (otherUserId || otherUserName) {
+          const key = otherUserId || otherUserName;
+          if (!userMap.has(key)) userMap.set(key, { name: otherUserName, owes: 0, owed: 0 });
+          userMap.get(key)!.owes += debt.amount;
         }
+      } else if (iOwe) {
+        summary.totalOwing += debt.amount;
+        if (debt.status === 'pending') summary.pendingOwing += debt.amount;
 
-        if (tx.to === userId) {
-          const amount = tx.amountBase;
-          tripSummary.owed += amount;
-          summary.totalOwed += amount;
-          if (tx.status === 'pending') {
-            tripSummary.pendingOwed += amount;
-            summary.pendingOwed += amount;
-          }
-
-          if (!userMap.has(tx.from)) {
-            userMap.set(tx.from, { name: tx.fromName, owes: 0, owed: 0 });
-          }
-          userMap.get(tx.from)!.owes += amount;
+        if (otherUserId || otherUserName) {
+          const key = otherUserId || otherUserName;
+          if (!userMap.has(key)) userMap.set(key, { name: otherUserName, owes: 0, owed: 0 });
+          userMap.get(key)!.owed += debt.amount;
         }
-      });
-
-      if (tripSummary.owed > 0 || tripSummary.owing > 0) {
-        summary.byTrip.push(tripSummary);
       }
     });
 
-    summary.byUser = Array.from(userMap.entries()).map(([userId, data]) => ({
-      userId,
+    // 2. Trip Settlements (if included)
+    if (includeTrips) {
+      const settlements = await Settlement.find({
+        $or: [
+          { 'transactions.from': userId },
+          { 'transactions.to': userId },
+        ],
+      }).populate('tripId', 'title baseCurrency');
+
+      settlements.forEach(settlement => {
+        const tripSummary = {
+          tripId: (settlement.tripId as any)._id,
+          tripName: (settlement.tripId as any).title,
+          owed: 0,
+          owing: 0,
+          pendingOwed: 0,
+          pendingOwing: 0,
+        };
+
+        settlement.transactions.forEach((tx: any) => {
+          if (tx.from === userId) {
+            const amount = tx.amountBase;
+            tripSummary.owing += amount;
+            summary.totalOwing += amount;
+            if (tx.status === 'pending') {
+              tripSummary.pendingOwing += amount;
+              summary.pendingOwing += amount;
+            }
+
+            if (!userMap.has(tx.to)) {
+              userMap.set(tx.to, { name: tx.toName, owes: 0, owed: 0 });
+            }
+            userMap.get(tx.to)!.owed += amount;
+          }
+
+          if (tx.to === userId) {
+            const amount = tx.amountBase;
+            tripSummary.owed += amount;
+            summary.totalOwed += amount;
+            if (tx.status === 'pending') {
+              tripSummary.pendingOwed += amount;
+              summary.pendingOwed += amount;
+            }
+
+            if (!userMap.has(tx.from)) {
+              userMap.set(tx.from, { name: tx.fromName, owes: 0, owed: 0 });
+            }
+            userMap.get(tx.from)!.owes += amount;
+          }
+        });
+
+        if (tripSummary.owed > 0 || tripSummary.owing > 0) {
+          summary.byTrip.push(tripSummary);
+        }
+      });
+    }
+
+    summary.byUser = Array.from(userMap.entries()).map(([uId, data]) => ({
+      userId: uId,
       ...data,
       net: data.owes - data.owed,
     }));
@@ -1509,43 +1566,77 @@ export class FinanceService {
     return summary;
   }
 
-  static async getDebtDetails(userId: string, tripId?: string, status?: string) {
-    const query: any = {
-      $or: [
-        { 'transactions.from': userId },
-        { 'transactions.to': userId },
-      ],
-    };
-
-    if (tripId) query.tripId = new Types.ObjectId(tripId);
-
-    const settlements = await Settlement.find(query)
-      .populate('tripId', 'title baseCurrency')
-      .sort({ createdAt: -1 });
-
+  static async getDebtDetails(userId: string, tripId?: string, status?: string, includeTrips: boolean = true) {
     const transactions: any[] = [];
 
-    settlements.forEach(settlement => {
-      settlement.transactions.forEach((tx: any) => {
-        if (tx.from === userId || tx.to === userId) {
-          if (status && tx.status !== status) return;
+    // 1. Independent Debts
+    const independentDebts = await Debt.find({
+      $or: [{ userId }, { friendUserId: userId }],
+    });
 
-          transactions.push({
-            ...tx.toObject(),
-            tripId: settlement.tripId,
-            settlementId: settlement._id,
-            createdAt: settlement.createdAt,
-          });
-        }
+    independentDebts.forEach(debt => {
+      if (status && debt.status !== status) return;
+      if (tripId) return; 
+      
+      const isOwner = debt.userId === userId;
+      let from = isOwner && debt.type === 'borrowed' ? userId : (debt.friendUserId || debt.name);
+      let to = isOwner && debt.type === 'lent' ? userId : (debt.friendUserId || debt.name);
+      
+      transactions.push({
+        _id: debt._id,
+        amountBase: debt.amount,
+        amount: debt.amount,
+        currency: debt.currency,
+        from,
+        to,
+        fromName: from === userId ? 'You' : debt.name,
+        toName: to === userId ? 'You' : debt.name,
+        status: debt.status,
+        createdAt: debt.createdAt,
+        type: debt.type,
+        reason: debt.reason
       });
     });
+
+    // 2. Trip Settlements (if included)
+    if (includeTrips) {
+      const query: any = {
+        $or: [
+          { 'transactions.from': userId },
+          { 'transactions.to': userId },
+        ],
+      };
+
+      if (tripId) query.tripId = new Types.ObjectId(tripId);
+
+      const settlements = await Settlement.find(query)
+        .populate('tripId', 'title baseCurrency')
+        .sort({ createdAt: -1 });
+
+      settlements.forEach(settlement => {
+        settlement.transactions.forEach((tx: any) => {
+          if (tx.from === userId || tx.to === userId) {
+            if (status && tx.status !== status) return;
+
+            transactions.push({
+              ...tx.toObject(),
+              tripId: settlement.tripId,
+              settlementId: settlement._id,
+              createdAt: settlement.createdAt,
+            });
+          }
+        });
+      });
+    }
+
+    transactions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return {
       transactions,
       count: transactions.length,
       pending: transactions.filter(t => t.status === 'pending').length,
       confirmed: transactions.filter(t => t.status === 'confirmed').length,
-      totalAmount: transactions.reduce((sum, t) => sum + t.amountBase, 0),
+      totalAmount: transactions.reduce((sum, t) => sum + (t.amountBase || t.amount), 0),
     };
   }
 

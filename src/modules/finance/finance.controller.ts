@@ -13,7 +13,7 @@ const getUser = (req: Request) => {
 
 export class FinanceController {
 
-  // ============================================================
+  // =====================================================www=======
   // DASHBOARD & ANALYTICS
   // ============================================================
 
@@ -305,10 +305,28 @@ export class FinanceController {
   // DEBT & SETTLEMENT
   // ============================================================
 
+  static async createDebt(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const debt = await FinanceService.createDebt(userId, req.body);
+      res.status(201).json({ success: true, data: debt });
+    } catch (error) { next(error); }
+  }
+
+  static async settleDebt(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const { id } = req.params;
+      const debt = await FinanceService.settleDebt(userId, id);
+      res.status(200).json({ success: true, data: debt });
+    } catch (error) { next(error); }
+  }
+
   static async getDebtSummary(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = getUser(req);
-      const summary = await FinanceService.getDebtSummary(userId);
+      const includeTrips = req.query.includeTrips !== 'false';
+      const summary = await FinanceService.getDebtSummary(userId, includeTrips);
       res.status(200).json({ success: true, data: summary });
     } catch (error) { next(error); }
   }
@@ -317,10 +335,12 @@ export class FinanceController {
     try {
       const userId = getUser(req);
       const { tripId, status } = req.query;
+      const includeTrips = req.query.includeTrips !== 'false';
       const details = await FinanceService.getDebtDetails(
         userId,
         tripId as string,
-        status as string
+        status as string,
+        includeTrips
       );
       res.status(200).json({ success: true, data: details });
     } catch (error) { next(error); }

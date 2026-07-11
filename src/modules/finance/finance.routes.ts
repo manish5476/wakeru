@@ -65,6 +65,8 @@ router.delete('/goals/:id', FinanceController.deleteGoal);
 // DEBT & SETTLEMENT
 // ─────────────────────────────────────────────────────────────
 
+router.post('/debt', FinanceController.createDebt);
+router.post('/debt/:id/settle', FinanceController.settleDebt);
 router.get('/debt/summary', FinanceController.getDebtSummary);
 router.get('/debt/details', FinanceController.getDebtDetails);
 
