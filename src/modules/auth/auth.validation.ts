@@ -75,6 +75,7 @@ export const updatePreferencesSchema = z.object({
     monthlyReport: z.boolean().optional(),
   }).optional(),
   appearance: z.object({
+    themePreset: z.string().optional(),
     backgroundType: z.enum(['color', 'image']).optional(),
     backgroundColor: z.string().nullable().optional(),
     backgroundImage: z.string().nullable().optional(),

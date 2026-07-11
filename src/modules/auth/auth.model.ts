@@ -31,6 +31,7 @@ export interface INotificationPreferences {
 }
 
 export interface IAppearancePreferences {
+  themePreset?: string;
   backgroundType: 'color' | 'image';
   backgroundColor: string | null;
   backgroundImage: string | null;
@@ -146,6 +147,7 @@ const NotificationPreferencesSchema = new Schema<INotificationPreferences>(
 
 const AppearancePreferencesSchema = new Schema<IAppearancePreferences>(
   {
+    themePreset: { type: String, default: 'light' },
     backgroundType: { type: String, enum: ['color', 'image'], default: 'color' },
     backgroundColor: { type: String, default: null },
     backgroundImage: { type: String, default: null },
@@ -185,6 +187,7 @@ const UserPreferencesSchema = new Schema<IUserPreferences>(
     appearance: {
       type: AppearancePreferencesSchema,
       default: () => ({
+        themePreset: 'light',
         backgroundType: 'color',
         backgroundColor: null,
         backgroundImage: null,

@@ -724,15 +724,134 @@ export class FinanceService {
     return bill;
   }
 
-  static async getBills(userId: string, filters: { isActive?: boolean; category?: string; upcoming?: boolean } = {}) {
+  static async lazyAdvanceBills(userId: string) {
+    const now = new Date();
+    // Only fetch bills that are paid and where dueDate is in the past
+    const bills = await Bill.find({ userId, isPaid: true, dueDate: { $lt: now } });
+    for (const bill of bills) {
+      if (!bill.frequency || (bill.frequency as string) === 'one-time' || (bill.frequency as string) === 'none') continue;
+
+      let shouldAdvance = false;
+      const dueDate = new Date(bill.dueDate);
+
+      if (bill.frequency === 'monthly') {
+        if (now.getMonth() !== dueDate.getMonth() || now.getFullYear() !== dueDate.getFullYear()) {
+          shouldAdvance = true;
+        }
+      } else if (bill.frequency === 'yearly') {
+        if (now.getFullYear() !== dueDate.getFullYear()) {
+          shouldAdvance = true;
+        }
+      } else if (bill.frequency === 'weekly') {
+        // If more than 7 days have passed since dueDate
+        const daysPassed = (now.getTime() - dueDate.getTime()) / (1000 * 3600 * 24);
+        if (daysPassed >= 7) {
+          shouldAdvance = true;
+        }
+      } else if (bill.frequency === 'daily') {
+        const daysPassed = (now.getTime() - dueDate.getTime()) / (1000 * 3600 * 24);
+        if (daysPassed >= 1) {
+          shouldAdvance = true;
+        }
+      }
+
+      if (shouldAdvance) {
+        const nextDate = new Date(bill.dueDate);
+        switch (bill.frequency) {
+          case 'monthly': nextDate.setMonth(nextDate.getMonth() + 1); break;
+          case 'weekly': nextDate.setDate(nextDate.getDate() + 7); break;
+          case 'yearly': nextDate.setFullYear(nextDate.getFullYear() + 1); break;
+          case 'daily': nextDate.setDate(nextDate.getDate() + 1); break;
+        }
+        bill.dueDate = nextDate;
+        bill.nextDueDate = nextDate;
+        bill.isPaid = false;
+        bill.paidThisMonth = false;
+        await bill.save();
+      }
+    }
+  }
+
+  static async getBills(
+    userId: string, 
+    filters: { 
+      isActive?: boolean | string; 
+      category?: string; 
+      upcoming?: boolean | string; 
+      isPaid?: boolean | string;
+      search?: string;
+      dateFilter?: string;
+      startDate?: string;
+      endDate?: string;
+      page?: string | number;
+      limit?: string | number;
+    } = {}
+  ) {
+    await this.lazyAdvanceBills(userId);
     const query: any = { userId };
-    if (filters.isActive !== undefined) query.isActive = filters.isActive;
-    if (filters.category) query.category = filters.category;
+    
+    if (filters.isActive !== undefined) {
+      query.isActive = filters.isActive === 'true' || filters.isActive === true;
+    }
+    
+    if (filters.category && filters.category !== 'All') {
+      query.category = filters.category;
+    }
+    
+    if (filters.isPaid !== undefined) {
+      query.isPaid = filters.isPaid === 'true' || filters.isPaid === true;
+    }
+    
     if (filters.upcoming) {
       query.dueDate = { $gte: new Date() };
       query.isPaid = false;
     }
-    return Bill.find(query).sort({ dueDate: 1 }).lean();
+
+    if (filters.search) {
+      query.title = { $regex: filters.search, $options: 'i' };
+    }
+
+    // Date filters (This Month, Next Month, Past)
+    if (filters.dateFilter && filters.dateFilter !== 'All Time') {
+      const now = new Date();
+      if (filters.dateFilter === 'This Month') {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        query.dueDate = { ...query.dueDate, $gte: startOfMonth, $lte: endOfMonth };
+      } else if (filters.dateFilter === 'Next Month') {
+        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59, 999);
+        query.dueDate = { ...query.dueDate, $gte: startOfNextMonth, $lte: endOfNextMonth };
+      } else if (filters.dateFilter === 'Past') {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        query.dueDate = { ...query.dueDate, $lt: startOfMonth };
+      }
+    }
+
+    // Specific Date Range
+    if (filters.startDate || filters.endDate) {
+      query.dueDate = query.dueDate || {};
+      if (filters.startDate) query.dueDate.$gte = new Date(filters.startDate);
+      if (filters.endDate) query.dueDate.$lte = new Date(filters.endDate);
+    }
+
+    // Pagination
+    const page = parseInt(filters.page as string) || 1;
+    const limit = parseInt(filters.limit as string) || 20;
+    const skip = (page - 1) * limit;
+
+    const total = await Bill.countDocuments(query);
+    const bills = await Bill.find(query).sort({ dueDate: 1 }).skip(skip).limit(limit).lean();
+
+    return {
+      bills,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
 
   static async getBillById(userId: string, billId: string) {
@@ -759,16 +878,8 @@ export class FinanceService {
     bill.paidAmount = paidAmount || bill.amount;
     bill.lastPaidDate = new Date();
 
-    const nextDate = new Date(bill.dueDate);
-    switch (bill.frequency) {
-      case 'monthly': nextDate.setMonth(nextDate.getMonth() + 1); break;
-      case 'weekly': nextDate.setDate(nextDate.getDate() + 7); break;
-      case 'yearly': nextDate.setFullYear(nextDate.getFullYear() + 1); break;
-    }
-    bill.dueDate = nextDate;
-    bill.nextDueDate = nextDate;
-    bill.isPaid = false;
-    bill.paidThisMonth = false;
+    // We do NOT advance the dueDate immediately here so the bill shows as "Paid" 
+    // for the current cycle on the frontend. It will be lazily advanced in getBills().
 
     await bill.save();
 
