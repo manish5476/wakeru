@@ -88,6 +88,17 @@ export const invitationService = {
     },
 
     /**
+     * Get a single invitation by its ID.
+     */
+    async getInvitationById(invitationId: string, userId: string): Promise<IInvitation> {
+        const invitation = await Invitation.findById(invitationId);
+        if (!invitation) throw new AppError('Invitation not found', 404);
+        if (invitation.toUserId !== userId) throw new AppError('This invitation is not for you', 403);
+
+        return invitation;
+    },
+
+    /**
      * Accept an invitation.
      */
     async acceptInvitation(invitationId: string, userId: string): Promise<void> {

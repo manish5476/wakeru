@@ -17,6 +17,12 @@ router.use(protect);
 router.get('/pending', invitationController.getPendingInvitations);
 
 /**
+ * GET /api/v1/invitations/:invitationId
+ * Get a single invitation by its ID.
+ */
+router.get('/:invitationId', invitationController.getInvitationById);
+
+/**
  * POST /api/v1/invitations/:invitationId/accept
  * Accept an invitation.
  */

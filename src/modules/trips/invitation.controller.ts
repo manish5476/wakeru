@@ -17,6 +17,21 @@ export const invitationController = {
         }
     },
 
+    async getInvitationById(req: Request, res: Response): Promise<void> {
+        try {
+            const { invitationId } = req.params;
+            const userId = (req as any).user.userId;
+            const invitation = await invitationService.getInvitationById(invitationId, userId);
+            res.status(200).json(invitation);
+        } catch (error) {
+            if (error instanceof AppError) {
+                res.status(error.statusCode).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Internal Server Error' });
+            }
+        }
+    },
+
     async acceptInvitation(req: Request, res: Response): Promise<void> {
         try {
             const { invitationId } = req.params;
