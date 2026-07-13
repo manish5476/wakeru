@@ -35,14 +35,14 @@ export const invitationService = {
         if (!receiver) throw new AppError('User not found', 404);
 
         // Check not already a member
-        if (trip.isMember(receiver._id.toString())) {
+        if (trip.isMember(receiver.firebaseUid)) {
             throw new AppError('User is already a member of this trip', 409);
         }
 
         // Check no pending invitation already
         const existing = await Invitation.findOne({
             tripId: new Types.ObjectId(tripId),
-            toUserId: receiver._id.toString(),
+            toUserId: receiver.firebaseUid,
             status: 'pending',
         });
         if (existing) {
@@ -59,7 +59,7 @@ export const invitationService = {
             tripTitle: trip.title,
             fromUserId,
             fromName: senderName,
-            toUserId: receiver._id.toString(),
+            toUserId: receiver.firebaseUid,
             toName: receiver.displayName,
             status: 'pending',
             message,
