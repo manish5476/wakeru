@@ -6,8 +6,9 @@ export interface IFeedback extends Document<string> {
   userId?: string;
   displayName: string;
   rating: number;
-  category: 'bug' | 'suggestion' | 'love' | 'other';
+  category: 'bug' | 'suggestion' | 'love' | 'other' | 'feature' | 'performance' | 'design';
   feedback: string;
+  images?: string[];
   deviceInfo?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
@@ -37,13 +38,17 @@ const FeedbackSchema = new Schema<IFeedback>(
     },
     category: {
       type: String,
-      enum: ['bug', 'suggestion', 'love', 'other'],
+      enum: ['bug', 'suggestion', 'love', 'other', 'feature', 'performance', 'design'],
       required: true,
     },
     feedback: {
       type: String,
       required: true,
       maxlength: 1000,
+    },
+    images: {
+      type: [String],
+      default: [],
     },
     deviceInfo: {
       type: Schema.Types.Mixed,

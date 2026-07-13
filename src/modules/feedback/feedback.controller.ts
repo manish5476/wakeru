@@ -3,6 +3,8 @@ import { Feedback } from './feedback.model';
 import jwt from 'jsonwebtoken';
 import { User } from '../auth/auth.model';
 import { config } from '../../config';
+import cloudinary from '../../config/cloudinary.config';
+import streamifier from 'streamifier';
 
 // Optional helper to check if a user is authenticated on an otherwise public endpoint
 const tryGetAuthenticatedUser = async (req: Request) => {
@@ -44,13 +46,44 @@ export const feedbackController = {
       const authUser = await tryGetAuthenticatedUser(req);
       const { rating, category, feedback, deviceInfo, displayName } = req.body;
 
+      let parsedDeviceInfo = deviceInfo;
+      if (typeof deviceInfo === 'string') {
+        try {
+          parsedDeviceInfo = JSON.parse(deviceInfo);
+        } catch (e) {}
+      }
+
+      const imageUrls: string[] = [];
+      if (req.files && Array.isArray(req.files)) {
+        const uploadPromises = req.files.map((file: Express.Multer.File) => {
+          return new Promise<string>((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'feedback',
+                public_id: `fb-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+                transformation: [{ width: 800, crop: 'limit' }, { fetch_format: 'webp', quality: 80 }],
+              },
+              (error: any, result: any) => {
+                if (error) return reject(error);
+                resolve(result.secure_url);
+              }
+            );
+            streamifier.createReadStream(file.buffer).pipe(uploadStream);
+          });
+        });
+        
+        const uploadedUrls = await Promise.all(uploadPromises);
+        imageUrls.push(...uploadedUrls);
+      }
+
       const newFeedback = new Feedback({
         userId: authUser?.userId || null,
         displayName: authUser?.displayName || displayName || 'Anonymous',
-        rating,
+        rating: Number(rating),
         category,
         feedback,
-        deviceInfo,
+        images: imageUrls,
+        deviceInfo: parsedDeviceInfo,
       });
 
       await newFeedback.save();
