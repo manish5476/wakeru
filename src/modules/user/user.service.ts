@@ -10,6 +10,7 @@ import { CONSTANTS } from '../../config/constants';
 import streamifier from 'streamifier';
 import cloudinary from '../../config/cloudinary.config';
 import { Media } from '../media/media.model';
+import { socketServer } from '../../infrastructure/websocket/socket.server';
 
 interface PaginatedUserSearchResult {
   users: Partial<IUserDocument>[];
@@ -73,6 +74,10 @@ export class UserService {
 
     if (!user) throw new NotFoundError('User');
     logger.info(`Profile updated: ${userId}`);
+    
+    // Broadcast to other devices/users
+    socketServer.notifyUserProfileUpdated(userId, user.toPublicProfile());
+    
     return user;
   }
 
@@ -100,6 +105,10 @@ export class UserService {
 
     if (!user) throw new NotFoundError('User');
     logger.info(`Preferences updated: ${userId}`);
+
+    // Broadcast to other devices
+    socketServer.notifyUserPreferencesUpdated(userId, user.preferences);
+
     return user;
   }
 

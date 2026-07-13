@@ -40,6 +40,14 @@ export interface IUser {
     };
     theme: 'light' | 'dark' | 'system';
     timezone: string;
+    appearance?: {
+      themePreset?: string;
+      backgroundType?: 'color' | 'image';
+      backgroundColor?: string | null;
+      backgroundImage?: string | null;
+      backgroundBlur?: number;
+      backgroundImagePosition?: { x: number; y: number; scale: number };
+    };
   };
 
   // Banking (optional)

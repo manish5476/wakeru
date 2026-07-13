@@ -741,6 +741,46 @@ class SocketServer {
         });
     }
 
+    // ── USER UPDATES ─────────────────────────────────────────
+
+    notifyUserPreferencesUpdated(userId: string, preferences: any): void {
+        this.sendToUser(userId, 'user:preferences_updated', {
+            type: 'USER_PREFERENCES_UPDATED',
+            preferences,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    notifyUserProfileUpdated(userId: string, profile: any): void {
+        this.sendToUser(userId, 'user:profile_updated', {
+            type: 'USER_PROFILE_UPDATED',
+            profile,
+            timestamp: new Date().toISOString(),
+        });
+        
+        // Also broadcast to all trips this user is in, so other users see the updated profile
+        const userRooms = this.userSockets.get(userId);
+        if (userRooms) {
+            userRooms.forEach(socketId => {
+                const sock = this.io?.sockets.sockets.get(socketId) as AuthenticatedSocket;
+                if (sock?.userRooms) {
+                    sock.userRooms.forEach(room => {
+                        if (room.startsWith('trip:')) {
+                            const tripId = room.replace('trip:', '');
+                            this.sendToTrip(tripId, 'trip:member_updated', {
+                                type: 'MEMBER_UPDATED',
+                                userId,
+                                profile,
+                                tripId,
+                                timestamp: new Date().toISOString(),
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+
     // ============================================================
     // UTILITY
     // ============================================================

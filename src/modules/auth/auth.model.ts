@@ -30,12 +30,22 @@ export interface INotificationPreferences {
   monthlyReport: boolean;
 }
 
+export interface IAppearancePreferences {
+  themePreset?: string;
+  backgroundType: 'color' | 'image';
+  backgroundColor: string | null;
+  backgroundImage: string | null;
+  backgroundBlur: number;
+  backgroundImagePosition: { x: number; y: number; scale: number };
+}
+
 export interface IUserPreferences {
   defaultCurrency: string;
   language: string;
   theme: 'light' | 'dark' | 'system';
   timezone: string;
   notifications: INotificationPreferences;
+  appearance?: IAppearancePreferences;
 }
 
 export interface IBankingDetails {
@@ -135,6 +145,28 @@ const NotificationPreferencesSchema = new Schema<INotificationPreferences>(
   { _id: false }
 );
 
+const AppearancePreferencesSchema = new Schema<IAppearancePreferences>(
+  {
+    themePreset: { type: String, default: 'light' },
+    backgroundType: { type: String, enum: ['color', 'image'], default: 'color' },
+    backgroundColor: { type: String, default: null },
+    backgroundImage: { type: String, default: null },
+    backgroundBlur: { type: Number, default: 50 },
+    backgroundImagePosition: {
+      type: new Schema(
+        {
+          x: { type: Number, default: 0 },
+          y: { type: Number, default: 0 },
+          scale: { type: Number, default: 1 },
+        },
+        { _id: false }
+      ),
+      default: () => ({ x: 0, y: 0, scale: 1 })
+    },
+  },
+  { _id: false }
+);
+
 const UserPreferencesSchema = new Schema<IUserPreferences>(
   {
     defaultCurrency: { type: String, default: 'INR' },
@@ -150,6 +182,17 @@ const UserPreferencesSchema = new Schema<IUserPreferences>(
         expenseAdded: true,
         settlementReminder: true,
         monthlyReport: true,
+      })
+    },
+    appearance: {
+      type: AppearancePreferencesSchema,
+      default: () => ({
+        themePreset: 'light',
+        backgroundType: 'color',
+        backgroundColor: null,
+        backgroundImage: null,
+        backgroundBlur: 50,
+        backgroundImagePosition: { x: 0, y: 0, scale: 1 }
       })
     },
   },

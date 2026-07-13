@@ -26,23 +26,23 @@ export const invitationService = {
         }
 
         // Check receiver exists
-        // NOTE: `toUserId` as passed in by callers is now consistently the Firebase UID.
+        // NOTE: `toUserId` as passed in by callers might be the internal _id or the Firebase UID.
         const receiver = await User.findOne({
-            firebaseUid: toUserId,
+            $or: [{ _id: toUserId }, { firebaseUid: toUserId }, { email: toUserId.toLowerCase() }],
             isActive: true,
             isDeleted: false,
         });
         if (!receiver) throw new AppError('User not found', 404);
 
         // Check not already a member
-        if (trip.isMember(toUserId)) {
+        if (trip.isMember(receiver._id.toString())) {
             throw new AppError('User is already a member of this trip', 409);
         }
 
         // Check no pending invitation already
         const existing = await Invitation.findOne({
             tripId: new Types.ObjectId(tripId),
-            toUserId: toUserId,
+            toUserId: receiver._id.toString(),
             status: 'pending',
         });
         if (existing) {
@@ -59,7 +59,7 @@ export const invitationService = {
             tripTitle: trip.title,
             fromUserId,
             fromName: senderName,
-            toUserId: toUserId,
+            toUserId: receiver._id.toString(),
             toName: receiver.displayName,
             status: 'pending',
             message,
@@ -69,7 +69,7 @@ export const invitationService = {
 
         // Send real-time WebSocket notification
         socketServer.notifyTripInvitation(
-            toUserId,
+            receiver._id.toString(),
             trip.title,
             senderName,
             tripId,
@@ -78,7 +78,7 @@ export const invitationService = {
 
         // Also create in-app notification
         await notificationService.notifyTripInvitation(
-            toUserId,
+            receiver._id.toString(),
             tripId,
             trip.title,
             senderName

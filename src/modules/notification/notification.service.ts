@@ -455,8 +455,8 @@ export class NotificationService {
     tripId: string
   ): Promise<void> {
     const [fromUser, toUser] = await Promise.all([
-      User.findOne({ firebaseUid: fromUid }).select('displayName').lean(),
-      User.findOne({ firebaseUid: toUid }).select('displayName').lean(),
+      User.findOne({ $or: [{ _id: fromUid }, { firebaseUid: fromUid }] }).select('displayName').lean(),
+      User.findOne({ $or: [{ _id: toUid }, { firebaseUid: toUid }] }).select('displayName').lean(),
     ]);
 
     await this.create(
@@ -490,8 +490,8 @@ export class NotificationService {
     tripId: string
   ): Promise<void> {
     const [fromUser, toUser] = await Promise.all([
-      User.findOne({ firebaseUid: fromUid }).select('displayName').lean(),
-      User.findOne({ firebaseUid: toUid }).select('displayName').lean(),
+      User.findOne({ $or: [{ _id: fromUid }, { firebaseUid: fromUid }] }).select('displayName').lean(),
+      User.findOne({ $or: [{ _id: toUid }, { firebaseUid: toUid }] }).select('displayName').lean(),
     ]);
 
     // Notify payer
@@ -946,7 +946,7 @@ export class NotificationService {
     baseCurrency: string,
     tripId: string
   ): Promise<void> {
-    const toUser = await User.findOne({ firebaseUid: toUid })
+    const toUser = await User.findOne({ $or: [{ _id: toUid }, { firebaseUid: toUid }] })
       .select('displayName')
       .lean();
 
@@ -1165,8 +1165,13 @@ export class NotificationService {
   // ============================================================
 
   private async sendThroughChannels(notification: any): Promise<void> {
-    const user = await User.findOne({ firebaseUid: notification.userId })
-      .select('firebaseUid email phoneNumber fcmTokens')
+    const user = await User.findOne({
+      $or: [
+        { _id: notification.userId },
+        { firebaseUid: notification.userId }
+      ]
+    })
+      .select('_id firebaseUid email phoneNumber fcmTokens')
       .lean();
     if (!user) return;
 
@@ -1216,10 +1221,10 @@ export class NotificationService {
 
       if (failedTokens.length > 0) {
         await User.updateOne(
-          { firebaseUid: user.firebaseUid },
+          { _id: user._id },
           { $pull: { fcmTokens: { $in: failedTokens } } }
         );
-        logger.info(`Removed ${failedTokens.length} invalid FCM tokens for user ${user.firebaseUid}`);
+        logger.info(`Removed ${failedTokens.length} invalid FCM tokens for user ${user._id}`);
       }
       
       logger.info(`📱 Push sent to ${user.firebaseUid} (${response.successCount} successful, ${response.failureCount} failed): ${notification.title}`);
