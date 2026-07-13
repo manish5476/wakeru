@@ -112,6 +112,11 @@ export class UserService {
     return user;
   }
 
+  async getPreferences(userId: string): Promise<IUserDocument[keyof IUserDocument]> {
+    const user = await this.getUserById(userId);
+    return user.preferences;
+  }
+
   /**
    * Update banking details
    */
@@ -162,7 +167,7 @@ export class UserService {
           public_id: `profile-${userId}-${Date.now()}`,
           transformation: [{ width: 400, height: 400, crop: 'fill' }, { fetch_format: 'webp', quality: 80 }],
         },
-        (error, result) => {
+        (error:any, result:any) => {
           if (error) return reject(error);
           resolve(result);
         }

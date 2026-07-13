@@ -74,6 +74,19 @@ export class UserController {
     }
   }
 
+  async getPreferences(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const preferences = await userService.getPreferences(req.user!.userId);
+      res.status(200).json({
+        success: true,
+        data: { preferences },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateBankingDetails(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = await userService.updateBankingDetails(req.user!.userId, req.body);

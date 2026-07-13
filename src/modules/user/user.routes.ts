@@ -33,6 +33,7 @@ router.use(AuthMiddleware.authenticate);
 router.get('/profile', userController.getProfile.bind(userController));
 router.put('/profile', ValidationMiddleware.validate(updateProfileSchema), userController.updateProfile.bind(userController));
 router.put('/preferences', ValidationMiddleware.validate(updatePreferencesSchema), userController.updatePreferences.bind(userController));
+router.get('/preferences', userController.getPreferences.bind(userController));
 router.put('/banking', ValidationMiddleware.validate(updateBankingDetailsSchema), userController.updateBankingDetails.bind(userController));
 router.post('/profile-picture', upload.single('profilePicture'), userController.uploadProfilePicture.bind(userController));
 
