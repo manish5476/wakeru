@@ -1,3 +1,5 @@
+// backend/src/modules/invitation/invitation.service.ts
+
 import { Types } from 'mongoose';
 import { Invitation, IInvitation } from './invitation.model';
 import { Trip } from './trip.model';
@@ -7,8 +9,6 @@ import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
 
 export const invitationService = {
-    // In invitation.service.ts, update sendInvitation method:
-
     /**
      * Send an invitation to a user.
      */
@@ -29,7 +29,11 @@ export const invitationService = {
 
         // Check receiver exists
         const receiver = await User.findOne({
-            $or: [{ _id: toUserId }, { firebaseUid: toUserId }, { email: toUserId.toLowerCase() }],
+            $or: [
+                { _id: toUserId }, 
+                { firebaseUid: toUserId }, 
+                { email: toUserId.toLowerCase() }
+            ],
             isActive: true,
             isDeleted: false,
         });
@@ -77,110 +81,17 @@ export const invitationService = {
             invitation._id.toString()
         );
 
-        // Also create in-app notification with invitation ID
+        // ✅ Create in-app notification WITH invitation ID
         await notificationService.notifyTripInvitation(
             receiver._id.toString(),
             tripId,
             trip.title,
             senderName,
-            invitation._id.toString()  // ✅ THIS IS CRITICAL
+            invitation._id.toString()
         );
 
         return invitation;
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // /**
-    //  * Send an invitation to a user.
-    //  */
-    // async sendInvitation(
-    //     tripId: string,
-    //     toUserId: string,
-    //     fromUserId: string,
-    //     message?: string
-    // ): Promise<IInvitation> {
-    //     // Load trip
-    //     const trip = await Trip.findById(tripId);
-    //     if (!trip) throw new AppError('Trip not found', 404);
-
-    //     // Check sender is admin
-    //     if (!trip.isAdmin(fromUserId)) {
-    //         throw new AppError('Only trip admins can send invitations', 403);
-    //     }
-
-    //     // Check receiver exists
-    //     // NOTE: `toUserId` as passed in by callers might be the internal _id or the Firebase UID.
-    //     const receiver = await User.findOne({
-    //         $or: [{ _id: toUserId }, { firebaseUid: toUserId }, { email: toUserId.toLowerCase() }],
-    //         isActive: true,
-    //         isDeleted: false,
-    //     });
-    //     if (!receiver) throw new AppError('User not found', 404);
-
-    //     // Check not already a member
-    //     if (trip.isMember(receiver.firebaseUid)) {
-    //         throw new AppError('User is already a member of this trip', 409);
-    //     }
-
-    //     // Check no pending invitation already
-    //     const existing = await Invitation.findOne({
-    //         tripId: new Types.ObjectId(tripId),
-    //         toUserId: receiver.firebaseUid,
-    //         status: 'pending',
-    //     });
-    //     if (existing) {
-    //         throw new AppError('An invitation is already pending for this user', 409);
-    //     }
-
-    //     // Get sender info
-    //     const sender = trip.getMember(fromUserId);
-    //     const senderName = sender?.displayName || 'Someone';
-
-    //     // Create invitation
-    //     const invitation = new Invitation({
-    //         tripId: new Types.ObjectId(tripId),
-    //         tripTitle: trip.title,
-    //         fromUserId,
-    //         fromName: senderName,
-    //         toUserId: receiver.firebaseUid,
-    //         toName: receiver.displayName,
-    //         status: 'pending',
-    //         message,
-    //     });
-
-    //     await invitation.save();
-
-    //     // Send real-time WebSocket notification
-    //     socketServer.notifyTripInvitation(
-    //         receiver._id.toString(),
-    //         trip.title,
-    //         senderName,
-    //         tripId,
-    //         invitation._id.toString()
-    //     );
-
-    //     // Also create in-app notification
-    //     await notificationService.notifyTripInvitation(
-    //         receiver._id.toString(),
-    //         tripId,
-    //         trip.title,
-    //         senderName
-    //     );
-
-    //     return invitation;
-    // },
 
     /**
      * Get a single invitation by its ID.
@@ -188,8 +99,9 @@ export const invitationService = {
     async getInvitationById(invitationId: string, userId: string): Promise<IInvitation> {
         const invitation = await Invitation.findById(invitationId);
         if (!invitation) throw new AppError('Invitation not found', 404);
-        if (invitation.toUserId !== userId) throw new AppError('This invitation is not for you', 403);
-
+        if (invitation.toUserId !== userId) {
+            throw new AppError('This invitation is not for you', 403);
+        }
         return invitation;
     },
 
@@ -199,7 +111,9 @@ export const invitationService = {
     async acceptInvitation(invitationId: string, userId: string): Promise<void> {
         const invitation = await Invitation.findById(invitationId);
         if (!invitation) throw new AppError('Invitation not found', 404);
-        if (invitation.toUserId !== userId) throw new AppError('This invitation is not for you', 403);
+        if (invitation.toUserId !== userId) {
+            throw new AppError('This invitation is not for you', 403);
+        }
         if (invitation.status !== 'pending') {
             throw new AppError(`Invitation is already ${invitation.status}`, 400);
         }
@@ -210,13 +124,15 @@ export const invitationService = {
         if (trip.isArchived) throw new AppError('Trip is archived', 400);
 
         // Get user info
-        // userId here is the Firebase UID (req.user.userId) — findByFirebaseUid
-        // keeps this consistent with how toUserId is now stored.
-        const user = await User.findOne({ firebaseUid: userId }).select('displayName photoURL').lean();
+        const user = await User.findOne({ firebaseUid: userId })
+            .select('displayName photoURL')
+            .lean();
         if (!user) throw new AppError('User not found', 404);
 
         // Add member to trip
-        const existingMember = trip.members.find((m) => m.userId === userId && !m.isActive);
+        const existingMember = trip.members.find(
+            (m) => m.userId === userId && !m.isActive
+        );
         if (existingMember) {
             existingMember.isActive = true;
             existingMember.displayName = user.displayName;
@@ -248,7 +164,7 @@ export const invitationService = {
             user.displayName
         );
 
-        // Notify sender
+        // Notify sender via WebSocket
         socketServer.sendToUser(invitation.fromUserId, 'invitation:accepted', {
             type: 'INVITATION_ACCEPTED',
             tripId: invitation.tripId.toString(),
@@ -256,6 +172,14 @@ export const invitationService = {
             userName: user.displayName,
             timestamp: new Date().toISOString(),
         });
+
+        // ✅ Also send in-app notification to sender
+        await notificationService.notifyInvitationAccepted(
+            invitation.fromUserId,
+            user.displayName,
+            invitation.tripTitle,
+            invitation.tripId.toString()
+        );
     },
 
     /**
@@ -264,7 +188,9 @@ export const invitationService = {
     async declineInvitation(invitationId: string, userId: string): Promise<void> {
         const invitation = await Invitation.findById(invitationId);
         if (!invitation) throw new AppError('Invitation not found', 404);
-        if (invitation.toUserId !== userId) throw new AppError('This invitation is not for you', 403);
+        if (invitation.toUserId !== userId) {
+            throw new AppError('This invitation is not for you', 403);
+        }
         if (invitation.status !== 'pending') {
             throw new AppError(`Invitation is already ${invitation.status}`, 400);
         }
@@ -273,8 +199,11 @@ export const invitationService = {
         invitation.respondedAt = new Date();
         await invitation.save();
 
-        // Notify sender
-        const user = await User.findOne({ firebaseUid: userId }).select('displayName').lean();
+        // Notify sender via WebSocket
+        const user = await User.findOne({ firebaseUid: userId })
+            .select('displayName')
+            .lean();
+        
         socketServer.sendToUser(invitation.fromUserId, 'invitation:declined', {
             type: 'INVITATION_DECLINED',
             tripId: invitation.tripId.toString(),
@@ -282,6 +211,14 @@ export const invitationService = {
             userName: user?.displayName || 'Someone',
             timestamp: new Date().toISOString(),
         });
+
+        // ✅ Also send in-app notification to sender
+        await notificationService.notifyInvitationDeclined(
+            invitation.fromUserId,
+            user?.displayName || 'Someone',
+            invitation.tripTitle,
+            invitation.tripId.toString()
+        );
     },
 
     /**
@@ -302,7 +239,9 @@ export const invitationService = {
     async getTripInvitations(tripId: string, userId: string): Promise<IInvitation[]> {
         const trip = await Trip.findById(tripId);
         if (!trip) throw new AppError('Trip not found', 404);
-        if (!trip.isAdmin(userId)) throw new AppError('Only admins can view invitations', 403);
+        if (!trip.isAdmin(userId)) {
+            throw new AppError('Only admins can view invitations', 403);
+        }
 
         return Invitation.find({
             tripId: new Types.ObjectId(tripId),
@@ -311,4 +250,4 @@ export const invitationService = {
             .sort({ createdAt: -1 })
             .exec();
     },
-}
+};

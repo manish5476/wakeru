@@ -1,3 +1,5 @@
+// backend/src/modules/invitation/invitation.routes.ts
+
 import { Router } from 'express';
 import { protect } from '../../middleware/auth.middleware';
 import { invitationController } from './invitation.controller';
@@ -15,6 +17,12 @@ router.use(protect);
  * Get all pending invitations for the current user.
  */
 router.get('/pending', invitationController.getPendingInvitations);
+
+/**
+ * POST /api/v1/invitations/send
+ * Send an invitation to a user.
+ */
+router.post('/send', invitationController.sendInvitation);
 
 /**
  * GET /api/v1/invitations/:invitationId
