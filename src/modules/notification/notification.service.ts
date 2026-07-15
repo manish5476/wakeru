@@ -609,11 +609,42 @@ export class NotificationService {
   /**
    * Notify user about trip invitation.
    */
+  // async notifyTripInvitation(
+  //   toUid: string,
+  //   tripId: string,
+  //   tripTitle: string,
+  //   inviterName: string
+  // ): Promise<void> {
+  //   await this.create(
+  //     toUid,
+  //     'TRIP_INVITATION',
+  //     'Trip Invitation! 🧳',
+  //     `${inviterName} invited you to "${tripTitle}"`,
+  //     {
+  //       data: { tripId },
+  //       isActionable: true,
+  //       actionButtons: [
+  //         { label: '✅ Accept', action: 'accept_invitation', value: 'accept', style: 'primary' },
+  //         { label: '❌ Decline', action: 'decline_invitation', value: 'decline', style: 'danger' },
+  //       ],
+  //       actionUrl: `/trips/${tripId}/join`,
+  //       priority: 'high',
+  //       category: 'trip',
+  //       channels: { push: true, email: true },
+  //     }
+  //   );
+  // }
+// In notification.service.ts, update these methods:
+
+  /**
+   * Notify user about trip invitation.
+   */
   async notifyTripInvitation(
     toUid: string,
     tripId: string,
     tripTitle: string,
-    inviterName: string
+    inviterName: string,
+    invitationId: string  // ✅ Added invitationId parameter
   ): Promise<void> {
     await this.create(
       toUid,
@@ -621,19 +652,99 @@ export class NotificationService {
       'Trip Invitation! 🧳',
       `${inviterName} invited you to "${tripTitle}"`,
       {
-        data: { tripId },
+        data: { 
+          tripId, 
+          invitationId,  // ✅ Store in notification data
+          type: 'invitation' 
+        },
         isActionable: true,
         actionButtons: [
-          { label: '✅ Accept', action: 'accept_invitation', value: 'accept', style: 'primary' },
-          { label: '❌ Decline', action: 'decline_invitation', value: 'decline', style: 'danger' },
+          { 
+            label: '✅ Accept', 
+            action: 'accept',  // ✅ Simplified
+            value: 'accept', 
+            style: 'primary' 
+          },
+          { 
+            label: '❌ Decline', 
+            action: 'decline',  // ✅ Simplified
+            value: 'decline', 
+            style: 'danger' 
+          },
         ],
-        actionUrl: `/trips/${tripId}/join`,
+        actionUrl: `/trips/${tripId}`,
         priority: 'high',
         category: 'trip',
         channels: { push: true, email: true },
       }
     );
   }
+
+  /**
+   * Notify about a join request.
+   */
+  async notifyJoinRequest(
+    adminUid: string,
+    requesterName: string,
+    tripTitle: string,
+    tripId: string,
+    requestId: string
+  ): Promise<void> {
+    await this.create(
+      adminUid,
+      'TRIP_JOIN_REQUEST',
+      'New Join Request 🙋',
+      `${requesterName} wants to join "${tripTitle}"`,
+      {
+        data: { 
+          tripId, 
+          requestId,  // ✅ Store requestId in data
+          type: 'join_request' 
+        },
+        isActionable: true,
+        actionButtons: [
+          { 
+            label: '✅ Approve', 
+            action: 'accept',  // ✅ Unified
+            value: 'approve', 
+            style: 'primary' 
+          },
+          { 
+            label: '❌ Reject', 
+            action: 'decline',  // ✅ Unified
+            value: 'reject', 
+            style: 'danger' 
+          },
+        ],
+        priority: 'high',
+        category: 'trip',
+        channels: { push: true },
+      }
+    );
+  }
+
+  /**
+   * Notify that friend request was accepted.
+   */
+  async notifyFriendAccepted(
+    userId: string,
+    friendName: string,
+    friendId?: string
+  ): Promise<void> {
+    await this.create(
+      userId,
+      'FRIEND_ACCEPTED',
+      'Friend Request Accepted! 🎉',
+      `${friendName} accepted your friend request`,
+      {
+        data: { friendName, friendId },
+        priority: 'medium',
+        category: 'social',
+        channels: { push: true },
+      }
+    );
+  }
+
 
   /**
    * Notify admin that invitation was accepted.
@@ -679,34 +790,34 @@ export class NotificationService {
     );
   }
 
-  /**
-   * Notify about a join request.
-   */
-  async notifyJoinRequest(
-    adminUid: string,
-    requesterName: string,
-    tripTitle: string,
-    tripId: string,
-    requestId: string
-  ): Promise<void> {
-    await this.create(
-      adminUid,
-      'TRIP_JOIN_REQUEST',
-      'New Join Request 🙋',
-      `${requesterName} wants to join "${tripTitle}"`,
-      {
-        data: { tripId, requestId },
-        isActionable: true,
-        actionButtons: [
-          { label: '✅ Approve', action: 'approve_join', value: 'approve', style: 'primary' },
-          { label: '❌ Reject', action: 'reject_join', value: 'reject', style: 'danger' },
-        ],
-        priority: 'high',
-        category: 'trip',
-        channels: { push: true },
-      }
-    );
-  }
+  // /**
+//  * Notify about a join request.
+  //  */
+  // async notifyJoinRequest(
+  //   adminUid: string,
+  //   requesterName: string,
+  //   tripTitle: string,
+  //   tripId: string,
+  //   requestId: string
+  // ): Promise<void> {
+  //   await this.create(
+  //     adminUid,
+  //     'TRIP_JOIN_REQUEST',
+  //     'New Join Request 🙋',
+  //     `${requesterName} wants to join "${tripTitle}"`,
+  //     {
+  //       data: { tripId, requestId },
+  //       isActionable: true,
+  //       actionButtons: [
+  //         { label: '✅ Approve', action: 'approve_join', value: 'approve', style: 'primary' },
+  //         { label: '❌ Reject', action: 'reject_join', value: 'reject', style: 'danger' },
+  //       ],
+  //       priority: 'high',
+  //       category: 'trip',
+  //       channels: { push: true },
+  //     }
+  //   );
+  // }
 
   /**
    * Notify that join request was approved.
@@ -915,26 +1026,26 @@ export class NotificationService {
     );
   }
 
-  /**
-   * Notify that friend request was accepted.
-   */
-  async notifyFriendAccepted(
-    userId: string,
-    friendName: string
-  ): Promise<void> {
-    await this.create(
-      userId,
-      'FRIEND_ACCEPTED',
-      'Friend Request Accepted! 🎉',
-      `${friendName} accepted your friend request`,
-      {
-        data: { friendName },
-        priority: 'medium',
-        category: 'social',
-        channels: { push: true },
-      }
-    );
-  }
+  // /**
+  //  * Notify that friend request was accepted.
+  //  */
+  // async notifyFriendAccepted(
+  //   userId: string,
+  //   friendName: string
+  // ): Promise<void> {
+  //   await this.create(
+  //     userId,
+  //     'FRIEND_ACCEPTED',
+  //     'Friend Request Accepted! 🎉',
+  //     `${friendName} accepted your friend request`,
+  //     {
+  //       data: { friendName },
+  //       priority: 'medium',
+  //       category: 'social',
+  //       channels: { push: true },
+  //     }
+  //   );
+  // }
 
   /**
    * Notify user about payment reminder.

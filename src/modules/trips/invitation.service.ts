@@ -7,6 +7,8 @@ import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
 
 export const invitationService = {
+  // In invitation.service.ts, update sendInvitation method:
+
     /**
      * Send an invitation to a user.
      */
@@ -26,7 +28,6 @@ export const invitationService = {
         }
 
         // Check receiver exists
-        // NOTE: `toUserId` as passed in by callers might be the internal _id or the Firebase UID.
         const receiver = await User.findOne({
             $or: [{ _id: toUserId }, { firebaseUid: toUserId }, { email: toUserId.toLowerCase() }],
             isActive: true,
@@ -76,16 +77,110 @@ export const invitationService = {
             invitation._id.toString()
         );
 
-        // Also create in-app notification
+        // Also create in-app notification with invitation ID
         await notificationService.notifyTripInvitation(
             receiver._id.toString(),
             tripId,
             trip.title,
-            senderName
+            senderName,
+            invitation._id.toString()  // ✅ Pass invitation ID
         );
 
         return invitation;
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // /**
+    //  * Send an invitation to a user.
+    //  */
+    // async sendInvitation(
+    //     tripId: string,
+    //     toUserId: string,
+    //     fromUserId: string,
+    //     message?: string
+    // ): Promise<IInvitation> {
+    //     // Load trip
+    //     const trip = await Trip.findById(tripId);
+    //     if (!trip) throw new AppError('Trip not found', 404);
+
+    //     // Check sender is admin
+    //     if (!trip.isAdmin(fromUserId)) {
+    //         throw new AppError('Only trip admins can send invitations', 403);
+    //     }
+
+    //     // Check receiver exists
+    //     // NOTE: `toUserId` as passed in by callers might be the internal _id or the Firebase UID.
+    //     const receiver = await User.findOne({
+    //         $or: [{ _id: toUserId }, { firebaseUid: toUserId }, { email: toUserId.toLowerCase() }],
+    //         isActive: true,
+    //         isDeleted: false,
+    //     });
+    //     if (!receiver) throw new AppError('User not found', 404);
+
+    //     // Check not already a member
+    //     if (trip.isMember(receiver.firebaseUid)) {
+    //         throw new AppError('User is already a member of this trip', 409);
+    //     }
+
+    //     // Check no pending invitation already
+    //     const existing = await Invitation.findOne({
+    //         tripId: new Types.ObjectId(tripId),
+    //         toUserId: receiver.firebaseUid,
+    //         status: 'pending',
+    //     });
+    //     if (existing) {
+    //         throw new AppError('An invitation is already pending for this user', 409);
+    //     }
+
+    //     // Get sender info
+    //     const sender = trip.getMember(fromUserId);
+    //     const senderName = sender?.displayName || 'Someone';
+
+    //     // Create invitation
+    //     const invitation = new Invitation({
+    //         tripId: new Types.ObjectId(tripId),
+    //         tripTitle: trip.title,
+    //         fromUserId,
+    //         fromName: senderName,
+    //         toUserId: receiver.firebaseUid,
+    //         toName: receiver.displayName,
+    //         status: 'pending',
+    //         message,
+    //     });
+
+    //     await invitation.save();
+
+    //     // Send real-time WebSocket notification
+    //     socketServer.notifyTripInvitation(
+    //         receiver._id.toString(),
+    //         trip.title,
+    //         senderName,
+    //         tripId,
+    //         invitation._id.toString()
+    //     );
+
+    //     // Also create in-app notification
+    //     await notificationService.notifyTripInvitation(
+    //         receiver._id.toString(),
+    //         tripId,
+    //         trip.title,
+    //         senderName
+    //     );
+
+    //     return invitation;
+    // },
 
     /**
      * Get a single invitation by its ID.
@@ -216,4 +311,4 @@ export const invitationService = {
             .sort({ createdAt: -1 })
             .exec();
     },
-};
+}

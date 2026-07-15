@@ -19,6 +19,7 @@ import {
   GenerateInviteInput,
 } from './trip.validators';
 import { AppError } from '../../shared/errors/AppError';
+import { notificationService } from '../notification';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES & INTERFACES
@@ -627,6 +628,7 @@ export const deleteStop = async (
  * Validates code exists and hasn't expired.
  * If user was previously a member (isActive=false), reactivates them.
  */
+
 export const joinTripByInviteCode = async (
   inviteCode: string,
   joiner: UserInfo
@@ -667,7 +669,7 @@ export const joinTripByInviteCode = async (
 
   await joinRequest.save();
 
-  // Notify admins
+  // Notify admins via WebSocket
   const admins = trip.members.filter((m) => m.role === 'admin' && m.isActive);
   admins.forEach((admin) => {
     socketServer.sendToUser(admin.userId, 'trip:join_request', {
@@ -680,8 +682,74 @@ export const joinTripByInviteCode = async (
     });
   });
 
+  // ✅ Also send in-app notifications with request ID
+  for (const admin of admins) {
+    await notificationService.notifyJoinRequest(
+      admin.userId,
+      joiner.displayName,
+      trip.title,
+      trip._id.toString(),
+      joinRequest._id.toString()  // ✅ Pass request ID
+    );
+  }
+
   return joinRequest;
 };
+// export const joinTripByInviteCode = async (
+//   inviteCode: string,
+//   joiner: UserInfo
+// ): Promise<IJoinRequest> => {
+//   const trip = await Trip.findOne({
+//     inviteCode: inviteCode.toUpperCase(),
+//     isArchived: false,
+//   });
+
+//   if (!trip) {
+//     throw new AppError('Invalid or expired invite code', 404);
+//   }
+
+//   // Check expiry
+//   if (trip.inviteCodeExpiresAt && trip.inviteCodeExpiresAt < new Date()) {
+//     throw new AppError('This invite code has expired', 400);
+//   }
+
+//   // Check if already an active member
+//   if (trip.isMember(joiner.userId)) {
+//     throw new AppError('You are already a member of this trip', 409);
+//   }
+
+//   // Create a join request instead of adding them immediately
+//   const existingRequest = await JoinRequest.findOne({ tripId: trip._id, userId: joiner.userId });
+//   if (existingRequest && existingRequest.status === 'pending') {
+//     throw new AppError('You already have a pending join request for this trip', 409);
+//   }
+
+//   const joinRequest = new JoinRequest({
+//     tripId: trip._id,
+//     tripTitle: trip.title,
+//     userId: joiner.userId,
+//     userName: joiner.displayName,
+//     photoURL: joiner.photoURL,
+//     status: 'pending',
+//   });
+
+//   await joinRequest.save();
+
+//   // Notify admins
+//   const admins = trip.members.filter((m) => m.role === 'admin' && m.isActive);
+//   admins.forEach((admin) => {
+//     socketServer.sendToUser(admin.userId, 'trip:join_request', {
+//       type: 'TRIP_JOIN_REQUEST',
+//       title: 'New Join Request',
+//       message: `${joiner.displayName} wants to join ${trip.title}`,
+//       tripId: trip._id.toString(),
+//       requestId: joinRequest._id.toString(),
+//       timestamp: new Date().toISOString(),
+//     });
+//   });
+
+//   return joinRequest;
+// };
 
 /**
  * Get all pending join requests for a trip (admin only).
