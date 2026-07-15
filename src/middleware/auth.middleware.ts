@@ -54,19 +54,23 @@ export const protect = async (
     }
 
     // 4. Find user by the userId from token (matches _id since we use UUID strings)
+    // IMPORTANT: Also select firebaseUid so it can be passed to services that use Firebase UID
     const userDoc = await User.findOne({
       _id: decoded.userId,
       isActive: true,
       isDeleted: false,
-    }).select('email role displayName photoURL isActive isDeleted').lean();
+    }).select('email role displayName photoURL isActive isDeleted firebaseUid').lean();
 
     if (!userDoc) {
       return next(new UnauthorizedError('User no longer exists or account is deactivated.'));
     }
 
     // 5. Attach user to request
+    // userId = UUID _id (for internal DB lookups)
+    // firebaseUid = Firebase UID (for friends/invitations/notifications services)
     req.user = {
       userId: decoded.userId,
+      firebaseUid: (userDoc as any).firebaseUid || decoded.userId,
       email: userDoc.email,
       role: userDoc.role,
       displayName: userDoc.displayName || 'User',

@@ -36,7 +36,8 @@ export interface ApiResponse<T = any> {
 // ✅ FIXED: Clean interface without index signatures
 export interface AuthenticatedRequest extends Request {
   user?: {
-    userId: string;
+    userId: string;       // UUID _id — used by auth middleware internally
+    firebaseUid: string;  // Firebase UID — used by friends/notifications/trips services
     email: string;
     role: string;
     displayName?: string;

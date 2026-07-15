@@ -88,7 +88,7 @@ export class AuthMiddleware {
       // ✅ UPGRADED:
       const user = await User.findOne(
         { _id: decoded.userId, isActive: true, isDeleted: false },
-        'email role displayName photoURL isActive isDeleted'  // ← ADDED
+        'email role displayName photoURL firebaseUid isActive isDeleted'
       ).lean();
 
       if (!user) {
@@ -97,10 +97,11 @@ export class AuthMiddleware {
 
       req.user = {
         userId: decoded.userId,
+        firebaseUid: user.firebaseUid || '',
         email: user.email,
         role: user.role,
-        displayName: user.displayName || 'User',   // ← ADDED
-        photoURL: user.photoURL || '',             // ← ADDED
+        displayName: user.displayName || 'User',
+        photoURL: user.photoURL || '',
       };
 
       next();
@@ -161,12 +162,13 @@ export class AuthMiddleware {
 
       const user = await User.findOne(
         { _id: decoded.userId, isActive: true, isDeleted: false },
-        'email role displayName photoURL'
+        'email role displayName photoURL firebaseUid'
       ).lean();
 
       if (user) {
         req.user = {
           userId: decoded.userId,
+          firebaseUid: user.firebaseUid || '',
           email: user.email,
           role: user.role,
           displayName: user.displayName || 'User',

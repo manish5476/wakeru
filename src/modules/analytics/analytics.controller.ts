@@ -3,8 +3,8 @@ import { analyticsService } from './analytics.service';
 
 const getUser = (req: Request) => {
   const user = (req as any).user;
-  if (!user?.userId) throw new Error('Not authenticated');
-  return user.userId;
+  if (!user?.firebaseUid) throw new Error('Not authenticated');
+  return user.firebaseUid; // ✅ FIXED: Use Firebase UID
 };
 
 export const analyticsController = {

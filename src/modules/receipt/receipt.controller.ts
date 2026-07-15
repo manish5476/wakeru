@@ -7,8 +7,8 @@ import { AppError } from '../../shared/errors/AppError';
 // ============================================================
 
 const getUser = (req: any) => {
-  if (!req.user?.userId) throw new AppError('Not authenticated', 401);
-  return req.user.userId;
+  if (!req.user?.firebaseUid) throw new AppError('Not authenticated', 401);
+  return req.user.firebaseUid; // ✅ FIXED: Use Firebase UID
 };
 
 // ============================================================

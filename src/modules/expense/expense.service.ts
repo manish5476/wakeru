@@ -1173,6 +1173,15 @@ export const deleteComment = async (
   );
 
   await expense.save();
+
+  // Notify socket clients
+  socketServer.notifyExpenseCommentDeleted(
+    expense.tripId.toString(),
+    expense._id.toString(),
+    expense.title,
+    userId
+  );
+
   return expense;
 };
 

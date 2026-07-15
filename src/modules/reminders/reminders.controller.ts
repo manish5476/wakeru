@@ -6,8 +6,9 @@ import { AppError } from '../../shared/errors/AppError';
 
 const getUser = (req: Request) => {
     const user = (req as any).user;
-    if (!user?.userId) throw new AppError('Not authenticated', 401);
-    return user.userId;
+    // ✅ FIXED: Use Firebase UID
+    if (!user?.firebaseUid) throw new AppError('Not authenticated', 401);
+    return user.firebaseUid;
 };
 
 export const remindersController = {

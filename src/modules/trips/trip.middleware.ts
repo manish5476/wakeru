@@ -93,7 +93,7 @@ export const requireMember = async (
 ): Promise<void> => {
   try {
     const trip = (req as any).trip;
-    const userId = (req as any).user?.userId;
+    const userId = (req as any).user?.firebaseUid;
     // set by Firebase auth middleware
 
     if (!trip) {
@@ -121,7 +121,7 @@ export const requireAdmin = async (
 ): Promise<void> => {
   try {
     const trip = (req as any).trip;
-    const userId = (req as any).user?.userId;
+    const userId = (req as any).user?.firebaseUid;
 
 
     if (!trip) {
@@ -150,7 +150,7 @@ export const requireEditor = async (
 ): Promise<void> => {
   try {
     const trip = (req as any).trip;
-    const userId = (req as any).user?.userId;
+    const userId = (req as any).user?.firebaseUid;
 
 
     if (!trip) {

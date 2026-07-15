@@ -1,29 +1,7 @@
 import { Router } from 'express';
 import * as tripController from './trip.controller';
-import {
-  loadTrip,
-  loadStop,
-  requireMember,
-  requireAdmin,
-  requireEditor,
-  validate,
-} from './trip.middleware';
-import {
-  createTripSchema,
-  updateTripSchema,
-  createStopSchema,
-  updateStopSchema,
-  reorderStopsSchema,
-  updateExchangeRateSchema,
-  updateMemberRoleSchema,
-  joinTripSchema,
-  generateInviteSchema,
-  tripIdParamSchema,
-  stopIdParamSchema,
-  joinRequestParamSchema,
-  memberParamSchema,
-  addMemberSchema,
-} from './trip.validators';
+import { loadTrip, loadStop, requireMember, requireAdmin, requireEditor, validate } from './trip.middleware';
+import { createTripSchema, updateTripSchema, createStopSchema, updateStopSchema, reorderStopsSchema, updateExchangeRateSchema, updateMemberRoleSchema, joinTripSchema, generateInviteSchema, tripIdParamSchema, stopIdParamSchema, joinRequestParamSchema, memberParamSchema, addMemberSchema, } from './trip.validators';
 import { protect } from '../../middleware/auth.middleware';
 import { z } from 'zod';
 
@@ -140,7 +118,7 @@ router.delete(
 router.get(
   '/:tripId/insights',
   validate(tripIdParamSchema, 'params'),
-  loadTrip(),
+  loadTrip({ includeArchived: true }),
   requireMember,
   tripController.getTripInsights
 );
@@ -148,7 +126,7 @@ router.get(
 router.get(
   '/:tripId/story',
   validate(tripIdParamSchema, 'params'),
-  loadTrip(),
+  loadTrip({ includeArchived: true }),
   requireMember,
   tripController.getTripStory
 );

@@ -333,9 +333,23 @@ export const deleteTripPermanent = async (trip: ITrip, userId: string): Promise<
   if (!trip.allowOthersToArchiveTrip && trip.createdBy !== userId) {
     throw new AppError('Only the trip creator can delete this trip', 403);
   }
+  
   const { Expense } = await import('../expense/expense.model');
-  await Expense.deleteMany({ tripId: trip._id });
-  await Trip.deleteOne({ _id: trip._id });
+  const { Stop } = await import('./stop.model');
+  const { Settlement } = await import('../settlement/settlement.model');
+  const { Invitation } = await import('./invitation.model');
+  const { JoinRequest } = await import('./join_request.model');
+  const { Notification } = await import('../notification/notification.model');
+
+  await Promise.all([
+    Expense.deleteMany({ tripId: trip._id }),
+    Stop.deleteMany({ tripId: trip._id }),
+    Settlement.deleteMany({ tripId: trip._id }),
+    Invitation.deleteMany({ tripId: trip._id }),
+    JoinRequest.deleteMany({ tripId: trip._id }),
+    Notification.deleteMany({ 'data.tripId': trip._id.toString() }),
+    Trip.deleteOne({ _id: trip._id })
+  ]);
 };
 
 /**

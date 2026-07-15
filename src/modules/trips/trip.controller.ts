@@ -16,11 +16,12 @@ import {
 } from './trip.validators';
 
 // Helper to read the authenticated Firebase user off the request
+// ✅ FIXED: Trip members store userId as Firebase UID, not UUID _id
 const getUser = (req: Request) => {
   const user = (req as any).user;
-  if (!user?.userId) throw new AppError('Not authenticated', 401);
+  if (!user?.firebaseUid) throw new AppError('Not authenticated', 401);
   return {
-    userId: user.userId,
+    userId: user.firebaseUid, // Firebase UID — this is what trip.members[].userId stores
     displayName: user.displayName || 'User',
     photoURL: user.photoURL || '',
   };

@@ -160,7 +160,7 @@ export const AuthService = {
 
     // Create user
     const userPayload: any = {
-      _id: uuidv4(),
+      _id: firebaseUid, // ✅ FIXED: MongoDB _id is exactly the Firebase UID
       firebaseUid,
       email: email.toLowerCase(),
       displayName: metadata?.displayName || decodedToken.name || 'Traveler',

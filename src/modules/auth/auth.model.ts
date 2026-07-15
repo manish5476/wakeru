@@ -289,7 +289,7 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
   {
     _id: {
       type: String,
-      default: () => uuidv4() // Use function to generate new UUID each time
+      required: true // We will manually provide the Firebase UID here
     },
     firebaseUid: {
       type: String,

@@ -24,16 +24,3 @@ router.get('/:userId/settlement', personController.getSettlementOptions);
 router.get('/:userId/full', personController.getFullDetail);
 
 export default router;
-
-
-// import { Router } from 'express';
-// import { personController } from './person.controller';
-// import { protect } from '../../middleware/auth.middleware';
-
-// const router = Router();
-// router.use(protect);
-
-// // Get person detail / relationship
-// router.get('/:userId', personController.getPersonDetail);
-
-// export default router;
