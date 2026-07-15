@@ -634,17 +634,19 @@ export class NotificationService {
   //     }
   //   );
   // }
-// In notification.service.ts, update these methods:
+  // In notification.service.ts, update these methods:
 
   /**
    * Notify user about trip invitation.
    */
+  // In notification.service.ts
+
   async notifyTripInvitation(
     toUid: string,
     tripId: string,
     tripTitle: string,
     inviterName: string,
-    invitationId: string  // ✅ Added invitationId parameter
+    invitationId: string  // ✅ Make sure this is being passed
   ): Promise<void> {
     await this.create(
       toUid,
@@ -652,24 +654,24 @@ export class NotificationService {
       'Trip Invitation! 🧳',
       `${inviterName} invited you to "${tripTitle}"`,
       {
-        data: { 
-          tripId, 
-          invitationId,  // ✅ Store in notification data
-          type: 'invitation' 
+        data: {
+          tripId,
+          invitationId,  // ✅ MUST include this
+          type: 'invitation'
         },
         isActionable: true,
         actionButtons: [
-          { 
-            label: '✅ Accept', 
-            action: 'accept',  // ✅ Simplified
-            value: 'accept', 
-            style: 'primary' 
+          {
+            label: '✅ Accept',
+            action: 'accept',  // ✅ Changed from 'accept_invitation'
+            value: 'accept',
+            style: 'primary'
           },
-          { 
-            label: '❌ Decline', 
-            action: 'decline',  // ✅ Simplified
-            value: 'decline', 
-            style: 'danger' 
+          {
+            label: '❌ Decline',
+            action: 'decline',  // ✅ Changed from 'decline_invitation'
+            value: 'decline',
+            style: 'danger'
           },
         ],
         actionUrl: `/trips/${tripId}`,
@@ -696,24 +698,24 @@ export class NotificationService {
       'New Join Request 🙋',
       `${requesterName} wants to join "${tripTitle}"`,
       {
-        data: { 
-          tripId, 
+        data: {
+          tripId,
           requestId,  // ✅ Store requestId in data
-          type: 'join_request' 
+          type: 'join_request'
         },
         isActionable: true,
         actionButtons: [
-          { 
-            label: '✅ Approve', 
+          {
+            label: '✅ Approve',
             action: 'accept',  // ✅ Unified
-            value: 'approve', 
-            style: 'primary' 
+            value: 'approve',
+            style: 'primary'
           },
-          { 
-            label: '❌ Reject', 
+          {
+            label: '❌ Reject',
             action: 'decline',  // ✅ Unified
-            value: 'reject', 
-            style: 'danger' 
+            value: 'reject',
+            style: 'danger'
           },
         ],
         priority: 'high',
@@ -791,7 +793,7 @@ export class NotificationService {
   }
 
   // /**
-//  * Notify about a join request.
+  //  * Notify about a join request.
   //  */
   // async notifyJoinRequest(
   //   adminUid: string,
@@ -1315,7 +1317,7 @@ export class NotificationService {
       };
 
       const response = await getMessaging().sendEachForMulticast(message);
-      
+
       // Cleanup invalid tokens
       const failedTokens: string[] = [];
       response.responses.forEach((resp, idx) => {
@@ -1337,7 +1339,7 @@ export class NotificationService {
         );
         logger.info(`Removed ${failedTokens.length} invalid FCM tokens for user ${user._id}`);
       }
-      
+
       logger.info(`📱 Push sent to ${user.firebaseUid} (${response.successCount} successful, ${response.failureCount} failed): ${notification.title}`);
     } catch (error) {
       logger.error(`Failed to send push notification to ${user.firebaseUid}:`, error);

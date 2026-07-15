@@ -7,7 +7,7 @@ import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
 
 export const invitationService = {
-  // In invitation.service.ts, update sendInvitation method:
+    // In invitation.service.ts, update sendInvitation method:
 
     /**
      * Send an invitation to a user.
@@ -83,7 +83,7 @@ export const invitationService = {
             tripId,
             trip.title,
             senderName,
-            invitation._id.toString()  // ✅ Pass invitation ID
+            invitation._id.toString()  // ✅ THIS IS CRITICAL
         );
 
         return invitation;
