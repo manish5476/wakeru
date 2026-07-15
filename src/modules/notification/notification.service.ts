@@ -606,41 +606,6 @@ export class NotificationService {
     }
   }
 
-  /**
-   * Notify user about trip invitation.
-   */
-  // async notifyTripInvitation(
-  //   toUid: string,
-  //   tripId: string,
-  //   tripTitle: string,
-  //   inviterName: string
-  // ): Promise<void> {
-  //   await this.create(
-  //     toUid,
-  //     'TRIP_INVITATION',
-  //     'Trip Invitation! 🧳',
-  //     `${inviterName} invited you to "${tripTitle}"`,
-  //     {
-  //       data: { tripId },
-  //       isActionable: true,
-  //       actionButtons: [
-  //         { label: '✅ Accept', action: 'accept_invitation', value: 'accept', style: 'primary' },
-  //         { label: '❌ Decline', action: 'decline_invitation', value: 'decline', style: 'danger' },
-  //       ],
-  //       actionUrl: `/trips/${tripId}/join`,
-  //       priority: 'high',
-  //       category: 'trip',
-  //       channels: { push: true, email: true },
-  //     }
-  //   );
-  // }
-  // In notification.service.ts, update these methods:
-
-  /**
-   * Notify user about trip invitation.
-   */
-  // In notification.service.ts
-
   async notifyTripInvitation(
     toUid: string,
     tripId: string,
