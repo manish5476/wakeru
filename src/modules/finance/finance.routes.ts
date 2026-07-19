@@ -15,6 +15,7 @@ router.get('/dashboard', FinanceController.getDashboard);
 router.get('/analytics', FinanceController.getAnalytics);
 router.get('/trends', FinanceController.getSpendingTrends);
 router.post('/sync-trips', FinanceController.syncTripExpenses);
+router.get('/streak', FinanceController.getStreak);
 
 // ─────────────────────────────────────────────────────────────
 // TRANSACTIONS

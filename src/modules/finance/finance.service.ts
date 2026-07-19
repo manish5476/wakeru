@@ -259,6 +259,98 @@ export class FinanceService {
   // TRANSACTION CRUD
   // ============================================================
 
+  static async getSpendingStreak(userId: string): Promise<{ currentStreak: number; longestStreak: number; isActive: boolean }> {
+    try {
+      const transactions = await Transaction.aggregate([
+        { 
+          $match: { 
+            userId, 
+            isDeleted: false,
+            type: { $in: ['expense', 'trip_expense'] },
+            amount: { $gt: 0 } 
+          } 
+        },
+        {
+          $project: {
+            localDate: {
+              $dateToString: { format: "%Y-%m-%d", date: "$date" }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: "$localDate"
+          }
+        },
+        {
+          $sort: { _id: -1 }
+        }
+      ]);
+
+      const uniqueDates = transactions.map(t => t._id as string);
+      if (uniqueDates.length === 0) {
+        return { currentStreak: 0, longestStreak: 0, isActive: false };
+      }
+
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+      let currentStreak = 0;
+      let longestStreak = 0;
+      let isActive = false;
+
+      if (uniqueDates.includes(todayStr) || uniqueDates.includes(yesterdayStr)) {
+        isActive = true;
+        let checkDate = new Date(today);
+        if (!uniqueDates.includes(todayStr)) {
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+        
+        while (true) {
+          const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+          if (uniqueDates.includes(dateStr)) {
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          } else {
+            break;
+          }
+        }
+      }
+
+      // Longest streak
+      let tempStreak = 0;
+      let previousDate: Date | null = null;
+      const chronologicalDates = [...uniqueDates].reverse();
+      
+      for (const dateStr of chronologicalDates) {
+        const parts = dateStr.split('-');
+        const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        
+        if (!previousDate) {
+          tempStreak = 1;
+        } else {
+          const diffTime = Math.abs(d.getTime() - previousDate.getTime());
+          const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            tempStreak++;
+          } else if (diffDays > 1) {
+            tempStreak = 1;
+          }
+        }
+        if (tempStreak > longestStreak) longestStreak = tempStreak;
+        previousDate = d;
+      }
+
+      return { currentStreak, longestStreak, isActive };
+    } catch (error) {
+      logger.error(`Error calculating streak for user ${userId}:`, error);
+      return { currentStreak: 0, longestStreak: 0, isActive: false };
+    }
+  }
+
   static async createTransaction(userId: string, data: Partial<ITransaction>) {
     const txDate = data.date ? new Date(data.date) : new Date();
     const transaction = new Transaction({

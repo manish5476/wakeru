@@ -26,6 +26,7 @@ router.get('/requests', friendsController.getPendingRequests);
 router.get('/search', validate(searchUsersSchema, 'query'), friendsController.searchUsers);
 router.get('/suggestions', friendsController.getSuggestions);
 router.get('/check/:friendUserId', friendsController.checkFriendship);
+router.get('/:friendUserId/details', friendsController.getFriendDetails);
 router.delete('/:friendUserId', validate(removeFriendParamSchema, 'params'), friendsController.removeFriend);
 router.post('/:friendUserId/block', validate(removeFriendParamSchema, 'params'), friendsController.blockFriend);
 router.post('/:friendUserId/mute', validate(removeFriendParamSchema, 'params'), validate(muteFriendSchema), friendsController.muteFriend);

@@ -62,6 +62,14 @@ export class FinanceController {
     } catch (error) { next(error); }
   }
 
+  static async getStreak(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const streak = await FinanceService.getSpendingStreak(userId);
+      res.status(200).json({ success: true, data: streak });
+    } catch (error) { next(error); }
+  }
+
   // ============================================================
   // TRANSACTIONS
   // ============================================================

@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { FriendRequest, Friendship, IFriendRequest, IFriendship } from './friends.model';
 import { User } from '../auth/auth.model';
 import { Trip } from '../trips/trip.model';
+import { Settlement } from '../settlement/settlement.model';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
@@ -732,6 +733,87 @@ export const friendsService = {
         return allInvites.sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
+    },
+
+    // ============================================================
+    // GET FRIEND DETAILS
+    // ============================================================
+
+    async getFriendDetails(userId: string, friendUserId: string): Promise<any> {
+        // Verify friendship
+        const [u1, u2] = [userId, friendUserId].sort();
+        const friendship = await Friendship.findOne({ user1Id: u1, user2Id: u2, status: 'active' }).lean();
+        if (!friendship) throw new AppError('You are not friends with this user', 403);
+
+        const friendInfo = await User.findOne({ firebaseUid: friendUserId }).select('displayName photoURL createdAt').lean();
+        if (!friendInfo) throw new AppError('Friend not found', 404);
+
+        // Fetch mutual trips
+        const mutualTrips = await Trip.find({
+            'members.userId': { $all: [userId, friendUserId] }
+        }).select('_id title coverImage startDate endDate stops').lean();
+
+        const mutualTripIds = mutualTrips.map(t => t._id);
+
+        // Fetch settlements for mutual trips
+        const settlements = await Settlement.find({ tripId: { $in: mutualTripIds } }).lean();
+
+        let expensesTogether = 0;
+        let settlementBalance = 0; // Positive = friend owes user, Negative = user owes friend
+
+        settlements.forEach(s => {
+            s.transactions.forEach(t => {
+                const isUserPayer = t.from === userId && t.to === friendUserId;
+                const isFriendPayer = t.from === friendUserId && t.to === userId;
+
+                if (isUserPayer || isFriendPayer) {
+                    // Total shared finances (confirmed and pending)
+                    expensesTogether += t.amountBase;
+
+                    // Calculate pending balance
+                    if (t.status !== 'confirmed') {
+                        if (isFriendPayer) {
+                            // User owes friend
+                            settlementBalance -= t.amountBase;
+                        } else if (isUserPayer) {
+                            // Friend owes user
+                            settlementBalance += t.amountBase;
+                        }
+                    }
+                }
+            });
+        });
+        const countries = new Set<string>();
+        const cities = new Set<string>();
+        mutualTrips.forEach(t => {
+            t.stops?.forEach((s: any) => {
+                if (s.country) countries.add(s.country);
+                if (s.name) cities.add(s.name);
+            });
+        });
+
+        return {
+            userId: friendUserId,
+            displayName: friendInfo.displayName || `Traveler ${friendUserId.substring(0, 5)}`,
+            coverImage: friendInfo.photoURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop',
+            friendSince: friendship.createdAt || friendInfo.createdAt,
+            travelScore: 4.8, // Mocked for now
+            tripsTogether: mutualTrips.length,
+            countries: Array.from(countries),
+            cities: Array.from(cities),
+            expensesTogether,
+            settlementBalance,
+            achievements: [], // Implement achievement lookup here if needed
+            recentTrips: mutualTrips.slice(0, 5).map(t => ({
+                id: t._id,
+                name: t.title,
+                date: t.startDate,
+                image: t.coverImage || 'https://images.unsplash.com/photo-1508009603885-247a5fb04156?q=80&w=2070&auto=format&fit=crop'
+            })),
+            timeline: [], // Implement timeline logic here if needed
+            sharedExpenses: [], // Implement specific pending expenses here if needed
+            mutualFriends: [] // Implement mutual friends intersection if needed
+        };
     },
 
     // ============================================================

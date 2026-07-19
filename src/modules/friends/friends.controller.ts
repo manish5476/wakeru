@@ -103,6 +103,14 @@ export const friendsController = {
         } catch (err) { next(err); }
     },
 
+    async getFriendDetails(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = getUser(req);
+            const details = await friendsService.getFriendDetails(userId, req.params.friendUserId);
+            res.status(200).json({ success: true, data: { details } });
+        } catch (err) { next(err); }
+    },
+
     // 🚀 TRIP INVITES
     async inviteFriendsToTrip(req: Request, res: Response, next: NextFunction) {
         try {
