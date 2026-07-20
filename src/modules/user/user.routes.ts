@@ -37,6 +37,13 @@ router.get('/preferences', userController.getPreferences.bind(userController));
 router.put('/banking', ValidationMiddleware.validate(updateBankingDetailsSchema), userController.updateBankingDetails.bind(userController));
 router.post('/profile-picture', upload.single('profilePicture'), userController.uploadProfilePicture.bind(userController));
 
+// Custom Themes
+router.post('/appearance/custom-themes', userController.createCustomTheme.bind(userController));
+router.patch('/appearance/custom-themes/:themeId', userController.updateCustomTheme.bind(userController));
+router.delete('/appearance/custom-themes/:themeId', userController.deleteCustomTheme.bind(userController));
+router.post('/appearance/custom-themes/:themeId/apply', userController.applyCustomTheme.bind(userController));
+router.post('/validate-contrast', userController.validateContrast.bind(userController));
+
 // Account management
 router.delete('/account', userController.deleteAccount.bind(userController));
 router.post('/deactivate', userController.deactivateAccount.bind(userController));
@@ -57,5 +64,3 @@ router.get('/:userId', userController.getPublicProfile.bind(userController));
 router.put('/:userId/role', AuthMiddleware.authorize('admin'), ValidationMiddleware.validate(upgradeRoleSchema), userController.upgradeRole.bind(userController));
 
 export default router;
-
-

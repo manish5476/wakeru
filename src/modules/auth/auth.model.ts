@@ -30,13 +30,70 @@ export interface INotificationPreferences {
   monthlyReport: boolean;
 }
 
+// export interface IAppearancePreferences {
+//   themePreset?: string;
+//   backgroundType: 'color' | 'image';
+//   backgroundColor: string | null;
+//   backgroundImage: string | null;
+//   backgroundBlur: number;
+//   backgroundImagePosition: { x: number; y: number; scale: number };
+// }
 export interface IAppearancePreferences {
+  // Existing fields
   themePreset?: string;
   backgroundType: 'color' | 'image';
   backgroundColor: string | null;
   backgroundImage: string | null;
   backgroundBlur: number;
   backgroundImagePosition: { x: number; y: number; scale: number };
+
+  // NEW: Custom theme support
+  customThemes: {
+    id: string;                    // UUID
+    name: string;
+    description: string;
+    isActive: boolean;
+    tokens: {
+      colors: {
+        primary: string;
+        secondary: string;
+        accent: string;
+        success: string;
+        warning: string;
+        error: string;
+        neutralLight: string;
+        neutralDark: string;
+      };
+      typography: {
+        baseSize: number;           // 14-18px
+        scale: number;              // 1.0-1.5 (multiplier)
+      };
+      spacing: {
+        base: number;               // 8-12px
+        scale: number;              // 1.0-1.5 (multiplier)
+      };
+      shadows: {
+        sm: { blur: number; offset: number; opacity: number };
+        md: { blur: number; offset: number; opacity: number };
+        lg: { blur: number; offset: number; opacity: number };
+      };
+      borderRadius: {
+        sm: number;
+        md: number;
+        lg: number;
+        xl: number;
+        full: number;
+      };
+    };
+    accessibility: {
+      contrastRatio: number;        
+      wcagLevel: 'AAA' | 'AA' | 'FAIL';
+      score: number;             
+    };
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
+  activeCustomThemeId?: string;     // Which custom theme is currently applied
 }
 
 export interface IUserPreferences {

@@ -211,6 +211,76 @@ export class UserController {
       next(error);
     }
   }
+
+  async createCustomTheme(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const theme = await userService.createCustomTheme(req.user!.userId, req.body);
+      res.status(201).json({
+        success: true,
+        message: 'Custom theme created successfully',
+        data: { theme },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateCustomTheme(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const theme = await userService.updateCustomTheme(req.user!.userId, req.params.themeId, req.body);
+      res.status(200).json({
+        success: true,
+        message: 'Custom theme updated successfully',
+        data: { theme },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteCustomTheme(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await userService.deleteCustomTheme(req.user!.userId, req.params.themeId);
+      res.status(200).json({
+        success: true,
+        message: 'Custom theme deleted successfully',
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async applyCustomTheme(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await userService.applyCustomTheme(req.user!.userId, req.params.themeId);
+      res.status(200).json({
+        success: true,
+        message: 'Custom theme applied successfully',
+        data: { user: user.toFullProfile() },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async validateContrast(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { color1, color2 } = req.body;
+      if (!color1 || !color2) throw new BadRequestError('Both color1 and color2 are required');
+      const result = await userService.validateContrast(color1, color2);
+      res.status(200).json({
+        success: true,
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const userController = new UserController();

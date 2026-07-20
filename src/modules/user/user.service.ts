@@ -11,6 +11,9 @@ import streamifier from 'streamifier';
 import cloudinary from '../../config/cloudinary.config';
 import { Media } from '../media/media.model';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
+import { v4 as uuidv4 } from 'uuid';
+// @ts-ignore
+import contrast from 'contrast';
 
 interface PaginatedUserSearchResult {
   users: Partial<IUserDocument>[];
@@ -351,6 +354,81 @@ export class UserService {
     if (!user) throw new NotFoundError('User');
     logger.info(`Role upgraded: ${userId} → ${newRole}`);
     return user;
+  }
+
+  async createCustomTheme(userId: string, themeData: any): Promise<any> {
+    const user = await this.getUserById(userId);
+    const newTheme = {
+      ...themeData,
+      id: uuidv4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    user.preferences.customThemes.push(newTheme);
+    await user.save();
+
+    return newTheme;
+  }
+
+  async updateCustomTheme(userId: string, themeId: string, themeData: any): Promise<any> {
+    const user = await this.getUserById(userId);
+    const themeIndex = user.preferences.customThemes.findIndex((t: { id: string; }) => t.id === themeId);
+
+    if (themeIndex === -1) {
+      throw new NotFoundError('Custom theme not found');
+    }
+
+    const updatedTheme = { ...user.preferences.customThemes[themeIndex], ...themeData, updatedAt: new Date() };
+    user.preferences.customThemes[themeIndex] = updatedTheme;
+    await user.save();
+
+    return updatedTheme;
+  }
+
+  async deleteCustomTheme(userId: string, themeId: string): Promise<void> {
+    const user = await this.getUserById(userId);
+    const themeIndex = user.preferences.customThemes.findIndex((t: { id: string; }) => t.id === themeId);
+
+    if (themeIndex === -1) {
+      throw new NotFoundError('Custom theme not found');
+    }
+
+    user.preferences.customThemes.splice(themeIndex, 1);
+
+    if (user.preferences.activeCustomThemeId === themeId) {
+      user.preferences.activeCustomThemeId = undefined;
+    }
+
+    await user.save();
+  }
+
+  async applyCustomTheme(userId: string, themeId: string): Promise<IUserDocument> {
+    const user = await this.getUserById(userId);
+    const themeExists = user.preferences.customThemes.some((t: { id: string; }) => t.id === themeId);
+
+    if (!themeExists) {
+      throw new NotFoundError('Custom theme not found');
+    }
+
+    user.preferences.activeCustomThemeId = themeId;
+    user.preferences.customThemes.forEach((theme: { isActive: boolean; id: string; }) => {
+      theme.isActive = theme.id === themeId;
+    });
+
+    await user.save();
+    return user;
+  }
+  
+  async validateContrast(color1: string, color2: string): Promise<any> {
+    const ratio = contrast(color1, color2);
+    let wcagLevel = 'FAIL';
+    if (ratio >= 7) {
+      wcagLevel = 'AAA';
+    } else if (ratio >= 4.5) {
+      wcagLevel = 'AA';
+    }
+    return { ratio, wcagLevel };
   }
 }
 
