@@ -126,71 +126,71 @@ class TravelPlanService {
     let plan = await TravelPlan.findOne({ tripId });
 
     if (!plan) {
-        plan = await TravelPlan.create({
-            tripId,
-            groupSize: trip.getActiveMembers().length,
-            'budgetOverview.total': trip.totalBudget || 0,
-            'budgetOverview.currency': trip.baseCurrency || 'USD',
-            'budgetOverview.spent': trip.totalSpentBase || 0,
-            importantContacts: [
-                {
-                    type: 'emergency',
-                    name: 'Emergency Contact',
-                    phone: 'Not provided',  // ← Add placeholder
-                    relation: '',
-                    email: '',
-                    isPrimary: true,
-                },
-                {
-                    type: 'insurance',
-                    name: 'Travel Insurance',
-                    phone: 'Not provided',  // ← Add placeholder
-                    provider: '',
-                    policyNo: '',
-                    coverage: '',
-                    isPrimary: true,
-                },
-                {
-                    type: 'hotel',
-                    name: 'Hotel',
-                    phone: 'Not provided',  // ← Add placeholder
-                    address: '',
-                    isPrimary: true,
-                },
-                {
-                    type: 'embassy',
-                    name: 'Embassy',
-                    phone: 'Not provided',  // ← Add placeholder
-                    address: '',
-                    country: '',
-                    email: '',
-                    workingHours: '',
-                    isPrimary: true,
-                },
-                {
-                    type: 'localEmergency',
-                    name: 'Police',
-                    phone: 'Not provided',  // ← Add placeholder
-                    isPrimary: true,
-                },
-                {
-                    type: 'localEmergency',
-                    name: 'Ambulance',
-                    phone: 'Not provided',  // ← Add placeholder
-                    isPrimary: false,
-                },
-                {
-                    type: 'localEmergency',
-                    name: 'Fire',
-                    phone: 'Not provided',  // ← Add placeholder
-                    isPrimary: false,
-                },
-            ]
-        });
+      plan = await TravelPlan.create({
+        tripId,
+        groupSize: trip.getActiveMembers().length,
+        'budgetOverview.total': trip.totalBudget || 0,
+        'budgetOverview.currency': trip.baseCurrency || 'USD',
+        'budgetOverview.spent': trip.totalSpentBase || 0,
+        importantContacts: [
+          {
+            type: 'emergency',
+            name: 'Emergency Contact',
+            phone: 'Not provided',  // ← Add placeholder
+            relation: '',
+            email: '',
+            isPrimary: true,
+          },
+          {
+            type: 'insurance',
+            name: 'Travel Insurance',
+            phone: 'Not provided',  // ← Add placeholder
+            provider: '',
+            policyNo: '',
+            coverage: '',
+            isPrimary: true,
+          },
+          {
+            type: 'hotel',
+            name: 'Hotel',
+            phone: 'Not provided',  // ← Add placeholder
+            address: '',
+            isPrimary: true,
+          },
+          {
+            type: 'embassy',
+            name: 'Embassy',
+            phone: 'Not provided',  // ← Add placeholder
+            address: '',
+            country: '',
+            email: '',
+            workingHours: '',
+            isPrimary: true,
+          },
+          {
+            type: 'localEmergency',
+            name: 'Police',
+            phone: 'Not provided',  // ← Add placeholder
+            isPrimary: true,
+          },
+          {
+            type: 'localEmergency',
+            name: 'Ambulance',
+            phone: 'Not provided',  // ← Add placeholder
+            isPrimary: false,
+          },
+          {
+            type: 'localEmergency',
+            name: 'Fire',
+            phone: 'Not provided',  // ← Add placeholder
+            isPrimary: false,
+          },
+        ]
+      });
     }
 
     return plan;
-}
+  }
 
   // ───────────────────────────────────────────────────────────────────────────
   // CONTACTS MANAGEMENT
@@ -203,51 +203,51 @@ class TravelPlanService {
   }
   async addContact(tripId: string, contactData: Partial<IContact>): Promise<ITravelPlan> {
     if (!contactData.type) {
-        throw new AppError('Contact type is required', 400);
+      throw new AppError('Contact type is required', 400);
     }
-    
+
     // Ensure phone is provided
     if (!contactData.phone) {
-        contactData.phone = 'Not provided';
+      contactData.phone = 'Not provided';
     }
-    
+
     // Ensure name is provided
     if (!contactData.name) {
-        contactData.name = 'Unnamed Contact';
+      contactData.name = 'Unnamed Contact';
     }
-    
+
     const existingPlan = await TravelPlan.findOne({ tripId });
     const hasSameType = existingPlan?.importantContacts?.some(
-        (c: any) => c.type === contactData.type
+      (c: any) => c.type === contactData.type
     );
-    
+
     const isPrimary = contactData.isPrimary !== undefined ? contactData.isPrimary : !hasSameType;
-    
+
     const plan = await TravelPlan.findOneAndUpdate(
-        { tripId },
-        { 
-            $push: { 
-                importantContacts: { 
-                    ...contactData,
-                    isPrimary
-                } 
-            } 
-        },
-        { new: true }
-    );
-    
-    if (!plan) throw new AppError('Travel plan not found', 404);
-    
-    if (isPrimary) {
-        const lastContact = plan.importantContacts[plan.importantContacts.length - 1];
-        if (lastContact && lastContact._id) {
-            await this.setPrimaryContact(tripId, lastContact._id.toString(), contactData.type);
+      { tripId },
+      {
+        $push: {
+          importantContacts: {
+            ...contactData,
+            isPrimary
+          }
         }
+      },
+      { new: true }
+    );
+
+    if (!plan) throw new AppError('Travel plan not found', 404);
+
+    if (isPrimary) {
+      const lastContact = plan.importantContacts[plan.importantContacts.length - 1];
+      if (lastContact && lastContact._id) {
+        await this.setPrimaryContact(tripId, lastContact._id.toString(), contactData.type);
+      }
     }
-    
+
     await plan.save();
     return plan;
-}
+  }
 
   // async addContact(tripId: string, contactData: Partial<IContact>): Promise<ITravelPlan> {
   //   if (!contactData.type) {

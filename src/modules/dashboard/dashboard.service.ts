@@ -182,17 +182,17 @@ export const dashboardService = {
             // Pending trip invites
             Invitation.countDocuments({ toUserId: userId, status: 'pending' }),
             // Pending join requests (trips where user is admin)
-            JoinRequest.countDocuments({
-                tripId: {
-                    $in: (await Trip.find({
-                        'members.userId': userId,
-                        'members.role': 'admin',
-                        'members.isActive': true,
-                        isArchived: false,
-                    }).select('_id')).map(t => t._id),
-                },
-                status: 'pending',
-            }),
+            Trip.find({
+                'members.userId': userId,
+                'members.role': 'admin',
+                'members.isActive': true,
+                isArchived: false,
+            }).select('_id').lean().then(adminTrips =>
+                JoinRequest.countDocuments({
+                    tripId: { $in: adminTrips.map(t => t._id) },
+                    status: 'pending',
+                })
+            ),
             // Upcoming bills (due within 7 days)
             Bill.find({
                 userId,
@@ -200,16 +200,19 @@ export const dashboardService = {
                 paidThisMonth: false,
                 dueDate: { $lte: new Date(now.getTime() + 7 * 86400000) },
             })
+                .select('title amount currency dueDate category frequency')
                 .sort({ dueDate: 1 })
                 .limit(5)
                 .lean(),
             // Active goals
             Goal.find({ userId, isCompleted: false })
+                .select('title icon targetAmount savedAmount progress currency targetDate')
                 .sort({ targetDate: 1 })
                 .limit(3)
                 .lean(),
             // Recent achievements
             UserAchievement.find({ userId, isUnlocked: true })
+                .select('achievementId name description icon tier unlockedAt')
                 .sort({ unlockedAt: -1 })
                 .limit(3)
                 .lean(),

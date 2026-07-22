@@ -555,7 +555,7 @@ export class FinanceService {
       _id: transactionId,
       userId,
       isDeleted: false,
-    }).populate('tripId', 'title coverImage');
+    }).populate('tripId', 'title coverImage').lean();
 
     if (!transaction) throw new AppError('Transaction not found', 404);
     return transaction;
@@ -947,7 +947,7 @@ export class FinanceService {
   }
 
   static async getBillById(userId: string, billId: string) {
-    const bill = await Bill.findOne({ _id: billId, userId });
+    const bill = await Bill.findOne({ _id: billId, userId }).lean();
     if (!bill) throw new AppError('Bill not found', 404);
     return bill;
   }

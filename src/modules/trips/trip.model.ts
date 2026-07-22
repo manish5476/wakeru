@@ -258,6 +258,17 @@ tripSchema.index({ 'members.userId': 1, 'members.isActive': 1, startDate: -1 });
 // DATE SORTING — trips list ordered by most recent
 tripSchema.index({ startDate: -1 });
 
+// ── NEW COMPOUND INDEXES ────────────────────────────────────
+
+// Dashboard: admin trips (for pending join request count sub-query)
+tripSchema.index({ 'members.userId': 1, 'members.role': 1, 'members.isActive': 1, isArchived: 1 });
+
+// Dashboard: upcoming trips within date range
+tripSchema.index({ 'members.userId': 1, 'members.isActive': 1, status: 1, startDate: 1 });
+
+// Budget overview: completed trips by user
+tripSchema.index({ 'members.userId': 1, 'members.isActive': 1, status: 1, endDate: -1 });
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PRE-VALIDATE HOOKS
 // ─────────────────────────────────────────────────────────────────────────────

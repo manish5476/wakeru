@@ -404,6 +404,23 @@ expenseSchema.index({ tripId: 1, tags: 1 });
 // Recurring expense parent lookup
 expenseSchema.index({ 'repeatConfig.parentExpenseId': 1 });
 
+// ── NEW COMPOUND INDEXES ────────────────────────────────────
+
+// Dashboard: "You Owe" — expenses not paid by user, with an unpaid split for that user
+expenseSchema.index({ isArchived: 1, 'splits.userId': 1, 'splits.isPaid': 1 });
+
+// Dashboard: "You Are Owed" — expenses paid by user with outstanding splits
+expenseSchema.index({ isArchived: 1, paidBy: 1, isSettled: 1 });
+
+// Finance sync: pull all user-involved expenses efficiently
+expenseSchema.index({ isArchived: 1, paidBy: 1, date: -1 });
+
+// Archive-filtered trip queries (most service calls filter isArchived first)
+expenseSchema.index({ tripId: 1, isArchived: 1, date: -1 });
+
+// User expense list with pagination sort by amount
+expenseSchema.index({ tripId: 1, isArchived: 1, isSettled: 1, date: -1 });
+
 // ============================================================
 // PRE-SAVE HOOKS
 // ============================================================

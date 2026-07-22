@@ -12,8 +12,44 @@ import cloudinary from '../../config/cloudinary.config';
 import { Media } from '../media/media.model';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { v4 as uuidv4 } from 'uuid';
-// @ts-ignore
-import contrast from 'contrast';
+
+function hexToRgb(color: string): [number, number, number] {
+  let hex = (color || '').trim().replace(/^#/, '');
+  if (hex.startsWith('rgb')) {
+    const match = hex.match(/\d+/g);
+    if (match && match.length >= 3) {
+      return [parseInt(match[0], 10), parseInt(match[1], 10), parseInt(match[2], 10)];
+    }
+  }
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+  if (hex.length === 6) {
+    const num = parseInt(hex, 16);
+    if (!isNaN(num)) {
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+  }
+  return [0, 0, 0];
+}
+
+function getLuminance(r: number, g: number, b: number): number {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function calculateContrastRatio(color1: string, color2: string): number {
+  const rgb1 = hexToRgb(color1);
+  const rgb2 = hexToRgb(color2);
+  const lum1 = getLuminance(rgb1[0], rgb1[1], rgb1[2]);
+  const lum2 = getLuminance(rgb2[0], rgb2[1], rgb2[2]);
+  const lighter = Math.max(lum1, lum2);
+  const darker = Math.min(lum1, lum2);
+  return Number(((lighter + 0.05) / (darker + 0.05)).toFixed(2));
+}
 
 interface PaginatedUserSearchResult {
   users: Partial<IUserDocument>[];
@@ -421,7 +457,7 @@ export class UserService {
   }
   
   async validateContrast(color1: string, color2: string): Promise<any> {
-    const ratio = contrast(color1, color2);
+    const ratio = calculateContrastRatio(color1, color2);
     let wcagLevel = 'FAIL';
     if (ratio >= 7) {
       wcagLevel = 'AAA';

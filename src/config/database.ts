@@ -24,16 +24,22 @@ export class Database {
 
     try {
       await mongoose.connect(config.MONGODB_URI, {
+        maxPoolSize: 50,
+        minPoolSize: 10,
         serverSelectionTimeoutMS: 5000,
         connectTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
         family: 4
       });
-      logger.info('🔌 Connected to MongoDB');
+      logger.info('🔌 Connected to MongoDB (Pool Size: 10-50)');
       this.retryCount = 0; // Reset retry count on successful connection
-      mongoose.connection.on('disconnected', () => {
-        logger.warn('MongoDB disconnected. Trying to reconnect...');
-        this.handleConnectionError();
-      });
+
+      if (mongoose.connection.listenerCount('disconnected') === 0) {
+        mongoose.connection.on('disconnected', () => {
+          logger.warn('MongoDB disconnected. Trying to reconnect...');
+          this.handleConnectionError();
+        });
+      }
     } catch (error) {
       logger.error('Initial MongoDB connection failed:', error);
       this.handleConnectionError();
