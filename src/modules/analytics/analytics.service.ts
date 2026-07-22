@@ -290,7 +290,7 @@ export const analyticsService = {
     const [
       summaryResult, categories, dailyData, stopData, currencyData,
       settlementStats, dayOfWeek, highestExpense, lowestExpense,
-      spendingVelocity,
+      spendingVelocity, memberAgg
     ] = await Promise.all([
       Expense.aggregate([{ $match: match }, { $group: { _id: null, totalSpent: { $sum: '$amountBase' }, totalExpenses: { $sum: 1 }, avgPerExpense: { $avg: '$amountBase' } } }]),
       Expense.aggregate([{ $match: match }, { $group: { _id: '$category', totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 }, avgAmount: { $avg: '$amountBase' } } }, { $sort: { totalAmount: -1 } }]),
@@ -302,6 +302,26 @@ export const analyticsService = {
       Expense.find(match).sort({ amountBase: -1 }).limit(1).select('title amountBase amountLocal localCurrency date paidByName category').lean(),
       Expense.find(match).sort({ amountBase: 1 }).limit(1).select('title amountBase amountLocal localCurrency date paidByName category').lean(),
       Expense.aggregate([{ $match: match }, { $sort: { date: 1 } }, { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }, dailyAmount: { $sum: '$amountBase' } } }, { $sort: { _id: 1 } }]),
+      Expense.aggregate([
+        { $match: match },
+        { $unwind: '$splits' },
+        { $sort: { 'splits.amountBase': -1 } },
+        {
+          $group: {
+            _id: '$splits.userId',
+            expenseCount: { $sum: 1 },
+            topExpenseId: { $first: '$_id' },
+            topExpenseTitle: { $first: '$title' },
+            topExpenseAmountBase: { $first: '$amountBase' },
+            topExpenseAmountLocal: { $first: '$amountLocal' },
+            topExpenseCurrency: { $first: '$localCurrency' },
+            topExpenseDate: { $first: '$date' },
+            topExpensePaidByName: { $first: '$paidByName' },
+            topExpenseCategory: { $first: '$category' },
+            categories: { $push: { category: '$category', amount: '$splits.amountBase' } }
+          }
+        }
+      ]),
     ]);
 
     const totalSpent = summaryResult[0]?.totalSpent || 0;
@@ -319,19 +339,38 @@ export const analyticsService = {
     const dailyTotals = dailyData.map((d: any) => ({ date: d._id, amount: d.totalAmount }));
     const maxDaily = dailyTotals.reduce((max: any, d: any) => d.amount > (max?.amount || 0) ? d : max, dailyTotals[0] || { date: '', amount: 0 });
 
-    // Member spending from trip cached data
+    // Member spending from trip cached data + aggregation
     const activeMembers = trip.getActiveMembers();
-    const memberSpending: MemberSpending[] = activeMembers.map((m) => ({
-      userId: m.userId,
-      displayName: m.displayName,
-      photoURL: m.photoURL,
-      totalPaid: m.totalPaidBase,
-      totalOwed: m.totalOwesBase,
-      netBalance: m.totalPaidBase - m.totalOwesBase,
-      expenseCount: 0,
-      percentage: 0,
-      categories: {},
-    }));
+    const memberSpending: MemberSpending[] = activeMembers.map((m) => {
+      const agg = memberAgg.find((a: any) => a._id === m.userId);
+      const cats: Record<string, number> = {};
+      if (agg) {
+        agg.categories.forEach((c: any) => {
+          cats[c.category] = (cats[c.category] || 0) + c.amount;
+        });
+      }
+      return {
+        userId: m.userId,
+        displayName: m.displayName,
+        photoURL: m.photoURL,
+        totalPaid: m.totalPaidBase,
+        totalOwed: m.totalOwesBase,
+        netBalance: m.totalPaidBase - m.totalOwesBase,
+        expenseCount: agg?.expenseCount || 0,
+        percentage: 0, // Calculated below
+        categories: cats,
+        topExpense: agg ? {
+          _id: agg.topExpenseId.toString(),
+          title: agg.topExpenseTitle,
+          amountBase: agg.topExpenseAmountBase,
+          amountLocal: agg.topExpenseAmountLocal,
+          currency: agg.topExpenseCurrency,
+          date: agg.topExpenseDate?.toISOString(),
+          paidByName: agg.topExpensePaidByName,
+          category: agg.topExpenseCategory,
+        } : undefined,
+      };
+    });
 
     // Stop breakdown
     const stopBreakdown: StopBreakdown[] = stopData.map((s: any) => {

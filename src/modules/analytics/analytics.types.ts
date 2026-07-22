@@ -214,6 +214,7 @@ export interface MemberSpending {
     expenseCount: number;
     percentage: number;
     categories: Record<string, number>;
+    topExpense?: ExpenseHighlight;
 }
 
 export interface StopBreakdown {
