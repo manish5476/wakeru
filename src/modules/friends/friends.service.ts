@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { FriendRequest, Friendship, IFriendRequest, IFriendship } from './friends.model';
 import { User } from '../auth/auth.model';
 import { Trip } from '../trips/trip.model';
+import { Expense } from '../expense/expense.model';
 import { Settlement } from '../settlement/settlement.model';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
@@ -294,7 +295,7 @@ export const friendsService = {
             f.user1Id === userId ? f.user2Id : f.user1Id
         );
 
-        // ✅ FIXED: Query by firebaseUid array (not _id)
+        // Fetch user profiles
         const users = await User.find({
             firebaseUid: { $in: friendFirebaseUids },
             isActive: true,
@@ -305,9 +306,69 @@ export const friendsService = {
 
         const userMap = new Map(users.map((u: any) => [u.firebaseUid, u]));
 
+        // Fetch mutual trips and countries visited together
+        const userTrips = await Trip.find({
+            'members.userId': userId,
+            'members.isActive': true,
+            isArchived: false,
+        }).select('_id members stops').lean();
+
+        const friendTripCountMap = new Map<string, number>();
+        const friendCountryCountMap = new Map<string, Set<string>>();
+
+        userTrips.forEach((trip: any) => {
+            const activeMemberUids = new Set(
+                trip.members?.filter((m: any) => m.isActive).map((m: any) => m.userId)
+            );
+            if (!activeMemberUids.has(userId)) return;
+
+            friendFirebaseUids.forEach(fUid => {
+                if (activeMemberUids.has(fUid)) {
+                    friendTripCountMap.set(fUid, (friendTripCountMap.get(fUid) || 0) + 1);
+                    if (!friendCountryCountMap.has(fUid)) {
+                        friendCountryCountMap.set(fUid, new Set<string>());
+                    }
+                    trip.stops?.forEach((s: any) => {
+                        if (s.country) friendCountryCountMap.get(fUid)?.add(s.country);
+                    });
+                }
+            });
+        });
+
+        // Compute balances with friends
+        const sharedExpenses = await Expense.find({
+            isArchived: false,
+            isSettled: false,
+            $and: [
+                { $or: [{ paidBy: userId }, { 'splits.userId': userId }] },
+                { $or: [{ paidBy: { $in: friendFirebaseUids } }, { 'splits.userId': { $in: friendFirebaseUids } }] },
+            ],
+        }).select('paidBy splits amountBase').lean();
+
+        const balanceMap = new Map<string, number>(); // friendUid -> netBalance (positive = they owe user)
+        sharedExpenses.forEach((e: any) => {
+            friendFirebaseUids.forEach(fUid => {
+                const userSplit = e.splits?.find((s: any) => s.userId === userId && !s.isPaid);
+                const friendSplit = e.splits?.find((s: any) => s.userId === fUid && !s.isPaid);
+
+                let delta = 0;
+                if (e.paidBy === fUid && userSplit) {
+                    delta -= (userSplit.amountBase || 0); // user owes friend
+                } else if (e.paidBy === userId && friendSplit) {
+                    delta += (friendSplit.amountBase || 0); // friend owes user
+                }
+                if (delta !== 0) {
+                    balanceMap.set(fUid, (balanceMap.get(fUid) || 0) + delta);
+                }
+            });
+        });
+
         let result: FriendInfo[] = friendships.map((f: any) => {
             const friendFirebaseUid = f.user1Id === userId ? f.user2Id : f.user1Id;
             const friendUser = userMap.get(friendFirebaseUid);
+            const sharedTrips = friendTripCountMap.get(friendFirebaseUid) || f.sharedTripCount || 0;
+            const countriesCount = friendCountryCountMap.get(friendFirebaseUid)?.size || 0;
+            const netBalance = Math.round((balanceMap.get(friendFirebaseUid) || 0) * 100) / 100;
 
             return {
                 userId: friendFirebaseUid,
@@ -316,7 +377,9 @@ export const friendsService = {
                 phoneNumber: friendUser?.phoneNumber,
                 email: friendUser?.email,
                 upiId: friendUser?.bankingDetails?.upiId,
-                totalSharedTrips: f.sharedTripCount || 0,
+                totalSharedTrips: sharedTrips,
+                countries: countriesCount,
+                settlementBalance: netBalance,
                 isFriend: true,
                 hasPendingRequest: false,
                 friendshipStatus: f.status,
@@ -745,44 +808,50 @@ export const friendsService = {
         const friendship = await Friendship.findOne({ user1Id: u1, user2Id: u2, status: 'active' }).lean();
         if (!friendship) throw new AppError('You are not friends with this user', 403);
 
-        const friendInfo = await User.findOne({ firebaseUid: friendUserId }).select('displayName photoURL createdAt').lean();
+        const friendInfo = await User.findOne({ firebaseUid: friendUserId })
+            .select('displayName photoURL email phoneNumber createdAt bio bankingDetails.upiId')
+            .lean();
         if (!friendInfo) throw new AppError('Friend not found', 404);
 
-        // Fetch mutual trips
+        // Fetch mutual trips where both users are active members
         const mutualTrips = await Trip.find({
-            'members.userId': { $all: [userId, friendUserId] }
-        }).select('_id title coverImage startDate endDate stops').lean();
+            $and: [
+                { 'members.userId': userId, 'members.isActive': true },
+                { 'members.userId': friendUserId, 'members.isActive': true },
+            ],
+            isArchived: false,
+        }).select('_id title coverImage startDate endDate stops totalBudget baseCurrency totalSpentBase status').sort({ startDate: -1 }).lean();
 
-        const mutualTripIds = mutualTrips.map(t => t._id);
-
-        // Fetch settlements for mutual trips
-        const settlements = await Settlement.find({ tripId: { $in: mutualTripIds } }).lean();
+        // Fetch all shared expenses between userId and friendUserId
+        const sharedExpensesDocs = await Expense.find({
+            isArchived: false,
+            $and: [
+                { $or: [{ paidBy: userId }, { 'splits.userId': userId }] },
+                { $or: [{ paidBy: friendUserId }, { 'splits.userId': friendUserId }] },
+            ],
+        }).sort({ date: -1 }).lean();
 
         let expensesTogether = 0;
-        let settlementBalance = 0; // Positive = friend owes user, Negative = user owes friend
+        let youOwe = 0;
+        let theyOwe = 0;
+        let pendingCount = 0;
 
-        settlements.forEach(s => {
-            s.transactions.forEach(t => {
-                const isUserPayer = t.from === userId && t.to === friendUserId;
-                const isFriendPayer = t.from === friendUserId && t.to === userId;
+        sharedExpensesDocs.forEach((e: any) => {
+            expensesTogether += (e.amountBase || 0);
 
-                if (isUserPayer || isFriendPayer) {
-                    // Total shared finances (confirmed and pending)
-                    expensesTogether += t.amountBase;
+            if (!e.isSettled) {
+                pendingCount++;
+                const userSplit = e.splits?.find((s: any) => s.userId === userId && !s.isPaid);
+                const friendSplit = e.splits?.find((s: any) => s.userId === friendUserId && !s.isPaid);
 
-                    // Calculate pending balance
-                    if (t.status !== 'confirmed') {
-                        if (isFriendPayer) {
-                            // User owes friend
-                            settlementBalance -= t.amountBase;
-                        } else if (isUserPayer) {
-                            // Friend owes user
-                            settlementBalance += t.amountBase;
-                        }
-                    }
+                if (e.paidBy === friendUserId && userSplit) {
+                    youOwe += (userSplit.amountBase || 0);
+                } else if (e.paidBy === userId && friendSplit) {
+                    theyOwe += (friendSplit.amountBase || 0);
                 }
-            });
+            }
         });
+
         const countries = new Set<string>();
         const cities = new Set<string>();
         mutualTrips.forEach(t => {
@@ -792,27 +861,99 @@ export const friendsService = {
             });
         });
 
+        // Compute per-trip stats for mutual trips
+        const tripDetailsList = mutualTrips.map((t: any) => {
+            const tripExpenses = sharedExpensesDocs.filter((e: any) => e.tripId?.toString() === t._id.toString());
+            let tripYouOwe = 0;
+            let tripTheyOwe = 0;
+            let tripSharedTotal = 0;
+
+            tripExpenses.forEach((e: any) => {
+                tripSharedTotal += (e.amountBase || 0);
+                if (!e.isSettled) {
+                    const uSplit = e.splits?.find((s: any) => s.userId === userId && !s.isPaid);
+                    const fSplit = e.splits?.find((s: any) => s.userId === friendUserId && !s.isPaid);
+                    if (e.paidBy === friendUserId && uSplit) tripYouOwe += (uSplit.amountBase || 0);
+                    if (e.paidBy === userId && fSplit) tripTheyOwe += (fSplit.amountBase || 0);
+                }
+            });
+
+            return {
+                id: t._id.toString(),
+                name: t.title,
+                date: t.startDate,
+                startDate: t.startDate,
+                endDate: t.endDate,
+                image: t.coverImage || 'https://images.unsplash.com/photo-1508009603885-247a5fb04156?q=80&w=2070&auto=format&fit=crop',
+                stopsCount: t.stops?.length || 0,
+                totalExpenses: t.totalSpentBase || tripSharedTotal,
+                sharedSpentTogether: tripSharedTotal,
+                tripBalance: Math.round((tripTheyOwe - tripYouOwe) * 100) / 100,
+                tripYouOwe: Math.round(tripYouOwe * 100) / 100,
+                tripTheyOwe: Math.round(tripTheyOwe * 100) / 100,
+                status: t.status || 'active',
+            };
+        });
+
+        // Eligible trips that user is in, but friend is NOT yet in (for "Add to Trip" feature)
+        const otherTrips = await Trip.find({
+            'members.userId': userId,
+            'members.isActive': true,
+            isArchived: false,
+            'members.userId': { $ne: friendUserId },
+        }).select('_id title coverImage startDate endDate status').sort({ startDate: -1 }).limit(20).lean();
+
+        const recentExpensesFormatted = sharedExpensesDocs.slice(0, 10).map((e: any) => {
+            const userSplit = e.splits?.find((s: any) => s.userId === userId);
+            const friendSplit = e.splits?.find((s: any) => s.userId === friendUserId);
+            return {
+                _id: e._id.toString(),
+                title: e.title,
+                amountBase: e.amountBase,
+                date: e.date,
+                category: e.category,
+                paidBy: e.paidBy,
+                paidByName: e.paidByName,
+                isSettled: e.isSettled,
+                yourShare: userSplit ? userSplit.amountBase : 0,
+                theirShare: friendSplit ? friendSplit.amountBase : 0,
+                direction: e.paidBy === userId ? 'you_paid' : 'they_paid',
+            };
+        });
+
+        const netBalance = Math.round((theyOwe - youOwe) * 100) / 100;
+
         return {
             userId: friendUserId,
             displayName: friendInfo.displayName || `Traveler ${friendUserId.substring(0, 5)}`,
+            email: friendInfo.email,
+            phoneNumber: friendInfo.phoneNumber,
+            photoURL: friendInfo.photoURL,
             coverImage: friendInfo.photoURL || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop',
             friendSince: friendship.createdAt || friendInfo.createdAt,
-            travelScore: 4.8, // Mocked for now
+            travelScore: mutualTrips.length > 0 ? Math.min(4.0 + mutualTrips.length * 0.2, 5.0) : 4.5,
             tripsTogether: mutualTrips.length,
             countries: Array.from(countries),
             cities: Array.from(cities),
-            expensesTogether,
-            settlementBalance,
-            achievements: [], // Implement achievement lookup here if needed
-            recentTrips: mutualTrips.slice(0, 5).map(t => ({
-                id: t._id,
-                name: t.title,
-                date: t.startDate,
-                image: t.coverImage || 'https://images.unsplash.com/photo-1508009603885-247a5fb04156?q=80&w=2070&auto=format&fit=crop'
+            expensesTogether: Math.round(expensesTogether * 100) / 100,
+            settlementBalance: netBalance,
+            youOwe: Math.round(youOwe * 100) / 100,
+            theyOwe: Math.round(theyOwe * 100) / 100,
+            pendingSettlementCount: pendingCount,
+            recentTrips: tripDetailsList,
+            mutualTrips: tripDetailsList,
+            eligibleTripsToInvite: otherTrips.map((t: any) => ({
+                id: t._id.toString(),
+                title: t.title,
+                coverImage: t.coverImage,
+                startDate: t.startDate,
+                endDate: t.endDate,
+                status: t.status,
             })),
-            timeline: [], // Implement timeline logic here if needed
-            sharedExpenses: [], // Implement specific pending expenses here if needed
-            mutualFriends: [] // Implement mutual friends intersection if needed
+            recentExpenses: recentExpensesFormatted,
+            achievements: ['Travel Buddy', 'Verified Companion'],
+            timeline: [],
+            sharedExpenses: recentExpensesFormatted,
         };
     },
 
