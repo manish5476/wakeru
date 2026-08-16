@@ -606,7 +606,102 @@ export class NotificationService {
     }
   }
 
+  /**
+   * Notify receiver that payer has marked payment as sent (initiated).
+   */
+  async notifyPaymentInitiated(
+    fromUid: string,
+    toUid: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string,
+    transactionId: string
+  ): Promise<void> {
+    const fromUser = await User.findOne({
+      $or: [{ _id: fromUid }, { firebaseUid: fromUid }],
+    }).select('displayName').lean();
+
+    await this.create(
+      toUid,
+      'SETTLEMENT_REQUEST',
+      'Payment Sent 📤',
+      `${fromUser?.displayName || 'Someone'} has marked a payment of ${baseCurrency} ${amount} as sent. Please confirm when received.`,
+      {
+        data: { tripId, fromUid, amount, baseCurrency, transactionId },
+        isActionable: true,
+        actionButtons: [
+          { label: '✅ Confirm Received', action: 'confirm_payment', value: transactionId, style: 'primary' },
+          { label: '❌ Reject', action: 'reject_payment', value: transactionId, style: 'danger' },
+        ],
+        actionUrl: `/trips/${tripId}/settle`,
+        priority: 'high',
+        category: 'settlement',
+        channels: { push: true, email: false },
+      }
+    );
+  }
+
+  /**
+   * Notify payer that receiver rejected the payment.
+   */
+  async notifyPaymentRejected(
+    payerUid: string,
+    receiverUid: string,
+    receiverName: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string
+  ): Promise<void> {
+    await this.create(
+      payerUid,
+      'SETTLEMENT_DISPUTED',
+      'Payment Not Confirmed ❌',
+      `${receiverName} did not confirm receiving your payment of ${baseCurrency} ${amount}. Please check and try again.`,
+      {
+        data: { tripId, receiverUid, amount, baseCurrency },
+        isActionable: true,
+        actionUrl: `/trips/${tripId}/settle`,
+        priority: 'high',
+        category: 'settlement',
+        channels: { push: true, email: false },
+      }
+    );
+  }
+
+  /**
+   * Notify payer of a payment reminder from the receiver.
+   */
+  async notifyPaymentReminder(
+    payerUid: string,
+    senderUid: string,
+    senderName: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string,
+    transactionId: string
+  ): Promise<void> {
+    await this.create(
+      payerUid,
+      'REMINDER',
+      '⏰ Payment Reminder',
+      `${senderName} is waiting for your payment of ${baseCurrency} ${amount}`,
+      {
+        data: { tripId, senderUid, amount, baseCurrency, transactionId },
+        isActionable: true,
+        actionButtons: [
+          { label: '💸 Mark Paid', action: 'mark_paid', value: transactionId, style: 'primary' },
+          { label: '📋 View Details', action: 'view_settlement', value: tripId },
+        ],
+        actionUrl: `/trips/${tripId}/settle`,
+        priority: 'high',
+        category: 'settlement',
+        channels: { push: true, email: false },
+      }
+    );
+  }
+
   async notifyTripInvitation(
+
     toUid: string,
     tripId: string,
     tripTitle: string,
@@ -1014,38 +1109,8 @@ export class NotificationService {
   //   );
   // }
 
-  /**
-   * Notify user about payment reminder.
-   */
-  async notifyPaymentReminder(
-    fromUid: string,
-    toUid: string,
-    amount: number,
-    baseCurrency: string,
-    tripId: string
-  ): Promise<void> {
-    const toUser = await User.findOne({ $or: [{ _id: toUid }, { firebaseUid: toUid }] })
-      .select('displayName')
-      .lean();
 
-    await this.create(
-      fromUid,
-      'PAYMENT_REMINDER',
-      'Payment Reminder ⏰',
-      `Reminder: You owe ${toUser?.displayName || 'Someone'} ${baseCurrency} ${amount}`,
-      {
-        data: { tripId, toUid, amount, baseCurrency },
-        isActionable: true,
-        actionButtons: [
-          { label: '💸 Pay Now', action: 'open_upi', value: 'pay', style: 'primary' },
-        ],
-        actionUrl: `/trips/${tripId}/settle`,
-        priority: 'urgent',
-        category: 'settlement',
-        channels: { push: true, email: true },
-      }
-    );
-  }
+
 
   /**
    * Notify about budget warning/exceeded.

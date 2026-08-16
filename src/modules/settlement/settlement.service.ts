@@ -11,6 +11,17 @@ import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { achievementService } from '../achievement/achievement.service';
 import { logger } from '../../config/logger';
+import { Reminder } from '../reminders/reminder.model';
+import { NotificationService } from '../notification/notification.service';
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+/** Minimum minutes between payment reminders for the same transaction. */
+const REMINDER_COOLDOWN_MINUTES = 30;
+
+const notificationService = new NotificationService();
 
 // ============================================================
 // TYPES
@@ -483,10 +494,8 @@ export const confirmPayment = async (
     throw new AppError('Only the recipient can confirm receipt', 403);
   }
   if (txn.status === 'confirmed') {
-    throw new AppError('Payment already confirmed', 400);
-  }
-  if (txn.status === 'pending') {
-    throw new AppError('Payment was never initiated', 400);
+    // Idempotent: return settlement if already confirmed
+    return settlement;
   }
 
   // Confirm the transaction
@@ -563,6 +572,15 @@ export const confirmPayment = async (
 
   await settlement.save();
 
+  // Also emit persistent notification (offline users will see it later)
+  notificationService.notifySettlementCompleted(
+    txn.from,
+    txn.to,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId
+  ).catch((err: Error) => logger.error('Failed to persist settlement-completed notification:', err));
+
   socketServer.notifySettlementCompleted(
     txn.from,
     txn.to,
@@ -574,11 +592,80 @@ export const confirmPayment = async (
   // If fully settled, notify all members
   if (settlement.isFullySettled) {
     socketServer.notifyTripFullySettled(tripId);
+    notificationService.notifyTripFullySettled(tripId).catch((err: Error) =>
+      logger.error('Failed to persist trip-fully-settled notification:', err)
+    );
   }
   
   achievementService.onSettlementConfirmed(tripId, txn.from, txn.to).catch(err => {
     logger.error('Failed to process achievements on settlement confirmed:', err);
   });
+
+  return settlement;
+};
+
+// ============================================================
+// SETTLE ALL — Payer initiates all outstanding transactions
+// ============================================================
+
+export const settleAll = async (
+  tripId: string,
+  payerUid: string
+): Promise<ISettlement> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
+
+  if (!settlement) throw new AppError('Settlement not found', 404);
+
+  // Find transactions where the user is the PAYER and not yet confirmed
+  const transactionsToInitiate = settlement.transactions.filter(
+    (txn) =>
+      txn.from === payerUid &&
+      (txn.status === 'pending' || txn.status === 'rejected')
+  );
+
+  if (transactionsToInitiate.length === 0) {
+    throw new AppError('No pending payments found to initiate.', 400);
+  }
+
+  const now = new Date();
+
+  for (const txn of transactionsToInitiate) {
+    txn.status = 'initiated';
+    txn.initiatedAt = now;
+
+    settlement.history.push({
+      action: 'settle_all_initiated',
+      actorUid: payerUid,
+      transactionId: (txn as any)._id,
+      amount: txn.amountBase,
+      timestamp: now,
+      metadata: { toName: txn.toName },
+    });
+  }
+
+  await settlement.save();
+
+  // Notify each receiver (real-time + persistent)
+  for (const txn of transactionsToInitiate) {
+    socketServer.notifyPaymentInitiated(
+      txn.to,
+      txn.fromName,
+      txn.amountBase,
+      txn.baseCurrency,
+      tripId,
+      (txn as any)._id.toString()
+    );
+    notificationService.notifyPaymentInitiated(
+      txn.from,
+      txn.to,
+      txn.amountBase,
+      txn.baseCurrency,
+      tripId,
+      (txn as any)._id.toString()
+    ).catch((err: Error) => logger.error('Failed to persist payment-initiated notification:', err));
+  }
 
   return settlement;
 };
@@ -896,6 +983,317 @@ function generateTransactionExplanation(
 }
 
 // ============================================================
+// SETTLE SELECTED — Payer initiates a chosen subset of transactions
+// ============================================================
+
+export const settleSelected = async (
+  tripId: string,
+  payerUid: string,
+  transactionIds: string[]
+): Promise<ISettlement> => {
+  if (!transactionIds || transactionIds.length === 0) {
+    throw new AppError('No transactions selected', 400);
+  }
+
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
+
+  if (!settlement) throw new AppError('Settlement not found', 404);
+
+  const now = new Date();
+  const initiated: ISettlementTransaction[] = [];
+
+  for (const txnId of transactionIds) {
+    const txn = settlement.transactions.find(
+      (t) => (t as any)._id.toString() === txnId
+    );
+
+    if (!txn) throw new AppError(`Transaction ${txnId} not found`, 404);
+    if (txn.from !== payerUid) {
+      throw new AppError(
+        `Transaction ${txnId} does not belong to you`,
+        403
+      );
+    }
+    if (txn.status === 'confirmed') {
+      // Skip already confirmed — idempotent
+      continue;
+    }
+    if (txn.status === 'initiated') {
+      // Already initiated — idempotent, skip
+      continue;
+    }
+
+    txn.status = 'initiated';
+    txn.initiatedAt = now;
+    initiated.push(txn);
+
+    settlement.history.push({
+      action: 'payment_initiated',
+      actorUid: payerUid,
+      transactionId: (txn as any)._id,
+      amount: txn.amountBase,
+      timestamp: now,
+      metadata: { source: 'settle_selected' },
+    });
+  }
+
+  await settlement.save();
+
+  // Notify receivers
+  for (const txn of initiated) {
+    socketServer.notifyPaymentInitiated(
+      txn.to,
+      txn.fromName,
+      txn.amountBase,
+      txn.baseCurrency,
+      tripId,
+      (txn as any)._id.toString()
+    );
+    notificationService.notifyPaymentInitiated(
+      txn.from,
+      txn.to,
+      txn.amountBase,
+      txn.baseCurrency,
+      tripId,
+      (txn as any)._id.toString()
+    ).catch((err: Error) => logger.error('Failed to persist payment-initiated notification:', err));
+  }
+
+  return settlement;
+};
+
+// ============================================================
+// SETTLE SINGLE — Payer initiates one transaction (Mark Paid)
+// ============================================================
+
+export const settleSingle = async (
+  tripId: string,
+  payerUid: string,
+  transactionId: string
+): Promise<{ settlement: ISettlement; transaction: ISettlementTransaction }> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
+
+  if (!settlement) throw new AppError('Settlement not found', 404);
+
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
+
+  if (!txn) throw new AppError('Transaction not found', 404);
+  if (txn.from !== payerUid) {
+    throw new AppError('This is not your payment to make', 403);
+  }
+
+  // Idempotency: already initiated or confirmed
+  if (txn.status === 'initiated') {
+    return { settlement, transaction: txn };
+  }
+  if (txn.status === 'confirmed') {
+    return { settlement, transaction: txn };
+  }
+
+  const now = new Date();
+  txn.status = 'initiated';
+  txn.initiatedAt = now;
+
+  settlement.history.push({
+    action: 'payment_initiated',
+    actorUid: payerUid,
+    transactionId: (txn as any)._id,
+    amount: txn.amountBase,
+    timestamp: now,
+    metadata: { source: 'settle_single' },
+  });
+
+  await settlement.save();
+
+  socketServer.notifyPaymentInitiated(
+    txn.to,
+    txn.fromName,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId,
+    (txn as any)._id.toString()
+  );
+  notificationService.notifyPaymentInitiated(
+    txn.from,
+    txn.to,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId,
+    (txn as any)._id.toString()
+  ).catch((err: Error) => logger.error('Failed to persist payment-initiated notification:', err));
+
+  return { settlement, transaction: txn };
+};
+
+// ============================================================
+// REMIND PAYER
+// ============================================================
+
+export const remindPayer = async (
+  tripId: string,
+  reminderSenderUid: string,
+  transactionId: string
+): Promise<void> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
+
+  if (!settlement) throw new AppError('Settlement not found', 404);
+
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
+
+  if (!txn) throw new AppError('Transaction not found', 404);
+
+  // Only the receiver can remind the payer
+  if (txn.to !== reminderSenderUid) {
+    throw new AppError('Only the recipient can send a reminder', 403);
+  }
+
+  // Cannot remind if already confirmed or cancelled
+  if (txn.status === 'confirmed') {
+    throw new AppError('This payment is already confirmed', 400);
+  }
+
+  // Cooldown: check for recent reminder
+  const cooldownCutoff = new Date(
+    Date.now() - REMINDER_COOLDOWN_MINUTES * 60 * 1000
+  );
+  const recentReminder = await Reminder.findOne({
+    userId: reminderSenderUid,
+    targetUserId: txn.from,
+    settlementId: settlement._id,
+    'metadata.transactionId': transactionId,
+    type: 'settlement',
+    createdAt: { $gte: cooldownCutoff },
+  });
+
+  if (recentReminder) {
+    throw new AppError(
+      `You already sent a reminder recently. Please wait ${REMINDER_COOLDOWN_MINUTES} minutes before sending another.`,
+      429
+    );
+  }
+
+  // Create reminder document
+  await Reminder.create({
+    userId: reminderSenderUid,
+    targetUserId: txn.from,
+    targetUserName: txn.fromName,
+    tripId: settlement.tripId,
+    tripName: undefined,
+    settlementId: settlement._id,
+    type: 'settlement',
+    title: `Payment Reminder`,
+    message: `${txn.toName} is waiting for your payment of ${txn.baseCurrency} ${txn.amountBase}`,
+    frequency: 'once',
+    nextTriggerAt: new Date(),
+    channels: { inApp: true, push: true, email: false, sms: false },
+    metadata: { transactionId, tripId, amount: txn.amountBase },
+  });
+
+  // Real-time socket notification to the payer
+  socketServer.notifyPaymentReminder(
+    txn.from,
+    txn.toName,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId,
+    transactionId
+  );
+
+  // Persistent in-app notification to the payer
+  notificationService.notifyPaymentReminder(
+    txn.from,
+    txn.to,
+    txn.toName,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId,
+    transactionId
+  ).catch((err: Error) => logger.error('Failed to persist payment-reminder notification:', err));
+};
+
+// ============================================================
+// REJECT PAYMENT
+// ============================================================
+
+export const rejectPayment = async (
+  tripId: string,
+  transactionId: string,
+  receiverUid: string,
+  reason: string
+): Promise<ISettlement> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
+
+  if (!settlement) throw new AppError('Settlement not found', 404);
+
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
+
+  if (!txn) throw new AppError('Transaction not found', 404);
+
+  if (txn.to !== receiverUid) {
+    throw new AppError('Only the recipient can reject a payment', 403);
+  }
+
+  if (txn.status !== 'initiated') {
+    throw new AppError(
+      'Only initiated payments can be rejected. The payer must first mark it as paid.',
+      400
+    );
+  }
+
+  const now = new Date();
+
+  // Store rejection info but reset status to pending so payer can retry
+  txn.rejectedAt = now;
+  txn.rejectionReason = reason;
+  txn.status = 'pending';
+
+  settlement.history.push({
+    action: 'payment_rejected',
+    actorUid: receiverUid,
+    transactionId: (txn as any)._id,
+    amount: txn.amountBase,
+    timestamp: now,
+    metadata: { reason, rejectedBy: txn.toName },
+  });
+
+  await settlement.save();
+
+  // Notify the payer
+  socketServer.notifyPaymentRejected(
+    txn.from,
+    txn.toName,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId,
+    transactionId
+  );
+  notificationService.notifyPaymentRejected(
+    txn.from,
+    txn.to,
+    txn.toName,
+    txn.amountBase,
+    txn.baseCurrency,
+    tripId
+  ).catch((err: Error) => logger.error('Failed to persist payment-rejected notification:', err));
+
+  return settlement;
+};
+
+// ============================================================
 // NAMESPACE EXPORT
 // ============================================================
 
@@ -906,6 +1304,11 @@ export const settlementService = {
   markSettlementStale,
   initiatePayment,
   confirmPayment,
+  settleAll,
+  settleSelected,
+  settleSingle,
+  remindPayer,
+  rejectPayment,
   disputePayment,
   retryPayment,
   getMySettlements,

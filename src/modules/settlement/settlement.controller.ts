@@ -339,3 +339,188 @@ export const exportSettlement = async (
     next(err);
   }
 };
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/settle-all
+ * Payer initiates all their outstanding payments in this trip.
+ */
+export const settleAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+
+    const settlement = await settlementService.settleAll(
+      tripId,
+      user.uid
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'All your outgoing payments have been marked as initiated. Awaiting receiver confirmation.',
+      data: {
+        settlement,
+        isFullySettled: settlement.isFullySettled,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/settle-selected
+ * Payer initiates a selected subset of their outstanding payments.
+ */
+export const settleSelected = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId } = req.params;
+    const { transactionIds } = req.body;
+
+    const settlement = await settlementService.settleSelected(
+      tripId,
+      user.uid,
+      transactionIds
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `${transactionIds.length} payment(s) marked as initiated. Awaiting receiver confirmation.`,
+      data: {
+        settlement,
+        isFullySettled: settlement.isFullySettled,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/transactions/:transactionId/settle
+ * Payer marks a single payment as paid (Mark Paid).
+ */
+export const settleSingle = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId, transactionId } = req.params;
+
+    const result = await settlementService.settleSingle(
+      tripId,
+      user.uid,
+      transactionId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment marked as paid. Waiting for the receiver to confirm.',
+      data: {
+        transaction: result.transaction,
+        settlement: result.settlement,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/transactions/:transactionId/remind
+ * Receiver sends a payment reminder to the payer.
+ */
+export const remindPayer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId, transactionId } = req.params;
+
+    await settlementService.remindPayer(tripId, user.uid, transactionId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Reminder sent successfully.',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/transactions/:transactionId/confirm
+ * Receiver confirms receipt of a payment (URL-based, replaces body-based confirm).
+ */
+export const confirmTransaction = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId, transactionId } = req.params;
+    const { notes } = req.body;
+
+    const settlement = await settlementService.confirmPayment(
+      tripId,
+      transactionId,
+      user.uid,
+      notes
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment confirmed. Related expenses updated.',
+      data: {
+        settlement,
+        isFullySettled: settlement.isFullySettled,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/transactions/:transactionId/reject
+ * Receiver rejects a payment claim (resets transaction to pending).
+ */
+export const rejectPayment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId, transactionId } = req.params;
+    const { reason } = req.body;
+
+    const settlement = await settlementService.rejectPayment(
+      tripId,
+      transactionId,
+      user.uid,
+      reason
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment rejected. The payer has been notified and can try again.',
+      data: { settlement },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

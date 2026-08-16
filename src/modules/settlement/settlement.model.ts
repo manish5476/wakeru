@@ -4,7 +4,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 // TYPES
 // ============================================================
 
-export type PaymentStatus = 'pending' | 'initiated' | 'confirmed' | 'disputed';
+export type PaymentStatus = 'pending' | 'initiated' | 'confirmed' | 'disputed' | 'rejected';
 
 export interface ISettlementTransaction {
   from: string;           // Firebase UID — who pays
@@ -21,12 +21,15 @@ export interface ISettlementTransaction {
   disputedAt?: Date;
   disputedBy?: string;
   disputeReason?: string;
+  // Rejection tracking (status resets to 'pending' after rejection)
+  rejectedAt?: Date;
+  rejectionReason?: string;
   // Explains WHY this transfer exists (for multi-hop netting transparency)
   explanation?: string[];
 }
 
 export interface ISettlementHistory {
-  action: 'calculated' | 'payment_initiated' | 'payment_confirmed' | 'payment_disputed' | 'payment_retried';
+  action: 'calculated' | 'payment_initiated' | 'payment_confirmed' | 'payment_disputed' | 'payment_retried' | 'payment_rejected' | 'settle_all_initiated';
   actorUid: string;
   actorName?: string;
   transactionId?: Types.ObjectId;
@@ -52,6 +55,7 @@ export interface ISettlement extends Document {
   initiatedCount: number;
   confirmedCount: number;
   disputedCount: number;
+  rejectedCount: number;
   settlementProgress: number;
 }
 
@@ -69,7 +73,7 @@ const transactionSchema = new Schema<ISettlementTransaction>(
     baseCurrency: { type: String, required: true, uppercase: true },
     status: {
       type: String,
-      enum: ['pending', 'initiated', 'confirmed', 'disputed'],
+      enum: ['pending', 'initiated', 'confirmed', 'disputed', 'rejected'],
       default: 'pending',
     },
     upiDeepLink: { type: String },
@@ -79,6 +83,8 @@ const transactionSchema = new Schema<ISettlementTransaction>(
     disputedAt: { type: Date },
     disputedBy: { type: String },
     disputeReason: { type: String, maxlength: 500 },
+    rejectedAt: { type: Date },
+    rejectionReason: { type: String, maxlength: 500 },
     explanation: [{ type: String }],
   },
   { _id: true }
@@ -88,7 +94,7 @@ const settlementHistorySchema = new Schema<ISettlementHistory>(
   {
     action: {
       type: String,
-      enum: ['calculated', 'payment_initiated', 'payment_confirmed', 'payment_disputed', 'payment_retried'],
+      enum: ['calculated', 'payment_initiated', 'payment_confirmed', 'payment_disputed', 'payment_retried', 'payment_rejected', 'settle_all_initiated'],
       required: true,
     },
     actorUid: { type: String, required: true },
@@ -179,6 +185,10 @@ settlementSchema.virtual('confirmedCount').get(function () {
 
 settlementSchema.virtual('disputedCount').get(function () {
   return this.transactions.filter((t) => t.status === 'disputed').length;
+});
+
+settlementSchema.virtual('rejectedCount').get(function () {
+  return this.transactions.filter((t) => t.status === 'rejected').length;
 });
 
 settlementSchema.virtual('isFullySettled').get(function () {
