@@ -17,7 +17,7 @@ export class Database {
   }
 
   async connect(): Promise<void> {
-    if (config.NODE_ENV === 'test' || !config.MONGODB_URI) {
+    if (config.NODE_ENV === 'test') {
       logger.warn('Database connection is disabled. The application will run without connecting to MongoDB.');
       return;
     }
@@ -42,7 +42,7 @@ export class Database {
       }
     } catch (error) {
       logger.error('Initial MongoDB connection failed:', error);
-      this.handleConnectionError();
+      throw error;
     }
   }
 

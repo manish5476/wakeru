@@ -143,6 +143,10 @@ export class RedisClient {
   public publisher: Redis;
   private isConnected: boolean = false;
 
+  get ready(): boolean {
+    return this.isConnected;
+  }
+
   private constructor() {
     // ── Active Method: Redis Cloud ──
     // Switch createRedisCloudOptions() to another method if needed.
@@ -243,10 +247,12 @@ export class RedisClient {
   async deletePattern(pattern: string): Promise<void> {
     if (!this.isConnected) return;
     try {
-      const keys = await this.client.keys(pattern);
-      if (keys.length > 0) {
-        await this.client.del(...keys);
-      }
+      let cursor = '0';
+      do {
+        const [nextCursor, keys] = await this.client.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
+        cursor = nextCursor;
+        if (keys.length > 0) await this.client.del(...keys);
+      } while (cursor !== '0');
     } catch (err: any) {
       logger.warn(`Redis deletePattern failed for "${pattern}": ${err.message}`);
     }
@@ -257,6 +263,16 @@ export class RedisClient {
     try {
       return (await this.client.exists(key)) === 1;
     } catch {
+      return false;
+    }
+  }
+
+  async setIfNotExists(key: string, value: string, ttlSeconds: number): Promise<boolean> {
+    if (!this.isConnected) return false;
+    try {
+      return (await this.client.set(key, value, 'EX', ttlSeconds, 'NX')) === 'OK';
+    } catch (err: any) {
+      logger.warn(`Redis SET NX failed for key "${key}": ${err.message}`);
       return false;
     }
   }

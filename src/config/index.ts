@@ -11,7 +11,7 @@ export const config = {
   API_VERSION: process.env.API_VERSION || 'v1',
 
   // MongoDB
-  MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb+srv://dummymailme_db_user:password@wareku.mxusxdr.mongodb.net/?appName=wareku',
+  MONGODB_URI: process.env.MONGODB_URI || process.env.MONGO_URI || '',
   MONGO_ROOT_USER: process.env.MONGO_ROOT_USER,
   MONGO_ROOT_PASSWORD: process.env.MONGO_ROOT_PASSWORD,
 
@@ -20,8 +20,8 @@ export const config = {
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
 
   // JWT
-  JWT_SECRET: process.env.JWT_SECRET || 'default-secret-change-in-production',
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'tripsplit-jwt-refresh-secret-dev-only',
+  JWT_SECRET: process.env.JWT_SECRET || '',
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || '',
   JWT_ACCESS_EXPIRATION: process.env.JWT_ACCESS_EXPIRATION || '15m',
   JWT_REFRESH_EXPIRATION: process.env.JWT_REFRESH_EXPIRATION || '7d',
 
@@ -62,17 +62,22 @@ export const config = {
   // File Upload
   MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '10485760'),
   UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads/',
+  RUN_SCHEDULER: process.env.RUN_SCHEDULER === 'true',
 } as const;
 
 // Validate critical configuration
 export const validateConfig = (): void => {
-  const requiredVars = [
-    'JWT_SECRET',
-    'MONGODB_URI',
-  ];
-
-  const missing = requiredVars.filter(varName => {
-    return !process.env[varName] && config[varName as keyof typeof config] === `default-${varName.toLowerCase()}-change-in-production`;
+  const requiredVars: Array<keyof typeof config> = ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'MONGODB_URI'];
+  const placeholders = new Set([
+    'your_jwt_secret_here',
+    'your_jwt_refresh_secret_here',
+    'default-secret-change-in-production',
+    'tripsplit-jwt-refresh-secret-dev-only',
+    'changeme',
+  ]);
+  const missing = requiredVars.filter((varName) => {
+    const value = config[varName];
+    return typeof value !== 'string' || !value.trim() || placeholders.has(value.trim().toLowerCase());
   });
 
   if (missing.length > 0) {

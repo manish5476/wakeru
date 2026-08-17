@@ -39,7 +39,7 @@ export const protect = async (
     try {
       decoded = jwt.verify(
         token,
-        config.JWT_SECRET || process.env.JWT_SECRET || 'tripsplit-secret-dev'
+        config.JWT_SECRET
       ) as JwtPayload;
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {

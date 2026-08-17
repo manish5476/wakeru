@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { remindersController } from './reminders.controller';
 import { protect } from '../../middleware/auth.middleware';
-import { validate } from '../trips/trip.middleware';
+import { validate, loadTrip, requireMember } from '../trips/trip.middleware';
 import {
     createReminderSchema,
     createSettlementReminderSchema,
@@ -23,7 +23,7 @@ router.post('/ping', validate(pingUserSchema), remindersController.pingUser);
 // Get reminders
 router.get('/', validate(reminderQuerySchema, 'query'), remindersController.getMyReminders);
 router.get('/incoming', remindersController.getIncomingReminders);
-router.get('/trip/:tripId', remindersController.getTripReminders);
+router.get('/trip/:tripId', loadTrip(), requireMember, remindersController.getTripReminders);
 
 // Manage reminders
 router.patch('/:reminderId/pause', validate(reminderParamSchema, 'params'), remindersController.pause);

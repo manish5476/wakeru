@@ -1,127 +1,76 @@
 import rateLimit from 'express-rate-limit';
+import { RedisStore } from 'rate-limit-redis';
 import { CONSTANTS } from '../config/constants';
+import { config } from '../config';
+import { redisClient } from '../config/redis';
 
-// ============================================================
-// Standard Rate Limiters
-// ============================================================
+// A configured managed Redis service makes limits shared by every API instance.
+// Local development retains express-rate-limit's in-memory store.
+const sharedStore = config.REDIS_URL !== 'redis://localhost:6379'
+  ? new RedisStore({ prefix: 'rate-limit:', sendCommand: (...args: string[]) => (redisClient.client.call as (...command: string[]) => Promise<any>)(...args) })
+  : undefined;
+
+const standard = {
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: sharedStore,
+};
+
+const message = (text: string) => ({ success: false, error: { code: 'RATE_LIMIT_EXCEEDED', message: text } });
 
 export const publicRateLimiter = rateLimit({
   windowMs: CONSTANTS.RATE_LIMITS.PUBLIC.windowMs,
   max: CONSTANTS.RATE_LIMITS.PUBLIC.max,
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many requests, please try again later'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: message('Too many requests, please try again later'),
+  ...standard,
 });
 
 export const authenticatedRateLimiter = rateLimit({
   windowMs: CONSTANTS.RATE_LIMITS.AUTHENTICATED.windowMs,
   max: CONSTANTS.RATE_LIMITS.AUTHENTICATED.max,
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many requests, please try again later'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: message('Too many requests, please try again later'),
+  ...standard,
 });
 
-// ============================================================
-// Strict Rate Limiters — Auth Endpoints
-// ============================================================
-
-/**
- * Strict rate limiter for authentication endpoints.
- * Prevents brute force attacks on login/register/forgot-password.
- * 
- * 10 requests per 15 minutes per IP — very strict.
- */
 export const strictRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 10 : 1000, // Relax in dev
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many authentication attempts. Please try again in 15 minutes.'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: false, // Count all attempts, even successful ones
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 10 : 1000,
+  message: message('Too many authentication attempts. Please try again in 15 minutes.'),
+  skipSuccessfulRequests: false,
+  ...standard,
 });
 
-/**
- * Slightly more lenient auth limiter — 30 requests per 15 minutes.
- * Use for token refresh and other auth-related but less sensitive endpoints.
- */
 export const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30,                    // 30 attempts per window
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many requests. Please try again later.'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: message('Too many requests. Please try again later.'),
+  ...standard,
 });
-
-// ============================================================
-// Feature-Specific Rate Limiters
-// ============================================================
 
 export const expenseCreateRateLimiter = rateLimit({
   windowMs: CONSTANTS.RATE_LIMITS.EXPENSE_CREATE.windowMs,
   max: CONSTANTS.RATE_LIMITS.EXPENSE_CREATE.max,
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many expenses created, please slow down'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: message('Too many expenses created, please slow down'),
+  ...standard,
 });
 
 export const ocrUploadRateLimiter = rateLimit({
   windowMs: CONSTANTS.RATE_LIMITS.OCR_UPLOAD.windowMs,
   max: CONSTANTS.RATE_LIMITS.OCR_UPLOAD.max,
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many uploads, please try again later'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  message: message('Too many uploads, please try again later'),
+  ...standard,
 });
 
-/**
- * UPI verification rate limiter.
- * Prevents abuse of penny drop verification.
- */
+export const feedbackRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: message('Too many feedback submissions, please try again later'),
+  ...standard,
+});
+
 export const upiVerificationRateLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3,                     // 3 attempts per hour
-  message: {
-    success: false,
-    error: {
-      code: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many UPI verification attempts. Please try again in 1 hour.'
-    }
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: message('Too many UPI verification attempts. Please try again in 1 hour.'),
+  ...standard,
 });

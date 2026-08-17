@@ -58,10 +58,11 @@ export class ReceiptController {
 
   async getTripReceipts(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = getUser(req);
       const { tripId } = req.params;
       const { page, limit } = req.query;
       
-      const result = await receiptService.getTripReceipts(tripId, {
+      const result = await receiptService.getTripReceipts(tripId, userId, {
         page: Number(page) || 1,
         limit: Number(limit) || 20,
       });

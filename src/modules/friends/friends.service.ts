@@ -897,10 +897,11 @@ export const friendsService = {
 
         // Eligible trips that user is in, but friend is NOT yet in (for "Add to Trip" feature)
         const otherTrips = await Trip.find({
-            'members.userId': userId,
-            'members.isActive': true,
+            $and: [
+                { members: { $elemMatch: { userId, isActive: true } } },
+                { 'members.userId': { $ne: friendUserId } },
+            ],
             isArchived: false,
-            'members.userId': { $ne: friendUserId },
         }).select('_id title coverImage startDate endDate status').sort({ startDate: -1 }).limit(20).lean();
 
         const recentExpensesFormatted = sharedExpensesDocs.slice(0, 10).map((e: any) => {

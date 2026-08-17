@@ -8,6 +8,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import { config } from '../../config';
 import { v4 as uuidv4 } from 'uuid';
+import { assertActiveTripMember } from '../trips/trip.middleware';
+import { QueueManager } from '../../infrastructure/queue/bull.config';
 
 export class ReceiptService {
   
@@ -21,28 +23,25 @@ export class ReceiptService {
     expenseId?: string
   ): Promise<any> {
     this.validateFile(file);
+    if (tripId) await assertActiveTripMember(tripId, userId);
 
     try {
       const receiptId = uuidv4();
       const filename = `receipt-${receiptId}-${Date.now()}`;
       const uploadDir = path.join(config.UPLOAD_DIR, 'receipts');
-      
       await fs.mkdir(uploadDir, { recursive: true });
 
-      // Save original
       const originalPath = path.join(uploadDir, `${filename}.jpg`);
       await sharp(file.buffer)
         .jpeg({ quality: 85 })
         .toFile(originalPath);
 
-      // Create thumbnail
       const thumbnailPath = path.join(uploadDir, `${filename}_thumb.jpg`);
       const metadata = await sharp(file.buffer)
         .resize(300, 300, { fit: 'inside' })
         .jpeg({ quality: 60 })
         .toFile(thumbnailPath);
 
-      // Create receipt document
       const receipt = new Receipt({
         receiptId,
         userId,
@@ -68,10 +67,24 @@ export class ReceiptService {
 
       await receipt.save();
 
-      // Process OCR in background
-      this.processReceiptAsync(receiptId, originalPath).catch((err) => {
-        logger.error('Background OCR failed:', err);
-      });
+      // Enqueue OCR to Bull queue with fallback to background async processing
+      try {
+        const ocrQueue = QueueManager.getQueue('receipt-ocr');
+        await ocrQueue.add(
+          { receiptId, imagePath: originalPath },
+          {
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 2000 },
+            removeOnComplete: 100,
+            removeOnFail: 50,
+          }
+        );
+      } catch (queueErr) {
+        logger.warn('Could not enqueue to Bull queue, falling back to in-process OCR:', queueErr);
+        this.processReceiptAsync(receiptId, originalPath).catch((err) => {
+          logger.error('Background OCR failed:', err);
+        });
+      }
 
       logger.info(`Receipt uploaded: ${receiptId}`);
       return receipt;
@@ -80,10 +93,6 @@ export class ReceiptService {
       throw new BadRequestError('Failed to upload receipt');
     }
   }
-
-  /**
-   * Get receipt by ID.
-   */
   async getReceipt(receiptId: string, userId: string): Promise<any> {
     const receipt = await Receipt.findOne({
       receiptId,
@@ -136,8 +145,10 @@ export class ReceiptService {
    */
   async getTripReceipts(
     tripId: string,
+    userId: string,
     options: { page?: number; limit?: number } = {}
   ) {
+    await assertActiveTripMember(tripId, userId);
     const { page = 1, limit = 20 } = options;
     const skip = (page - 1) * limit;
 
@@ -254,6 +265,7 @@ export class ReceiptService {
    * Convert receipt data to expense input.
    */
   async convertToExpense(receiptId: string, userId: string, tripId: string) {
+    await assertActiveTripMember(tripId, userId);
     const receipt = await this.getReceipt(receiptId, userId);
 
     if (receipt.status !== 'COMPLETED' && receipt.status !== 'REVIEWED') {

@@ -110,6 +110,14 @@ export const requireMember = async (
   }
 };
 
+/** Service-layer guard for trip-scoped operations called outside route middleware. */
+export const assertActiveTripMember = async (tripId: string, userId: string) => {
+  const trip = await Trip.findOne({ _id: tripId, isArchived: false });
+  if (!trip) throw new AppError('Trip not found', 404);
+  if (!trip.isMember(userId)) throw new AppError('You are not a member of this trip', 403);
+  return trip;
+};
+
 /**
  * Ensures the authenticated user is an admin of req.trip.
  * Must be used AFTER loadTrip.

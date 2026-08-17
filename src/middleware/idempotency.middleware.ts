@@ -40,11 +40,14 @@ export class IdempotencyMiddleware {
         }))
         .digest('hex');
 
-      await redisClient.set(
+      const acquired = await redisClient.setIfNotExists(
         `${cacheKey}:lock`,
         fingerprint,
         10
       );
+      if (redisClient.ready && !acquired) {
+        throw new AppError('A request with this Idempotency-Key is already in progress', 409, 'IDEMPOTENCY_REQUEST_IN_PROGRESS');
+      }
 
       (req as any).idempotencyKey = idempotencyKey;
       (req as any).idempotencyCacheKey = cacheKey;

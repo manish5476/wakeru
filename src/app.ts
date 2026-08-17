@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import compression from 'compression';
 import path from 'path';
 import { config } from './config';
+import mongoose from 'mongoose';
+import { redisClient } from './config/redis';
 import { errorHandler } from './middleware/errorHandler.middleware';
 import { requestLogger } from './middleware/requestLogger.middleware';
 import { IdempotencyMiddleware } from './middleware/idempotency.middleware';
@@ -77,6 +79,15 @@ app.get('/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
+});
+
+app.get('/readiness', (_req, res) => {
+  const mongoReady = mongoose.connection.readyState === 1;
+  if (!mongoReady) {
+    res.status(503).json({ status: 'not_ready', dependencies: { mongo: 'unavailable', redis: redisClient.ready ? 'ready' : 'degraded' } });
+    return;
+  }
+  res.status(200).json({ status: 'ready', dependencies: { mongo: 'ready', redis: redisClient.ready ? 'ready' : 'degraded' } });
 });
 
 // ============================================================

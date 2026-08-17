@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node -r ./tsconfig-paths-bootstrap.js dist/server.js",
     "dev": "nodemon",
+    "worker": "node -r ./tsconfig-paths-bootstrap.js dist/worker.js",
     "migrate:custom": "ts-node scripts/migrator/index.ts",
     "build": "tsc",
     "test": "jest --coverage",
@@ -19,6 +20,7 @@
   "dependencies": {
     "@google-cloud/vision": "^4.0.0",
     "@prisma/client": "^5.22.0",
+    "@socket.io/redis-adapter": "^8.3.0",
     "@types/ioredis": "^4.28.10",
     "apple-signin-auth": "^1.5.0",
     "aws-sdk": "^2.1500.0",
@@ -47,6 +49,7 @@
     "node-cron": "^4.4.1",
     "node-schedule": "^2.1.1",
     "pdfkit": "^0.13.0",
+    "rate-limit-redis": "^4.3.1",
     "redis": "^4.6.0",
     "sharp": "^0.33.0",
     "socket.io": "^4.8.3",

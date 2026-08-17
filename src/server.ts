@@ -6,10 +6,11 @@ import { redisClient } from './config/redis';
 import { logger } from './config/logger';
 import { initializeFirebase } from './config/firebase';
 import { socketServer } from './infrastructure/websocket/socket.server';
-import { startReminderCron } from './modules/reminders/reminder.cron';
+import { QueueManager } from './infrastructure/queue/bull.config';
 
 class Server {
   private httpServer: http.Server | null = null;
+  private shuttingDown = false;
 
   async start(): Promise<void> {
     try {
@@ -53,6 +54,8 @@ class Server {
 
   private setupGracefulShutdown(): void {
     const shutdown = async (signal: string) => {
+      if (this.shuttingDown) return;
+      this.shuttingDown = true;
       logger.info(`${signal} received. Starting graceful shutdown...`);
 
       // Close HTTP server (stops accepting new connections)
@@ -67,6 +70,8 @@ class Server {
 
       // Close WebSocket server
       await socketServer.shutdown();
+
+      await QueueManager.closeAll();
 
       // Close Redis
       await redisClient.disconnect();
@@ -104,7 +109,6 @@ class Server {
 // Start server
 const server = new Server();
 server.start();
-startReminderCron();
 
 
 export default server; // server restarted

@@ -15,7 +15,6 @@ export const errorHandler = (
     stack: err.stack,
     path: req.path,
     method: req.method,
-    body: req.body,
     user: (req as any).user?.userId
   });
 

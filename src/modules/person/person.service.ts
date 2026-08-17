@@ -60,7 +60,9 @@ export const personService = {
         const [person, friendshipInfo, balanceResult] = await Promise.all([
             getUserById(
                 personUserId,
-                'displayName photoURL email phoneNumber bankingDetails.upiId bio stats totalTrips createdAt'
+                isSelf
+                    ? 'displayName photoURL email phoneNumber bankingDetails.upiId bio stats totalTrips createdAt'
+                    : 'displayName photoURL bio stats totalTrips createdAt'
             ),
             this._getFriendshipStatus(currentUserId, personUserId),
             this._getBalanceAggregate(currentUserId, personUserId),
@@ -97,9 +99,11 @@ export const personService = {
                 userId: personUserId,
                 displayName: personData.displayName || 'Unknown',
                 photoURL: personData.photoURL,
-                email: personData.email,
-                phoneNumber: personData.phoneNumber,
-                upiId: personData.bankingDetails?.upiId,
+                ...(isSelf ? {
+                    email: personData.email,
+                    phoneNumber: personData.phoneNumber,
+                    upiId: personData.bankingDetails?.upiId,
+                } : {}),
                 bio: personData.bio,
                 friendshipStatus: friendshipInfo.status,
                 friendshipSince: friendshipInfo.since,

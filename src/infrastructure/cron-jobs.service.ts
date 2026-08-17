@@ -2,8 +2,10 @@ import cron from 'node-cron';
 import { smartNotificationService } from '../modules/notification/smart-notifications.service';
 import { logger } from '../config/logger';
 import { exchangeRateService } from '@/modules/trips/exchange-rate.service';
+import { ScheduledTask } from 'node-cron';
 
 export const cronJobs = {
+    tasks: [] as ScheduledTask[],
     /**
      * Initialize all cron jobs.
      */
@@ -11,27 +13,27 @@ export const cronJobs = {
         logger.info('⏰ Starting cron jobs...');
 
         // Smart notifications — every hour
-        cron.schedule('0 * * * *', async () => {
+        this.tasks.push(cron.schedule('0 * * * *', async () => {
             logger.info('Running smart notification checks...');
             try {
                 await smartNotificationService.runScheduledChecks();
             } catch (error) {
                 logger.error('Smart notification check failed:', error);
             }
-        });
+        }));
 
         // Exchange rate alerts — every 30 minutes
-        cron.schedule('*/30 * * * *', async () => {
+        this.tasks.push(cron.schedule('*/30 * * * *', async () => {
             logger.info('Running exchange rate alert checks...');
             try {
                 await exchangeRateService.checkAlerts();
             } catch (error) {
                 logger.error('Exchange rate alert check failed:', error);
             }
-        });
+        }));
 
         // Auto-complete trips (past end date) — daily at midnight
-        cron.schedule('0 0 * * *', async () => {
+        this.tasks.push(cron.schedule('0 0 * * *', async () => {
             logger.info('Auto-completing past trips...');
             try {
                 const { Trip } = await import('../modules/trips/trip.model');
@@ -45,10 +47,10 @@ export const cronJobs = {
             } catch (error) {
                 logger.error('Auto-complete trips failed:', error);
             }
-        });
+        }));
 
         // Clean up expired friend requests — daily
-        cron.schedule('0 1 * * *', async () => {
+        this.tasks.push(cron.schedule('0 1 * * *', async () => {
             logger.info('Cleaning up expired friend requests...');
             try {
                 const { FriendRequest } = await import('../modules/friends/friends.model');
@@ -62,8 +64,12 @@ export const cronJobs = {
             } catch (error) {
                 logger.error('Cleanup expired requests failed:', error);
             }
-        });
+        }));
 
         logger.info('✅ All cron jobs started');
+    },
+    stop(): void {
+        this.tasks.forEach((task) => task.stop());
+        this.tasks = [];
     },
 };

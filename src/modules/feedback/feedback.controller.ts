@@ -5,6 +5,23 @@ import { User } from '../auth/auth.model';
 import { config } from '../../config';
 import cloudinary from '../../config/cloudinary.config';
 import streamifier from 'streamifier';
+import { z } from 'zod';
+
+const feedbackSchema = z.object({
+  rating: z.coerce.number().int().min(1).max(5),
+  category: z.string().trim().min(1).max(100),
+  feedback: z.string().trim().min(1).max(5000),
+  displayName: z.string().trim().max(100).optional(),
+  deviceInfo: z.union([z.string().max(4000), z.record(z.unknown())]).optional(),
+});
+
+const hasValidImageSignature = (file: Express.Multer.File): boolean => {
+  const bytes = file.buffer;
+  if (file.mimetype === 'image/jpeg') return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  if (file.mimetype === 'image/png') return bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  if (file.mimetype === 'image/webp') return bytes.length >= 12 && bytes.subarray(0, 4).toString() === 'RIFF' && bytes.subarray(8, 12).toString() === 'WEBP';
+  return false;
+};
 
 // Optional helper to check if a user is authenticated on an otherwise public endpoint
 const tryGetAuthenticatedUser = async (req: Request) => {
@@ -15,7 +32,7 @@ const tryGetAuthenticatedUser = async (req: Request) => {
       if (token) {
         const decoded = jwt.verify(
           token,
-          config.JWT_SECRET || process.env.JWT_SECRET || 'tripsplit-secret-dev'
+          config.JWT_SECRET
         ) as { userId: string; type: string };
         
         if (decoded.userId && decoded.type === 'access') {
@@ -44,7 +61,8 @@ export const feedbackController = {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const authUser = await tryGetAuthenticatedUser(req);
-      const { rating, category, feedback, deviceInfo, displayName } = req.body;
+      const input = feedbackSchema.parse(req.body);
+      const { rating, category, feedback, deviceInfo, displayName } = input;
 
       let parsedDeviceInfo = deviceInfo;
       if (typeof deviceInfo === 'string') {
@@ -55,6 +73,9 @@ export const feedbackController = {
 
       const imageUrls: string[] = [];
       if (req.files && Array.isArray(req.files)) {
+        if (!req.files.every(hasValidImageSignature)) {
+          return res.status(400).json({ success: false, error: 'One or more uploads are not valid images' });
+        }
         const uploadPromises = req.files.map((file: Express.Multer.File) => {
           return new Promise<string>((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(

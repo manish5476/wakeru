@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import { config } from '../../config';
 import { logger } from '../../config/logger';
 import { User } from '../../modules/auth/auth.model';
+import { Trip } from '../../modules/trips/trip.model';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { redisClient } from '../../config/redis';
 
 // ============================================================
 // Types
@@ -37,6 +40,16 @@ class SocketServer {
     private userSockets: Map<string, Set<string>> = new Map(); // userId → Set<socketId>
     private onlineUsers: Map<string, OnlineUserInfo> = new Map(); // userId → OnlineUserInfo
 
+    private async canAccessTrip(userId: string, tripId: string): Promise<boolean> {
+        try {
+            if (!tripId) return false;
+            const trip = await Trip.findOne({ _id: tripId, isArchived: false }).select('members').lean();
+            return Boolean(trip && (trip as any).members?.some((member: any) => member.userId === userId && member.isActive));
+        } catch {
+            return false;
+        }
+    }
+
     /**
      * Initialize Socket.IO with HTTP server.
      */
@@ -55,6 +68,13 @@ class SocketServer {
                 skipMiddlewares: true,
             },
         });
+
+        if (redisClient.ready) {
+            this.io.adapter(createAdapter(redisClient.publisher, redisClient.subscriber));
+            logger.info('Socket.IO Redis adapter enabled');
+        } else {
+            logger.warn('Socket.IO Redis adapter disabled; running in single-instance mode');
+        }
 
         // Authentication middleware
         this.io.use(async (socket: AuthenticatedSocket, next) => {
@@ -152,6 +172,10 @@ class SocketServer {
         // Subscribe to trip updates
         socket.on('subscribe:trip', async (tripId: string) => {
             if (!tripId) return;
+            if (!(await this.canAccessTrip(userId, tripId))) {
+                socket.emit('trip:subscription_denied', { tripId });
+                return;
+            }
             socket.join(`trip:${tripId}`);
             socket.userRooms?.add(`trip:${tripId}`);
 
@@ -191,7 +215,8 @@ class SocketServer {
         });
 
         // Typing indicator for expense creation
-        socket.on('expense:typing', (data: { tripId: string; field?: string }) => {
+        socket.on('expense:typing', async (data: { tripId: string; field?: string }) => {
+            if (!data?.tripId || !socket.userRooms?.has(`trip:${data.tripId}`) || !(await this.canAccessTrip(userId, data.tripId))) return;
             socket.to(`trip:${data.tripId}`).emit('expense:typing', {
                 userId,
                 field: data.field || 'expense',
@@ -199,7 +224,8 @@ class SocketServer {
             });
         });
 
-        socket.on('expense:stop_typing', (data: { tripId: string }) => {
+        socket.on('expense:stop_typing', async (data: { tripId: string }) => {
+            if (!data?.tripId || !socket.userRooms?.has(`trip:${data.tripId}`) || !(await this.canAccessTrip(userId, data.tripId))) return;
             socket.to(`trip:${data.tripId}`).emit('expense:stop_typing', {
                 userId,
                 timestamp: new Date().toISOString(),
@@ -207,7 +233,8 @@ class SocketServer {
         });
 
         // User is viewing a specific expense (collaborative awareness)
-        socket.on('expense:viewing', (data: { tripId: string; expenseId: string }) => {
+        socket.on('expense:viewing', async (data: { tripId: string; expenseId: string }) => {
+            if (!data?.tripId || !socket.userRooms?.has(`trip:${data.tripId}`) || !(await this.canAccessTrip(userId, data.tripId))) return;
             socket.to(`trip:${data.tripId}`).emit('expense:viewing', {
                 userId,
                 expenseId: data.expenseId,
@@ -224,7 +251,11 @@ class SocketServer {
         });
 
         // Get online members for a trip
-        socket.on('trip:online_members', (tripId: string) => {
+        socket.on('trip:online_members', async (tripId: string) => {
+            if (!tripId || !socket.userRooms?.has(`trip:${tripId}`) || !(await this.canAccessTrip(userId, tripId))) {
+                socket.emit('trip:online_members', { tripId, members: [] });
+                return;
+            }
             const room = this.io?.sockets.adapter.rooms.get(`trip:${tripId}`);
             if (!room) {
                 socket.emit('trip:online_members', { tripId, members: [] });

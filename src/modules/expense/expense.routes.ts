@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as expenseController from './expense.controller';
 import { protect } from '../auth/auth.middleware';
-import { validate } from '../trips/trip.middleware';
+import { validate, loadTrip, requireMember } from '../trips/trip.middleware';
 import {
   createExpenseSchema, updateExpenseSchema, expenseListQuerySchema, expenseParamSchema, stopExpenseParamSchema, tripExpenseParamSchema, markSplitPaidParamSchema, addCommentSchema, commentParamSchema,
 } from './expense.validation';
@@ -24,12 +24,16 @@ router.get(
   '/trip/:tripId',
   validate(tripExpenseParamSchema, 'params'),
   validate(expenseListQuerySchema, 'query'),
+  loadTrip(),
+  requireMember,
   expenseController.getTripExpenses
 );
 
 router.get(
   '/trip/:tripId/analytics',
   validate(tripExpenseParamSchema, 'params'),
+  loadTrip(),
+  requireMember,
   expenseController.getTripExpenseAnalytics
 );
 

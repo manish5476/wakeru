@@ -19,5 +19,6 @@ export const initializeFirebase = () => {
     }
   } catch (error) {
     logger.error('Failed to initialize Firebase Admin', error);
+    throw error;
   }
 };
