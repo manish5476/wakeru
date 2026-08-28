@@ -295,8 +295,12 @@ export class UserService {
    * Search users
    */
   async searchUsers(query: string, page: number = 1, limit: number = 10): Promise<PaginatedUserSearchResult> {
-    const searchRegex = new RegExp(query, 'i');
-    const users = await User.find({
+    if (!query || query.trim().length === 0) {
+      return { users: [], total: 0, page, limit };
+    }
+    const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const searchRegex = new RegExp(escaped, 'i');
+    const filter = {
       isDeleted: false,
       isActive: true,
       $or: [
@@ -304,21 +308,16 @@ export class UserService {
         { displayName: searchRegex },
         { phoneNumber: searchRegex },
       ],
-    })
-      .select('_id email displayName photoURL')
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
+    };
 
-    const total = await User.countDocuments({
-      isDeleted: false,
-      isActive: true,
-      $or: [
-        { email: searchRegex },
-        { displayName: searchRegex },
-        { phoneNumber: searchRegex },
-      ],
-    });
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .select('_id firebaseUid email displayName photoURL')
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(filter),
+    ]);
 
     return { users: users as unknown as Partial<IUserDocument>[], total, page, limit };
   }

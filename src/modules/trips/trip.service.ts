@@ -82,37 +82,6 @@ export const createTrip = async (
     totalSpentBase: 0,
   });
 
-  // Handle initial members — send invitations instead of directly adding
-  if (input.memberIds && input.memberIds.length > 0) {
-    await trip.save(); // Must save trip first so it has an _id for the invitation
-
-    // Check both _id and firebaseUid to ensure robust matching based on frontend input
-    const users = await User.find({
-      $or: [
-        { _id: { $in: input.memberIds } },
-        { firebaseUid: { $in: input.memberIds } }
-      ],
-      isActive: true,
-      isDeleted: false,
-    });
-
-    for (const u of users) {
-      // Compare Firebase UID correctly to prevent inviting the creator
-      if (u.firebaseUid !== creator.userId) {
-        try {
-          await invitationService.sendInvitation(
-            trip._id.toString(),
-            u.firebaseUid, // Enforce using firebaseUid as the user identity
-            creator.userId,
-            `${creator.displayName} invited you to join ${trip.title}`
-          );
-        } catch (e: any) {
-          logger.error(`Failed to send invitation during trip creation: ${e.message}`);
-        }
-      }
-    }
-  }
-
   // Always ensure at least ONE stop exists
   let stopData: Partial<IStop>;
   if (initialStop) {
@@ -137,8 +106,41 @@ export const createTrip = async (
 
   const newStop = await Stop.create({ ...stopData, tripId: trip._id });
   await Trip.findByIdAndUpdate(trip._id, { $push: { stops: newStop._id } });
-
   trip.stops.push(newStop._id as any);
+
+  // Handle initial members — send invitations concurrently without blocking sequentially
+  if (input.memberIds && input.memberIds.length > 0) {
+    try {
+      const users = await User.find({
+        $or: [
+          { _id: { $in: input.memberIds } },
+          { firebaseUid: { $in: input.memberIds } }
+        ],
+        isActive: true,
+        isDeleted: false,
+      });
+
+      const invitePromises = users
+        .filter((u) => u.firebaseUid !== creator.userId)
+        .map((u) =>
+          invitationService
+            .sendInvitation(
+              trip._id.toString(),
+              u.firebaseUid,
+              creator.userId,
+              `${creator.displayName} invited you to join ${trip.title}`
+            )
+            .catch((e: any) => {
+              logger.error(`Failed to send invitation during trip creation: ${e.message}`);
+            })
+        );
+
+      await Promise.allSettled(invitePromises);
+    } catch (inviteErr: any) {
+      logger.error(`Error querying users for invitations: ${inviteErr.message}`);
+    }
+  }
+
   return trip;
 };
 
