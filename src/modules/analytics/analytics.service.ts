@@ -27,6 +27,7 @@ function buildDateFilter(startDate?: string, endDate?: string) {
 function buildUserMatch(userId: string, filters: AnalyticsFilters = {}) {
   const match: any = {
     $or: [{ paidBy: userId }, { 'splits.userId': userId }],
+    isArchived: false,
   };
   const dateFilter = buildDateFilter(filters.startDate, filters.endDate);
   if (dateFilter) match.date = dateFilter;
@@ -55,7 +56,7 @@ export const analyticsService = {
     lastWeekStart.setDate(lastWeekStart.getDate() - 7);
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const userFilter = { $or: [{ paidBy: userId }, { 'splits.userId': userId }] };
+    const userFilter = { $or: [{ paidBy: userId }, { 'splits.userId': userId }], isArchived: false };
 
     const [
       thisMonth, lastMonth, thisWeek, lastWeek, today,
@@ -75,13 +76,13 @@ export const analyticsService = {
       Expense.find(userFilter).sort({ date: -1 }).limit(5).select('title amountBase amountLocal localCurrency date category paidByName').lean(),
       Expense.aggregate([{ $match: { ...userFilter, date: { $gte: new Date(Date.now() - 7 * 86400000) } } }, { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }, amount: { $sum: '$amountBase' }, count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
       Expense.aggregate([
-        { $match: { paidBy: { $ne: userId }, 'splits.userId': userId, 'splits.isPaid': false } },
+        { $match: { paidBy: { $ne: userId }, 'splits.userId': userId, 'splits.isPaid': false, isArchived: false } },
         { $unwind: '$splits' },
         { $match: { 'splits.userId': userId, 'splits.isPaid': false } },
         { $group: { _id: null, total: { $sum: '$splits.amountBase' } } }
       ]),
       Expense.aggregate([
-        { $match: { paidBy: userId, 'splits.userId': { $ne: userId }, 'splits.isPaid': false } },
+        { $match: { paidBy: userId, isArchived: false, splits: { $elemMatch: { userId: { $ne: userId }, isPaid: false } } } },
         { $unwind: '$splits' },
         { $match: { 'splits.userId': { $ne: userId }, 'splits.isPaid': false } },
         { $group: { _id: null, total: { $sum: '$splits.amountBase' } } }
@@ -131,20 +132,21 @@ export const analyticsService = {
     const match = buildUserMatch(userId, filters);
     const dateFilter = buildDateFilter(filters.startDate, filters.endDate);
 
+    const splitMatch = { 'splits.userId': userId };
     const [
       summaryResult, categories, monthlyData, dailyData, weeklyData,
       tripData, dayOfWeek, hourOfDay, highestExpense, lowestExpense,
     ] = await Promise.all([
-      Expense.aggregate([{ $match: match }, { $group: { _id: null, totalSpent: { $sum: '$amountBase' }, totalExpenses: { $sum: 1 }, avgPerExpense: { $avg: '$amountBase' } } }]),
-      Expense.aggregate([{ $match: match }, { $group: { _id: '$category', totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 }, avgAmount: { $avg: '$amountBase' } } }, { $sort: { totalAmount: -1 } }]),
-      Expense.aggregate([{ $match: match }, { $group: { _id: { year: { $year: '$date' }, month: { $month: '$date' } }, totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 } } }, { $sort: { '_id.year': 1, '_id.month': 1 } }]),
-      Expense.aggregate([{ $match: { ...match, date: { $gte: new Date(Date.now() - 90 * 86400000) } } }, { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }, totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 }, dayOfWeek: { $first: { $dayOfWeek: '$date' } } } }, { $sort: { _id: 1 } }]),
-      Expense.aggregate([{ $match: match }, { $group: { _id: { year: { $year: '$date' }, week: { $week: '$date' } }, totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 }, startDate: { $min: '$date' }, endDate: { $max: '$date' } } }, { $sort: { '_id.year': 1, '_id.week': 1 } }]),
-      Expense.aggregate([{ $match: match }, { $group: { _id: '$tripId', totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 } } }, { $sort: { totalAmount: -1 } }, { $limit: 10 }, { $lookup: { from: 'trips', localField: '_id', foreignField: '_id', as: 'trip' } }, { $unwind: { path: '$trip', preserveNullAndEmptyArrays: true } }, { $project: { tripId: '$_id', tripTitle: { $ifNull: ['$trip.title', 'Unknown'] }, totalAmount: 1, count: 1, startDate: '$trip.startDate', endDate: '$trip.endDate', status: '$trip.status', memberCount: { $size: { $ifNull: ['$trip.members', []] } } } }]),
-      Expense.aggregate([{ $match: match }, { $group: { _id: { $dayOfWeek: '$date' }, totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
-      Expense.aggregate([{ $match: match }, { $group: { _id: { $hour: '$date' }, totalAmount: { $sum: '$amountBase' }, count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
-      Expense.find(match).sort({ amountBase: -1 }).limit(1).select('title amountBase amountLocal localCurrency date paidByName category').lean(),
-      Expense.find(match).sort({ amountBase: 1 }).limit(1).select('title amountBase amountLocal localCurrency date paidByName category').lean(),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: null, totalSpent: { $sum: '$splits.amountBase' }, totalExpenses: { $sum: 1 }, avgPerExpense: { $avg: '$splits.amountBase' } } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: '$category', totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 }, avgAmount: { $avg: '$splits.amountBase' } } }, { $sort: { totalAmount: -1 } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: { year: { $year: '$date' }, month: { $month: '$date' } }, totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 } } }, { $sort: { '_id.year': 1, '_id.month': 1 } }]),
+      Expense.aggregate([{ $match: { ...match, date: { $gte: new Date(Date.now() - 90 * 86400000) } } }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }, totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 }, dayOfWeek: { $first: { $dayOfWeek: '$date' } } } }, { $sort: { _id: 1 } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: { year: { $year: '$date' }, week: { $week: '$date' } }, totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 }, startDate: { $min: '$date' }, endDate: { $max: '$date' } } }, { $sort: { '_id.year': 1, '_id.week': 1 } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: '$tripId', totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 } } }, { $sort: { totalAmount: -1 } }, { $limit: 10 }, { $lookup: { from: 'trips', localField: '_id', foreignField: '_id', as: 'trip' } }, { $unwind: { path: '$trip', preserveNullAndEmptyArrays: true } }, { $project: { tripId: '$_id', tripTitle: { $ifNull: ['$trip.title', 'Unknown'] }, totalAmount: 1, count: 1, startDate: '$trip.startDate', endDate: '$trip.endDate', status: '$trip.status', memberCount: { $size: { $ifNull: ['$trip.members', []] } } } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: { $dayOfWeek: '$date' }, totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: { $hour: '$date' }, totalAmount: { $sum: '$splits.amountBase' }, count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $sort: { 'splits.amountBase': -1 } }, { $limit: 1 }]),
+      Expense.aggregate([{ $match: match }, { $unwind: '$splits' }, { $match: splitMatch }, { $sort: { 'splits.amountBase': 1 } }, { $limit: 1 }]),
     ]);
 
     const totalSpent = summaryResult[0]?.totalSpent || 0;
@@ -153,8 +155,10 @@ export const analyticsService = {
     // Median calculation
     const medianResult = await Expense.aggregate([
       { $match: match },
-      { $sort: { amountBase: 1 } },
-      { $group: { _id: null, amounts: { $push: '$amountBase' } } },
+      { $unwind: '$splits' },
+      { $match: splitMatch },
+      { $sort: { 'splits.amountBase': 1 } },
+      { $group: { _id: null, amounts: { $push: '$splits.amountBase' } } },
     ]);
     const amounts = medianResult[0]?.amounts || [];
     const median = amounts.length > 0 ? amounts[Math.floor(amounts.length / 2)] : 0;
@@ -172,7 +176,7 @@ export const analyticsService = {
       const prevStart = new Date(start.getTime() - duration);
       const prevEnd = new Date(start.getTime() - 1);
       const prevMatch = buildUserMatch(userId, { startDate: prevStart.toISOString(), endDate: prevEnd.toISOString() });
-      const [prevResult] = await Expense.aggregate([{ $match: prevMatch }, { $group: { _id: null, totalSpent: { $sum: '$amountBase' }, totalExpenses: { $sum: 1 } } }]);
+      const [prevResult] = await Expense.aggregate([{ $match: prevMatch }, { $unwind: '$splits' }, { $match: splitMatch }, { $group: { _id: null, totalSpent: { $sum: '$splits.amountBase' }, totalExpenses: { $sum: 1 } } }]);
       const prevTotal = prevResult?.totalSpent || 0;
       const change = prevTotal > 0 ? parseFloat((((totalSpent - prevTotal) / prevTotal) * 100).toFixed(1)) : totalSpent > 0 ? 100 : 0;
       periodComparison = {
@@ -200,8 +204,8 @@ export const analyticsService = {
       highestExpense: highestExpense[0] ? {
         _id: highestExpense[0]._id.toString(),
         title: highestExpense[0].title,
-        amountBase: highestExpense[0].amountBase,
-        amountLocal: highestExpense[0].amountLocal,
+        amountBase: highestExpense[0].splits.amountBase, // Now showing user's share!
+        amountLocal: highestExpense[0].splits.amountLocal, // User's share
         currency: highestExpense[0].localCurrency,
         date: highestExpense[0].date?.toISOString(),
         paidByName: highestExpense[0].paidByName,
@@ -210,8 +214,8 @@ export const analyticsService = {
       lowestExpense: lowestExpense[0] ? {
         _id: lowestExpense[0]._id.toString(),
         title: lowestExpense[0].title,
-        amountBase: lowestExpense[0].amountBase,
-        amountLocal: lowestExpense[0].amountLocal,
+        amountBase: lowestExpense[0].splits.amountBase, // User's share
+        amountLocal: lowestExpense[0].splits.amountLocal, // User's share
         currency: lowestExpense[0].localCurrency,
         date: lowestExpense[0].date?.toISOString(),
         paidByName: lowestExpense[0].paidByName,
@@ -281,7 +285,7 @@ export const analyticsService = {
     if (!trip) throw new AppError('Trip not found', 404);
     if (!trip.isMember(userId)) throw new AppError('Access denied', 403);
 
-    const match: any = { tripId: new Types.ObjectId(tripId) };
+    const match: any = { tripId: new Types.ObjectId(tripId), isArchived: false };
     const dateFilter = buildDateFilter(filters.startDate, filters.endDate);
     if (dateFilter) match.date = dateFilter;
     if (filters.category) match.category = filters.category;
@@ -521,6 +525,7 @@ export const analyticsService = {
     const match = {
       $or: [{ paidBy: userId }, { 'splits.userId': userId }],
       date: { $gte: startDate, $lte: endDate },
+      isArchived: false,
     };
 
     const [monthlyData, categoryData, quarterlyData, prevYearData] = await Promise.all([

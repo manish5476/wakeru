@@ -164,13 +164,15 @@ export const dashboardService = {
                 .sort({ endDate: -1 })
                 .limit(3)
                 .lean(),
-            // Pending settlements count
-            Expense.countDocuments({
-                isArchived: false,
-                isSettled: false,
-                $or: [{ paidBy: userId }, { 'splits.userId': userId }],
+            // Pending settlements — count from the settlements transactions collection,
+            // consistent with what the Settlements page (getMySettlements) shows.
+            // Uses net-balance calculated transactions, NOT raw expense split flags.
+            Settlement.countDocuments({
+                $or: [
+                    { transactions: { $elemMatch: { from: userId, status: { $in: ['pending', 'initiated'] } } } },
+                    { transactions: { $elemMatch: { to: userId, status: { $in: ['pending', 'initiated'] } } } },
+                ],
             }),
-            // Recent expenses (last 10)
             Expense.find(userFilter)
                 .sort({ date: -1 })
                 .limit(10)
