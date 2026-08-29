@@ -26,6 +26,7 @@ router.get('/incoming', remindersController.getIncomingReminders);
 router.get('/trip/:tripId', loadTrip(), requireMember, remindersController.getTripReminders);
 
 // Manage reminders
+router.patch('/:reminderId/complete', validate(reminderParamSchema, 'params'), remindersController.complete);
 router.patch('/:reminderId/pause', validate(reminderParamSchema, 'params'), remindersController.pause);
 router.patch('/:reminderId/resume', validate(reminderParamSchema, 'params'), remindersController.resume);
 router.delete('/:reminderId', validate(reminderParamSchema, 'params'), remindersController.cancel);

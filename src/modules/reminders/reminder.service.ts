@@ -68,6 +68,7 @@ export const reminderService = {
             channels?: Partial<{ inApp: boolean; push: boolean; email: boolean; sms: boolean }>;
             maxTriggers?: number;
             nextTriggerAt?: Date;
+            metadata?: Record<string, any>;
         }
     ): Promise<IReminder> {
         let tripName: string | undefined;
@@ -120,6 +121,7 @@ export const reminderService = {
             maxTriggers: data.maxTriggers || 10,
             status: 'active',
             triggerCount: 0,
+            metadata: data.metadata,
         });
 
         await reminder.save();
@@ -157,6 +159,14 @@ export const reminderService = {
             escalateToGroup: true,
             channels: { push: true, email: true },
             maxTriggers: 7,
+            metadata: {
+                amount,
+                currency,
+                tripId,
+                expenseId,
+                payerId: toUid,
+                receiverId: fromUid,
+            },
         });
     },
 
@@ -442,6 +452,43 @@ export const reminderService = {
         return reminder;
     },
 
+    async complete(reminderId: string, userId: string): Promise<IReminder> {
+        const reminder = await Reminder.findById(reminderId);
+        if (!reminder) throw new AppError('Reminder not found', 404);
+
+        // Authorization: only the creator (userId) or target recipient (targetUserId) can complete it
+        const isOwner = reminder.userId === userId;
+        const isTarget = reminder.targetUserId === userId;
+        if (!isOwner && !isTarget) {
+            throw new AppError('You are not authorized to complete this reminder', 403);
+        }
+
+        // Idempotency: if already completed, return as-is
+        if (reminder.status === 'completed') {
+            return reminder;
+        }
+
+        // Atomic update: only update if active or paused
+        const updated = await Reminder.findOneAndUpdate(
+            { _id: reminderId, status: { $in: ['active', 'paused'] } },
+            {
+                $set: {
+                    status: 'completed',
+                    completedAt: new Date(),
+                },
+            },
+            { new: true }
+        );
+
+        if (!updated) {
+            const current = await Reminder.findById(reminderId);
+            return current || reminder;
+        }
+
+        logger.info(`Reminder ${reminderId} completed by user ${userId}`);
+        return updated;
+    },
+
     async cancel(reminderId: string, userId: string, reason?: string): Promise<IReminder> {
         const reminder = await Reminder.findOne({ _id: reminderId, userId });
         if (!reminder) throw new AppError('Reminder not found', 404);
@@ -450,6 +497,70 @@ export const reminderService = {
         reminder.cancelledReason = reason;
         await reminder.save();
         return reminder;
+    },
+
+    /**
+     * Auto-complete reminders upon financial settlement/payment confirmation.
+     * Only completes reminders matching this satisfied payment obligation.
+     */
+    async completeSettlementReminders(
+        tripId: string,
+        settlementId: Types.ObjectId | string,
+        payerUid: string,
+        receiverUid: string,
+        transactionId?: string,
+        isFullySettled: boolean = false
+    ): Promise<number> {
+        const now = new Date();
+        const orConditions: any[] = [
+            {
+                settlementId: new Types.ObjectId(settlementId),
+                targetUserId: payerUid,
+                userId: receiverUid,
+            },
+            {
+                tripId: new Types.ObjectId(tripId),
+                targetUserId: payerUid,
+                userId: receiverUid,
+                type: { $in: ['settlement', 'payment'] },
+            },
+        ];
+
+        if (transactionId) {
+            orConditions.push({ 'metadata.transactionId': transactionId });
+        }
+
+        const query = {
+            status: { $in: ['active', 'paused'] },
+            $or: orConditions,
+        };
+
+        const result = await Reminder.updateMany(query, {
+            $set: {
+                status: 'completed',
+                completedAt: now,
+            },
+        });
+
+        // If the entire trip is fully settled, also complete any general trip-level settlement reminders
+        if (isFullySettled) {
+            await Reminder.updateMany(
+                {
+                    tripId: new Types.ObjectId(tripId),
+                    type: { $in: ['settlement', 'trip_ending'] },
+                    status: { $in: ['active', 'paused'] },
+                },
+                {
+                    $set: {
+                        status: 'completed',
+                        completedAt: now,
+                    },
+                }
+            );
+        }
+
+        logger.info(`Completed ${result.modifiedCount} reminder(s) upon settlement confirmation for trip ${tripId}`);
+        return result.modifiedCount;
     },
 
     async getUserReminders(

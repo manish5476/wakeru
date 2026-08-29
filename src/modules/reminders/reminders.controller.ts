@@ -74,6 +74,14 @@ export const remindersController = {
                 title: expenseTitle ? `Payment: ${expenseTitle}` : `Payment for ${tripName || 'trip'}`,
                 message: message || `Reminder sent to settle ₹${amount || 0} for ${tripName || 'trip'}.`,
                 frequency: 'once',
+                metadata: {
+                    amount,
+                    currency: 'INR',
+                    tripName,
+                    expenseTitle,
+                    payerId: targetUserId,
+                    receiverId: userId,
+                },
             });
 
             // Create notification for target user
@@ -168,6 +176,19 @@ export const remindersController = {
     // ============================================================
     // MANAGE
     // ============================================================
+
+    /** PATCH /api/v1/reminders/:reminderId/complete */
+    async complete(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = getUser(req);
+            const reminder = await reminderService.complete(req.params.reminderId, userId);
+            res.status(200).json({
+                success: true,
+                message: 'Reminder completed',
+                data: { reminder }
+            });
+        } catch (err) { next(err); }
+    },
 
     /** PATCH /api/v1/reminders/:reminderId/pause */
     async pause(req: Request, res: Response, next: NextFunction) {

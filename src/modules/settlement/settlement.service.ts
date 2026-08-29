@@ -572,6 +572,21 @@ const confirmPaymentWithoutSession = async (
 
   await settlement.save();
 
+  // Auto-complete matching active payment/settlement reminders for this obligation
+  try {
+    const { reminderService } = await import('../reminders/reminder.service');
+    await reminderService.completeSettlementReminders(
+      tripId,
+      settlement._id,
+      txn.from,
+      txn.to,
+      (txn as any)._id?.toString(),
+      settlement.isFullySettled
+    );
+  } catch (reminderErr) {
+    logger.error('Failed to auto-complete settlement reminders:', reminderErr);
+  }
+
   // Also emit persistent notification (offline users will see it later)
   notificationService.notifySettlementCompleted(
     txn.from,
@@ -757,6 +772,21 @@ export const confirmPayment = async (
       achievementService.onSettlementConfirmed(tripId, from, to).catch(err => {
         logger.error('Failed to process achievements on settlement confirmed:', err);
       });
+
+      // Auto-complete matching active payment/settlement reminders for this obligation
+      try {
+        const { reminderService } = await import('../reminders/reminder.service');
+        await reminderService.completeSettlementReminders(
+          tripId,
+          resultSettlement!._id,
+          from,
+          to,
+          transactionId,
+          fullySettled
+        );
+      } catch (reminderErr) {
+        logger.error('Failed to auto-complete settlement reminders:', reminderErr);
+      }
     }
 
     return resultSettlement!;
@@ -1351,12 +1381,14 @@ export const remindPayer = async (
   }
 
   // Create reminder document
+  const trip = await Trip.findById(settlement.tripId).select('title').lean();
+
   await Reminder.create({
     userId: reminderSenderUid,
     targetUserId: txn.from,
     targetUserName: txn.fromName,
     tripId: settlement.tripId,
-    tripName: undefined,
+    tripName: trip?.title,
     settlementId: settlement._id,
     type: 'settlement',
     title: `Payment Reminder`,
@@ -1364,7 +1396,15 @@ export const remindPayer = async (
     frequency: 'once',
     nextTriggerAt: new Date(),
     channels: { inApp: true, push: true, email: false, sms: false },
-    metadata: { transactionId, tripId, amount: txn.amountBase },
+    metadata: {
+      transactionId: (txn as any)._id?.toString() || transactionId,
+      tripId: settlement.tripId?.toString(),
+      tripName: trip?.title,
+      amount: txn.amountBase,
+      currency: txn.baseCurrency,
+      payerId: txn.from,
+      receiverId: txn.to,
+    },
   });
 
   // Real-time socket notification to the payer
