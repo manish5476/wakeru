@@ -814,7 +814,16 @@ export const approveJoinRequest = async (
   if (!joinRequest) throw new AppError('Join request not found', 404);
   if (joinRequest.status !== 'pending') throw new AppError(`Request already ${joinRequest.status}`, 400);
 
-  const trip = await getTripById(joinRequest.tripId.toString(), requestingUserId);
+  let trip: ITrip;
+  try {
+    trip = await getTripById(joinRequest.tripId.toString(), requestingUserId);
+  } catch (err: any) {
+    if (err?.statusCode === 404 || err?.message?.includes('not found')) {
+      await JoinRequest.deleteOne({ _id: joinRequest._id });
+      throw new AppError('This trip no longer exists. The request has been removed.', 404);
+    }
+    throw err;
+  }
   if (!trip.isAdmin(requestingUserId)) {
     throw new AppError('Only admins can approve join requests', 403);
   }
@@ -827,7 +836,7 @@ export const approveJoinRequest = async (
 
   // Add the member
   const existingMember = trip.members.find(
-    (m) => m.userId === joinRequest.userId && !m.isActive
+    (m: any) => m.userId === joinRequest.userId && !m.isActive
   );
 
   if (existingMember) {
@@ -882,7 +891,16 @@ export const rejectJoinRequest = async (
   if (!joinRequest) throw new AppError('Join request not found', 404);
   if (joinRequest.status !== 'pending') throw new AppError(`Request already ${joinRequest.status}`, 400);
 
-  const trip = await getTripById(joinRequest.tripId.toString(), requestingUserId);
+  let trip: any;
+  try {
+    trip = await getTripById(joinRequest.tripId.toString(), requestingUserId);
+  } catch (err: any) {
+    if (err?.statusCode === 404 || err?.message?.includes('not found')) {
+      await JoinRequest.deleteOne({ _id: joinRequest._id });
+      return { message: 'Request removed because trip no longer exists' } as any;
+    }
+    throw err;
+  }
   if (!trip.isAdmin(requestingUserId)) {
     throw new AppError('Only admins can reject join requests', 403);
   }

@@ -102,10 +102,16 @@ export const computeMinimumTransactions = (
 // CALCULATE SETTLEMENT
 // ============================================================
 
+const inFlightCalculations = new Map<string, Promise<ISettlement>>();
+
 export const calculateSettlement = async (
   tripId: string,
   requestingUid: string
 ): Promise<ISettlement> => {
+  const running = inFlightCalculations.get(tripId);
+  if (running) return running;
+
+  const calcPromise = (async () => {
   const trip = await Trip.findById(tripId);
   if (!trip) throw new AppError('Trip not found', 404);
   if (!trip.isMember(requestingUid)) {
@@ -117,7 +123,9 @@ export const calculateSettlement = async (
     tripId: new Types.ObjectId(tripId),
     isSettled: false,
     isArchived: false,
-  }).lean();
+  })
+    .select('paidBy splits')
+    .lean();
 
   // Build member display name lookup
   const memberMap = new Map<string, string>();
@@ -281,6 +289,14 @@ export const calculateSettlement = async (
   );
 
   return settlement;
+  })();
+
+  inFlightCalculations.set(tripId, calcPromise);
+  try {
+    return await calcPromise;
+  } finally {
+    inFlightCalculations.delete(tripId);
+  }
 };
 
 // ============================================================
@@ -1021,21 +1037,45 @@ export const getMySettlements = async (
   userId: string,
   status?: string
 ) => {
-  const query: any = {
-    $or: [
-      { 'transactions.from': userId },
-      { 'transactions.to': userId },
-    ],
-  };
+  const userTrips = await Trip.find({
+    'members.userId': userId,
+    'members.isActive': true,
+    isDeleted: { $ne: true },
+  })
+    .select('_id title')
+    .lean();
 
-  const settlements = await Settlement.find(query)
+  const tripIds = userTrips.map((t) => t._id);
+
+  const settlements = await Settlement.find({
+    tripId: { $in: tripIds },
+  })
     .populate('tripId', 'title')
     .lean();
 
-  const myTransactions = settlements.flatMap((s: any) =>
-    s.transactions
+  const settlementMap = new Map(
+    settlements.map((s: any) => [s.tripId?._id?.toString() || s.tripId?.toString(), s])
+  );
+
+  const freshSettlements = await Promise.all(
+    userTrips.map(async (trip) => {
+      const s = settlementMap.get(trip._id.toString());
+      if (!s || s.isStale) {
+        return calculateSettlement(trip._id.toString(), userId);
+      }
+      return s;
+    })
+  );
+
+  const myTransactions = freshSettlements.flatMap((s: any) =>
+    (s.transactions || [])
       .filter(
         (t: any) =>
+          t &&
+          typeof t.amountBase === 'number' &&
+          t.amountBase > 0 &&
+          Boolean(t.from) &&
+          Boolean(t.to) &&
           (t.from === userId || t.to === userId) &&
           (!status || t.status === status)
       )

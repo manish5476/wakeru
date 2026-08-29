@@ -120,7 +120,10 @@ export const invitationService = {
 
         // Load trip
         const trip = await Trip.findById(invitation.tripId);
-        if (!trip) throw new AppError('Trip not found', 404);
+        if (!trip || trip.isArchived) {
+            await Invitation.deleteOne({ _id: invitation._id });
+            throw new AppError('This trip no longer exists. The invitation has been removed.', 404);
+        }
         if (trip.isArchived) throw new AppError('Trip is archived', 400);
 
         // Get user info
@@ -180,6 +183,28 @@ export const invitationService = {
             invitation.tripTitle,
             invitation.tripId.toString()
         );
+
+        // ✅ Mark receiver's invitation notification as resolved & non-actionable
+        const { Notification } = await import('../notification/notification.model');
+        await Notification.updateMany(
+            {
+                userId: userId,
+                $or: [
+                    { 'data.invitationId': invitation._id.toString() },
+                    { 'data.invitationId': invitation._id },
+                    { 'data.tripId': invitation.tripId.toString(), type: 'TRIP_INVITATION' }
+                ]
+            },
+            {
+                $set: {
+                    isRead: true,
+                    isActionable: false,
+                    actionButtons: [],
+                    message: `You joined "${invitation.tripTitle}"`,
+                    readAt: new Date()
+                }
+            }
+        );
     },
 
     /**
@@ -193,6 +218,12 @@ export const invitationService = {
         }
         if (invitation.status !== 'pending') {
             throw new AppError(`Invitation is already ${invitation.status}`, 400);
+        }
+
+        const trip = await Trip.findById(invitation.tripId);
+        if (!trip || trip.isArchived) {
+            await Invitation.deleteOne({ _id: invitation._id });
+            return;
         }
 
         invitation.status = 'declined';
@@ -219,18 +250,65 @@ export const invitationService = {
             invitation.tripTitle,
             invitation.tripId.toString()
         );
+
+        // ✅ Mark receiver's invitation notification as resolved & non-actionable
+        const { Notification } = await import('../notification/notification.model');
+        await Notification.updateMany(
+            {
+                userId: userId,
+                $or: [
+                    { 'data.invitationId': invitation._id.toString() },
+                    { 'data.invitationId': invitation._id },
+                    { 'data.tripId': invitation.tripId.toString(), type: 'TRIP_INVITATION' }
+                ]
+            },
+            {
+                $set: {
+                    isRead: true,
+                    isActionable: false,
+                    actionButtons: [],
+                    message: `You declined the invitation to "${invitation.tripTitle}"`,
+                    readAt: new Date()
+                }
+            }
+        );
     },
 
     /**
      * Get pending invitations for a user.
      */
     async getPendingInvitations(userId: string): Promise<IInvitation[]> {
-        return Invitation.find({
+        const invites = await Invitation.find({
             toUserId: userId,
             status: 'pending',
         })
             .sort({ createdAt: -1 })
             .exec();
+
+        if (!invites.length) return [];
+
+        const tripIds = invites.map((i) => i.tripId);
+        const existingTrips = await Trip.find({
+            _id: { $in: tripIds },
+            isArchived: { $ne: true },
+        })
+            .select('_id title')
+            .lean();
+
+        const existingTripMap = new Map(
+            existingTrips.map((t) => [t._id.toString(), t])
+        );
+
+        // Auto-cleanup orphan invitations where trip is deleted or not found
+        const orphanIds = invites
+            .filter((i) => !existingTripMap.has(i.tripId.toString()))
+            .map((i) => i._id);
+
+        if (orphanIds.length > 0) {
+            await Invitation.deleteMany({ _id: { $in: orphanIds } });
+        }
+
+        return invites.filter((i) => existingTripMap.has(i.tripId.toString()));
     },
 
     /**

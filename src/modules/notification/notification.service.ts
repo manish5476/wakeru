@@ -176,7 +176,7 @@ export class NotificationService {
     if (category) query.category = category;
     if (priority) query.priority = priority;
 
-    const [notifications, total, unreadCount] = await Promise.all([
+    const [rawNotifications, total, unreadCount] = await Promise.all([
       Notification.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -185,6 +185,46 @@ export class NotificationService {
       Notification.countDocuments(query),
       Notification.countDocuments({ userId, isRead: false }),
     ]);
+
+    // Check actionable TRIP_INVITATION notifications to ensure underlying invitations are still pending
+    const actionableInvNotifs = rawNotifications.filter(
+      (n: any) => n.type === 'TRIP_INVITATION' && n.isActionable
+    );
+
+    if (actionableInvNotifs.length > 0) {
+      const { Invitation } = await import('../trips/invitation.model');
+      const invIds = actionableInvNotifs
+        .map((n: any) => n.data?.invitationId)
+        .filter(Boolean);
+
+      const pendingInvites = await Invitation.find({
+        _id: { $in: invIds },
+        status: 'pending',
+      }).select('_id').lean();
+
+      const pendingSet = new Set(pendingInvites.map((i: any) => i._id.toString()));
+      const resolvedNotifIds: any[] = [];
+
+      for (const notif of rawNotifications as any[]) {
+        if (notif.type === 'TRIP_INVITATION' && notif.isActionable) {
+          const invId = notif.data?.invitationId?.toString();
+          if (!invId || !pendingSet.has(invId)) {
+            notif.isActionable = false;
+            notif.actionButtons = [];
+            resolvedNotifIds.push(notif._id);
+          }
+        }
+      }
+
+      if (resolvedNotifIds.length > 0) {
+        await Notification.updateMany(
+          { _id: { $in: resolvedNotifIds } },
+          { $set: { isActionable: false, actionButtons: [] } }
+        );
+      }
+    }
+
+    const notifications = rawNotifications;
 
     return {
       notifications,
