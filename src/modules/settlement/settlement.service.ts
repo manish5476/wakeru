@@ -1166,8 +1166,8 @@ export const getSettlementHistory = async (
 ) => {
   const settlement = await getSettlement(tripId, requestingUid);
 
-  return [...settlement.history].sort(
-    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+  return [...(settlement.history || [])].sort(
+    (a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
 };
 
