@@ -1097,7 +1097,11 @@ export const deleteExpensePermanent = async (
     );
   }
 
-  await expense.deleteOne();
+  const { Reminder } = await import('../reminders/reminder.model');
+  await Promise.all([
+    expense.deleteOne(),
+    Reminder.deleteMany({ expenseId: expense._id })
+  ]);
 };
 
 // ============================================================

@@ -149,15 +149,17 @@ export const calculateSettlement = async (
         balanceMap.set(split.userId, current - split.amountBase);
         unpaidAmount += split.amountBase;
 
-        // Track who owes whom at the expense level
-        if (!debtExplanations.has(split.userId)) {
-          debtExplanations.set(split.userId, new Map());
+        // Track who owes whom at the expense level (only between different users)
+        if (split.userId !== expense.paidBy) {
+          if (!debtExplanations.has(split.userId)) {
+            debtExplanations.set(split.userId, new Map());
+          }
+          const payerDebt = debtExplanations.get(split.userId)!;
+          payerDebt.set(
+            expense.paidBy,
+            (payerDebt.get(expense.paidBy) ?? 0) + split.amountBase
+          );
         }
-        const payerDebt = debtExplanations.get(split.userId)!;
-        payerDebt.set(
-          expense.paidBy,
-          (payerDebt.get(expense.paidBy) ?? 0) + split.amountBase
-        );
       }
     }
 

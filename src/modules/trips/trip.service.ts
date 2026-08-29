@@ -342,6 +342,7 @@ export const deleteTripPermanent = async (trip: ITrip, userId: string): Promise<
   const { Invitation } = await import('./invitation.model');
   const { JoinRequest } = await import('./join_request.model');
   const { Notification } = await import('../notification/notification.model');
+  const { Reminder } = await import('../reminders/reminder.model');
 
   await Promise.all([
     Expense.deleteMany({ tripId: trip._id }),
@@ -350,6 +351,7 @@ export const deleteTripPermanent = async (trip: ITrip, userId: string): Promise<
     Invitation.deleteMany({ tripId: trip._id }),
     JoinRequest.deleteMany({ tripId: trip._id }),
     Notification.deleteMany({ 'data.tripId': trip._id.toString() }),
+    Reminder.deleteMany({ tripId: trip._id }),
     Trip.deleteOne({ _id: trip._id })
   ]);
 };
