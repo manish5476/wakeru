@@ -9,8 +9,10 @@ export type PaymentStatus = 'pending' | 'initiated' | 'confirmed' | 'disputed' |
 export interface ISettlementTransaction {
   from: string;           // Firebase UID — who pays
   fromName: string;       // Denormalized
+  fromEmail?: string;     // Denormalized
   to: string;             // Firebase UID — who receives
   toName: string;         // Denormalized
+  toEmail?: string;       // Denormalized
   amountBase: number;     // Amount in trip's baseCurrency
   baseCurrency: string;
   status: PaymentStatus;
@@ -67,8 +69,10 @@ const transactionSchema = new Schema<ISettlementTransaction>(
   {
     from: { type: String, required: true, index: true },
     fromName: { type: String, required: true },
+    fromEmail: { type: String },
     to: { type: String, required: true, index: true },
     toName: { type: String, required: true },
+    toEmail: { type: String },
     amountBase: { type: Number, required: true, min: 0 },
     baseCurrency: { type: String, required: true, uppercase: true },
     status: {

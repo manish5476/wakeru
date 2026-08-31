@@ -179,18 +179,32 @@ export const calculateSettlement = async (
   // Run minimum transaction algorithm
   const minTransactions = computeMinimumTransactions(netBalances);
 
-  // Get UPI IDs for all recipients
-  const receiverIds = minTransactions.map((t) => t.to);
-  const receivers = await User.find({
-    firebaseUid: { $in: receiverIds },
+  // Get UPI IDs and Email IDs for all recipients & participants (supporting both Firebase UID and UUID _id)
+  const participantUids = Array.from(new Set(minTransactions.flatMap((t) => [t.from, t.to])));
+  const users = await User.find({
+    $or: [
+      { firebaseUid: { $in: participantUids } },
+      { _id: { $in: participantUids } },
+    ],
     isActive: true,
     isDeleted: false,
   })
-    .select('firebaseUid bankingDetails.upiId displayName')
+    .select('firebaseUid _id email bankingDetails.upiId displayName')
     .lean();
-  const upiMap = new Map(
-    receivers.map((r: any) => [r.firebaseUid, r.bankingDetails?.upiId])
-  );
+
+  const upiMap = new Map();
+  const emailMap = new Map();
+  users.forEach((u: any) => {
+    if (u.firebaseUid) {
+      if (u.bankingDetails?.upiId) upiMap.set(u.firebaseUid, u.bankingDetails.upiId);
+      if (u.email) emailMap.set(u.firebaseUid, u.email);
+    }
+    if (u._id) {
+      const idStr = String(u._id);
+      if (u.bankingDetails?.upiId) upiMap.set(idStr, u.bankingDetails.upiId);
+      if (u.email) emailMap.set(idStr, u.email);
+    }
+  });
 
   // Preserve lifecycle state for existing transactions
   const existingSettlement = await Settlement.findOne({
@@ -220,8 +234,10 @@ export const calculateSettlement = async (
       return {
         from: t.from,
         fromName: t.fromName,
+        fromEmail: emailMap.get(t.from) || prior.fromEmail,
         to: t.to,
         toName: t.toName,
+        toEmail: emailMap.get(t.to) || prior.toEmail,
         amountBase: t.amount,
         baseCurrency: trip.baseCurrency,
         status: prior.status,
@@ -249,8 +265,10 @@ export const calculateSettlement = async (
     return {
       from: t.from,
       fromName: t.fromName,
+      fromEmail: emailMap.get(t.from),
       to: t.to,
       toName: t.toName,
+      toEmail: emailMap.get(t.to),
       amountBase: t.amount,
       baseCurrency: trip.baseCurrency,
       status: 'pending' as const,
@@ -317,6 +335,39 @@ export const getSettlement = async (
     return calculateSettlement(tripId, requestingUid);
   }
 
+  // Ensure fromEmail and toEmail are populated even on pre-existing settlements
+  const needsEmail = existing.transactions.some((t) => !t.fromEmail || !t.toEmail);
+  if (needsEmail) {
+    const participantUids = Array.from(
+      new Set(existing.transactions.flatMap((t) => [t.from, t.to]))
+    );
+    const users = await User.find({
+      $or: [
+        { firebaseUid: { $in: participantUids } },
+        { _id: { $in: participantUids } },
+      ],
+      isActive: true,
+      isDeleted: false,
+    })
+      .select('firebaseUid _id email')
+      .lean();
+
+    const emailMap = new Map();
+    users.forEach((u: any) => {
+      if (u.firebaseUid && u.email) emailMap.set(u.firebaseUid, u.email);
+      if (u._id && u.email) emailMap.set(String(u._id), u.email);
+    });
+
+    for (const txn of existing.transactions) {
+      if (!txn.fromEmail && emailMap.has(txn.from)) {
+        txn.fromEmail = emailMap.get(txn.from);
+      }
+      if (!txn.toEmail && emailMap.has(txn.to)) {
+        txn.toEmail = emailMap.get(txn.to);
+      }
+    }
+  }
+
   return existing;
 };
 
@@ -350,6 +401,7 @@ export const getSettlementSummary = async (
     .map((t) => ({
       to: t.to,
       toName: t.toName,
+      toEmail: t.toEmail,
       amount: t.amountBase,
       status: t.status,
       upiDeepLink: t.upiDeepLink,
@@ -361,6 +413,7 @@ export const getSettlementSummary = async (
     .map((t) => ({
       from: t.from,
       fromName: t.fromName,
+      fromEmail: t.fromEmail,
       amount: t.amountBase,
       status: t.status,
       transactionId: (t as any)._id,
@@ -433,7 +486,7 @@ export const initiatePayment = async (
   }
 
   const recipient = await User.findOne({
-    firebaseUid: txn.to,
+    $or: [{ firebaseUid: txn.to }, { _id: txn.to }],
     isActive: true,
     isDeleted: false,
   })
@@ -1069,7 +1122,7 @@ export const getMySettlements = async (
     })
   );
 
-  const myTransactions = freshSettlements.flatMap((s: any) =>
+  const rawTransactions = freshSettlements.flatMap((s: any) =>
     (s.transactions || [])
       .filter(
         (t: any) =>
@@ -1088,6 +1141,33 @@ export const getMySettlements = async (
         settlementId: s._id,
       }))
   );
+
+  // Collect participant UIDs and fetch email addresses
+  const allParticipantUids = Array.from(
+    new Set(rawTransactions.flatMap((t: any) => [t.from, t.to]))
+  );
+  const users = await User.find({
+    $or: [
+      { firebaseUid: { $in: allParticipantUids } },
+      { _id: { $in: allParticipantUids } },
+    ],
+    isActive: true,
+    isDeleted: false,
+  })
+    .select('firebaseUid _id email')
+    .lean();
+
+  const emailMap = new Map();
+  users.forEach((u: any) => {
+    if (u.firebaseUid && u.email) emailMap.set(u.firebaseUid, u.email);
+    if (u._id && u.email) emailMap.set(String(u._id), u.email);
+  });
+
+  const myTransactions = rawTransactions.map((t: any) => ({
+    ...t,
+    fromEmail: t.fromEmail || emailMap.get(t.from),
+    toEmail: t.toEmail || emailMap.get(t.to),
+  }));
 
   return {
     transactions: myTransactions,
