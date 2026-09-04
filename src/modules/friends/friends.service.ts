@@ -4,6 +4,7 @@ import { User } from '../auth/auth.model';
 import { Trip } from '../trips/trip.model';
 import { Expense } from '../expense/expense.model';
 import { Settlement } from '../settlement/settlement.model';
+import { calculateSettlement } from '../settlement/settlement.service';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
@@ -335,30 +336,43 @@ export const friendsService = {
             });
         });
 
-        // Compute balances with friends
-        const sharedExpenses = await Expense.find({
-            isArchived: false,
-            isSettled: false,
-            $and: [
-                { $or: [{ paidBy: userId }, { 'splits.userId': userId }] },
-                { $or: [{ paidBy: { $in: friendFirebaseUids } }, { 'splits.userId': { $in: friendFirebaseUids } }] },
-            ],
-        }).select('paidBy splits amountBase').lean();
+        // Compute balances with friends from active Settlement records
+        const userTripIds = userTrips.map((t: any) => t._id);
+        const settlements = await Settlement.find({
+            tripId: { $in: userTripIds },
+        }).lean();
+
+        const settlementMap = new Map(
+            settlements.map((s: any) => [s.tripId?._id?.toString() || s.tripId?.toString(), s])
+        );
+
+        const freshSettlements = await Promise.all(
+            userTrips.map(async (trip: any) => {
+                const s = settlementMap.get(trip._id.toString());
+                if (!s || s.isStale) {
+                    try {
+                        return await calculateSettlement(trip._id.toString(), userId);
+                    } catch {
+                        return s;
+                    }
+                }
+                return s;
+            })
+        );
 
         const balanceMap = new Map<string, number>(); // friendUid -> netBalance (positive = they owe user)
-        sharedExpenses.forEach((e: any) => {
-            friendFirebaseUids.forEach(fUid => {
-                const userSplit = e.splits?.find((s: any) => s.userId === userId && !s.isPaid);
-                const friendSplit = e.splits?.find((s: any) => s.userId === fUid && !s.isPaid);
+        const friendUidSet = new Set(friendFirebaseUids);
 
-                let delta = 0;
-                if (e.paidBy === fUid && userSplit) {
-                    delta -= (userSplit.amountBase || 0); // user owes friend
-                } else if (e.paidBy === userId && friendSplit) {
-                    delta += (friendSplit.amountBase || 0); // friend owes user
-                }
-                if (delta !== 0) {
-                    balanceMap.set(fUid, (balanceMap.get(fUid) || 0) + delta);
+        freshSettlements.filter(Boolean).forEach((s: any) => {
+            (s.transactions || []).forEach((t: any) => {
+                if (t.status !== 'confirmed') {
+                    if (t.to === userId && friendUidSet.has(t.from)) {
+                        // Friend owes user
+                        balanceMap.set(t.from, (balanceMap.get(t.from) || 0) + (t.amountBase || 0));
+                    } else if (t.from === userId && friendUidSet.has(t.to)) {
+                        // User owes friend
+                        balanceMap.set(t.to, (balanceMap.get(t.to) || 0) - (t.amountBase || 0));
+                    }
                 }
             });
         });
@@ -831,6 +845,30 @@ export const friendsService = {
             ],
         }).sort({ date: -1 }).lean();
 
+        // Fetch settlements for mutual trips
+        const mutualTripIds = mutualTrips.map(t => t._id);
+        const settlements = await Settlement.find({
+            tripId: { $in: mutualTripIds },
+        }).lean();
+
+        const settlementMap = new Map(
+            settlements.map((s: any) => [s.tripId?._id?.toString() || s.tripId?.toString(), s])
+        );
+
+        const freshSettlements = await Promise.all(
+            mutualTrips.map(async (trip: any) => {
+                const s = settlementMap.get(trip._id.toString());
+                if (!s || s.isStale) {
+                    try {
+                        return await calculateSettlement(trip._id.toString(), userId);
+                    } catch {
+                        return s;
+                    }
+                }
+                return s;
+            })
+        );
+
         let expensesTogether = 0;
         let youOwe = 0;
         let theyOwe = 0;
@@ -838,18 +876,20 @@ export const friendsService = {
 
         sharedExpensesDocs.forEach((e: any) => {
             expensesTogether += (e.amountBase || 0);
+        });
 
-            if (!e.isSettled) {
-                pendingCount++;
-                const userSplit = e.splits?.find((s: any) => s.userId === userId && !s.isPaid);
-                const friendSplit = e.splits?.find((s: any) => s.userId === friendUserId && !s.isPaid);
-
-                if (e.paidBy === friendUserId && userSplit) {
-                    youOwe += (userSplit.amountBase || 0);
-                } else if (e.paidBy === userId && friendSplit) {
-                    theyOwe += (friendSplit.amountBase || 0);
+        freshSettlements.filter(Boolean).forEach((s: any) => {
+            (s.transactions || []).forEach((t: any) => {
+                if (t.status !== 'confirmed') {
+                    if (t.to === userId && t.from === friendUserId) {
+                        theyOwe += (t.amountBase || 0);
+                        pendingCount++;
+                    } else if (t.from === userId && t.to === friendUserId) {
+                        youOwe += (t.amountBase || 0);
+                        pendingCount++;
+                    }
                 }
-            }
+            });
         });
 
         const countries = new Set<string>();
@@ -863,19 +903,27 @@ export const friendsService = {
 
         // Compute per-trip stats for mutual trips
         const tripDetailsList = mutualTrips.map((t: any) => {
-            const tripExpenses = sharedExpensesDocs.filter((e: any) => e.tripId?.toString() === t._id.toString());
+            const tripSettlement = freshSettlements.find((s: any) => s && (s.tripId?._id?.toString() === t._id.toString() || s.tripId?.toString() === t._id.toString()));
             let tripYouOwe = 0;
             let tripTheyOwe = 0;
+
+            if (tripSettlement) {
+                (tripSettlement.transactions || []).forEach((txn: any) => {
+                    if (txn.status !== 'confirmed') {
+                        if (txn.from === userId && txn.to === friendUserId) {
+                            tripYouOwe += (txn.amountBase || 0);
+                        } else if (txn.from === friendUserId && txn.to === userId) {
+                            tripTheyOwe += (txn.amountBase || 0);
+                        }
+                    }
+                });
+            }
+
+            const tripExpenses = sharedExpensesDocs.filter((e: any) => e.tripId?.toString() === t._id.toString());
             let tripSharedTotal = 0;
 
             tripExpenses.forEach((e: any) => {
                 tripSharedTotal += (e.amountBase || 0);
-                if (!e.isSettled) {
-                    const uSplit = e.splits?.find((s: any) => s.userId === userId && !s.isPaid);
-                    const fSplit = e.splits?.find((s: any) => s.userId === friendUserId && !s.isPaid);
-                    if (e.paidBy === friendUserId && uSplit) tripYouOwe += (uSplit.amountBase || 0);
-                    if (e.paidBy === userId && fSplit) tripTheyOwe += (fSplit.amountBase || 0);
-                }
             });
 
             return {
