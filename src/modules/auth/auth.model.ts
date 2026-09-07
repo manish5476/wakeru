@@ -44,6 +44,7 @@ export interface IAppearancePreferences {
   backgroundType: 'color' | 'image';
   backgroundColor: string | null;
   backgroundImage: string | null;
+  fontColor?: string | null;
   backgroundBlur: number;
   backgroundImagePosition: { x: number; y: number; scale: number };
 
@@ -208,6 +209,7 @@ const AppearancePreferencesSchema = new Schema<IAppearancePreferences>(
     backgroundType: { type: String, enum: ['color', 'image'], default: 'color' },
     backgroundColor: { type: String, default: null },
     backgroundImage: { type: String, default: null },
+    fontColor: { type: String, default: null },
     backgroundBlur: { type: Number, default: 50 },
     backgroundImagePosition: {
       type: new Schema(

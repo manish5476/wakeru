@@ -79,6 +79,7 @@ export const updatePreferencesSchema = z.object({
     backgroundType: z.enum(['color', 'image']).optional(),
     backgroundColor: z.string().nullable().optional(),
     backgroundImage: z.string().nullable().optional(),
+    fontColor: z.string().nullable().optional(),
     backgroundBlur: z.number().min(0).max(100).optional(),
     backgroundImagePosition: z.object({
       x: z.number(),

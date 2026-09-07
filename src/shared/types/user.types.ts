@@ -45,6 +45,7 @@ export interface IUser {
       backgroundType?: 'color' | 'image';
       backgroundColor?: string | null;
       backgroundImage?: string | null;
+      fontColor?: string | null;
       backgroundBlur?: number;
       backgroundImagePosition?: { x: number; y: number; scale: number };
     };
