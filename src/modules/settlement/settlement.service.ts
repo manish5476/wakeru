@@ -1624,6 +1624,138 @@ export const rejectPayment = async (
 };
 
 // ============================================================
+// REVERT PAYMENT (UNDO INITIATION OR CONFIRMATION)
+// ============================================================
+
+export const revertPayment = async (
+  tripId: string,
+  transactionId: string,
+  actorUid: string,
+  reason?: string
+): Promise<{ settlement: ISettlement; transaction: ISettlementTransaction }> => {
+  const settlement = await Settlement.findOne({
+    tripId: new Types.ObjectId(tripId),
+  });
+
+  if (!settlement) throw new AppError('Settlement not found', 404);
+
+  const txn = settlement.transactions.find(
+    (t) => (t as any)._id.toString() === transactionId
+  );
+
+  if (!txn) throw new AppError('Transaction not found', 404);
+
+  if (txn.status === 'pending') {
+    throw new AppError('This payment is already pending', 400);
+  }
+
+  // Authorization: Payer, Receiver, or Trip Admin can revert
+  const trip = await Trip.findById(settlement.tripId);
+  if (!trip) throw new AppError('Trip not found', 404);
+
+  const isParticipant = txn.from === actorUid || txn.to === actorUid;
+  const isAdmin = trip.isAdmin(actorUid);
+
+  if (!isParticipant && !isAdmin) {
+    throw new AppError('You are not authorized to revert this payment', 403);
+  }
+
+  const previousStatus = txn.status;
+
+  // If the transaction was confirmed, revert affected expense splits
+  if (previousStatus === 'confirmed') {
+    await Expense.updateMany(
+      {
+        tripId: new Types.ObjectId(tripId),
+        'splits.userId': txn.from,
+        paidBy: txn.to,
+      },
+      {
+        $set: {
+          'splits.$[elem].isPaid': false,
+          'splits.$[elem].paidAt': null,
+          isSettled: false,
+        },
+      },
+      {
+        arrayFilters: [{ 'elem.userId': txn.from }],
+      }
+    );
+
+    await Expense.updateMany(
+      {
+        tripId: new Types.ObjectId(tripId),
+        paidBy: txn.from,
+        'splits.userId': txn.to,
+      },
+      {
+        $set: {
+          'splits.$[elem].isPaid': false,
+          'splits.$[elem].paidAt': null,
+          isSettled: false,
+        },
+      },
+      {
+        arrayFilters: [{ 'elem.userId': txn.to }],
+      }
+    );
+
+    const affectedExpenses = await Expense.find({
+      tripId: new Types.ObjectId(tripId),
+      isSettled: true,
+    });
+
+    const toUnsettle = affectedExpenses.filter((e) =>
+      e.splits.some((s) => !s.isPaid)
+    );
+
+    if (toUnsettle.length > 0) {
+      await Expense.bulkWrite(
+        toUnsettle.map((e) => ({
+          updateOne: {
+            filter: { _id: e._id },
+            update: { $set: { isSettled: false } },
+          },
+        }))
+      );
+    }
+  }
+
+  const now = new Date();
+  txn.status = 'pending';
+  txn.initiatedAt = undefined;
+  txn.confirmedAt = undefined;
+  txn.upiDeepLink = undefined;
+  txn.rejectedAt = undefined;
+  txn.rejectionReason = undefined;
+
+  settlement.history.push({
+    action: 'payment_reverted',
+    actorUid,
+    transactionId: (txn as any)._id,
+    amount: txn.amountBase,
+    timestamp: now,
+    metadata: {
+      reason: reason || 'Payment reverted to pending',
+      previousStatus,
+      revertedBy: actorUid,
+    },
+  });
+
+  await settlement.save();
+
+  // Socket notification
+  socketServer.sendToTrip(tripId, 'settlement:updated', {
+    tripId,
+    settlementId: settlement._id.toString(),
+    action: 'payment_reverted',
+    transactionId,
+  });
+
+  return { settlement, transaction: txn };
+};
+
+// ============================================================
 // NAMESPACE EXPORT
 // ============================================================
 
@@ -1639,6 +1771,7 @@ export const settlementService = {
   settleSingle,
   remindPayer,
   rejectPayment,
+  revertPayment,
   disputePayment,
   retryPayment,
   getMySettlements,
@@ -1646,4 +1779,5 @@ export const settlementService = {
   computeMinimumTransactions,
   getSettlementHistory,
 };
+
 

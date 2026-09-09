@@ -55,6 +55,10 @@ export const rejectPaymentSchema = z.object({
   reason: z.string().min(1, 'Reason is required').max(500, 'Reason too long'),
 });
 
+export const revertPaymentSchema = z.object({
+  reason: z.string().max(500, 'Reason too long').optional(),
+});
+
 // ============================================================
 // QUERY SCHEMAS
 // ============================================================
@@ -75,4 +79,5 @@ export type DisputePaymentInput = z.infer<typeof disputePaymentSchema>;
 export type RetryPaymentInput = z.infer<typeof retryPaymentSchema>;
 export type SettleSelectedInput = z.infer<typeof settleSelectedSchema>;
 export type RejectPaymentInput = z.infer<typeof rejectPaymentSchema>;
+export type RevertPaymentInput = z.infer<typeof revertPaymentSchema>;
 export type SettlementQuery = z.infer<typeof settlementQuerySchema>;

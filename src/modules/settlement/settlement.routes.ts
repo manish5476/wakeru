@@ -13,6 +13,7 @@ import {
   settleAllSchema,
   settleSelectedSchema,
   rejectPaymentSchema,
+  revertPaymentSchema,
 } from './settlement.validation';
 
 const router = Router();
@@ -158,6 +159,14 @@ router.post(
   '/trip/:tripId/transactions/:transactionId/remind',
   validate(transactionParamSchema, 'params'),
   settlementController.remindPayer
+);
+
+// Payer/Receiver/Admin: Revert Payment (resets initiated or confirmed back to pending)
+router.post(
+  '/trip/:tripId/transactions/:transactionId/revert',
+  validate(transactionParamSchema, 'params'),
+  validate(revertPaymentSchema),
+  settlementController.revertPayment
 );
 
 export default router;

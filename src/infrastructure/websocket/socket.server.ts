@@ -1,6 +1,8 @@
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
+import { getAuth } from 'firebase-admin/auth';
+import { Types } from 'mongoose';
 import { config } from '../../config';
 import { logger } from '../../config/logger';
 import { User } from '../../modules/auth/auth.model';
@@ -14,6 +16,8 @@ import { redisClient } from '../../config/redis';
 
 interface AuthenticatedSocket extends Socket {
     userId?: string;
+    firebaseUid?: string;
+    mongoId?: string;
     userRooms?: Set<string>;
 }
 
@@ -79,7 +83,7 @@ class SocketServer {
         // Authentication middleware
         this.io.use(async (socket: AuthenticatedSocket, next) => {
             try {
-                let token = socket.handshake.auth.token || socket.handshake.query.token;
+                let token = socket.handshake.auth?.token || socket.handshake.query?.token;
 
                 if (!token) {
                     return next(new Error('Authentication token required'));
@@ -88,34 +92,56 @@ class SocketServer {
                 // Strip "Bearer " and any quotes
                 token = String(token).replace(/^Bearer\s+/, '').replace(/^["']|["']$/g, '');
 
-                const decoded = jwt.verify(token, config.JWT_SECRET) as {
-                    userId: string;
-                    type: string;
-                };
+                let targetUserId: string | null = null;
 
-                // Validate token type
-                if (decoded.type !== 'access') {
+                try {
+                    const decoded = jwt.verify(token, config.JWT_SECRET) as {
+                        userId: string;
+                        type: string;
+                    };
+                    if (decoded.type === 'access') {
+                        targetUserId = decoded.userId;
+                    }
+                } catch (jwtErr: any) {
+                    // Fallback to Firebase ID token verification
+                    try {
+                        const fbDecoded = await getAuth().verifyIdToken(token);
+                        targetUserId = fbDecoded.uid;
+                    } catch (fbErr: any) {
+                        logger.warn('Socket auth failed (both JWT & Firebase invalid):', {
+                            jwtError: jwtErr.message,
+                        });
+                        return next(new Error('Invalid authentication token'));
+                    }
+                }
+
+                if (!targetUserId) {
                     return next(new Error('Invalid token type. Use access token.'));
                 }
 
                 // Verify user exists and is active
                 const user = await User.findOne({
-                    firebaseUid: decoded.userId,
+                    $or: [
+                        { firebaseUid: targetUserId },
+                        ...(Types.ObjectId.isValid(targetUserId) ? [{ _id: targetUserId }] : [])
+                    ],
                     isActive: true,
                     isDeleted: false,
                 })
-                    .select('firebaseUid displayName photoURL')
+                    .select('_id firebaseUid displayName photoURL')
                     .lean();
 
                 if (!user) {
                     return next(new Error('User not found or deactivated'));
                 }
 
-                socket.userId = decoded.userId;
+                socket.userId = targetUserId;
+                socket.firebaseUid = user.firebaseUid;
+                socket.mongoId = (user as any)._id?.toString();
                 socket.userRooms = new Set();
                 next();
             } catch (error: any) {
-                logger.warn('Socket auth failed:', { error: error.message });
+                logger.warn('Socket auth error:', { error: error.message });
                 next(new Error('Invalid authentication token'));
             }
         });
@@ -160,6 +186,12 @@ class SocketServer {
 
         // Join user's personal room
         socket.join(`user:${userId}`);
+        if (socket.firebaseUid && socket.firebaseUid !== userId) {
+            socket.join(`user:${socket.firebaseUid}`);
+        }
+        if (socket.mongoId && socket.mongoId !== userId) {
+            socket.join(`user:${socket.mongoId}`);
+        }
 
         // Store user info on socket for quick access
         socket.data.userId = userId;

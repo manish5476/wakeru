@@ -19,6 +19,12 @@ router.use(protect);
 router.get('/pending', invitationController.getPendingInvitations);
 
 /**
+ * GET /api/v1/invitations/sent
+ * Get all pending invitations sent by the current user.
+ */
+router.get('/sent', invitationController.getSentInvitations);
+
+/**
  * POST /api/v1/invitations/send
  * Send an invitation to a user.
  */
@@ -41,5 +47,12 @@ router.post('/:invitationId/accept', invitationController.acceptInvitation);
  * Decline an invitation.
  */
 router.post('/:invitationId/decline', invitationController.declineInvitation);
+
+/**
+ * DELETE /api/v1/invitations/:invitationId
+ * Cancel/revoke a pending invitation (by sender or admin).
+ */
+router.delete('/:invitationId', invitationController.cancelInvitation);
+router.post('/:invitationId/cancel', invitationController.cancelInvitation);
 
 export default router;

@@ -524,3 +524,38 @@ export const rejectPayment = async (
     next(err);
   }
 };
+
+/**
+ * POST /api/v1/settlements/trip/:tripId/transactions/:transactionId/revert
+ * Reverts an initiated or confirmed payment back to pending status.
+ */
+export const revertPayment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const user = getUser(req);
+    const { tripId, transactionId } = req.params;
+    const { reason } = req.body || {};
+
+    const result = await settlementService.revertPayment(
+      tripId,
+      transactionId,
+      user.uid,
+      reason
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment reverted to pending successfully.',
+      data: {
+        transaction: result.transaction,
+        settlement: result.settlement,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+

@@ -595,7 +595,7 @@ export const getAdminJoinRequests = async (
 ): Promise<void> => {
   try {
     const user = getUser(req);
-    const requests = await tripService.getAdminPendingRequests(user.userId);
+    const requests = await tripService.getAdminPendingRequests(user.userId, user);
 
     res.status(200).json({
       success: true,

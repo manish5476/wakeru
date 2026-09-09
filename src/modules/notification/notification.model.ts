@@ -351,6 +351,10 @@ NotificationSchema.index({ userId: 1, priority: 1, createdAt: -1 });
 // Filter by category
 NotificationSchema.index({ userId: 1, category: 1, createdAt: -1 });
 
+// Action resolution indexes for invitations and trips
+NotificationSchema.index({ 'data.invitationId': 1 });
+NotificationSchema.index({ 'data.tripId': 1, type: 1 });
+
 // Auto-delete read notifications after 30 days (TTL index)
 NotificationSchema.index(
   { readAt: 1 },

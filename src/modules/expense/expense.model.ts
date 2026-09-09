@@ -418,6 +418,12 @@ expenseSchema.index({ isArchived: 1, paidBy: 1, date: -1 });
 // Archive-filtered trip queries (most service calls filter isArchived first)
 expenseSchema.index({ tripId: 1, isArchived: 1, date: -1 });
 
+// User involved in splits across all active trips sorted by date
+expenseSchema.index({ isArchived: 1, 'splits.userId': 1, date: -1 });
+
+// Stop-specific expenses within a trip
+expenseSchema.index({ tripId: 1, isArchived: 1, stopId: 1, date: -1 });
+
 // User expense list with pagination sort by amount
 expenseSchema.index({ tripId: 1, isArchived: 1, isSettled: 1, date: -1 });
 

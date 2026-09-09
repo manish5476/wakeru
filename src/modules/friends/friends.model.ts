@@ -138,7 +138,8 @@ const friendshipSchema = new Schema<IFriendship>(
 
 // Indexes
 friendRequestSchema.index({ fromUserId: 1, toUserId: 1 }, { unique: true });
-friendRequestSchema.index({ toUserId: 1, status: 1 });
+friendRequestSchema.index({ toUserId: 1, status: 1, createdAt: -1 });
+friendRequestSchema.index({ fromUserId: 1, status: 1, createdAt: -1 });
 friendRequestSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL auto-delete
 
 friendshipSchema.index({ user1Id: 1, user2Id: 1 }, { unique: true });

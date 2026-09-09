@@ -113,7 +113,9 @@ export const createTrip = async (
     try {
       const users = await User.find({
         $or: [
-          { _id: { $in: input.memberIds } },
+          ...(input.memberIds.filter((id) => Types.ObjectId.isValid(id)).length > 0
+            ? [{ _id: { $in: input.memberIds.filter((id) => Types.ObjectId.isValid(id)) } }]
+            : []),
           { firebaseUid: { $in: input.memberIds } }
         ],
         isActive: true,
@@ -121,19 +123,20 @@ export const createTrip = async (
       });
 
       const invitePromises = users
-        .filter((u) => u.firebaseUid !== creator.userId)
-        .map((u) =>
-          invitationService
+        .filter((u) => u.firebaseUid !== creator.userId && (u as any)._id?.toString() !== creator.userId)
+        .map((u) => {
+          const targetId = u.firebaseUid || (u as any)._id?.toString();
+          return invitationService
             .sendInvitation(
               trip._id.toString(),
-              u.firebaseUid,
+              targetId,
               creator.userId,
               `${creator.displayName} invited you to join ${trip.title}`
             )
             .catch((e: any) => {
               logger.error(`Failed to send invitation during trip creation: ${e.message}`);
-            })
-        );
+            });
+        });
 
       await Promise.allSettled(invitePromises);
     } catch (inviteErr: any) {
@@ -152,11 +155,11 @@ export const getUserTrips = async (
   userId: string,
   filters: TripFilters = {}
 ): Promise<PaginatedTrips> => {
-  // Auto-Complete Automation
-  await Trip.updateMany(
+  // Auto-Complete Automation in background so read returns immediately
+  Trip.updateMany(
     { 'members.userId': userId, status: { $in: ['active', 'planning'] }, endDate: { $lt: new Date() } },
     { $set: { status: 'completed' } }
-  );
+  ).catch((err) => logger.error('Async trip completion update failed', err));
 
   const query: Record<string, unknown> = {
     'members.userId': userId,
@@ -789,20 +792,39 @@ export const getPendingRequests = async (
  * Used on the home screen to surface requests needing attention.
  */
 export const getAdminPendingRequests = async (
-  adminUserId: string
+  adminUserId: string,
+  userContext?: { userId?: string; firebaseUid?: string }
 ): Promise<IJoinRequest[]> => {
+  const candidateIds = [adminUserId, userContext?.firebaseUid, userContext?.userId].filter(Boolean) as string[];
+
   // Find all trips where the user is an active admin
   const adminTrips = await Trip.find({
     members: {
-      $elemMatch: { userId: adminUserId, role: 'admin', isActive: true },
+      $elemMatch: { userId: { $in: candidateIds }, role: 'admin', isActive: true },
     },
     isArchived: false,
-  }).select('_id').lean();
+  }).select('_id title').lean();
 
   const tripIds = adminTrips.map((t) => t._id);
   if (tripIds.length === 0) return [];
+  const tripMap = new Map(adminTrips.map((t) => [t._id.toString(), t.title]));
 
-  return JoinRequest.find({ tripId: { $in: tripIds }, status: 'pending' }).sort({ createdAt: -1 }).lean() as unknown as IJoinRequest[];
+  const requests = await JoinRequest.find({ tripId: { $in: tripIds }, status: 'pending' })
+    .sort({ createdAt: -1 })
+    .lean() as any[];
+
+  return requests.map((req) => ({
+    ...req,
+    tripTitle: req.tripTitle || tripMap.get(req.tripId?.toString()) || 'Trip',
+    tripId: {
+      _id: req.tripId?.toString(),
+      title: req.tripTitle || tripMap.get(req.tripId?.toString()) || 'Trip',
+    },
+    user: {
+      displayName: req.userName,
+      photoURL: req.photoURL,
+    },
+  })) as unknown as IJoinRequest[];
 };
 
 /**
@@ -937,10 +959,35 @@ export const updateMemberRole = async (
     throw new AppError('You cannot change your own role', 400);
   }
 
-  const member = trip.getMember(targetUserId);
+  let member = trip.getMember(targetUserId);
+
+  if (!member) {
+    // Try resolving target user if targetUserId was Mongo _id instead of firebaseUid or vice-versa
+    const user = await User.findOne({
+      $or: [
+        { firebaseUid: targetUserId },
+        ...(Types.ObjectId.isValid(targetUserId) ? [{ _id: targetUserId }] : [])
+      ]
+    }).lean();
+
+    if (user) {
+      member = trip.members.find(
+        (m) => m.isActive && (m.userId === user.firebaseUid || m.userId === (user as any)._id?.toString())
+      );
+    }
+  }
 
   if (!member) {
     throw new AppError('Member not found in this trip', 404);
+  }
+
+  if (member.userId === requestingUserId) {
+    throw new AppError('You cannot change your own role', 400);
+  }
+
+  // Guard: cannot demote creator
+  if (member.userId === trip.createdBy && newRole !== 'admin') {
+    throw new AppError('Cannot change the role of the trip creator', 400);
   }
 
   // Guard: cannot remove last admin
@@ -958,7 +1005,15 @@ export const updateMemberRole = async (
   }
 
   member.role = newRole;
+  trip.markModified('members');
   await trip.save();
+
+  // Also perform atomic update in DB to guarantee persistence
+  await Trip.updateOne(
+    { _id: trip._id, 'members.userId': member.userId },
+    { $set: { 'members.$.role': newRole } }
+  );
+
   return trip;
 };
 

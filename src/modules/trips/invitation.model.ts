@@ -69,8 +69,10 @@ const invitationSchema = new Schema<IInvitation>(
     }
 );
 
-// Index for finding pending invitations for a user
-invitationSchema.index({ toUserId: 1, status: 1 });
+// Compound indexes for instantaneous pending and sent invitation lookups
+invitationSchema.index({ toUserId: 1, status: 1, createdAt: -1 });
+invitationSchema.index({ fromUserId: 1, status: 1, createdAt: -1 });
+invitationSchema.index({ tripId: 1, status: 1 });
 invitationSchema.index({ tripId: 1, toUserId: 1 }, { unique: true }); // One invite per user per trip
 
 export const Invitation = model<IInvitation>('Invitation', invitationSchema);

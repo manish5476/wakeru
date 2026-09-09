@@ -31,7 +31,7 @@ export interface ISettlementTransaction {
 }
 
 export interface ISettlementHistory {
-  action: 'calculated' | 'payment_initiated' | 'payment_confirmed' | 'payment_disputed' | 'payment_retried' | 'payment_rejected' | 'settle_all_initiated';
+  action: 'calculated' | 'payment_initiated' | 'payment_confirmed' | 'payment_disputed' | 'payment_retried' | 'payment_rejected' | 'settle_all_initiated' | 'payment_reverted';
   actorUid: string;
   actorName?: string;
   transactionId?: Types.ObjectId;
@@ -98,7 +98,7 @@ const settlementHistorySchema = new Schema<ISettlementHistory>(
   {
     action: {
       type: String,
-      enum: ['calculated', 'payment_initiated', 'payment_confirmed', 'payment_disputed', 'payment_retried', 'payment_rejected', 'settle_all_initiated'],
+      enum: ['calculated', 'payment_initiated', 'payment_confirmed', 'payment_disputed', 'payment_retried', 'payment_rejected', 'settle_all_initiated', 'payment_reverted'],
       required: true,
     },
     actorUid: { type: String, required: true },
