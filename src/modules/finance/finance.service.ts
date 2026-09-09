@@ -54,6 +54,7 @@ interface AnalyticsFilters {
   period?: 'week' | 'month' | 'quarter' | 'year' | 'all';
   startDate?: string;
   endDate?: string;
+  includeTripExpenses?: boolean;
 }
 
 // ============================================================
@@ -708,12 +709,12 @@ export class FinanceService {
     return budget;
   }
 
-  static async getBudget(userId: string, month: string, precomputedTotal?: number) {
+  static async getBudget(userId: string, month: string, precomputedTotal?: number, includeTripExpenses: boolean = false) {
     let budget = await Budget.findOne({ userId, month });
 
     const totalSpent = precomputedTotal !== undefined
       ? precomputedTotal
-      : await this.getTotalExpenseForMonth(userId, month);
+      : await this.getTotalExpenseForMonth(userId, month, includeTripExpenses);
 
     if (!budget) {
       budget = await Budget.create({
@@ -810,15 +811,19 @@ export class FinanceService {
     await budget.save();
   }
 
-  static async getTotalExpenseForMonth(userId: string, month: string): Promise<number> {
+  static async getTotalExpenseForMonth(userId: string, month: string, includeTripExpenses: boolean = false): Promise<number> {
     const startDate = new Date(`${month}-01T00:00:00.000Z`);
     const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const typeMatch = includeTripExpenses
+      ? { $in: ['expense', 'trip_expense', 'settlement_paid'] }
+      : 'expense';
 
     const result = await Transaction.aggregate([
       {
         $match: {
           userId,
-          type: { $in: ['expense', 'trip_expense', 'settlement_paid'] },
+          type: typeMatch,
           date: { $gte: startDate, $lte: endDate },
           isDeleted: false,
         },
@@ -1157,7 +1162,12 @@ export class FinanceService {
               },
             ],
             categorySpending: [
-              { $match: { date: { $gte: startDate, $lte: endDate }, type: { $in: ['expense', 'trip_expense'] } } },
+              {
+                $match: {
+                  date: { $gte: startDate, $lte: endDate },
+                  type: includeTripExpenses ? { $in: ['expense', 'trip_expense'] } : 'expense',
+                },
+              },
               {
                 $group: {
                   _id: '$category',
@@ -1166,7 +1176,12 @@ export class FinanceService {
               },
             ],
             dailySpending: [
-              { $match: { date: { $gte: startDate, $lte: endDate }, type: { $in: ['expense', 'trip_expense'] } } },
+              {
+                $match: {
+                  date: { $gte: startDate, $lte: endDate },
+                  type: includeTripExpenses ? { $in: ['expense', 'trip_expense'] } : 'expense',
+                },
+              },
               {
                 $group: {
                   _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
@@ -1175,7 +1190,12 @@ export class FinanceService {
               },
             ],
             recentTransactions: [
-              { $match: { date: { $gte: startDate, $lte: endDate } } },
+              {
+                $match: {
+                  date: { $gte: startDate, $lte: endDate },
+                  ...(includeTripExpenses ? {} : { type: { $in: ['expense', 'income'] } }),
+                },
+              },
               { $sort: { date: -1 } },
               { $limit: 10 },
             ],
@@ -1201,15 +1221,15 @@ export class FinanceService {
       lastByType[row._id] = row.total;
     }
 
-    const totalIncome = (currentByType['income'] || 0) + (currentByType['settlement_received'] || 0);
-    const totalExpense = (currentByType['expense'] || 0) + (currentByType['trip_expense'] || 0);
+    const totalIncome = (currentByType['income'] || 0) + (includeTripExpenses ? (currentByType['settlement_received'] || 0) : 0);
+    const totalExpense = (currentByType['expense'] || 0) + (includeTripExpenses ? (currentByType['trip_expense'] || 0) : 0);
     const tripExpenses = currentByType['trip_expense'] || 0;
     const manualExpenses = currentByType['expense'] || 0;
     const settlementsPaid = currentByType['settlement_paid'] || 0;
     const settlementsReceived = currentByType['settlement_received'] || 0;
 
-    const lastMonthExpense = (lastByType['expense'] || 0) + (lastByType['trip_expense'] || 0) + (lastByType['settlement_paid'] || 0);
-    const lastMonthIncome = (lastByType['income'] || 0) + (lastByType['settlement_received'] || 0);
+    const lastMonthExpense = (lastByType['expense'] || 0) + (includeTripExpenses ? ((lastByType['trip_expense'] || 0) + (lastByType['settlement_paid'] || 0)) : 0);
+    const lastMonthIncome = (lastByType['income'] || 0) + (includeTripExpenses ? (lastByType['settlement_received'] || 0) : 0);
 
     const totalTransactionCount = Object.values(currentCount).reduce((s, c) => s + c, 0);
 
@@ -1218,8 +1238,8 @@ export class FinanceService {
       categorySpendingMap[row._id] = row.spent;
     }
 
-    const totalExpenseForBudget = totalExpense + settlementsPaid;
-    const budget = await this.getBudget(userId, targetMonth, totalExpenseForBudget);
+    const totalExpenseForBudget = totalExpense + (includeTripExpenses ? settlementsPaid : 0);
+    const budget = await this.getBudget(userId, targetMonth, totalExpenseForBudget, includeTripExpenses);
     const totalBudget = budget?.totalBudget || 0;
 
     const allCategoryNames = new Set([
@@ -1346,11 +1366,16 @@ export class FinanceService {
         endDate = filters.endDate ? new Date(filters.endDate) : new Date();
     }
 
+    const includeTripExpenses = filters.includeTripExpenses === true;
+    const typeMatch = includeTripExpenses
+      ? { $in: ['expense', 'trip_expense'] }
+      : 'expense';
+
     const transactions = await Transaction.find({
       userId,
       date: { $gte: startDate, $lte: endDate },
       isDeleted: false,
-      type: { $in: ['expense', 'trip_expense'] },
+      type: typeMatch,
     }).sort({ date: 1 }).lean();
 
     const dailyTrend: Record<string, number> = {};
@@ -1506,16 +1531,20 @@ export class FinanceService {
     };
   }
 
-  static async getSpendingTrends(userId: string, months: number = 6, category?: string) {
+  static async getSpendingTrends(userId: string, months: number = 6, category?: string, includeTripExpenses: boolean = false) {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
+
+    const typeMatch = includeTripExpenses
+      ? { $in: ['expense', 'trip_expense', 'settlement_paid'] }
+      : 'expense';
 
     const match: any = {
       userId,
       isDeleted: false,
       date: { $gte: startDate, $lte: endDate },
-      type: { $in: ['expense', 'trip_expense', 'settlement_paid'] },
+      type: typeMatch,
     };
 
     if (category) match.category = category;

@@ -22,7 +22,7 @@ export class FinanceController {
     try {
       const userId = getUser(req);
       const month = req.query.month as string | undefined;
-      const includeTripExpenses = req.query.includeTripExpenses !== 'false';
+      const includeTripExpenses = req.query.includeTripExpenses === 'true' || req.query.includeTripExpenses === '1';
       const dashboard = await FinanceService.getDashboard(userId, month, includeTripExpenses);
       res.status(200).json({ success: true, data: dashboard });
     } catch (error) { next(error); }
@@ -31,10 +31,12 @@ export class FinanceController {
   static async getAnalytics(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = getUser(req);
+      const includeTripExpenses = req.query.includeTripExpenses === 'true' || req.query.includeTripExpenses === '1';
       const filters = {
         period: req.query.period as any,
         startDate: req.query.startDate as string,
         endDate: req.query.endDate as string,
+        includeTripExpenses,
       };
       const analytics = await FinanceService.getAnalytics(userId, filters);
       res.status(200).json({ success: true, data: analytics });
@@ -45,10 +47,12 @@ export class FinanceController {
     try {
       const userId = getUser(req);
       const { months = 6, category } = req.query;
+      const includeTripExpenses = req.query.includeTripExpenses === 'true' || req.query.includeTripExpenses === '1';
       const trends = await FinanceService.getSpendingTrends(
         userId,
         parseInt(months as string),
-        category as string
+        category as string,
+        includeTripExpenses
       );
       res.status(200).json({ success: true, data: trends });
     } catch (error) { next(error); }
@@ -149,7 +153,8 @@ export class FinanceController {
     try {
       const userId = getUser(req);
       const month = req.query.month as string || new Date().toISOString().substring(0, 7);
-      const budget = await FinanceService.getBudget(userId, month);
+      const includeTripExpenses = req.query.includeTripExpenses === 'true' || req.query.includeTripExpenses === '1';
+      const budget = await FinanceService.getBudget(userId, month, undefined, includeTripExpenses);
       res.status(200).json({ success: true, data: budget });
     } catch (error) { next(error); }
   }
