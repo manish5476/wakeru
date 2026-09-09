@@ -373,17 +373,42 @@ export class FinanceService {
     const query: any = { userId, isDeleted: false };
 
     // Basic filters
-    if (filters.type) query.type = filters.type;
+    const andClauses: any[] = [];
+    if (filters.type) {
+      if (filters.type === 'regular') {
+        query.type = 'expense';
+        andClauses.push({
+          $or: [
+            { tripId: { $exists: false } },
+            { tripId: null },
+          ],
+        });
+      } else if (filters.type === 'trip_expense') {
+        query.type = 'trip_expense';
+      } else if (filters.type === 'all_expenses') {
+        query.type = { $in: ['expense', 'trip_expense'] };
+      } else if (filters.type === 'expense') {
+        query.type = 'expense';
+      } else if (filters.type !== 'all') {
+        query.type = filters.type;
+      }
+    }
     if (filters.category) query.category = filters.category;
     if (filters.tripId) query.tripId = new Types.ObjectId(filters.tripId);
     if (filters.tags && filters.tags.length > 0) query.tags = { $in: filters.tags };
     
     // Search filter
     if (filters.search) {
-      query.$or = [
-        { title: { $regex: filters.search, $options: 'i' } },
-        { notes: { $regex: filters.search, $options: 'i' } },
-      ];
+      andClauses.push({
+        $or: [
+          { title: { $regex: filters.search, $options: 'i' } },
+          { notes: { $regex: filters.search, $options: 'i' } },
+        ],
+      });
+    }
+
+    if (andClauses.length > 0) {
+      query.$and = andClauses;
     }
 
     // Date filtering with multiple options
@@ -774,7 +799,9 @@ export class FinanceService {
     const budget = await Budget.findOne({ userId, month });
     if (!budget) return;
 
-    const catBudget = budget.categoryBudgets.find(cb => cb.category === category);
+    const catBudget = budget.categoryBudgets.find(
+      cb => cb.category?.toLowerCase() === category?.toLowerCase()
+    );
     if (catBudget) {
       catBudget.spent = Math.max(0, (catBudget.spent || 0) + amountDelta);
     }
@@ -1195,11 +1222,27 @@ export class FinanceService {
     const budget = await this.getBudget(userId, targetMonth, totalExpenseForBudget);
     const totalBudget = budget?.totalBudget || 0;
 
-    const categoryBreakdown = Object.entries(categorySpendingMap)
-      .map(([category, spent]) => {
-        const budgetForCategory = budget?.categoryBudgets?.find((cb: any) => cb.category === category);
+    const allCategoryNames = new Set([
+      ...Object.keys(categorySpendingMap),
+      ...(budget?.categoryBudgets || []).map((cb: any) => cb.category),
+    ]);
+
+    const categoryBreakdown = Array.from(allCategoryNames)
+      .map((catName) => {
+        const budgetForCategory = budget?.categoryBudgets?.find(
+          (cb: any) => cb.category?.toLowerCase() === catName?.toLowerCase()
+        );
+        let spent = categorySpendingMap[catName] || 0;
+        if (!spent) {
+          for (const [k, v] of Object.entries(categorySpendingMap)) {
+            if (k.toLowerCase() === catName.toLowerCase()) {
+              spent = v;
+              break;
+            }
+          }
+        }
         return {
-          category,
+          category: catName,
           spent: Math.round(spent * 100) / 100,
           budget: budgetForCategory?.amount || 0,
           budgetRemaining: (budgetForCategory?.amount || 0) - spent,
@@ -1207,7 +1250,7 @@ export class FinanceService {
           isOverBudget: budgetForCategory ? spent > budgetForCategory.amount : false,
         };
       })
-      .sort((a, b) => b.spent - a.spent);
+      .sort((a, b) => (b.spent || b.budget) - (a.spent || a.budget));
 
     const topCategory = categoryBreakdown[0] || { category: 'none', spent: 0, percentOfTotal: 0 };
 
@@ -1571,23 +1614,27 @@ export class FinanceService {
       else if (!isOwner && debt.type === 'lent') iOwe = true;
       else if (!isOwner && debt.type === 'borrowed') iAmOwed = true;
 
+      const isPending = debt.status === 'pending';
+
       if (iAmOwed) {
         summary.totalOwed += debt.amount;
-        if (debt.status === 'pending') summary.pendingOwed += debt.amount;
-
-        if (otherUserId || otherUserName) {
-          const key = otherUserId || otherUserName;
-          if (!userMap.has(key)) userMap.set(key, { name: otherUserName, owes: 0, owed: 0 });
-          userMap.get(key)!.owes += debt.amount;
+        if (isPending) {
+          summary.pendingOwed += debt.amount;
+          if (otherUserId || otherUserName) {
+            const key = otherUserId || otherUserName;
+            if (!userMap.has(key)) userMap.set(key, { name: otherUserName, owes: 0, owed: 0 });
+            userMap.get(key)!.owes += debt.amount;
+          }
         }
       } else if (iOwe) {
         summary.totalOwing += debt.amount;
-        if (debt.status === 'pending') summary.pendingOwing += debt.amount;
-
-        if (otherUserId || otherUserName) {
-          const key = otherUserId || otherUserName;
-          if (!userMap.has(key)) userMap.set(key, { name: otherUserName, owes: 0, owed: 0 });
-          userMap.get(key)!.owed += debt.amount;
+        if (isPending) {
+          summary.pendingOwing += debt.amount;
+          if (otherUserId || otherUserName) {
+            const key = otherUserId || otherUserName;
+            if (!userMap.has(key)) userMap.set(key, { name: otherUserName, owes: 0, owed: 0 });
+            userMap.get(key)!.owed += debt.amount;
+          }
         }
       }
     });
@@ -1612,34 +1659,36 @@ export class FinanceService {
         };
 
         settlement.transactions.forEach((tx: any) => {
+          const isPending = tx.status === 'pending';
+
           if (tx.from === userId) {
             const amount = tx.amountBase;
             tripSummary.owing += amount;
             summary.totalOwing += amount;
-            if (tx.status === 'pending') {
+            if (isPending) {
               tripSummary.pendingOwing += amount;
               summary.pendingOwing += amount;
-            }
 
-            if (!userMap.has(tx.to)) {
-              userMap.set(tx.to, { name: tx.toName, owes: 0, owed: 0 });
+              if (!userMap.has(tx.to)) {
+                userMap.set(tx.to, { name: tx.toName, owes: 0, owed: 0 });
+              }
+              userMap.get(tx.to)!.owed += amount;
             }
-            userMap.get(tx.to)!.owed += amount;
           }
 
           if (tx.to === userId) {
             const amount = tx.amountBase;
             tripSummary.owed += amount;
             summary.totalOwed += amount;
-            if (tx.status === 'pending') {
+            if (isPending) {
               tripSummary.pendingOwed += amount;
               summary.pendingOwed += amount;
-            }
 
-            if (!userMap.has(tx.from)) {
-              userMap.set(tx.from, { name: tx.fromName, owes: 0, owed: 0 });
+              if (!userMap.has(tx.from)) {
+                userMap.set(tx.from, { name: tx.fromName, owes: 0, owed: 0 });
+              }
+              userMap.get(tx.from)!.owes += amount;
             }
-            userMap.get(tx.from)!.owes += amount;
           }
         });
 
@@ -1649,11 +1698,13 @@ export class FinanceService {
       });
     }
 
-    summary.byUser = Array.from(userMap.entries()).map(([uId, data]) => ({
-      userId: uId,
-      ...data,
-      net: data.owes - data.owed,
-    }));
+    summary.byUser = Array.from(userMap.entries())
+      .map(([uId, data]) => ({
+        userId: uId,
+        ...data,
+        net: data.owes - data.owed,
+      }))
+      .filter((u) => u.owes > 0 || u.owed > 0);
 
     return summary;
   }
