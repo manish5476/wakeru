@@ -4,6 +4,7 @@ import { protect } from '../../middleware/auth.middleware';
 import { validate, loadTrip, requireMember } from '../trips/trip.middleware';
 import { analyticsQuerySchema, yearlySummarySchema, tripAnalyticsParamSchema } from './analytics.validators';
 import { comparisonService } from './comparison.service';
+import { entitlementService } from '../subscription';
 
 const router = Router();
 router.use(protect);
@@ -30,7 +31,8 @@ router.get('/yearly/:year', validate(yearlySummarySchema, 'params'), analyticsCo
 // Comparison routes
 router.get('/compare/trip/:tripId', loadTrip(), requireMember, async (req, res, next) => {
     try {
-        const userId = (req as any).user?.firebaseUid;
+        const userId = (req as any).user?.firebaseUid || (req as any).user?.userId;
+        await entitlementService.assertCanUseFeature(userId, 'advanced_analytics');
         const data = await comparisonService.compareTripWithPrevious(req.params.tripId, userId);
         res.status(200).json({ success: true, data });
     } catch (err) { next(err); }
@@ -38,7 +40,8 @@ router.get('/compare/trip/:tripId', loadTrip(), requireMember, async (req, res, 
 
 router.get('/compare/group/:tripId', loadTrip(), requireMember, async (req, res, next) => {
     try {
-        const userId = (req as any).user?.firebaseUid;
+        const userId = (req as any).user?.firebaseUid || (req as any).user?.userId;
+        await entitlementService.assertCanUseFeature(userId, 'advanced_analytics');
         const data = await comparisonService.compareWithGroup(req.params.tripId, userId);
         res.status(200).json({ success: true, data });
     } catch (err) { next(err); }
@@ -46,7 +49,8 @@ router.get('/compare/group/:tripId', loadTrip(), requireMember, async (req, res,
 
 router.get('/compare/trends', async (req, res, next) => {
     try {
-        const userId = (req as any).user?.firebaseUid;
+        const userId = (req as any).user?.firebaseUid || (req as any).user?.userId;
+        await entitlementService.assertCanUseFeature(userId, 'advanced_analytics');
         const data = await comparisonService.getSpendingTrends(userId);
         res.status(200).json({ success: true, data });
     } catch (err) { next(err); }

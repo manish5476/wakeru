@@ -2,6 +2,7 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.[tj]sx?$': 'ts-jest',
   },
+  transformIgnorePatterns: ['node_modules/(?!(jose)/)'],
 };

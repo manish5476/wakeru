@@ -29,6 +29,7 @@ import feedbackRoutes from './modules/feedback/feedback.routes';
 import { financeRoutes } from './modules/finance';
 import achievementRoutes from './modules/achievement/achievement.routes';
 import locationRoutes from './modules/location/location.routes';
+import { subscriptionRoutes, adminPlanRoutes } from './modules/subscription';
 
 import { cronJobs } from './infrastructure/cron-jobs.service';
 
@@ -139,6 +140,8 @@ app.use('/api/v1/person', authenticatedRateLimiter, personRoutes);
 app.use('/api/v1/feedback', authenticatedRateLimiter, feedbackRoutes);
 app.use('/api/v1/finance', authenticatedRateLimiter, IdempotencyMiddleware.checkIdempotency, financeRoutes);
 app.use('/api/v1/achievements', authenticatedRateLimiter, achievementRoutes);
+app.use('/api/v1/subscription', authenticatedRateLimiter, subscriptionRoutes);
+app.use('/api/v1/admin', authenticatedRateLimiter, adminPlanRoutes);
 
 // ============================================================
 // 404 Handler

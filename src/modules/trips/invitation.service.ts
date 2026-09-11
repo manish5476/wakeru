@@ -7,6 +7,7 @@ import { User } from '../auth/auth.model';
 import { AppError } from '../../shared/errors/AppError';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
+import { entitlementService } from '../subscription';
 
 export const invitationService = {
     /**
@@ -26,6 +27,20 @@ export const invitationService = {
         if (!trip.isAdmin(fromUserId) && trip.createdBy !== fromUserId) {
             throw new AppError('Only trip admins can send invitations', 403);
         }
+
+        // Authoritative peoplePerTrip subscription limit check
+        const activeMembersCount = trip.members.filter((m) => m.isActive).length;
+        const pendingInvitesCount = await Invitation.countDocuments({
+            tripId: trip._id,
+            status: 'pending',
+        });
+        const currentCommittedPeople = activeMembersCount + pendingInvitesCount;
+        await entitlementService.assertWithinLimit(
+            trip.createdBy,
+            'peoplePerTrip',
+            1,
+            currentCommittedPeople
+        );
 
         // Check receiver exists
         const receiver = await User.findOne({
@@ -155,6 +170,15 @@ export const invitationService = {
             existingMember.photoURL = user.photoURL || '';
             existingMember.joinedAt = new Date();
         } else {
+            // Authoritative limit check before admitting new member
+            const activeMembersCount = trip.members.filter((m) => m.isActive).length;
+            await entitlementService.assertWithinLimit(
+                trip.createdBy,
+                'peoplePerTrip',
+                1,
+                activeMembersCount
+            );
+
             trip.members.push({
                 userId: memberUserId,
                 displayName: user.displayName,

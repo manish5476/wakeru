@@ -7,6 +7,7 @@ import { logger } from './config/logger';
 import { initializeFirebase } from './config/firebase';
 import { socketServer } from './infrastructure/websocket/socket.server';
 import { QueueManager } from './infrastructure/queue/bull.config';
+import { seedDefaultPlans } from './modules/subscription';
 
 class Server {
   private httpServer: http.Server | null = null;
@@ -20,6 +21,7 @@ class Server {
 
       // Connect to MongoDB
       await database.connect();
+      await seedDefaultPlans();
 
       // Connect to Redis
       await redisClient.connect();

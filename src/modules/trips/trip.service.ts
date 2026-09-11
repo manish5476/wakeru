@@ -20,6 +20,7 @@ import {
 } from './trip.validators';
 import { AppError } from '../../shared/errors/AppError';
 import { notificationService } from '../notification';
+import { entitlementService } from '../subscription';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES & INTERFACES
@@ -60,6 +61,18 @@ export const createTrip = async (
   input: CreateTripInput,
   creator: UserInfo
 ): Promise<ITrip> => {
+  // Authoritative subscription entitlement checks
+  await entitlementService.assertWithinLimit(creator.userId, 'trips', 1);
+  if (input.memberIds && input.memberIds.length > 0) {
+    // 1 creator + invited members
+    await entitlementService.assertWithinLimit(
+      creator.userId,
+      'peoplePerTrip',
+      1 + input.memberIds.length,
+      0
+    );
+  }
+
   const { initialStop, ...tripData } = input;
 
   const creatorMember: ITripMember = {
@@ -434,6 +447,9 @@ export const addStop = async (
   input: CreateStopInput,
   creatorUserId: string
 ): Promise<ITrip> => {
+  // Authoritative subscription entitlement check for stops
+  await entitlementService.assertWithinLimit(trip.createdBy, 'stopsPerTrip', 1, trip.stops.length);
+
   // Auto-set exchange rate to 1 if same currency as base
   if (input.currency.toUpperCase() === trip.baseCurrency.toUpperCase()) {
     input.currentExchangeRate = 1.0;
