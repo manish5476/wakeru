@@ -11,8 +11,16 @@ export class AppError extends Error {
       details?: any,
       isOperational = true
     ) {
-      super(message);
-      this.statusCode = statusCode;
+      // Defensive guard against accidental (statusCode, message) swapped arguments
+      let resolvedMessage = message;
+      let resolvedStatusCode = statusCode;
+      if (typeof message === 'number' && typeof statusCode === 'string') {
+        resolvedMessage = statusCode;
+        resolvedStatusCode = message;
+      }
+
+      super(resolvedMessage);
+      this.statusCode = typeof resolvedStatusCode === 'number' ? resolvedStatusCode : 500;
       this.code = code || 'INTERNAL_ERROR';
       this.details = details;
       this.isOperational = isOperational;

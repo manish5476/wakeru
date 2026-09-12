@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { getAuth } from 'firebase-admin/auth';
 import { User, IUser, IUserDocument } from './auth.model';
-import { AppError, ConflictError, UnauthorizedError, ForbiddenError, NotFoundError, ValidationError } from '../../shared/errors/AppError';
+import { AppError, ConflictError, UnauthorizedError, ForbiddenError, NotFoundError, ValidationError, TooManyRequestsError } from '../../shared/errors/AppError';
 import { config } from '../../config';
 import { logger } from '../../config/logger';
 
@@ -347,7 +347,7 @@ export const AuthService = {
       const isSameDay = stats.lastRequestAt.toDateString() === now.toDateString();
 
       if (isSameDay && stats.count >= 2) {
-        throw new AppError(429, 'Too many password reset requests. Please try again tomorrow.');
+        throw new TooManyRequestsError('Too many password reset requests. Please try again tomorrow.');
       }
 
       // The actual email sending is handled by the frontend client using sendPasswordResetEmail()
