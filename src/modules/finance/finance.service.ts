@@ -387,9 +387,11 @@ export class FinanceService {
       } else if (filters.type === 'trip_expense') {
         query.type = 'trip_expense';
       } else if (filters.type === 'all_expenses') {
-        query.type = { $in: ['expense', 'trip_expense'] };
+        query.type = { $in: ['expense', 'trip_expense', 'settlement_paid'] };
       } else if (filters.type === 'expense') {
         query.type = 'expense';
+      } else if (filters.type === 'income') {
+        query.type = { $in: ['income', 'settlement_received'] };
       } else if (filters.type !== 'all') {
         query.type = filters.type;
       }
@@ -398,12 +400,16 @@ export class FinanceService {
     if (filters.tripId) query.tripId = new Types.ObjectId(filters.tripId);
     if (filters.tags && filters.tags.length > 0) query.tags = { $in: filters.tags };
     
-    // Search filter
+    // Search filter across title, notes, category, tags, tripName, paymentMethod
     if (filters.search) {
       andClauses.push({
         $or: [
           { title: { $regex: filters.search, $options: 'i' } },
           { notes: { $regex: filters.search, $options: 'i' } },
+          { category: { $regex: filters.search, $options: 'i' } },
+          { tags: { $regex: filters.search, $options: 'i' } },
+          { tripName: { $regex: filters.search, $options: 'i' } },
+          { paymentMethod: { $regex: filters.search, $options: 'i' } },
         ],
       });
     }
@@ -417,42 +423,57 @@ export class FinanceService {
       // Custom date range (highest priority)
       query.date = {};
       if (filters.dateRange.startDate) {
-        query.date.$gte = new Date(filters.dateRange.startDate);
+        const s = filters.dateRange.startDate;
+        query.date.$gte = s.includes('T') ? new Date(s) : new Date(`${s}T00:00:00.000Z`);
       }
       if (filters.dateRange.endDate) {
-        query.date.$lte = new Date(filters.dateRange.endDate);
+        const e = filters.dateRange.endDate;
+        query.date.$lte = e.includes('T') ? new Date(e) : new Date(`${e}T23:59:59.999Z`);
       }
     } else if (filters.day) {
       // Filter by specific day: YYYY-MM-DD
       const startDate = new Date(`${filters.day}T00:00:00.000Z`);
       const endDate = new Date(`${filters.day}T23:59:59.999Z`);
       query.date = { $gte: startDate, $lte: endDate };
-    } else if (filters.month && filters.year) {
-      // Filter by specific month and year: YYYY-MM
-      const monthNum = parseInt(filters.month) - 1; // 0-indexed month
-      const startDate = new Date(filters.year, monthNum, 1, 0, 0, 0, 0);
-      const endDate = new Date(filters.year, monthNum + 1, 0, 23, 59, 59, 999);
-      query.date = { $gte: startDate, $lte: endDate };
-    } else if (filters.month) {
-      // Filter by month (year defaults to current year)
-      const currentYear = new Date().getFullYear();
-      const monthNum = parseInt(filters.month) - 1;
-      const startDate = new Date(currentYear, monthNum, 1, 0, 0, 0, 0);
-      const endDate = new Date(currentYear, monthNum + 1, 0, 23, 59, 59, 999);
-      query.date = { $gte: startDate, $lte: endDate };
-    } else if (filters.year) {
-      // Filter by specific year
-      const startDate = new Date(filters.year, 0, 1, 0, 0, 0, 0);
-      const endDate = new Date(filters.year, 11, 31, 23, 59, 59, 999);
-      query.date = { $gte: startDate, $lte: endDate };
+    } else if (filters.month || filters.year) {
+      // Robust Month / Year parser: handles "YYYY-MM", numeric month, with or without year
+      let yearNum = new Date().getFullYear();
+      let monthNum: number | null = null;
+
+      if (typeof filters.month === 'string' && filters.month.includes('-')) {
+        const parts = filters.month.split('-');
+        yearNum = parseInt(parts[0], 10) || yearNum;
+        monthNum = (parseInt(parts[1], 10) || 1) - 1;
+      } else if (filters.month !== undefined && filters.month !== null && filters.month !== '') {
+        monthNum = (parseInt(String(filters.month), 10) || 1) - 1;
+        if (filters.year) {
+          yearNum = parseInt(String(filters.year), 10) || yearNum;
+        }
+      } else if (filters.year) {
+        yearNum = parseInt(String(filters.year), 10) || yearNum;
+      }
+
+      if (monthNum !== null) {
+        // Specific month in year
+        const startDate = new Date(Date.UTC(yearNum, monthNum, 1, 0, 0, 0, 0));
+        const endDate = new Date(Date.UTC(yearNum, monthNum + 1, 0, 23, 59, 59, 999));
+        query.date = { $gte: startDate, $lte: endDate };
+      } else {
+        // Entire year
+        const startDate = new Date(Date.UTC(yearNum, 0, 1, 0, 0, 0, 0));
+        const endDate = new Date(Date.UTC(yearNum, 11, 31, 23, 59, 59, 999));
+        query.date = { $gte: startDate, $lte: endDate };
+      }
     } else if (filters.startDate || filters.endDate) {
       // Legacy date range filter (backward compatibility)
       query.date = {};
       if (filters.startDate) {
-        query.date.$gte = new Date(filters.startDate);
+        const s = filters.startDate;
+        query.date.$gte = s.includes('T') ? new Date(s) : new Date(`${s}T00:00:00.000Z`);
       }
       if (filters.endDate) {
-        query.date.$lte = new Date(filters.endDate);
+        const e = filters.endDate;
+        query.date.$lte = e.includes('T') ? new Date(e) : new Date(`${e}T23:59:59.999Z`);
       }
     }
 
