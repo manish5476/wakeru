@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { notificationController } from './notification.controller';
-import { protect } from '../auth/auth.middleware';
+import { protect, AuthMiddleware } from '../auth/auth.middleware';
 
 const router = Router();
 router.use(protect);
+
+// Admin-only app update routes
+router.get('/admin/check-permission', AuthMiddleware.authorize('admin'), notificationController.checkAdminPermission);
+router.post('/admin/broadcast-update', AuthMiddleware.authorize('admin'), notificationController.broadcastAppUpdate);
 
 router.get('/', notificationController.getNotifications);
 router.get('/unread-count', notificationController.getUnreadCount);
