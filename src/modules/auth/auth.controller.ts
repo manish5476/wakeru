@@ -4,6 +4,7 @@ import { User } from './auth.model';
 import { AuthenticatedRequest, ApiResponse } from '../../shared/types/common.types';
 import { NotFoundError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
+import { config } from '../../config';
 
 export class AuthController {
   
@@ -202,10 +203,19 @@ export class AuthController {
         throw new NotFoundError('User not found');
       }
 
+      const userData = user.toObject();
+      const normalizedEmail = (user.email || '').toLowerCase().trim();
+      if (config.ADMIN_EMAILS.includes(normalizedEmail)) {
+        userData.role = 'admin';
+        if (user.role !== 'admin') {
+          await User.updateOne({ _id: user._id }, { $set: { role: 'admin' } });
+        }
+      }
+
       const response: ApiResponse = {
         success: true,
         message: 'Profile fetched successfully',
-        data: { user: user.toObject() },
+        data: { user: userData },
         timestamp: new Date().toISOString(),
       };
 

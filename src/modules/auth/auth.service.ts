@@ -44,10 +44,16 @@ const REFRESH_TOKEN_EXPIRY = config.JWT_REFRESH_EXPIRATION || '7d';
  * Atomically stores refresh token with $slice to limit array size.
  */
 const generateTokens = async (user: IUser | IUserDocument): Promise<TokenPair> => {
+  let role = user.role;
+  const userEmail = (user.email || '').toLowerCase().trim();
+  if (config.ADMIN_EMAILS.includes(userEmail)) {
+    role = 'admin';
+  }
+
   const accessToken = jwt.sign(
     {
       userId: user._id,
-      role: user.role,
+      role,
       type: 'access',
       iss: 'tripsplit',
     } as TokenPayload,
@@ -159,10 +165,13 @@ export const AuthService = {
     }
 
     // Create user
+    const normalizedEmail = email.toLowerCase().trim();
+    const role = config.ADMIN_EMAILS.includes(normalizedEmail) ? 'admin' : 'user';
     const userPayload: any = {
       _id: firebaseUid, // ✅ FIXED: MongoDB _id is exactly the Firebase UID
       firebaseUid,
-      email: email.toLowerCase(),
+      email: normalizedEmail,
+      role,
       displayName: metadata?.displayName || decodedToken.name || 'Traveler',
       photoURL: metadata?.photoURL || decodedToken.picture || '',
       authProviders,
@@ -231,12 +240,25 @@ export const AuthService = {
     }
 
     // Bypass full document validation to avoid errors with stale refreshTokens
-    await User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
+    const userEmail = (user.email || '').toLowerCase().trim();
+    const isAdminEmail = config.ADMIN_EMAILS.includes(userEmail);
+
+    if (isAdminEmail && user.role !== 'admin') {
+      user.role = 'admin';
+      await User.updateOne({ _id: user._id }, { $set: { role: 'admin', lastLoginAt: new Date() } });
+    } else {
+      await User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
+    }
 
     const tokens = await generateTokens(user);
     logger.info('User logged in', { userId: user._id });
 
-    return { user: user.toObject() as unknown as IUser, tokens, isNewUser: false };
+    const userObj = user.toObject() as unknown as IUser;
+    if (isAdminEmail) {
+      userObj.role = 'admin';
+    }
+
+    return { user: userObj, tokens, isNewUser: false };
   },
 
   /**

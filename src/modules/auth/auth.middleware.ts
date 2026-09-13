@@ -95,11 +95,20 @@ export class AuthMiddleware {
         throw new UnauthorizedError('Account not found or has been deactivated');
       }
 
+      let effectiveRole = user.role;
+      const normalizedEmail = (user.email || '').toLowerCase().trim();
+      if (config.ADMIN_EMAILS.includes(normalizedEmail)) {
+        effectiveRole = 'admin';
+        if (user.role !== 'admin') {
+          User.updateOne({ _id: decoded.userId }, { $set: { role: 'admin' } }).catch(() => {});
+        }
+      }
+
       req.user = {
         userId: decoded.userId,
         firebaseUid: user.firebaseUid || '',
         email: user.email,
-        role: user.role,
+        role: effectiveRole,
         displayName: user.displayName || 'User',
         photoURL: user.photoURL || '',
       };
@@ -166,11 +175,17 @@ export class AuthMiddleware {
       ).lean();
 
       if (user) {
+        let effectiveRole = user.role;
+        const normalizedEmail = (user.email || '').toLowerCase().trim();
+        if (config.ADMIN_EMAILS.includes(normalizedEmail)) {
+          effectiveRole = 'admin';
+        }
+
         req.user = {
           userId: decoded.userId,
           firebaseUid: user.firebaseUid || '',
           email: user.email,
-          role: user.role,
+          role: effectiveRole,
           displayName: user.displayName || 'User',
           photoURL: user.photoURL || '',
         };

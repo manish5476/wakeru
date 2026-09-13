@@ -88,12 +88,21 @@ export const protect = async (
         return next(new UnauthorizedError('User no longer exists or account is deactivated.'));
       }
 
+      let effectiveRole = userDoc.role;
+      const normalizedEmail = (userDoc.email || '').toLowerCase().trim();
+      if (config.ADMIN_EMAILS.includes(normalizedEmail)) {
+        effectiveRole = 'admin';
+        if (userDoc.role !== 'admin') {
+          User.updateOne({ _id: userDoc._id }, { $set: { role: 'admin' } }).catch(() => {});
+        }
+      }
+
       userRecord = {
         data: {
           userId: decoded.userId,
           firebaseUid: (userDoc as any).firebaseUid || decoded.userId,
           email: userDoc.email,
-          role: userDoc.role,
+          role: effectiveRole,
           displayName: userDoc.displayName || 'User',
           photoURL: userDoc.photoURL || '',
         },

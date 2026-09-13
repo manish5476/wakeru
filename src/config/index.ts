@@ -63,6 +63,13 @@ export const config = {
   MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '10485760'),
   UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads/',
   RUN_SCHEDULER: process.env.RUN_SCHEDULER === 'true',
+
+  // Admin & App Owner
+  OWNER_EMAIL: (process.env.OWNER_EMAIL || 'msms5476@gmail.com').trim().toLowerCase(),
+  ADMIN_EMAILS: (process.env.ADMIN_EMAILS || process.env.OWNER_EMAIL || 'msms5476@gmail.com')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
 } as const;
 
 // Validate critical configuration

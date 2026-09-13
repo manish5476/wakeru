@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { notificationService } from './notification.service';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { AppError } from '../../shared/errors/AppError';
+import { config } from '../../config';
 
 const getUser = (req: Request) => {
   const user = (req as any).user;
@@ -104,10 +105,11 @@ export const notificationController = {
       if (!user || user.role !== 'admin') {
         throw new AppError('Admin permission required', 403);
       }
+      const isOwner = (user.email || '').toLowerCase().trim() === config.OWNER_EMAIL.toLowerCase();
       res.status(200).json({
         success: true,
         data: {
-          isOwner: true,
+          isOwner,
           role: user.role,
           canBroadcast: true,
           adminEmail: user.email,

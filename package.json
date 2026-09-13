@@ -15,7 +15,8 @@
     "format": "prettier --write src/**/*.ts",
     "seed": "ts-node -r tsconfig-paths/register src/seeds/seed.ts",
     "migrate": "ts-node -r tsconfig-paths/register src/migrations/runner.ts",
-    "migrate:create": "ts-node -r tsconfig-paths/register src/migrations/runner.ts create"
+    "migrate:create": "ts-node -r tsconfig-paths/register src/migrations/runner.ts create",
+    "admin": "ts-node -r tsconfig-paths/register scripts/manage_admin.ts"
   },
   "dependencies": {
     "@google-cloud/vision": "^4.0.0",
