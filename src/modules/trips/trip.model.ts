@@ -285,16 +285,31 @@ tripSchema.pre('validate', function (next) {
 // PRE-SAVE HOOKS
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Auto-generate invite code on first save if not already set
+// Auto-generate invite code and ensure expiry covers the full trip period
 tripSchema.pre('save', function (next) {
   if (!this.inviteCode) {
     // 8-character uppercase hex code — e.g. "A3F9C12B"
     this.inviteCode = crypto.randomBytes(4).toString('hex').toUpperCase();
-    // Default expiry: 7 days from now
-    const expiry = new Date();
-    expiry.setDate(expiry.getDate() + 7);
-    this.inviteCodeExpiresAt = expiry;
   }
+
+  // Calculate target expiry: at least 7 days from now, OR end of trip + 24 hours if endDate is set
+  const minExpiry = new Date();
+  minExpiry.setDate(minExpiry.getDate() + 7);
+
+  let targetExpiry = minExpiry;
+  if (this.endDate) {
+    const tripEndDate = new Date(this.endDate);
+    tripEndDate.setHours(23, 59, 59, 999);
+    if (tripEndDate > minExpiry) {
+      targetExpiry = tripEndDate;
+    }
+  }
+
+  // If expiry is not set or earlier than target expiry, auto-extend it
+  if (!this.inviteCodeExpiresAt || this.inviteCodeExpiresAt < targetExpiry) {
+    this.inviteCodeExpiresAt = targetExpiry;
+  }
+
   next();
 });
 

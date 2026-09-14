@@ -312,6 +312,20 @@ export const updateTrip = async (
     }
   });
 
+  // Ensure inviteCode exists
+  if (!trip.inviteCode) {
+    trip.inviteCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+  }
+
+  // If endDate is set/extended, auto-extend inviteCodeExpiresAt to cover the full trip duration
+  if (trip.endDate) {
+    const tripEndDate = new Date(trip.endDate);
+    tripEndDate.setHours(23, 59, 59, 999);
+    if (!trip.inviteCodeExpiresAt || trip.inviteCodeExpiresAt < tripEndDate) {
+      trip.inviteCodeExpiresAt = tripEndDate;
+    }
+  }
+
   await trip.save();
   
   if (!wasCompleted && trip.status === 'completed') {
@@ -679,9 +693,16 @@ export const joinTripByInviteCode = async (
     throw new AppError('Invalid or expired invite code', 404);
   }
 
-  // Check expiry
+  // Check expiry — if trip endDate is still in the future or today, gracefully auto-extend
   if (trip.inviteCodeExpiresAt && trip.inviteCodeExpiresAt < new Date()) {
-    throw new AppError('This invite code has expired', 400);
+    if (trip.endDate && new Date(trip.endDate) >= new Date()) {
+      const extendedExpiry = new Date(trip.endDate);
+      extendedExpiry.setHours(23, 59, 59, 999);
+      trip.inviteCodeExpiresAt = extendedExpiry;
+      await trip.save();
+    } else {
+      throw new AppError('This invite code has expired', 400);
+    }
   }
 
   // Check if already an active member
@@ -1149,6 +1170,14 @@ export const regenerateInviteCode = async (
   const newCode = crypto.randomBytes(4).toString('hex').toUpperCase();
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + input.expiresInDays);
+
+  if (trip.endDate) {
+    const tripEndDate = new Date(trip.endDate);
+    tripEndDate.setHours(23, 59, 59, 999);
+    if (tripEndDate > expiresAt) {
+      expiresAt.setTime(tripEndDate.getTime());
+    }
+  }
 
   trip.inviteCode = newCode;
   trip.inviteCodeExpiresAt = expiresAt;

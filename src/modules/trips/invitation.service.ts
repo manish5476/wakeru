@@ -43,69 +43,128 @@ export const invitationService = {
         );
 
         // Check receiver exists
+        const trimmedToUserId = toUserId.trim();
         const receiver = await User.findOne({
             $or: [
-                ...(Types.ObjectId.isValid(toUserId) ? [{ _id: toUserId }] : []),
-                { firebaseUid: toUserId }, 
-                { email: toUserId.toLowerCase() }
+                ...(Types.ObjectId.isValid(trimmedToUserId) ? [{ _id: trimmedToUserId }] : []),
+                { firebaseUid: trimmedToUserId }, 
+                { email: trimmedToUserId.toLowerCase() }
             ],
             isActive: true,
             isDeleted: false,
         });
-        if (!receiver) throw new AppError('User not found', 404);
 
-        const receiverCandidateIds = [receiver.firebaseUid, (receiver as any)._id?.toString()].filter(Boolean);
+        let canonicalToUserId: string;
+        let canonicalToName: string;
+        let receiverCandidateIds: string[];
+
+        if (receiver) {
+            canonicalToUserId = receiver.firebaseUid || (receiver as any)._id?.toString();
+            canonicalToName = receiver.displayName || 'Friend';
+            receiverCandidateIds = [
+                receiver.firebaseUid,
+                (receiver as any)._id?.toString(),
+                receiver.email?.toLowerCase(),
+                trimmedToUserId.toLowerCase(),
+            ].filter(Boolean);
+        } else {
+            // Check if valid email address
+            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedToUserId);
+            if (!isEmail) {
+                throw new AppError('User not found', 404);
+            }
+            canonicalToUserId = trimmedToUserId.toLowerCase();
+            canonicalToName = trimmedToUserId.split('@')[0];
+            receiverCandidateIds = [canonicalToUserId];
+        }
 
         // Check not already a member
         if (receiverCandidateIds.some((id) => trip.isMember(id))) {
             throw new AppError('User is already a member of this trip', 409);
         }
 
-        // Check no pending invitation already
-        const existing = await Invitation.findOne({
-            tripId: new Types.ObjectId(tripId),
-            toUserId: { $in: receiverCandidateIds },
-            status: 'pending',
-        });
-        if (existing) {
-            throw new AppError('An invitation is already pending for this user', 409);
-        }
-
         // Get sender info
         const sender = trip.getMember(fromUserId);
         const senderName = sender?.displayName || 'Someone';
 
-        // Create invitation
+        // Check if an invitation already exists (pending, declined, expired, or accepted)
+        const existing = await Invitation.findOne({
+            tripId: new Types.ObjectId(tripId),
+            toUserId: { $in: receiverCandidateIds },
+        });
+
+        if (existing) {
+            if (existing.status === 'pending') {
+                throw new AppError('An invitation is already pending for this user', 409);
+            }
+            if (existing.status === 'accepted') {
+                throw new AppError('User has already accepted an invitation to this trip', 409);
+            }
+
+            // Reactivate declined or expired invitation to avoid duplicate key error
+            existing.status = 'pending';
+            existing.fromUserId = fromUserId;
+            existing.fromName = senderName;
+            existing.tripTitle = trip.title;
+            existing.toUserId = canonicalToUserId;
+            existing.toName = canonicalToName;
+            existing.message = message;
+            existing.respondedAt = undefined;
+            await existing.save();
+
+            if (receiver) {
+                socketServer.notifyTripInvitation(
+                    receiver._id.toString(),
+                    trip.title,
+                    senderName,
+                    tripId,
+                    existing._id.toString()
+                );
+                await notificationService.notifyTripInvitation(
+                    receiver._id.toString(),
+                    tripId,
+                    trip.title,
+                    senderName,
+                    existing._id.toString()
+                );
+            }
+
+            return existing;
+        }
+
+        // Create new invitation
         const invitation = new Invitation({
             tripId: new Types.ObjectId(tripId),
             tripTitle: trip.title,
             fromUserId,
             fromName: senderName,
-            toUserId: receiver.firebaseUid || receiver._id.toString(),
-            toName: receiver.displayName,
+            toUserId: canonicalToUserId,
+            toName: canonicalToName,
             status: 'pending',
             message,
         });
 
         await invitation.save();
 
-        // Send real-time WebSocket notification
-        socketServer.notifyTripInvitation(
-            receiver._id.toString(),
-            trip.title,
-            senderName,
-            tripId,
-            invitation._id.toString()
-        );
+        if (receiver) {
+            // Send real-time WebSocket notification
+            socketServer.notifyTripInvitation(
+                receiver._id.toString(),
+                trip.title,
+                senderName,
+                tripId,
+                invitation._id.toString()
+            );
 
-        // ✅ Create in-app notification WITH invitation ID
-        await notificationService.notifyTripInvitation(
-            receiver._id.toString(),
-            tripId,
-            trip.title,
-            senderName,
-            invitation._id.toString()
-        );
+            // ✅ Create in-app notification WITH invitation ID
+            await notificationService.notifyTripInvitation(
+                receiver._id.toString(),
+                tripId,
+                trip.title,
+                senderName,
+                invitation._id.toString()
+            );
+        }
 
         return invitation;
     },
@@ -116,7 +175,24 @@ export const invitationService = {
     async getInvitationById(invitationId: string, userId: string): Promise<IInvitation> {
         const invitation = await Invitation.findById(invitationId);
         if (!invitation) throw new AppError('Invitation not found', 404);
-        if (invitation.toUserId !== userId) {
+
+        const user = await User.findOne({
+            $or: [
+                { firebaseUid: userId },
+                ...(Types.ObjectId.isValid(userId) ? [{ _id: userId }] : []),
+                { email: userId.toLowerCase() }
+            ]
+        }).select('_id firebaseUid email').lean();
+
+        const candidateIds = [
+            userId,
+            user?.firebaseUid,
+            (user as any)?._id?.toString(),
+            user?.email?.toLowerCase(),
+            user?.email
+        ].filter(Boolean);
+
+        if (!candidateIds.includes(invitation.toUserId)) {
             throw new AppError('This invitation is not for you', 403);
         }
         return invitation;
@@ -140,11 +216,17 @@ export const invitationService = {
                 { email: userId.toLowerCase() }
             ]
         })
-            .select('displayName photoURL firebaseUid')
+            .select('displayName photoURL firebaseUid email')
             .lean();
         if (!user) throw new AppError('User not found', 404);
 
-        const candidateIds = [userId, user.firebaseUid, (user as any)._id?.toString()].filter(Boolean);
+        const candidateIds = [
+            userId,
+            user.firebaseUid,
+            (user as any)._id?.toString(),
+            user.email?.toLowerCase(),
+            user.email
+        ].filter(Boolean);
         if (!candidateIds.includes(invitation.toUserId)) {
             throw new AppError('This invitation is not for you', 403);
         }
@@ -261,9 +343,15 @@ export const invitationService = {
                 ...(Types.ObjectId.isValid(userId) ? [{ _id: userId }] : []),
                 { email: userId.toLowerCase() }
             ]
-        }).select('_id firebaseUid displayName').lean();
+        }).select('_id firebaseUid email displayName').lean();
 
-        const candidateIds = [userId, user?.firebaseUid, (user as any)?._id?.toString()].filter(Boolean);
+        const candidateIds = [
+            userId,
+            user?.firebaseUid,
+            (user as any)?._id?.toString(),
+            user?.email?.toLowerCase(),
+            user?.email
+        ].filter(Boolean);
         if (!candidateIds.includes(invitation.toUserId)) {
             throw new AppError('This invitation is not for you', 403);
         }
@@ -489,7 +577,13 @@ export const invitationService = {
             ]
         }).select('_id firebaseUid email').lean();
 
-        const candidateIds = [userId, user?.firebaseUid, (user as any)?._id?.toString()].filter(Boolean);
+        const candidateIds = [
+            userId,
+            user?.firebaseUid,
+            (user as any)?._id?.toString(),
+            user?.email?.toLowerCase(),
+            user?.email
+        ].filter(Boolean);
 
         const trip = await Trip.findById(invitation.tripId);
         const isSender = candidateIds.includes(invitation.fromUserId);
