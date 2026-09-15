@@ -42,11 +42,18 @@ router.post(
 
 /**
  * POST /api/v1/trips/join/:inviteCode → Join trip via invite code
+ * GET  /api/v1/trips/join/:inviteCode → Preview trip via invite code
  */
 router.post(
   '/join/:inviteCode',
   validate(joinTripSchema, 'params'),
   tripController.joinTrip
+);
+
+router.get(
+  '/join/:inviteCode',
+  validate(joinTripSchema, 'params'),
+  tripController.getTripByInviteCode
 );
 
 /**

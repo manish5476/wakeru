@@ -480,6 +480,24 @@ export const joinTrip = async (
   }
 };
 
+export const getTripByInviteCode = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { inviteCode } = req.params;
+    const tripPreview = await tripService.getTripByInviteCode(inviteCode);
+
+    res.status(200).json({
+      success: true,
+      data: { trip: tripPreview },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const generateInviteCode = async (
   req: Request,
   res: Response,

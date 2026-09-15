@@ -201,7 +201,7 @@ export const invitationService = {
     /**
      * Accept an invitation.
      */
-    async acceptInvitation(invitationId: string, userId: string): Promise<void> {
+    async acceptInvitation(invitationId: string, userId: string): Promise<any> {
         const invitation = await Invitation.findById(invitationId);
         if (!invitation) throw new AppError('Invitation not found', 404);
         if (invitation.status !== 'pending') {
@@ -241,40 +241,46 @@ export const invitationService = {
         }
         if (trip.isArchived) throw new AppError('Trip is archived', 400);
 
-        // Add member to trip
-        const existingMember = trip.members.find(
-            (m) => candidateIds.includes(m.userId) && !m.isActive
+        // Add member to trip (idempotent — do not duplicate active members)
+        const isAlreadyActiveMember = trip.members.some(
+            (m) => candidateIds.includes(m.userId) && m.isActive
         );
-        if (existingMember) {
-            existingMember.isActive = true;
-            existingMember.userId = memberUserId;
-            existingMember.displayName = user.displayName;
-            existingMember.photoURL = user.photoURL || '';
-            existingMember.joinedAt = new Date();
-        } else {
-            // Authoritative limit check before admitting new member
-            const activeMembersCount = trip.members.filter((m) => m.isActive).length;
-            await entitlementService.assertWithinLimit(
-                trip.createdBy,
-                'peoplePerTrip',
-                1,
-                activeMembersCount
+
+        if (!isAlreadyActiveMember) {
+            const existingMember = trip.members.find(
+                (m) => candidateIds.includes(m.userId) && !m.isActive
             );
+            if (existingMember) {
+                existingMember.isActive = true;
+                existingMember.userId = memberUserId;
+                existingMember.displayName = user.displayName;
+                existingMember.photoURL = user.photoURL || '';
+                existingMember.joinedAt = new Date();
+            } else {
+                // Authoritative limit check before admitting new member
+                const activeMembersCount = trip.members.filter((m) => m.isActive).length;
+                await entitlementService.assertWithinLimit(
+                    trip.createdBy,
+                    'peoplePerTrip',
+                    1,
+                    activeMembersCount
+                );
 
-            trip.members.push({
-                userId: memberUserId,
-                displayName: user.displayName,
-                photoURL: user.photoURL || '',
-                role: 'member',
-                joinedAt: new Date(),
-                isActive: true,
-                totalPaidBase: 0,
-                totalOwesBase: 0,
-            });
+                trip.members.push({
+                    userId: memberUserId,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL || '',
+                    role: 'member',
+                    joinedAt: new Date(),
+                    isActive: true,
+                    totalPaidBase: 0,
+                    totalOwesBase: 0,
+                });
+            }
+
+            trip.markModified('members');
+            await trip.save();
         }
-
-        trip.markModified('members');
-        await trip.save();
 
         // Update invitation status
         invitation.status = 'accepted';
@@ -325,6 +331,8 @@ export const invitationService = {
                 }
             }
         );
+
+        return trip;
     },
 
     /**
@@ -450,14 +458,25 @@ export const invitationService = {
             Trip.find({
                 _id: { $in: tripIds },
                 isArchived: { $ne: true },
-            }).select('_id title').lean(),
+            }).select('_id title description startDate endDate coverImage status inviteCode baseCurrency totalBudget').lean(),
             User.find({
                 firebaseUid: { $in: invites.map((i) => i.fromUserId) },
             }).select('firebaseUid displayName photoURL').lean(),
         ]);
 
         const existingTripMap = new Map(
-            existingTrips.map((t) => [t._id.toString(), { _id: t._id.toString(), title: t.title }])
+            existingTrips.map((t: any) => [t._id.toString(), {
+                _id: t._id.toString(),
+                title: t.title,
+                description: t.description,
+                startDate: t.startDate,
+                endDate: t.endDate,
+                coverImage: t.coverImage,
+                status: t.status,
+                inviteCode: t.inviteCode,
+                baseCurrency: t.baseCurrency,
+                totalBudget: t.totalBudget,
+            }])
         );
         const senderMap = new Map(
             senders.map((s) => [s.firebaseUid, { displayName: s.displayName, photoURL: s.photoURL }])
@@ -544,11 +563,22 @@ export const invitationService = {
             _id: { $in: tripIds },
             isArchived: { $ne: true },
         })
-            .select('_id title')
+            .select('_id title description startDate endDate coverImage status inviteCode baseCurrency totalBudget')
             .lean();
 
         const existingTripMap = new Map(
-            existingTrips.map((t) => [t._id.toString(), { _id: t._id.toString(), title: t.title }])
+            existingTrips.map((t: any) => [t._id.toString(), {
+                _id: t._id.toString(),
+                title: t.title,
+                description: t.description,
+                startDate: t.startDate,
+                endDate: t.endDate,
+                coverImage: t.coverImage,
+                status: t.status,
+                inviteCode: t.inviteCode,
+                baseCurrency: t.baseCurrency,
+                totalBudget: t.totalBudget,
+            }])
         );
 
         return invites

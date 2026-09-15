@@ -326,6 +326,11 @@ export const updateTrip = async (
     }
   }
 
+  // If a completed trip is extended to a future date and no explicit status was specified, reactivate it
+  if (trip.endDate && new Date(trip.endDate) >= new Date() && trip.status === 'completed' && !input.status) {
+    trip.status = 'active';
+  }
+
   await trip.save();
   
   if (!wasCompleted && trip.status === 'completed') {
@@ -333,6 +338,9 @@ export const updateTrip = async (
       logger.error('Failed to process achievements on trip completed:', err);
     });
   }
+
+  // Real-time broadcast to all members in the trip
+  socketServer.notifyTripUpdated(trip._id.toString(), trip.toObject ? trip.toObject() : trip);
   
   return trip;
 };
@@ -753,6 +761,36 @@ export const joinTripByInviteCode = async (
 
   return joinRequest;
 };
+
+/**
+ * Public preview of trip details by invite code (title, dates, coverImage, member count).
+ */
+export const getTripByInviteCode = async (inviteCode: string) => {
+  const trip = await Trip.findOne({
+    inviteCode: inviteCode.toUpperCase(),
+    isArchived: false,
+  }).select('_id title description coverImage startDate endDate status baseCurrency members createdBy').lean();
+
+  if (!trip) {
+    throw new AppError('Invalid or expired invite code', 404);
+  }
+
+  const activeMembers = (trip.members || []).filter((m: any) => m.isActive);
+  const admin = (trip.members || []).find((m: any) => m.role === 'admin' && m.isActive);
+
+  return {
+    tripId: trip._id.toString(),
+    title: trip.title,
+    description: trip.description,
+    coverImage: trip.coverImage,
+    startDate: trip.startDate,
+    endDate: trip.endDate,
+    status: trip.status,
+    baseCurrency: trip.baseCurrency,
+    memberCount: activeMembers.length,
+    organizerName: admin?.displayName || 'Trip Organizer',
+  };
+};
 // export const joinTripByInviteCode = async (
 //   inviteCode: string,
 //   joiner: UserInfo
@@ -895,30 +933,37 @@ export const approveJoinRequest = async (
   joinRequest.respondedBy = requestingUserId;
   await joinRequest.save();
 
-  // Add the member
-  const existingMember = trip.members.find(
-    (m: any) => m.userId === joinRequest.userId && !m.isActive
+  // Add the member (idempotent — ensure no duplicates)
+  const isAlreadyActive = trip.members.some(
+    (m: any) => m.userId === joinRequest.userId && m.isActive
   );
 
-  if (existingMember) {
-    existingMember.isActive = true;
-    existingMember.displayName = joinRequest.userName;
-    existingMember.photoURL = joinRequest.photoURL;
-    existingMember.joinedAt = new Date();
-  } else {
-    trip.members.push({
-      userId: joinRequest.userId,
-      displayName: joinRequest.userName,
-      photoURL: joinRequest.photoURL,
-      role: 'member',
-      joinedAt: new Date(),
-      isActive: true,
-      totalPaidBase: 0,
-      totalOwesBase: 0,
-    });
-  }
+  if (!isAlreadyActive) {
+    const existingMember = trip.members.find(
+      (m: any) => m.userId === joinRequest.userId && !m.isActive
+    );
 
-  await trip.save();
+    if (existingMember) {
+      existingMember.isActive = true;
+      existingMember.displayName = joinRequest.userName;
+      existingMember.photoURL = joinRequest.photoURL;
+      existingMember.joinedAt = new Date();
+    } else {
+      trip.members.push({
+        userId: joinRequest.userId,
+        displayName: joinRequest.userName,
+        photoURL: joinRequest.photoURL,
+        role: 'member',
+        joinedAt: new Date(),
+        isActive: true,
+        totalPaidBase: 0,
+        totalOwesBase: 0,
+      });
+    }
+
+    trip.markModified('members');
+    await trip.save();
+  }
 
   // Notify the approved user
   socketServer.sendToUser(joinRequest.userId, 'trip:join_approved', {

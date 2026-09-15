@@ -727,6 +727,15 @@ class SocketServer {
         });
     }
 
+    notifyTripUpdated(tripId: string, updatedTrip: any): void {
+        this.sendToTrip(tripId, 'trip:updated', {
+            type: 'TRIP_UPDATED',
+            tripId,
+            trip: updatedTrip,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
     notifyMemberRemoved(tripId: string, memberName: string, removedById: string): void {
         this.sendToTrip(tripId, 'trip:member_removed', {
             type: 'MEMBER_REMOVED',

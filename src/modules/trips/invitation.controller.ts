@@ -54,9 +54,16 @@ export const invitationController = {
         try {
             const { invitationId } = req.params;
             const userId = getUserId(req);
-            await invitationService.acceptInvitation(invitationId, userId);
+            const trip = await invitationService.acceptInvitation(invitationId, userId);
             
-            res.status(200).json({ success: true, message: 'Invitation accepted successfully' });
+            res.status(200).json({
+                success: true,
+                message: 'Invitation accepted successfully',
+                data: {
+                    trip,
+                    tripId: trip?._id?.toString()
+                }
+            });
         } catch (error) {
             if (error instanceof AppError) {
                 res.status(error.statusCode).json({ success: false, message: error.message });
