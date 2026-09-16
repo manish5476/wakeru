@@ -965,7 +965,7 @@ export const approveJoinRequest = async (
     await trip.save();
   }
 
-  // Notify the approved user
+  // Notify the approved user via socket
   socketServer.sendToUser(joinRequest.userId, 'trip:join_approved', {
     type: 'TRIP_JOIN_APPROVED',
     title: 'Join Request Approved',
@@ -973,6 +973,17 @@ export const approveJoinRequest = async (
     tripId: trip._id.toString(),
     timestamp: new Date().toISOString(),
   });
+
+  // Persist notification for the approved user
+  try {
+    await notificationService.notifyJoinApproved(
+      joinRequest.userId,
+      trip.title,
+      trip._id.toString()
+    );
+  } catch (notifErr) {
+    logger.warn('Failed to save join approved notification:', notifErr);
+  }
 
   // Notify other members in the trip
   socketServer.sendToTrip(trip._id.toString(), 'trip:member_joined', {
@@ -1016,7 +1027,7 @@ export const rejectJoinRequest = async (
   joinRequest.respondedBy = requestingUserId;
   await joinRequest.save();
 
-  // Notify the rejected user
+  // Notify the rejected user via socket
   socketServer.sendToUser(joinRequest.userId, 'trip:join_rejected', {
     type: 'TRIP_JOIN_REJECTED',
     title: 'Join Request Rejected',
@@ -1024,6 +1035,17 @@ export const rejectJoinRequest = async (
     tripId: trip._id.toString(),
     timestamp: new Date().toISOString(),
   });
+
+  // Persist notification for the rejected user
+  try {
+    await notificationService.notifyJoinRejected(
+      joinRequest.userId,
+      trip.title,
+      trip._id.toString()
+    );
+  } catch (notifErr) {
+    logger.warn('Failed to save join rejected notification:', notifErr);
+  }
 };
 
 /**

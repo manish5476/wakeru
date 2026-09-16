@@ -826,6 +826,32 @@ export class NotificationService {
   }
 
   /**
+   * Notify user that their join request was rejected.
+   */
+  async notifyJoinRejected(
+    userId: string,
+    tripTitle: string,
+    tripId: string
+  ): Promise<void> {
+    await this.create(
+      userId,
+      'TRIP_JOIN_REJECTED',
+      'Join Request Declined',
+      `Your request to join "${tripTitle}" was declined.`,
+      {
+        data: {
+          tripId,
+          tripTitle,
+          type: 'trip_join_rejected',
+        },
+        priority: 'medium',
+        category: 'trip',
+        channels: { push: true, inApp: true },
+      }
+    );
+  }
+
+  /**
    * Notify that friend request was accepted.
    */
   async notifyFriendAccepted(
@@ -935,12 +961,12 @@ export class NotificationService {
       'Join Request Approved! 👍',
       `Your request to join "${tripTitle}" has been approved!`,
       {
-        data: { tripId },
+        data: { tripId, tripTitle, type: 'trip_join_approved' },
         isActionable: true,
         actionUrl: `/trips/${tripId}`,
         priority: 'high',
         category: 'trip',
-        channels: { push: true },
+        channels: { push: true, inApp: true },
       }
     );
   }

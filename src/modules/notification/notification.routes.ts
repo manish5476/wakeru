@@ -16,6 +16,7 @@ router.post('/read-all', notificationController.markAllAsRead);
 router.post('/read-by-type', notificationController.markAsReadByType);
 router.post('/:notificationId/read', notificationController.markAsRead);
 router.delete('/clear-all', notificationController.clearAll);
+router.delete('/', notificationController.clearAll);
 router.delete('/:notificationId', notificationController.deleteNotification);
 router.post('/delete-old', notificationController.deleteOld);
 

@@ -206,9 +206,9 @@ const NotificationPreferencesSchema = new Schema<INotificationPreferences>(
 const AppearancePreferencesSchema = new Schema<IAppearancePreferences>(
   {
     themePreset: { type: String, default: 'light' },
-    backgroundType: { type: String, enum: ['color', 'image'], default: 'color' },
+    backgroundType: { type: String, enum: ['color', 'image'], default: 'image' },
     backgroundColor: { type: String, default: null },
-    backgroundImage: { type: String, default: null },
+    backgroundImage: { type: String, default: 'cover_1' },
     fontColor: { type: String, default: null },
     backgroundBlur: { type: Number, default: 50 },
     backgroundImagePosition: {
@@ -247,9 +247,9 @@ const UserPreferencesSchema = new Schema<IUserPreferences>(
       type: AppearancePreferencesSchema,
       default: () => ({
         themePreset: 'light',
-        backgroundType: 'color',
+        backgroundType: 'image',
         backgroundColor: null,
-        backgroundImage: null,
+        backgroundImage: 'cover_1',
         backgroundBlur: 50,
         backgroundImagePosition: { x: 0, y: 0, scale: 1 }
       })

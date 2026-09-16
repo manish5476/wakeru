@@ -32,8 +32,8 @@ interface AuthResult {
 // ============================================================
 
 const MAX_REFRESH_TOKENS_PER_USER = 5;
-const ACCESS_TOKEN_EXPIRY = config.JWT_ACCESS_EXPIRATION || '15m';
-const REFRESH_TOKEN_EXPIRY = config.JWT_REFRESH_EXPIRATION || '7d';
+const ACCESS_TOKEN_EXPIRY = config.JWT_ACCESS_EXPIRATION || '30d';
+const REFRESH_TOKEN_EXPIRY = config.JWT_REFRESH_EXPIRATION || '30d';
 
 // ============================================================
 // Helper Functions
