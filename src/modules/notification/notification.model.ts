@@ -69,6 +69,12 @@ export type NotificationType =
   | 'FRIEND_ACTIVITY'
   | 'SETTLEMENT_REMINDER'
 
+  // ── LENDING & BORROWING EVENTS ────────────────────────────
+  | 'LENDING_RECORDED'
+  | 'BORROWING_RECORDED'
+  | 'REPAYMENT_RECORDED'
+  | 'LENDING_SETTLED'
+
   // ── SYSTEM EVENTS ────────────────────────────────────────
   | 'MONTHLY_REPORT'
   | 'SYSTEM_UPDATE'

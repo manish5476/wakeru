@@ -316,6 +316,52 @@ export class FinanceController {
   }
 
   // ============================================================
+  // PERSONAL LENDING & BORROWING
+  // ============================================================
+
+  static async createLending(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const result = await FinanceService.createLendingRecord(userId, req.body);
+      res.status(201).json({ success: true, data: result });
+    } catch (error) { next(error); }
+  }
+
+  static async recordRepayment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const { id } = req.params;
+      const result = await FinanceService.recordRepayment(userId, id, req.body);
+      res.status(200).json({ success: true, data: result });
+    } catch (error) { next(error); }
+  }
+
+  static async getLendingRecords(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const result = await FinanceService.getLendingRecords(userId, req.query);
+      res.status(200).json({ success: true, data: result });
+    } catch (error) { next(error); }
+  }
+
+  static async getLendingById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const { id } = req.params;
+      const result = await FinanceService.getLendingById(userId, id);
+      res.status(200).json({ success: true, data: result });
+    } catch (error) { next(error); }
+  }
+
+  static async getLendingSummary(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const result = await FinanceService.getLendingSummary(userId);
+      res.status(200).json({ success: true, data: result });
+    } catch (error) { next(error); }
+  }
+
+  // ============================================================
   // DEBT & SETTLEMENT
   // ============================================================
 

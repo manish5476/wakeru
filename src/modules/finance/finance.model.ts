@@ -4,7 +4,7 @@ import { Schema, model, Document, Types } from 'mongoose';
 // TYPES
 // ============================================================
 
-export type TransactionType = 'income' | 'expense' | 'transfer' | 'trip_expense' | 'settlement_paid' | 'settlement_received';
+export type TransactionType = 'income' | 'expense' | 'transfer' | 'trip_expense' | 'settlement_paid' | 'settlement_received' | 'lent' | 'borrowed' | 'repayment';
 export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type PaymentMethod = 'Cash' | 'Card' | 'UPI' | 'Net Banking' | 'Wallet' | 'Other';
 
@@ -37,6 +37,12 @@ export interface ITransaction extends Document {
   myShare?: number;                  // User's share of the expense
   totalExpenseAmount?: number;       // Total expense amount (if split)
   splitWith?: string[];              // Who was this split with (display names)
+  // Personal Lending / Borrowing linkage
+  relationshipId?: Types.ObjectId;   // Linked Debt / Lending record
+  personName?: string;               // Contact or friend name
+  personPhone?: string;              // Contact phone number
+  personUserId?: string;             // Linked TripSplit user ID if registered
+  repaymentForTxId?: Types.ObjectId; // Original lent/borrowed transaction if this is a repayment
   // Status
   isDeleted: boolean;
   deletedAt?: Date;
@@ -130,9 +136,17 @@ export interface IDebt extends Document {
   currency: string;
   friendUserId?: string;
   name?: string;
+  phone?: string;
   reason: string;
-  status: 'pending' | 'settled';
+  repaidAmount: number;
+  outstandingAmount: number;
+  status: 'pending' | 'partially_paid' | 'settled';
   date: Date;
+  dueDate?: Date;
+  lastRepaymentDate?: Date;
+  paymentMethod?: PaymentMethod;
+  notes?: string;
+  clientOperationId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -188,7 +202,7 @@ const transactionSchema = new Schema<ITransaction>(
     userId: { type: String, required: true, index: true },
     type: {
       type: String,
-      enum: ['income', 'expense', 'transfer', 'trip_expense', 'settlement_paid', 'settlement_received'],
+      enum: ['income', 'expense', 'transfer', 'trip_expense', 'settlement_paid', 'settlement_received', 'lent', 'borrowed', 'repayment'],
       required: true,
     },
     amount: { type: Number, required: true, min: 0 },
@@ -217,6 +231,12 @@ const transactionSchema = new Schema<ITransaction>(
     myShare: { type: Number },
     totalExpenseAmount: { type: Number },
     splitWith: [{ type: String }],
+    // Personal Lending / Borrowing linkage
+    relationshipId: { type: Schema.Types.ObjectId, ref: 'Debt', index: true },
+    personName: { type: String, trim: true },
+    personPhone: { type: String, trim: true },
+    personUserId: { type: String, index: true },
+    repaymentForTxId: { type: Schema.Types.ObjectId, ref: 'Transaction' },
     // Status
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
@@ -343,30 +363,43 @@ const debtSchema = new Schema<IDebt>(
     type: { type: String, enum: ['lent', 'borrowed'], required: true },
     amount: { type: Number, required: true, min: 0 },
     currency: { type: String, default: 'INR', uppercase: true },
-    friendUserId: { type: String },
-    name: { type: String },
-    reason: { type: String, required: true },
-    status: { type: String, enum: ['pending', 'settled'], default: 'pending' },
+    friendUserId: { type: String, index: true },
+    name: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    reason: { type: String, required: true, trim: true },
+    repaidAmount: { type: Number, default: 0, min: 0 },
+    outstandingAmount: { type: Number, required: true, min: 0 },
+    status: {
+      type: String,
+      enum: ['pending', 'partially_paid', 'settled'],
+      default: 'pending',
+      index: true,
+    },
     date: { type: Date, default: Date.now },
+    dueDate: { type: Date },
+    lastRepaymentDate: { type: Date },
+    paymentMethod: {
+      type: String,
+      enum: ['Cash', 'Card', 'UPI', 'Net Banking', 'Wallet', 'Other'],
+      default: 'Cash',
+    },
+    notes: { type: String, maxlength: 500 },
+    clientOperationId: { type: String, sparse: true, index: true },
   },
   { timestamps: true, versionKey: false }
 );
 
 debtSchema.index({ userId: 1, status: 1 });
+debtSchema.index({ userId: 1, type: 1, status: 1 });
+debtSchema.index({ userId: 1, friendUserId: 1 });
+debtSchema.index({ userId: 1, date: -1 });
 
-// ── NEW COMPOUND INDEXES ────────────────────────────────────
-
-// Bills: upcoming unpaid bills (used in dashboard and getBills)
+// Bills compound indexes
 billSchema.index({ userId: 1, isPaid: 1, dueDate: 1 });
-
-// Bills: filter by active + category
 billSchema.index({ userId: 1, isActive: 1, category: 1, dueDate: 1 });
 
-// Goals: active goals sorted by deadline
+// Goals compound index
 goalSchema.index({ userId: 1, isCompleted: 1, targetDate: 1 });
-
-// Debts: lent/borrowed split view
-debtSchema.index({ userId: 1, type: 1, status: 1 });
 
 // ============================================================
 // MODELS

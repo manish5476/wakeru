@@ -63,6 +63,16 @@ router.post('/goals/:id/contribute', FinanceController.contributeToGoal);
 router.delete('/goals/:id', FinanceController.deleteGoal);
 
 // ─────────────────────────────────────────────────────────────
+// PERSONAL LENDING & BORROWING
+// ─────────────────────────────────────────────────────────────
+
+router.get('/lending', FinanceController.getLendingRecords);
+router.post('/lending', FinanceController.createLending);
+router.get('/lending/summary', FinanceController.getLendingSummary);
+router.get('/lending/:id', FinanceController.getLendingById);
+router.post('/lending/:id/repay', FinanceController.recordRepayment);
+
+// ─────────────────────────────────────────────────────────────
 // DEBT & SETTLEMENT
 // ─────────────────────────────────────────────────────────────
 

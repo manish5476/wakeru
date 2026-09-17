@@ -5,6 +5,7 @@ import { Expense } from '../expense/expense.model';
 import { Trip } from '../trips/trip.model';
 import { Settlement } from '../settlement/settlement.model';
 import { User } from '../auth/auth.model';
+import { notificationService } from '../notification/notification.service';
 import mongoose, { Types } from 'mongoose';
 import { AppError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
@@ -392,6 +393,14 @@ export class FinanceService {
         query.type = 'expense';
       } else if (filters.type === 'income') {
         query.type = { $in: ['income', 'settlement_received'] };
+      } else if (filters.type === 'lent') {
+        query.type = 'lent';
+      } else if (filters.type === 'borrowed') {
+        query.type = 'borrowed';
+      } else if (filters.type === 'repayment') {
+        query.type = 'repayment';
+      } else if (filters.type === 'lending_all') {
+        query.type = { $in: ['lent', 'borrowed', 'repayment'] };
       } else if (filters.type !== 'all') {
         query.type = filters.type;
       }
@@ -400,7 +409,7 @@ export class FinanceService {
     if (filters.tripId) query.tripId = new Types.ObjectId(filters.tripId);
     if (filters.tags && filters.tags.length > 0) query.tags = { $in: filters.tags };
     
-    // Search filter across title, notes, category, tags, tripName, paymentMethod
+    // Search filter across title, notes, category, tags, tripName, paymentMethod, personName, personPhone
     if (filters.search) {
       andClauses.push({
         $or: [
@@ -410,6 +419,8 @@ export class FinanceService {
           { tags: { $regex: filters.search, $options: 'i' } },
           { tripName: { $regex: filters.search, $options: 'i' } },
           { paymentMethod: { $regex: filters.search, $options: 'i' } },
+          { personName: { $regex: filters.search, $options: 'i' } },
+          { personPhone: { $regex: filters.search, $options: 'i' } },
         ],
       });
     }
@@ -508,6 +519,21 @@ export class FinanceService {
                 $cond: [{ $in: ['$type', ['income', 'settlement_received']] }, '$amount', 0] 
               } 
             },
+            totalLent: {
+              $sum: {
+                $cond: [{ $eq: ['$type', 'lent'] }, '$amount', 0]
+              }
+            },
+            totalBorrowed: {
+              $sum: {
+                $cond: [{ $eq: ['$type', 'borrowed'] }, '$amount', 0]
+              }
+            },
+            totalRepaid: {
+              $sum: {
+                $cond: [{ $eq: ['$type', 'repayment'] }, '$amount', 0]
+              }
+            },
           },
         },
       ]),
@@ -519,6 +545,9 @@ export class FinanceService {
         totalExpense: summary[0]?.totalExpense || 0,
         totalIncome: summary[0]?.totalIncome || 0,
         netAmount: (summary[0]?.totalIncome || 0) - (summary[0]?.totalExpense || 0),
+        totalLent: summary[0]?.totalLent || 0,
+        totalBorrowed: summary[0]?.totalBorrowed || 0,
+        totalRepaid: summary[0]?.totalRepaid || 0,
       },
       pagination: {
         page,
@@ -1616,6 +1645,333 @@ export class FinanceService {
         endDate,
         months,
       },
+    };
+  }
+
+  static async createLendingRecord(userId: string, data: any) {
+    const amount = Number(data.amount);
+    if (!amount || isNaN(amount) || amount <= 0) {
+      throw new AppError('Valid positive amount is required', 400);
+    }
+    const type = data.type;
+    if (type !== 'lent' && type !== 'borrowed') {
+      throw new AppError('Type must be either lent or borrowed', 400);
+    }
+    const personName = (data.personName || data.name || '').trim();
+    if (!personName) {
+      throw new AppError('Contact / person name is required', 400);
+    }
+
+    // Offline idempotency check
+    if (data.clientOperationId) {
+      const existingDebt = await Debt.findOne({ userId, clientOperationId: data.clientOperationId });
+      if (existingDebt) {
+        const existingTx = await Transaction.findOne({ relationshipId: existingDebt._id, isDeleted: false });
+        return { debt: existingDebt, transaction: existingTx };
+      }
+    }
+
+    const txDate = data.date ? new Date(data.date) : new Date();
+    const dueDate = data.dueDate ? new Date(data.dueDate) : undefined;
+    const phone = data.personPhone ? String(data.personPhone).trim() : (data.phone ? String(data.phone).trim() : undefined);
+    const friendUserId = data.personUserId || data.friendUserId || undefined;
+    const reason = (data.reason || data.notes || (type === 'lent' ? `Lent to ${personName}` : `Borrowed from ${personName}`)).trim();
+
+    const debt = new Debt({
+      userId,
+      type,
+      amount,
+      currency: data.currency || 'INR',
+      friendUserId,
+      name: personName,
+      phone,
+      reason,
+      repaidAmount: 0,
+      outstandingAmount: amount,
+      status: 'pending',
+      date: txDate,
+      dueDate,
+      paymentMethod: data.paymentMethod || 'Cash',
+      notes: data.notes?.trim(),
+      clientOperationId: data.clientOperationId,
+    });
+    await debt.save();
+
+    const txTitle = type === 'lent' ? `Lent to ${personName}` : `Borrowed from ${personName}`;
+    const transaction = new Transaction({
+      userId,
+      type,
+      amount,
+      currency: debt.currency,
+      title: txTitle,
+      category: type === 'lent' ? 'Lending' : 'Borrowing',
+      date: txDate,
+      paymentMethod: debt.paymentMethod,
+      notes: debt.notes,
+      relationshipId: debt._id,
+      personName,
+      personPhone: phone,
+      personUserId: friendUserId,
+      isAutoGenerated: false,
+    });
+    await transaction.save();
+
+    // Notify counterparty if registered TripSplit user
+    if (friendUserId) {
+      try {
+        const currentUser = await User.findOne({ uid: userId });
+        const senderName = currentUser?.displayName || currentUser?.name || 'A contact';
+        const formattedAmount = `${debt.currency} ${amount.toLocaleString('en-IN')}`;
+        const notifType = type === 'lent' ? 'LENDING_RECORDED' : 'BORROWING_RECORDED';
+        const notifTitle = type === 'lent' ? 'Money Lent to You' : 'Money Borrowed from You';
+        const notifMessage = type === 'lent'
+          ? `${senderName} recorded lending you ${formattedAmount}`
+          : `${senderName} recorded borrowing ${formattedAmount} from you`;
+        await notificationService.create(friendUserId, notifType, notifTitle, notifMessage, {
+          data: { debtId: debt._id.toString(), relationshipType: type, amount },
+          category: 'lending',
+        });
+      } catch (notifErr) {
+        logger.warn(`Failed to send lending notification to ${friendUserId}:`, notifErr);
+      }
+    }
+
+    logger.info(`Lending record created: ${userId} - ${type} ${amount} with ${personName}`);
+    return { debt, transaction };
+  }
+
+  static async recordRepayment(userId: string, debtId: string, data: any) {
+    const debt = await Debt.findOne({ _id: debtId, userId });
+    if (!debt) {
+      throw new AppError('Lending record not found', 404);
+    }
+
+    const repaymentAmount = Number(data.amount);
+    if (!repaymentAmount || isNaN(repaymentAmount) || repaymentAmount <= 0) {
+      throw new AppError('Valid positive repayment amount is required', 400);
+    }
+
+    // Overpayment validation
+    if (repaymentAmount > debt.outstandingAmount) {
+      throw new AppError(
+        `Repayment amount (${repaymentAmount}) cannot exceed outstanding balance (${debt.outstandingAmount})`,
+        400
+      );
+    }
+
+    // Update debt totals
+    debt.repaidAmount = (debt.repaidAmount || 0) + repaymentAmount;
+    debt.outstandingAmount = Math.max(0, debt.amount - debt.repaidAmount);
+    const repaymentDate = data.date ? new Date(data.date) : new Date();
+    debt.lastRepaymentDate = repaymentDate;
+    debt.status = debt.outstandingAmount === 0 ? 'settled' : 'partially_paid';
+    await debt.save();
+
+    const partyName = debt.name || 'Friend';
+    const repaymentTitle = debt.type === 'lent'
+      ? `Repayment received from ${partyName}`
+      : `Repayment paid to ${partyName}`;
+
+    const repaymentTx = new Transaction({
+      userId,
+      type: 'repayment',
+      amount: repaymentAmount,
+      currency: debt.currency,
+      title: repaymentTitle,
+      category: 'Repayment',
+      date: repaymentDate,
+      paymentMethod: data.paymentMethod || 'Cash',
+      notes: data.notes?.trim(),
+      relationshipId: debt._id,
+      personName: debt.name,
+      personPhone: debt.phone,
+      personUserId: debt.friendUserId,
+      isAutoGenerated: false,
+    });
+    await repaymentTx.save();
+
+    // Notify counterparty if registered
+    if (debt.friendUserId) {
+      try {
+        const currentUser = await User.findOne({ uid: userId });
+        const senderName = currentUser?.displayName || currentUser?.name || 'A contact';
+        const formattedAmount = `${debt.currency} ${repaymentAmount.toLocaleString('en-IN')}`;
+        const isSettled = debt.status === 'settled';
+        const notifType = isSettled ? 'LENDING_SETTLED' : 'REPAYMENT_RECORDED';
+        const notifTitle = isSettled ? 'Debt Settled' : 'Repayment Recorded';
+        const notifMessage = isSettled
+          ? `${senderName} marked the record with ${partyName} of ${debt.currency} ${debt.amount.toLocaleString('en-IN')} as fully settled`
+          : `${senderName} recorded a repayment of ${formattedAmount}`;
+        await notificationService.create(debt.friendUserId, notifType, notifTitle, notifMessage, {
+          data: { debtId: debt._id.toString(), repaymentAmount, status: debt.status },
+          category: 'lending',
+        });
+      } catch (notifErr) {
+        logger.warn(`Failed to dispatch repayment notification to ${debt.friendUserId}:`, notifErr);
+      }
+    }
+
+    logger.info(`Repayment recorded for debt ${debtId}: ${repaymentAmount} (remaining: ${debt.outstandingAmount})`);
+    return { debt, repaymentTransaction: repaymentTx };
+  }
+
+  static async getLendingRecords(userId: string, filters: any = {}): Promise<{
+    records: any[];
+    pagination: { page: number; limit: number; total: number; totalPages: number; hasMore: boolean };
+    summary: any;
+  }> {
+    const query: any = { userId };
+    if (filters.type && filters.type !== 'all') {
+      query.type = filters.type;
+    }
+    if (filters.status && filters.status !== 'all') {
+      query.status = filters.status;
+    }
+    if (filters.personUserId) {
+      query.friendUserId = filters.personUserId;
+    }
+    if (filters.search) {
+      const searchRegex = { $regex: filters.search, $options: 'i' };
+      query.$or = [
+        { name: searchRegex },
+        { phone: searchRegex },
+        { reason: searchRegex },
+        { notes: searchRegex },
+      ];
+    }
+
+    const page = Math.max(1, Number(filters.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(filters.limit) || 30));
+    const skip = (page - 1) * limit;
+
+    const [records, total] = await Promise.all([
+      Debt.find(query)
+        .sort({ date: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Debt.countDocuments(query),
+    ]);
+
+    // Attach latest transactions for each record
+    const debtIds = records.map(r => r._id);
+    const transactions = await Transaction.find({
+      relationshipId: { $in: debtIds },
+      isDeleted: false,
+    }).sort({ date: -1 }).lean();
+
+    const txMap = new Map<string, any[]>();
+    transactions.forEach(tx => {
+      const relId = tx.relationshipId?.toString();
+      if (relId) {
+        if (!txMap.has(relId)) txMap.set(relId, []);
+        txMap.get(relId)!.push(tx);
+      }
+    });
+
+    const enriched = records.map(r => ({
+      ...r,
+      transactions: txMap.get(r._id.toString()) || [],
+    }));
+
+    const summary = await this.getLendingSummary(userId);
+
+    return {
+      records: enriched,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasMore: skip + records.length < total,
+      },
+      summary,
+    };
+  }
+
+  static async getLendingById(userId: string, debtId: string): Promise<any> {
+    const debt = await Debt.findOne({
+      _id: debtId,
+      $or: [{ userId }, { friendUserId: userId }],
+    }).lean();
+
+    if (!debt) {
+      throw new AppError('Lending record not found', 404);
+    }
+
+    const transactions = await Transaction.find({
+      relationshipId: debt._id,
+      isDeleted: false,
+    }).sort({ date: -1, createdAt: -1 }).lean();
+
+    return {
+      ...debt,
+      transactions,
+    };
+  }
+
+  static async getLendingSummary(userId: string) {
+    const debts = await Debt.find({ userId }).lean();
+
+    let totalLent = 0;
+    let totalLentRepaid = 0;
+    let outstandingLent = 0;
+    let totalBorrowed = 0;
+    let totalBorrowedRepaid = 0;
+    let outstandingBorrowed = 0;
+    let pendingCount = 0;
+    let settledCount = 0;
+
+    const recentContactsMap = new Map<string, { name: string; phone?: string; friendUserId?: string }>();
+
+    debts.forEach(d => {
+      const amt = Number(d.amount) || 0;
+      const repaid = Number(d.repaidAmount) || 0;
+      const outstanding = Number(d.outstandingAmount) || Math.max(0, amt - repaid);
+
+      if (d.type === 'lent') {
+        totalLent += amt;
+        totalLentRepaid += repaid;
+        if (d.status !== 'settled') {
+          outstandingLent += outstanding;
+        }
+      } else if (d.type === 'borrowed') {
+        totalBorrowed += amt;
+        totalBorrowedRepaid += repaid;
+        if (d.status !== 'settled') {
+          outstandingBorrowed += outstanding;
+        }
+      }
+
+      if (d.status === 'settled') {
+        settledCount++;
+      } else {
+        pendingCount++;
+      }
+
+      if (d.name) {
+        const key = d.name.toLowerCase().trim();
+        if (!recentContactsMap.has(key)) {
+          recentContactsMap.set(key, {
+            name: d.name,
+            phone: d.phone,
+            friendUserId: d.friendUserId,
+          });
+        }
+      }
+    });
+
+    return {
+      totalLent,
+      totalLentRepaid,
+      outstandingLent,
+      totalBorrowed,
+      totalBorrowedRepaid,
+      outstandingBorrowed,
+      netOutstanding: outstandingLent - outstandingBorrowed,
+      pendingCount,
+      settledCount,
+      recentContacts: Array.from(recentContactsMap.values()).slice(0, 15),
     };
   }
 
