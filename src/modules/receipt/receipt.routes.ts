@@ -42,4 +42,7 @@ router.delete('/:receiptId', receiptController.deleteReceipt.bind(receiptControl
 router.post('/:receiptId/reprocess', receiptController.reprocessReceipt.bind(receiptController));
 router.post('/:receiptId/convert', receiptController.convertToExpense.bind(receiptController));
 
+// Pre-flight receipt expense validation & duplicate detection
+router.post('/validate', receiptController.validateReceiptExpense.bind(receiptController));
+
 export default router;

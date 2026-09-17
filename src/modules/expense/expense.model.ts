@@ -82,6 +82,18 @@ export interface IAttachment {
 }
 
 /**
+ * Receipt metadata extracted from OCR / on-device scanner
+ */
+export interface IReceiptMetadata {
+  receiptHash?: string;
+  receiptNumber?: string;
+  merchantName?: string;
+  receiptDate?: Date;
+  ocrParserVersion?: string;
+  confidence?: number;
+}
+
+/**
  * Expense document — the core transaction record.
  */
 export interface IExpense extends Document {
@@ -119,6 +131,7 @@ export interface IExpense extends Document {
   comments: IExpenseComment[];
   repeatConfig?: IRepeatConfig;
   attachments: IAttachment[];
+  receiptMetadata?: IReceiptMetadata;
 
   // Status
   isSettled: boolean;
@@ -211,6 +224,18 @@ const expenseHistorySchema = new Schema(
         newValue: { type: Schema.Types.Mixed },
       },
     ],
+  },
+  { _id: false }
+);
+
+const receiptMetadataSchema = new Schema<IReceiptMetadata>(
+  {
+    receiptHash: { type: String, index: true },
+    receiptNumber: { type: String },
+    merchantName: { type: String },
+    receiptDate: { type: Date },
+    ocrParserVersion: { type: String },
+    confidence: { type: Number },
   },
   { _id: false }
 );
@@ -343,6 +368,9 @@ const expenseSchema = new Schema<IExpense>(
       type: [attachmentSchema],
       default: [],
     },
+    receiptMetadata: {
+      type: receiptMetadataSchema,
+    },
 
     // Status
     isSettled: {
@@ -423,6 +451,9 @@ expenseSchema.index({ isArchived: 1, 'splits.userId': 1, date: -1 });
 
 // Stop-specific expenses within a trip
 expenseSchema.index({ tripId: 1, isArchived: 1, stopId: 1, date: -1 });
+
+// Receipt duplicate lookup within a trip
+expenseSchema.index({ tripId: 1, 'receiptMetadata.receiptHash': 1 });
 
 // User expense list with pagination sort by amount
 expenseSchema.index({ tripId: 1, isArchived: 1, isSettled: 1, date: -1 });

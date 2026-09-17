@@ -1,6 +1,8 @@
 import { Response, NextFunction } from 'express';
 import { receiptService } from './receipt.service';
 import { AppError } from '../../shared/errors/AppError';
+import { Trip } from '../trips/trip.model';
+import { Expense } from '../expense/expense.model';
 
 // ============================================================
 // HELPER
@@ -8,7 +10,7 @@ import { AppError } from '../../shared/errors/AppError';
 
 const getUser = (req: any) => {
   if (!req.user?.firebaseUid) throw new AppError('Not authenticated', 401);
-  return req.user.firebaseUid; // ✅ FIXED: Use Firebase UID
+  return req.user.firebaseUid;
 };
 
 // ============================================================
@@ -147,6 +149,66 @@ export class ReceiptController {
         success: true,
         message: 'Receipt data ready for expense creation',
         data: { expenseData },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async validateReceiptExpense(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = getUser(req);
+      const amountMinor = req.body.amountMinor ?? req.body.totalMinor;
+      const { tripId, currency, splits, receiptHash } = req.body;
+
+      if (!tripId) {
+        throw new AppError('tripId is required', 400);
+      }
+
+      const trip = await Trip.findById(tripId);
+      if (!trip) {
+        throw new AppError('Trip not found', 404);
+      }
+
+      if (typeof trip.isMember === 'function' ? !trip.isMember(userId) : !trip.members?.some((m: any) => m.userId === userId)) {
+        throw new AppError('User is not a member of this trip', 403);
+      }
+
+      if (amountMinor !== undefined && (!Number.isInteger(amountMinor) || amountMinor <= 0)) {
+        throw new AppError('amountMinor must be a positive integer', 400);
+      }
+
+      if (splits && Array.isArray(splits) && splits.length > 0 && amountMinor !== undefined) {
+        const splitSum = splits.reduce((sum: number, s: any) => sum + (s.amountMinor ?? s.amountLocal ?? 0), 0);
+        if (splitSum !== amountMinor) {
+          throw new AppError(`Split sum (${splitSum}) does not equal total amountMinor (${amountMinor})`, 400);
+        }
+      }
+
+      let existingExpense: any = null;
+      if (receiptHash) {
+        existingExpense = await Expense.findOne({
+          tripId,
+          'receiptMetadata.receiptHash': receiptHash,
+          isArchived: false,
+        }).select('_id title amountLocal date');
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          valid: true,
+          duplicateDetected: !!existingExpense,
+          existingExpense: existingExpense
+            ? {
+                id: existingExpense._id,
+                title: existingExpense.title,
+                amountLocal: existingExpense.amountLocal,
+                date: existingExpense.date,
+              }
+            : null,
+          tripCurrency: trip.baseCurrency,
+        },
       });
     } catch (error) {
       next(error);
