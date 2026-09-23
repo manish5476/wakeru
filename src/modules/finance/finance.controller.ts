@@ -7,16 +7,25 @@ import { Budget } from './finance.model';
 
 const getUser = (req: Request) => {
   const user = (req as any).user;
-  // ✅ FIXED: Use Firebase UID
-  if (!user?.firebaseUid) throw new AppError('Not authenticated', 401);
-  return user.firebaseUid;
+  const uid = user?.firebaseUid || user?.userId || user?._id?.toString() || user?.uid;
+  if (!uid) throw new AppError('Not authenticated', 401);
+  return uid;
 };
 
 export class FinanceController {
 
-  // =====================================================www=======
+  // ============================================================
   // DASHBOARD & ANALYTICS
   // ============================================================
+
+  static async getOverview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = getUser(req);
+      const month = req.query.month as string | undefined;
+      const overview = await FinanceService.getMonthlyFinanceOverview(userId, month);
+      res.status(200).json({ success: true, data: overview });
+    } catch (error) { next(error); }
+  }
 
   static async getDashboard(req: Request, res: Response, next: NextFunction) {
     try {

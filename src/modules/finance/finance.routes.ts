@@ -11,6 +11,7 @@ router.use(protect);
 // DASHBOARD & ANALYTICS
 // ─────────────────────────────────────────────────────────────
 
+router.get('/overview', FinanceController.getOverview);
 router.get('/dashboard', FinanceController.getDashboard);
 router.get('/analytics', FinanceController.getAnalytics);
 router.get('/trends', FinanceController.getSpendingTrends);
