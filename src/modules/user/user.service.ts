@@ -97,7 +97,7 @@ export class UserService {
       }
     }
 
-    const allowedFields = ['displayName', 'photoURL', 'bio', 'phoneNumber'];
+    const allowedFields = ['displayName', 'photoURL', 'bio', 'phoneNumber', 'onboardingCompleted'];
     const sanitized: Record<string, any> = {};
     for (const key of allowedFields) {
       if (updateData[key] !== undefined) {

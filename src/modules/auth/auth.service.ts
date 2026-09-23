@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { getAuth } from 'firebase-admin/auth';
-import { User, IUser, IUserDocument } from './auth.model';
+import { User, IUser, IUserDocument, DEFAULT_USER_PREFERENCES } from './auth.model';
 import { AppError, ConflictError, UnauthorizedError, ForbiddenError, NotFoundError, ValidationError, TooManyRequestsError } from '../../shared/errors/AppError';
 import { config } from '../../config';
 import { logger } from '../../config/logger';
@@ -175,6 +175,8 @@ export const AuthService = {
       displayName: metadata?.displayName || decodedToken.name || 'Traveler',
       photoURL: metadata?.photoURL || decodedToken.picture || '',
       authProviders,
+      preferences: DEFAULT_USER_PREFERENCES,
+      onboardingCompleted: false,
       lastLoginAt: new Date(),
     };
 
@@ -243,12 +245,16 @@ export const AuthService = {
     const userEmail = (user.email || '').toLowerCase().trim();
     const isAdminEmail = config.ADMIN_EMAILS.includes(userEmail);
 
+    const updates: Record<string, any> = { lastLoginAt: new Date() };
     if (isAdminEmail && user.role !== 'admin') {
       user.role = 'admin';
-      await User.updateOne({ _id: user._id }, { $set: { role: 'admin', lastLoginAt: new Date() } });
-    } else {
-      await User.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
+      updates.role = 'admin';
     }
+    if (!user.preferences) {
+      updates.preferences = DEFAULT_USER_PREFERENCES;
+      user.preferences = DEFAULT_USER_PREFERENCES;
+    }
+    await User.updateOne({ _id: user._id }, { $set: updates });
 
     const tokens = await generateTokens(user);
     logger.info('User logged in', { userId: user._id });

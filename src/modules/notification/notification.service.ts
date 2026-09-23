@@ -6,6 +6,7 @@ import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { logger } from '../../config/logger';
 import { AppError } from '../../shared/errors/AppError';
 import { getMessaging } from 'firebase-admin/messaging';
+import axios from 'axios';
 
 // ============================================================
 // TYPES
@@ -104,6 +105,7 @@ export class NotificationService {
         logger.error('Channel delivery failed:', { userId, type, error: err.message });
       });
 
+      logger.info('notification_created', { notificationId: notification.notificationId, type, userId });
       logger.info(`Notification created: ${type} → ${userId}`);
       return notification;
     } catch (error) {
@@ -722,7 +724,7 @@ export class NotificationService {
   ): Promise<void> {
     await this.create(
       payerUid,
-      'REMINDER',
+      'PAYMENT_REMINDER',
       '⏰ Payment Reminder',
       `${senderName} is waiting for your payment of ${baseCurrency} ${amount}`,
       {
@@ -1400,45 +1402,165 @@ export class NotificationService {
   }
 
   private async sendPush(user: any, notification: any): Promise<void> {
-    try {
-      const message = {
-        notification: {
+    const rawTokens: string[] = Array.isArray(user.fcmTokens) ? user.fcmTokens : [];
+    if (rawTokens.length === 0) return;
+
+    logger.info('notification_target_resolved', {
+      userId: user._id,
+      notificationId: notification.notificationId,
+      totalTokens: rawTokens.length,
+    });
+
+    const expoTokens = rawTokens.filter((t: string) => typeof t === 'string' && (t.startsWith('ExponentPushToken') || t.startsWith('ExpoPushToken')));
+    const fcmTokens = rawTokens.filter((t: string) => typeof t === 'string' && !t.startsWith('ExponentPushToken') && !t.startsWith('ExpoPushToken'));
+
+    logger.info('push_token_found', {
+      userId: user._id,
+      expoTokensCount: expoTokens.length,
+      fcmTokensCount: fcmTokens.length,
+    });
+
+    // Extract deep link and relevant metadata payload from notification.data or notification.options?.data
+    const sourceData = notification.data || notification.options?.data || {};
+    const dataPayload: Record<string, string> = {};
+    for (const [k, v] of Object.entries(sourceData)) {
+      if (v !== undefined && v !== null) {
+        dataPayload[k] = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      }
+    }
+    if (notification.actionUrl) {
+      dataPayload.actionUrl = String(notification.actionUrl);
+    }
+    if (notification.notificationId) {
+      dataPayload.notificationId = String(notification.notificationId);
+    }
+    if (notification.type) {
+      dataPayload.type = String(notification.type);
+    }
+    if (notification.category) {
+      dataPayload.category = String(notification.category);
+    }
+
+    logger.info('push_delivery_attempted', {
+      userId: user._id,
+      notificationType: notification.type,
+      expoTokensCount: expoTokens.length,
+      fcmTokensCount: fcmTokens.length,
+    });
+
+    // 1. Send via Expo Push API for ExponentPushTokens
+    if (expoTokens.length > 0) {
+      try {
+        const expoMessages = expoTokens.map((to: string) => ({
+          to,
+          sound: 'default',
           title: notification.title,
           body: notification.message || notification.body,
-        },
-        data: notification.options?.data ? Object.fromEntries(
-          Object.entries(notification.options.data).map(([k, v]) => [k, String(v)])
-        ) : {},
-        tokens: user.fcmTokens,
-      };
+          data: dataPayload,
+          priority: 'high',
+        }));
 
-      const response = await getMessaging().sendEachForMulticast(message);
+        const expoResponse = await axios.post(
+          'https://exp.host/--/api/v2/push/send',
+          expoMessages,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Accept-encoding': 'gzip, deflate',
+              'Content-Type': 'application/json',
+            },
+            timeout: 10000,
+          }
+        );
 
-      // Cleanup invalid tokens
-      const failedTokens: string[] = [];
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          const errorCode = resp.error?.code;
-          if (
-            errorCode === 'messaging/invalid-registration-token' ||
-            errorCode === 'messaging/registration-token-not-registered'
-          ) {
-            failedTokens.push(user.fcmTokens[idx]);
+        logger.info('push_delivery_success', {
+          provider: 'expo',
+          userId: user._id,
+          sentCount: expoTokens.length,
+        });
+
+        const tickets = expoResponse.data?.data;
+        if (Array.isArray(tickets)) {
+          const unregisteredExpoTokens: string[] = [];
+          tickets.forEach((ticket: any, idx: number) => {
+            if (ticket.status === 'error' && ticket.details?.error === 'DeviceNotRegistered') {
+              unregisteredExpoTokens.push(expoTokens[idx]);
+            }
+          });
+          if (unregisteredExpoTokens.length > 0) {
+            await User.updateOne(
+              { _id: user._id },
+              { $pull: { fcmTokens: { $in: unregisteredExpoTokens } } }
+            );
+            logger.info(`Removed ${unregisteredExpoTokens.length} unregistered Expo push tokens for user ${user._id}`);
           }
         }
-      });
-
-      if (failedTokens.length > 0) {
-        await User.updateOne(
-          { _id: user._id },
-          { $pull: { fcmTokens: { $in: failedTokens } } }
-        );
-        logger.info(`Removed ${failedTokens.length} invalid FCM tokens for user ${user._id}`);
+      } catch (expoErr: any) {
+        logger.warn('push_delivery_failed', {
+          provider: 'expo',
+          userId: user._id,
+          error: expoErr.message,
+        });
       }
+    }
 
-      logger.info(`📱 Push sent to ${user.firebaseUid} (${response.successCount} successful, ${response.failureCount} failed): ${notification.title}`);
-    } catch (error) {
-      logger.error(`Failed to send push notification to ${user.firebaseUid}:`, error);
+    // 2. Send via Firebase FCM for native FCM tokens
+    if (fcmTokens.length > 0) {
+      try {
+        const message = {
+          notification: {
+            title: notification.title,
+            body: notification.message || notification.body,
+          },
+          data: dataPayload,
+          tokens: fcmTokens,
+        };
+
+        const response = await getMessaging().sendEachForMulticast(message);
+
+        if (response.successCount > 0) {
+          logger.info('push_delivery_success', {
+            provider: 'fcm',
+            userId: user._id,
+            successCount: response.successCount,
+          });
+        }
+
+        if (response.failureCount > 0) {
+          logger.warn('push_delivery_failed', {
+            provider: 'fcm',
+            userId: user._id,
+            failureCount: response.failureCount,
+          });
+        }
+
+        const failedFcmTokens: string[] = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            const errorCode = resp.error?.code;
+            if (
+              errorCode === 'messaging/invalid-registration-token' ||
+              errorCode === 'messaging/registration-token-not-registered'
+            ) {
+              failedFcmTokens.push(fcmTokens[idx]);
+            }
+          }
+        });
+
+        if (failedFcmTokens.length > 0) {
+          await User.updateOne(
+            { _id: user._id },
+            { $pull: { fcmTokens: { $in: failedFcmTokens } } }
+          );
+          logger.info(`Removed ${failedFcmTokens.length} invalid FCM tokens for user ${user._id}`);
+        }
+      } catch (fcmError: any) {
+        logger.warn('push_delivery_failed', {
+          provider: 'fcm',
+          userId: user._id,
+          error: fcmError.message,
+        });
+      }
     }
   }
 

@@ -169,6 +169,8 @@ export interface IUser {
     lastRequestAt: Date;
   };
 
+  onboardingCompleted?: boolean;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -203,14 +205,43 @@ const NotificationPreferencesSchema = new Schema<INotificationPreferences>(
   { _id: false }
 );
 
+export const DEFAULT_USER_PREFERENCES: IUserPreferences = {
+  defaultCurrency: 'INR',
+  language: 'en',
+  theme: 'dark',
+  timezone: 'Asia/Kolkata',
+  notifications: {
+    push: true,
+    email: true,
+    sms: false,
+    expenseAdded: true,
+    settlementReminder: true,
+    monthlyReport: true,
+  },
+  appearance: {
+    themePreset: 'ocean',
+    backgroundType: 'color',
+    backgroundColor: '#FFFFFF',
+    backgroundImage: 'cover_6',
+    fontColor: '#F59E0B',
+    backgroundBlur: 100,
+    backgroundImagePosition: {
+      x: 0,
+      y: 0,
+      scale: 1,
+    },
+    customThemes: [],
+  },
+};
+
 const AppearancePreferencesSchema = new Schema<IAppearancePreferences>(
   {
-    themePreset: { type: String, default: 'light' },
-    backgroundType: { type: String, enum: ['color', 'image'], default: 'image' },
-    backgroundColor: { type: String, default: null },
-    backgroundImage: { type: String, default: 'cover_1' },
-    fontColor: { type: String, default: null },
-    backgroundBlur: { type: Number, default: 50 },
+    themePreset: { type: String, default: 'ocean' },
+    backgroundType: { type: String, enum: ['color', 'image'], default: 'color' },
+    backgroundColor: { type: String, default: '#FFFFFF' },
+    backgroundImage: { type: String, default: 'cover_6' },
+    fontColor: { type: String, default: '#F59E0B' },
+    backgroundBlur: { type: Number, default: 100 },
     backgroundImagePosition: {
       type: new Schema(
         {
@@ -230,7 +261,7 @@ const UserPreferencesSchema = new Schema<IUserPreferences>(
   {
     defaultCurrency: { type: String, default: 'INR' },
     language: { type: String, default: 'en' },
-    theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+    theme: { type: String, enum: ['light', 'dark', 'system'], default: 'dark' },
     timezone: { type: String, default: 'Asia/Kolkata' },
     notifications: {
       type: NotificationPreferencesSchema,
@@ -246,11 +277,12 @@ const UserPreferencesSchema = new Schema<IUserPreferences>(
     appearance: {
       type: AppearancePreferencesSchema,
       default: () => ({
-        themePreset: 'light',
-        backgroundType: 'image',
-        backgroundColor: null,
-        backgroundImage: 'cover_1',
-        backgroundBlur: 50,
+        themePreset: 'ocean',
+        backgroundType: 'color',
+        backgroundColor: '#FFFFFF',
+        backgroundImage: 'cover_6',
+        fontColor: '#F59E0B',
+        backgroundBlur: 100,
         backgroundImagePosition: { x: 0, y: 0, scale: 1 }
       })
     },
@@ -422,6 +454,11 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
     fcmTokens: {
       type: [String],
       default: []
+    },
+
+    onboardingCompleted: {
+      type: Boolean,
+      default: false,
     },
 
     // Preferences & Banking

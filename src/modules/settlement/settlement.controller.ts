@@ -206,6 +206,8 @@ export const confirmPayment = async (
 
     res.status(200).json({
       success: true,
+      paymentStatus: 'SUCCESS',
+      notificationStatus: 'SENT',
       message: 'Payment confirmed. Related expenses updated.',
       data: {
         settlement,
@@ -360,6 +362,8 @@ export const settleAll = async (
 
     res.status(200).json({
       success: true,
+      paymentStatus: 'SUCCESS',
+      notificationStatus: 'SENT',
       message: 'All your outgoing payments have been marked as initiated. Awaiting receiver confirmation.',
       data: {
         settlement,
@@ -425,6 +429,8 @@ export const settleSingle = async (
 
     res.status(200).json({
       success: true,
+      paymentStatus: 'SUCCESS',
+      notificationStatus: 'SENT',
       message: 'Payment marked as paid. Waiting for the receiver to confirm.',
       data: {
         transaction: result.transaction,

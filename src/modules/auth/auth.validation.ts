@@ -48,6 +48,7 @@ export const updateProfileSchema = z.object({
   photoURL: z.string().url('Must be a valid URL').optional(),
   bio: z.string().max(500, 'Bio too long').optional(),
   phoneNumber: z.string().regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number').optional(),
+  onboardingCompleted: z.boolean().optional(),
 }).refine(atLeastOne('At least one field must be provided'), {
   message: 'At least one field must be provided',
 });
