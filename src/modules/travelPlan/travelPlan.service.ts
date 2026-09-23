@@ -1,5 +1,4 @@
-// travelPlan.service.ts
-
+import { Types } from 'mongoose';
 import {
   TravelPlan, ITravelPlan,
   IChecklistItem, IItineraryDay, IFlightDetail,
@@ -461,10 +460,15 @@ class TravelPlanService {
   // ───────────────────────────────────────────────────────────────────────────
 
   async addChecklistItem(tripId: string, item: Omit<IChecklistItem, '_id' | 'checked'>): Promise<ITravelPlan> {
+    const newItem = {
+      _id: new Types.ObjectId(),
+      ...item,
+      checked: false,
+    };
     const plan = await TravelPlan.findOneAndUpdate(
       { tripId },
-      { $push: { checklist: { ...item, checked: false } } },
-      { new: true }
+      { $push: { checklist: newItem } },
+      { new: true, upsert: true }
     );
     if (!plan) throw new AppError('Plan not found', 404);
     return plan;
@@ -474,7 +478,15 @@ class TravelPlanService {
     const plan = await TravelPlan.findOne({ tripId });
     if (!plan) throw new AppError('Travel plan not found', 404);
 
-    const item = plan.checklist.id(itemId);
+    let item: any = null;
+    try {
+      item = plan.checklist.id(itemId);
+    } catch {
+      item = null;
+    }
+    if (!item) {
+      item = plan.checklist.find((i: any) => i._id?.toString() === itemId || i.item === itemId);
+    }
     if (!item) throw new AppError('Checklist item not found', 404);
 
     item.checked = !item.checked;
@@ -669,16 +681,24 @@ class TravelPlanService {
   // ───────────────────────────────────────────────────────────────────────────
 
   async addPackingItem(tripId: string, data: { category: string, name: string, quantity?: number, priority?: string }): Promise<ITravelPlan> {
+    const newItem = {
+      _id: new Types.ObjectId(),
+      name: data.name,
+      checked: false,
+      quantity: data.quantity || 1,
+      priority: data.priority || 'recommended',
+    };
+
     let plan = await TravelPlan.findOneAndUpdate(
       { tripId, 'packingList.category': new RegExp(`^${data.category}$`, 'i') },
-      { $push: { 'packingList.$.items': { name: data.name, checked: false, quantity: data.quantity || 1, priority: data.priority || 'recommended' } } },
+      { $push: { 'packingList.$.items': newItem } },
       { new: true }
     );
 
     if (!plan) {
       plan = await TravelPlan.findOneAndUpdate(
         { tripId },
-        { $push: { packingList: { category: data.category, items: [{ name: data.name, checked: false, quantity: data.quantity || 1, priority: data.priority || 'recommended' }] } } },
+        { $push: { packingList: { _id: new Types.ObjectId(), category: data.category, items: [newItem] } } },
         { new: true }
       );
     }
@@ -691,10 +711,26 @@ class TravelPlanService {
     const plan = await TravelPlan.findOne({ tripId });
     if (!plan) throw new AppError('Plan not found', 404);
 
-    const category = plan.packingList.id(categoryId);
+    let category: any = null;
+    try {
+      category = plan.packingList.id(categoryId);
+    } catch {
+      category = null;
+    }
+    if (!category) {
+      category = plan.packingList.find((c: any) => c._id?.toString() === categoryId || c.category?.toLowerCase() === categoryId?.toLowerCase());
+    }
     if (!category) throw new AppError('Category not found', 404);
 
-    const item = category.items.id(itemId);
+    let item: any = null;
+    try {
+      item = category.items.id(itemId);
+    } catch {
+      item = null;
+    }
+    if (!item) {
+      item = category.items.find((i: any) => i._id?.toString() === itemId || i.name === itemId);
+    }
     if (!item) throw new AppError('Item not found', 404);
 
     item.checked = !item.checked;
@@ -799,7 +835,17 @@ class TravelPlanService {
     const plan = await TravelPlan.findOne({ tripId });
     if (!plan) throw new AppError('Travel plan not found', 404);
 
-    plan.packingList = this.getDefaultPackingList(plan.travelStyle) as any;
+    const defaultList = this.getDefaultPackingList(plan.travelStyle);
+    plan.packingList = defaultList.map(cat => ({
+      _id: new Types.ObjectId(),
+      category: cat.category,
+      icon: cat.icon,
+      items: cat.items.map(item => ({
+        _id: new Types.ObjectId(),
+        ...item,
+        checked: false,
+      })),
+    })) as any;
     await plan.save();
     return plan;
   }
