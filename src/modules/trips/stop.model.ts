@@ -80,7 +80,7 @@ export const stopSchema = new Schema<IStop>(
       type: String,
       maxlength: [1000, 'Notes cannot exceed 1000 characters'],
     },
-    coverImage: { type: String, default: 'https://i.pinimg.com/736x/68/11/6b/68116be5b8fcd754b7f811625bd51223.jpg' },
+    coverImage: { type: String, default: '' },
     totalSpentLocal: { type: Number, default: 0 },
     totalSpentBase: { type: Number, default: 0 },
     expenseCount: { type: Number, default: 0, min: 0 },

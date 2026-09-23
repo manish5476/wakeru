@@ -146,7 +146,7 @@ const tripSchema = new Schema<ITrip>(
       type: String,
       maxlength: [1000, 'Description cannot exceed 1000 characters'],
     },
-    coverImage: { type: String, default: 'https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg' },
+    coverImage: { type: String, default: '' },
     template: {
       type: String,
       enum: ['quick', 'domestic', 'international'],
