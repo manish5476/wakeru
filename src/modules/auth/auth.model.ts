@@ -45,6 +45,7 @@ export interface IAppearancePreferences {
   backgroundColor: string | null;
   backgroundImage: string | null;
   fontColor?: string | null;
+  cardSurfaceStyle?: 'solid' | 'glass' | 'soft' | 'outlined';
   backgroundBlur: number;
   backgroundImagePosition: { x: number; y: number; scale: number };
 
@@ -224,6 +225,7 @@ export const DEFAULT_USER_PREFERENCES: IUserPreferences = {
     backgroundColor: '#FFFFFF',
     backgroundImage: 'cover_6',
     fontColor: '#F59E0B',
+    cardSurfaceStyle: 'solid',
     backgroundBlur: 100,
     backgroundImagePosition: {
       x: 0,
@@ -241,6 +243,7 @@ const AppearancePreferencesSchema = new Schema<IAppearancePreferences>(
     backgroundColor: { type: String, default: '#FFFFFF' },
     backgroundImage: { type: String, default: 'cover_6' },
     fontColor: { type: String, default: '#F59E0B' },
+    cardSurfaceStyle: { type: String, enum: ['solid', 'glass', 'soft', 'outlined'], default: 'solid' },
     backgroundBlur: { type: Number, default: 100 },
     backgroundImagePosition: {
       type: new Schema(
