@@ -517,12 +517,18 @@ class TravelPlanService {
   // ───────────────────────────────────────────────────────────────────────────
 
   async addItineraryDay(tripId: string, dayData: Partial<IItineraryDay>): Promise<ITravelPlan> {
-    const plan = await TravelPlan.findOne({ tripId });
-    if (!plan) throw new AppError('Plan not found', 404);
+    const existing = await TravelPlan.findOne({ tripId });
+    if (!existing) throw new AppError('Plan not found', 404);
 
-    const dayNumber = plan.itinerary.length + 1;
-    plan.itinerary.push({ ...dayData, day: `Day ${dayNumber}` } as any);
-    await plan.save();
+    const dayNumber = (existing.itinerary?.length || 0) + 1;
+    const newDay = { ...dayData, day: dayData.day || `Day ${dayNumber}` };
+
+    const plan = await TravelPlan.findOneAndUpdate(
+      { tripId },
+      { $push: { itinerary: newDay } },
+      { new: true }
+    );
+    if (!plan) throw new AppError('Plan not found', 404);
     return plan;
   }
 
@@ -582,7 +588,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Plan not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -593,7 +598,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Flight not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -604,7 +608,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Plan not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -624,7 +627,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Plan not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -635,7 +637,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Accommodation not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -646,7 +647,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Plan not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -661,7 +661,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Failed to add transport', 500);
-    await plan.save();
     return plan;
   }
 
@@ -685,7 +684,6 @@ class TravelPlanService {
     }
 
     if (!plan) throw new AppError('Travel plan not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -817,7 +815,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Failed to add document', 500);
-    await plan.save();
     return plan;
   }
 
@@ -828,7 +825,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Document not found', 404);
-    await plan.save();
     return plan;
   }
 
@@ -972,7 +968,6 @@ class TravelPlanService {
       { new: true }
     );
     if (!plan) throw new AppError('Travel plan not found', 404);
-    await plan.save();
     return plan;
   }
 
