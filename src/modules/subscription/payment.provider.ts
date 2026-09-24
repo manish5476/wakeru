@@ -5,12 +5,14 @@ import { AppError } from '../../shared/errors/AppError';
 import { redisClient } from '../../config/redis';
 import { logger } from '../../config/logger';
 import crypto from 'crypto';
+import axios from 'axios';
 
 export interface CheckoutSessionInput {
   userId: string;
   userEmail: string;
   planKey: string;
   billingInterval?: 'month' | 'year';
+  currency?: string;
   successUrl?: string;
   cancelUrl?: string;
 }
@@ -21,6 +23,9 @@ export interface CheckoutSessionResult {
   planKey: string;
   amount: number;
   currency: string;
+  orderId?: string;
+  keyId?: string;
+  provider?: SubscriptionProvider;
 }
 
 export interface WebhookEvent {
@@ -61,14 +66,22 @@ export class MockPaymentProvider implements IPaymentProvider {
       throw new AppError(`Plan "${input.planKey}" not found or inactive`, 404);
     }
 
+    const interval = input.billingInterval || 'month';
+    const currency = input.currency || plan.pricing.currency || 'INR';
+    const tier = plan.pricing.tiers?.[currency];
+    const amount = tier
+      ? interval === 'year' ? tier.yearlyAmount : tier.amount
+      : interval === 'year' && plan.pricing.yearlyAmount ? plan.pricing.yearlyAmount : plan.pricing.amount;
+
     const sessionId = `mock_sess_${crypto.randomUUID().replace(/-/g, '')}`;
 
     return {
       sessionId,
       checkoutUrl: `/checkout-complete?session_id=${sessionId}`,
       planKey: plan.key,
-      amount: plan.pricing.amount,
-      currency: plan.pricing.currency,
+      amount,
+      currency,
+      provider: 'mock',
     };
   }
 
@@ -82,8 +95,238 @@ export class MockPaymentProvider implements IPaymentProvider {
   }
 }
 
+/**
+ * Razorpay Payment Provider.
+ * Handles Indian Rupees (INR), UPI (GPay, PhonePe, Paytm), NetBanking, and Card payments.
+ */
+export class RazorpayPaymentProvider implements IPaymentProvider {
+  private keyId: string;
+  private keySecret: string;
+  private webhookSecret: string;
+
+  constructor() {
+    this.keyId = process.env.RAZORPAY_KEY_ID || '';
+    this.keySecret = process.env.RAZORPAY_KEY_SECRET || '';
+    this.webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || '';
+  }
+
+  async createCheckoutSession(input: CheckoutSessionInput): Promise<CheckoutSessionResult> {
+    const plan = await Plan.findOne({ key: input.planKey, status: 'active' });
+    if (!plan) {
+      throw new AppError(`Plan "${input.planKey}" not found or inactive`, 404);
+    }
+
+    const interval = input.billingInterval || 'month';
+    const amount = interval === 'year' && plan.pricing.yearlyAmount
+      ? plan.pricing.yearlyAmount
+      : plan.pricing.amount;
+    const currency = input.currency || plan.pricing.currency || 'INR';
+
+    let orderId = `order_${crypto.randomUUID().slice(0, 14)}`;
+
+    if (this.keyId && this.keySecret) {
+      try {
+        const authHeader = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
+        const response = await axios.post(
+          'https://api.razorpay.com/v1/orders',
+          {
+            amount: Math.round(amount * 100), // paise
+            currency,
+            receipt: `rcpt_${input.userId.slice(-6)}_${Date.now()}`,
+            notes: {
+              userId: input.userId,
+              planKey: plan.key,
+              billingInterval: interval,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Basic ${authHeader}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        orderId = response.data.id;
+      } catch (err: any) {
+        logger.error('Razorpay order creation failed', err?.response?.data || err?.message);
+        throw new AppError('Unable to generate payment order. Please try again.', 502);
+      }
+    }
+
+    return {
+      sessionId: orderId,
+      orderId,
+      checkoutUrl: `/checkout-complete?order_id=${orderId}`,
+      planKey: plan.key,
+      amount,
+      currency,
+      keyId: this.keyId,
+      provider: 'razorpay',
+    };
+  }
+
+  async verifyAndParseWebhook(payload: any, signature?: string): Promise<WebhookEvent> {
+    if (this.webhookSecret && signature) {
+      const raw = typeof payload === 'string' ? payload : JSON.stringify(payload);
+      const expected = crypto.createHmac('sha256', this.webhookSecret).update(raw).digest('hex');
+      if (expected !== signature) {
+        throw new AppError('Invalid Razorpay webhook signature', 401);
+      }
+    }
+
+    const event = typeof payload === 'string' ? JSON.parse(payload) : payload;
+    const payment = event.payload?.payment?.entity || {};
+    const order = event.payload?.order?.entity || {};
+    const notes = payment.notes || order.notes || {};
+
+    let type: WebhookEvent['type'] = 'checkout.session.completed';
+    if (event.event === 'payment.failed') {
+      type = 'payment.failed';
+    }
+
+    return {
+      id: event.event_id || `evt_${crypto.randomUUID()}`,
+      type,
+      provider: 'razorpay',
+      data: {
+        userId: notes.userId,
+        planKey: notes.planKey,
+        providerPaymentId: payment.id,
+        providerSubscriptionId: order.id,
+        status: payment.status,
+        raw: event,
+      },
+    };
+  }
+}
+
+/**
+ * Stripe Payment Provider.
+ * Handles Global Payments in USD, EUR, GBP, Apple Pay, and Google Pay.
+ */
+export class StripePaymentProvider implements IPaymentProvider {
+  private secretKey: string;
+  private webhookSecret: string;
+
+  constructor() {
+    this.secretKey = process.env.STRIPE_SECRET_KEY || '';
+    this.webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+  }
+
+  async createCheckoutSession(input: CheckoutSessionInput): Promise<CheckoutSessionResult> {
+    const plan = await Plan.findOne({ key: input.planKey, status: 'active' });
+    if (!plan) {
+      throw new AppError(`Plan "${input.planKey}" not found or inactive`, 404);
+    }
+
+    const interval = input.billingInterval || 'month';
+    const currency = input.currency || 'USD';
+    const tier = plan.pricing.tiers?.[currency];
+    const amount = tier
+      ? interval === 'year' ? tier.yearlyAmount : tier.amount
+      : interval === 'year' && plan.pricing.yearlyAmount ? plan.pricing.yearlyAmount : plan.pricing.amount;
+
+    let sessionId = `cs_${crypto.randomUUID().replace(/-/g, '')}`;
+    let checkoutUrl = input.successUrl || `/checkout-complete?session_id=${sessionId}`;
+
+    if (this.secretKey) {
+      try {
+        const params = new URLSearchParams();
+        params.append('mode', 'payment');
+        params.append('success_url', input.successUrl || `${process.env.APP_URL || 'https://wakeru.net'}/plans?session_id={CHECKOUT_SESSION_ID}&success=true`);
+        params.append('cancel_url', input.cancelUrl || `${process.env.APP_URL || 'https://wakeru.net'}/plans?canceled=true`);
+        params.append('client_reference_id', input.userId);
+        params.append('customer_email', input.userEmail);
+        params.append('metadata[userId]', input.userId);
+        params.append('metadata[planKey]', plan.key);
+        params.append('metadata[billingInterval]', interval);
+        params.append('line_items[0][price_data][currency]', currency.toLowerCase());
+        params.append('line_items[0][price_data][unit_amount]', Math.round(amount * 100).toString());
+        params.append('line_items[0][price_data][product_data][name]', `Wakeru Split ${plan.name} (${interval === 'year' ? 'Annual' : 'Monthly'})`);
+        params.append('line_items[0][quantity]', '1');
+
+        const response = await axios.post(
+          'https://api.stripe.com/v1/checkout/sessions',
+          params.toString(),
+          {
+            headers: {
+              Authorization: `Bearer ${this.secretKey}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        );
+        sessionId = response.data.id;
+        checkoutUrl = response.data.url;
+      } catch (err: any) {
+        logger.error('Stripe checkout session creation failed', err?.response?.data || err?.message);
+        throw new AppError('Unable to generate Stripe checkout session.', 502);
+      }
+    }
+
+    return {
+      sessionId,
+      checkoutUrl,
+      planKey: plan.key,
+      amount,
+      currency,
+      provider: 'stripe',
+    };
+  }
+
+  async verifyAndParseWebhook(payload: any, signature?: string): Promise<WebhookEvent> {
+    if (this.webhookSecret && signature) {
+      const sigParts = signature.split(',').reduce((acc: any, part) => {
+        const [k, v] = part.split('=');
+        if (k && v) acc[k.trim()] = v.trim();
+        return acc;
+      }, {});
+
+      if (sigParts.t && sigParts.v1) {
+        const rawBody = typeof payload === 'string' ? payload : JSON.stringify(payload);
+        const signedPayload = `${sigParts.t}.${rawBody}`;
+        const expected = crypto.createHmac('sha256', this.webhookSecret).update(signedPayload).digest('hex');
+        if (expected !== sigParts.v1) {
+          throw new AppError('Invalid Stripe webhook signature', 401);
+        }
+      }
+    }
+
+    const event = typeof payload === 'string' ? JSON.parse(payload) : payload;
+    const session = event.data?.object || {};
+    const metadata = session.metadata || {};
+
+    return {
+      id: event.id || `evt_${crypto.randomUUID()}`,
+      type: event.type || 'checkout.session.completed',
+      provider: 'stripe',
+      data: {
+        userId: metadata.userId || session.client_reference_id,
+        planKey: metadata.planKey,
+        providerCustomerId: session.customer,
+        providerSubscriptionId: session.subscription || session.id,
+        providerPaymentId: session.payment_intent,
+        status: session.payment_status,
+        raw: event,
+      },
+    };
+  }
+}
+
 export class PaymentManager {
-  private static provider: IPaymentProvider = new MockPaymentProvider();
+  private static provider: IPaymentProvider = PaymentManager.initDefaultProvider();
+
+  private static initDefaultProvider(): IPaymentProvider {
+    const providerName = (process.env.PAYMENT_PROVIDER || 'mock').toLowerCase();
+    if (providerName === 'razorpay') {
+      logger.info('PaymentManager initialized with Razorpay provider');
+      return new RazorpayPaymentProvider();
+    } else if (providerName === 'stripe') {
+      logger.info('PaymentManager initialized with Stripe provider');
+      return new StripePaymentProvider();
+    }
+    logger.info('PaymentManager initialized with Mock/Sandbox provider');
+    return new MockPaymentProvider();
+  }
 
   static setProvider(provider: IPaymentProvider): void {
     this.provider = provider;

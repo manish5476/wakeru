@@ -70,7 +70,7 @@ export class SubscriptionController {
     try {
       const userId = req.user?.firebaseUid || req.user?.userId;
       const userEmail = req.user?.email || '';
-      const { planKey, billingInterval } = req.body;
+      const { planKey, billingInterval, currency, successUrl, cancelUrl } = req.body;
 
       if (!userId) {
         throw new AppError('Authentication required', 401);
@@ -86,6 +86,9 @@ export class SubscriptionController {
         userEmail,
         planKey,
         billingInterval,
+        currency,
+        successUrl,
+        cancelUrl,
       });
 
       res.status(200).json({
@@ -107,6 +110,10 @@ export class SubscriptionController {
     next: NextFunction
   ): Promise<void> {
     try {
+      if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PAYMENT_SIMULATION !== 'true') {
+        throw new AppError('Payment simulation is disabled in production environment', 403);
+      }
+
       const userId = req.user?.firebaseUid || req.user?.userId;
       const { planKey } = req.body;
 

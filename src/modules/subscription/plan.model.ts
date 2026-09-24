@@ -6,10 +6,18 @@ export interface ILimitConfig {
   unit?: string;        // 'per account', 'per trip', 'per month', etc.
 }
 
+export interface ICurrencyTier {
+  amount: number;
+  yearlyAmount: number;
+  currency: string;
+}
+
 export interface IPlanPricing {
-  amount: number;       // e.g. 0 for Free, 499 for Pro, 1499 for Super Pro
+  amount: number;       // e.g. 0 for Free, 399 for Pro, 899 for Super Pro
   currency: string;     // 'INR', 'USD', etc.
   billingInterval: 'free' | 'month' | 'year' | 'lifetime';
+  yearlyAmount?: number; // annual billing total (e.g. 3830 for Pro)
+  tiers?: Record<string, ICurrencyTier>; // regional currencies (INR, USD)
 }
 
 export interface IPlan extends Document {
@@ -48,6 +56,8 @@ const PlanPricingSchema = new Schema<IPlanPricing>(
       required: true,
       default: 'month',
     },
+    yearlyAmount: { type: Number, default: 0 },
+    tiers: { type: Schema.Types.Mixed, default: {} },
   },
   { _id: false }
 );
@@ -119,11 +129,6 @@ export const Plan: Model<IPlan> = model<IPlan>('Plan', PlanSchema);
  * Admins can later modify any of these values without requiring code changes.
  */
 export async function seedDefaultPlans(): Promise<void> {
-  const existingCount = await Plan.countDocuments();
-  if (existingCount > 0) {
-    return;
-  }
-
   const defaultPlans = [
     {
       key: 'free',
@@ -137,6 +142,11 @@ export async function seedDefaultPlans(): Promise<void> {
         amount: 0,
         currency: 'INR',
         billingInterval: 'free',
+        yearlyAmount: 0,
+        tiers: {
+          INR: { amount: 0, yearlyAmount: 0, currency: 'INR' },
+          USD: { amount: 0, yearlyAmount: 0, currency: 'USD' },
+        },
       },
       limits: {
         trips: { value: 5, unlimited: false, unit: 'trips per account' },
@@ -168,6 +178,11 @@ export async function seedDefaultPlans(): Promise<void> {
         amount: 399,
         currency: 'INR',
         billingInterval: 'month',
+        yearlyAmount: 3830,
+        tiers: {
+          INR: { amount: 399, yearlyAmount: 3830, currency: 'INR' },
+          USD: { amount: 4.99, yearlyAmount: 39.99, currency: 'USD' },
+        },
       },
       limits: {
         trips: { value: 50, unlimited: false, unit: 'trips per account' },
@@ -199,6 +214,11 @@ export async function seedDefaultPlans(): Promise<void> {
         amount: 899,
         currency: 'INR',
         billingInterval: 'month',
+        yearlyAmount: 8630,
+        tiers: {
+          INR: { amount: 899, yearlyAmount: 8630, currency: 'INR' },
+          USD: { amount: 9.99, yearlyAmount: 79.99, currency: 'USD' },
+        },
       },
       limits: {
         trips: { value: null, unlimited: true, unit: 'unlimited trips' },
@@ -220,5 +240,22 @@ export async function seedDefaultPlans(): Promise<void> {
     },
   ];
 
-  await Plan.insertMany(defaultPlans);
+  const existingCount = await Plan.countDocuments();
+  if (existingCount === 0) {
+    await Plan.insertMany(defaultPlans);
+    return;
+  }
+
+  // Synchronize and backfill yearlyAmount and currency tiers into existing plan records
+  for (const def of defaultPlans) {
+    await Plan.updateOne(
+      { key: def.key },
+      {
+        $set: {
+          'pricing.yearlyAmount': def.pricing.yearlyAmount,
+          'pricing.tiers': def.pricing.tiers,
+        },
+      }
+    );
+  }
 }
