@@ -140,6 +140,8 @@ export const createExpenseSchema = z.object({
     )
     .max(10)
     .optional(),
+
+  clientOperationId: z.string().optional(),
 });
 
 // ============================================================

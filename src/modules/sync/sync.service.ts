@@ -53,6 +53,30 @@ export class SyncService {
       try {
         if (op.entityType === 'expense') {
           if (op.operationType === 'CREATE') {
+            // Check if expense was already created (e.g. by direct POST /expenses)
+            if (op.clientOperationId) {
+              const existingExpense = await Expense.findOne({ clientOperationId: op.clientOperationId });
+              if (existingExpense) {
+                await SyncLog.create({
+                  clientOperationId: op.clientOperationId,
+                  userId,
+                  entityType: 'expense',
+                  entityId: existingExpense._id.toString(),
+                  operationType: 'CREATE',
+                  status: 'APPLIED',
+                  resultPayload: existingExpense,
+                }).catch(() => {});
+
+                results.push({
+                  clientOperationId: op.clientOperationId,
+                  status: 'APPLIED',
+                  serverId: existingExpense._id.toString(),
+                  serverRecord: existingExpense,
+                });
+                continue;
+              }
+            }
+
             let stopId = op.payload.stopId;
             const tripId = op.payload.tripId;
 
@@ -109,6 +133,7 @@ export class SyncService {
             }
 
             const input = {
+              clientOperationId: op.clientOperationId,
               stopId,
               title: op.payload.title,
               category: op.payload.category || 'other',

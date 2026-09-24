@@ -137,7 +137,8 @@ export interface IExpense extends Document {
   isSettled: boolean;
   isArchived: boolean;
 
-  // Audit
+  // Audit & Idempotency
+  clientOperationId?: string;
   addedBy: string;
   editedBy?: string;
   editedAt?: Date;
@@ -384,7 +385,12 @@ const expenseSchema = new Schema<IExpense>(
       index: true,
     },
 
-    // Audit
+    // Audit & Idempotency
+    clientOperationId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
     addedBy: { type: String, required: true },
     editedBy: { type: String },
     editedAt: { type: Date },

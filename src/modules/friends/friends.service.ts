@@ -10,6 +10,7 @@ import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { notificationService } from '../notification/notification.service';
 import { achievementService } from '../achievement/achievement.service';
 import { logger } from '../../config/logger';
+import { LedgerService } from '../ledger/ledger.service';
 
 // ============================================================
 // TYPES
@@ -878,19 +879,37 @@ export const friendsService = {
             expensesTogether += (e.amountBase || 0);
         });
 
-        freshSettlements.filter(Boolean).forEach((s: any) => {
-            (s.transactions || []).forEach((t: any) => {
-                if (t.status !== 'confirmed') {
-                    if (t.to === userId && t.from === friendUserId) {
-                        theyOwe += (t.amountBase || 0);
-                        pendingCount++;
-                    } else if (t.from === userId && t.to === friendUserId) {
-                        youOwe += (t.amountBase || 0);
-                        pendingCount++;
+        // Use Canonical Ledger for accurate, identity-resolved bilateral debts
+        try {
+            const authoritative = await LedgerService.getAuthoritativeBalances(userId);
+            const friendIdentityMap = await LedgerService.resolveUserIdentities([friendUserId]);
+            const friendCanonical = friendIdentityMap.get(friendUserId)?.canonicalId || friendUserId;
+
+            const counterparty = authoritative.counterparties.find(
+                (cp) => cp.counterpartyId === friendCanonical || cp.counterpartyId === friendUserId
+            );
+
+            if (counterparty) {
+                youOwe = counterparty.grossYouOwe;
+                theyOwe = counterparty.grossTheyOwe;
+                pendingCount = counterparty.status !== 'paid' ? 1 : 0;
+            }
+        } catch (ledgerErr) {
+            logger.warn(`[FriendsService] LedgerService fallback for friend ${friendUserId}:`, ledgerErr);
+            freshSettlements.filter(Boolean).forEach((s: any) => {
+                (s.transactions || []).forEach((t: any) => {
+                    if (t.status !== 'confirmed') {
+                        if (t.to === userId && t.from === friendUserId) {
+                            theyOwe += (t.amountBase || 0);
+                            pendingCount++;
+                        } else if (t.from === userId && t.to === friendUserId) {
+                            youOwe += (t.amountBase || 0);
+                            pendingCount++;
+                        }
                     }
-                }
+                });
             });
-        });
+        }
 
         const countries = new Set<string>();
         const cities = new Set<string>();

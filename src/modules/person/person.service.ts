@@ -4,6 +4,7 @@ import { Trip } from '../trips/trip.model';
 import { Friendship, FriendRequest } from '../friends/friends.model';
 import { User } from '../auth/auth.model';
 import { AppError } from '../../shared/errors/AppError';
+import { LedgerService } from '../ledger/ledger.service';
 
 // ============================================================
 // SHARED HELPERS
@@ -12,7 +13,9 @@ import { AppError } from '../../shared/errors/AppError';
 const getUserById = async (userId: string, selectFields: string) => {
     // ✅ FIX: Query by _id (UUID), not firebaseUid
     const user = await User.findOne({
-        _id: userId,           // ← Query by Mongo _id (UUID)
+        $or: Types.ObjectId.isValid(userId)
+            ? [{ _id: new Types.ObjectId(userId) }, { firebaseUid: userId }]
+            : [{ firebaseUid: userId }],
         isActive: true,
         isDeleted: false,
     }).select(selectFields).lean();
@@ -511,7 +514,29 @@ export const personService = {
 
     async _getBalanceAggregate(userId1: string, userId2: string) {
         if (userId1 === userId2) {
-            return { youOwe: 0, theyOwe: 0, pendingCount: 0, baseCurrency: 'INR' };
+            return { youOwe: 0, theyOwe: 0, netBalance: 0, pendingCount: 0, baseCurrency: 'INR' };
+        }
+
+        try {
+            const authoritative = await LedgerService.getAuthoritativeBalances(userId1);
+            const counterpartiesMap = await LedgerService.resolveUserIdentities([userId2]);
+            const canonical2 = counterpartiesMap.get(userId2)?.canonicalId || userId2;
+
+            const cp = authoritative.counterparties.find(
+                c => c.counterpartyId === canonical2 || c.counterpartyId === userId2
+            );
+
+            if (cp) {
+                return {
+                    youOwe: cp.grossYouOwe,
+                    theyOwe: cp.grossTheyOwe,
+                    netBalance: cp.direction === 'owes_you' ? cp.netAmount : cp.direction === 'you_owe' ? -cp.netAmount : 0,
+                    pendingCount: cp.status !== 'paid' ? 1 : 0,
+                    baseCurrency: authoritative.baseCurrency || 'INR',
+                };
+            }
+        } catch {
+            // fall back to aggregation
         }
 
         const result = await Expense.aggregate([

@@ -364,6 +364,37 @@ export const createExpense = async (
     );
   }
 
+  // 0. Idempotency Check: prevent duplicate creations from network retries or offline sync races
+  if (input.clientOperationId) {
+    const existing = await Expense.findOne({ clientOperationId: input.clientOperationId });
+    if (existing) {
+      logger.info(`[Expense] Idempotent hit: expense already created for clientOperationId ${input.clientOperationId}`);
+      return existing;
+    }
+  }
+
+  // Rapid duplicate suppression guard: identical expense created within last 60 seconds
+  const windowStart = new Date(Date.now() - 60000);
+  const potentialDuplicate = await Expense.findOne({
+    tripId: trip._id,
+    stopId: new Types.ObjectId(input.stopId),
+    title: input.title,
+    amountLocal: input.amountLocal,
+    paidBy: input.paidBy,
+    createdAt: { $gte: windowStart },
+  });
+
+  if (potentialDuplicate) {
+    if (!input.clientOperationId || !potentialDuplicate.clientOperationId || input.clientOperationId === potentialDuplicate.clientOperationId) {
+      logger.warn(`[Expense] Deduplicated rapid duplicate creation for "${input.title}" (tripId: ${trip._id})`);
+      if (input.clientOperationId && !potentialDuplicate.clientOperationId) {
+        potentialDuplicate.clientOperationId = input.clientOperationId;
+        await potentialDuplicate.save();
+      }
+      return potentialDuplicate;
+    }
+  }
+
   // Compute base amount using CURRENT exchange rate (locked at creation time)
   const exchangeRateUsed = stop.currentExchangeRate;
   const amountBase = parseFloat(
@@ -395,6 +426,7 @@ export const createExpense = async (
     date: input.date,
     amountLocal: input.amountLocal,
     amountBase,
+    clientOperationId: input.clientOperationId,
     location: input.location,
     tags: input.tags || [],
     localCurrency: stop.currency,
