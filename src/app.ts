@@ -31,6 +31,7 @@ import achievementRoutes from './modules/achievement/achievement.routes';
 import locationRoutes from './modules/location/location.routes';
 import { subscriptionRoutes, adminPlanRoutes } from './modules/subscription';
 import { syncRoutes } from './modules/sync';
+import ledgerRoutes from './modules/ledger/ledger.routes';
 
 import { cronJobs } from './infrastructure/cron-jobs.service';
 
@@ -144,6 +145,7 @@ app.use('/api/v1/achievements', authenticatedRateLimiter, achievementRoutes);
 app.use('/api/v1/subscription', authenticatedRateLimiter, subscriptionRoutes);
 app.use('/api/v1/admin', authenticatedRateLimiter, adminPlanRoutes);
 app.use('/api/v1/sync', authenticatedRateLimiter, syncRoutes);
+app.use('/api/v1/ledger', authenticatedRateLimiter, ledgerRoutes);
 
 // ============================================================
 // 404 Handler

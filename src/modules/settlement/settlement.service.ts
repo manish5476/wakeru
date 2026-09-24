@@ -13,6 +13,7 @@ import { achievementService } from '../achievement/achievement.service';
 import { logger } from '../../config/logger';
 import { Reminder } from '../reminders/reminder.model';
 import { NotificationService } from '../notification/notification.service';
+import { LedgerService } from '../ledger/ledger.service';
 
 // ============================================================
 // CONSTANTS
@@ -127,44 +128,75 @@ export const calculateSettlement = async (
     .select('paidBy splits')
     .lean();
 
-  // Build member display name lookup
-  const memberMap = new Map<string, string>();
-  trip.getActiveMembers().forEach((m) => {
-    memberMap.set(m.userId, m.displayName);
+  // Resolve all participant identities canonicalized
+  const allParticipantIds = new Set<string>();
+  trip.getActiveMembers().forEach((m) => allParticipantIds.add(m.userId));
+  expenses.forEach((e) => {
+    if (e.paidBy) allParticipantIds.add(String(e.paidBy));
+    (e.splits || []).forEach((s) => {
+      if (s.userId) allParticipantIds.add(String(s.userId));
+    });
   });
 
-  // Compute net balance per member
+  const identityMap = await LedgerService.resolveUserIdentities(Array.from(allParticipantIds));
+
+  // Build member display name lookup and balanceMap by canonicalId
+  const memberMap = new Map<string, string>();
   const balanceMap = new Map<string, number>();
-  trip.getActiveMembers().forEach((m) => balanceMap.set(m.userId, 0));
+
+  trip.getActiveMembers().forEach((m) => {
+    const idInfo = identityMap.get(m.userId);
+    const cId = idInfo?.canonicalId || m.userId;
+    memberMap.set(cId, m.displayName || idInfo?.displayName || 'Traveler');
+    balanceMap.set(cId, 0);
+  });
 
   // Track expense→member relationships for explanation generation
   const debtExplanations = new Map<string, Map<string, number>>();
 
   for (const expense of expenses) {
     let unpaidAmount = 0;
+    const payerInfo = identityMap.get(expense.paidBy);
+    const payerCanonical = payerInfo?.canonicalId || expense.paidBy;
 
-    for (const split of expense.splits) {
+    if (!balanceMap.has(payerCanonical)) {
+      balanceMap.set(payerCanonical, 0);
+      memberMap.set(payerCanonical, payerInfo?.displayName || 'Traveler');
+    }
+
+    for (const split of expense.splits || []) {
       if (!split.isPaid) {
-        const current = balanceMap.get(split.userId) ?? 0;
-        balanceMap.set(split.userId, current - split.amountBase);
+        const splitInfo = identityMap.get(split.userId);
+        const splitCanonical = splitInfo?.canonicalId || split.userId;
+
+        // CRITICAL: Payer's own share NEVER generates debt against themselves!
+        if (splitCanonical === payerCanonical || LedgerService.areSameUser(splitCanonical, payerCanonical, identityMap)) {
+          continue;
+        }
+
+        if (!balanceMap.has(splitCanonical)) {
+          balanceMap.set(splitCanonical, 0);
+          memberMap.set(splitCanonical, splitInfo?.displayName || 'Traveler');
+        }
+
+        const current = balanceMap.get(splitCanonical) ?? 0;
+        balanceMap.set(splitCanonical, current - split.amountBase);
         unpaidAmount += split.amountBase;
 
-        // Track who owes whom at the expense level (only between different users)
-        if (split.userId !== expense.paidBy) {
-          if (!debtExplanations.has(split.userId)) {
-            debtExplanations.set(split.userId, new Map());
-          }
-          const payerDebt = debtExplanations.get(split.userId)!;
-          payerDebt.set(
-            expense.paidBy,
-            (payerDebt.get(expense.paidBy) ?? 0) + split.amountBase
-          );
+        // Track who owes whom at the expense level (strictly between different users)
+        if (!debtExplanations.has(splitCanonical)) {
+          debtExplanations.set(splitCanonical, new Map());
         }
+        const payerDebt = debtExplanations.get(splitCanonical)!;
+        payerDebt.set(
+          payerCanonical,
+          (payerDebt.get(payerCanonical) ?? 0) + split.amountBase
+        );
       }
     }
 
-    const currentPayer = balanceMap.get(expense.paidBy) ?? 0;
-    balanceMap.set(expense.paidBy, currentPayer + unpaidAmount);
+    const currentPayer = balanceMap.get(payerCanonical) ?? 0;
+    balanceMap.set(payerCanonical, currentPayer + unpaidAmount);
   }
 
   // Convert to NetBalance array
@@ -176,8 +208,11 @@ export const calculateSettlement = async (
     })
   );
 
-  // Run minimum transaction algorithm
-  const minTransactions = computeMinimumTransactions(netBalances);
+  // Run minimum transaction algorithm and filter out any accidental self-transactions
+  const rawMinTransactions = computeMinimumTransactions(netBalances);
+  const minTransactions = rawMinTransactions.filter(
+    (t) => t.from !== t.to && !LedgerService.areSameUser(t.from, t.to, identityMap)
+  );
 
   // Get UPI IDs and Email IDs for all recipients & participants (supporting both Firebase UID and UUID _id)
   const participantUids = Array.from(new Set(minTransactions.flatMap((t) => [t.from, t.to])));
@@ -561,7 +596,7 @@ const confirmPaymentWithoutSession = async (
   );
 
   if (!txn) throw new AppError('Transaction not found', 404);
-  if (txn.to !== confirmingUid) {
+  if (txn.to !== confirmingUid && !LedgerService.areSameUser(txn.to, confirmingUid)) {
     throw new AppError('Only the recipient can confirm receipt', 403);
   }
   if (txn.status === 'confirmed') {
@@ -582,13 +617,25 @@ const confirmPaymentWithoutSession = async (
     metadata: { notes },
   });
 
+  // Resolve identities so that whether splits/paidBy used _id or firebaseUid, they all match
+  const idMap = await LedgerService.resolveUserIdentities([txn.from, txn.to]);
+  const fromIdent = idMap.get(txn.from);
+  const toIdent = idMap.get(txn.to);
+
+  const fromAliases = Array.from(
+    new Set([txn.from, fromIdent?.canonicalId, fromIdent?.firebaseUid, fromIdent?.mongoId].filter(Boolean) as string[])
+  );
+  const toAliases = Array.from(
+    new Set([txn.to, toIdent?.canonicalId, toIdent?.firebaseUid, toIdent?.mongoId].filter(Boolean) as string[])
+  );
+
   // Mark all splits between these two users as paid
   await Expense.updateMany(
     {
       tripId: new Types.ObjectId(tripId),
       isSettled: false,
-      'splits.userId': txn.from,
-      paidBy: txn.to,
+      'splits.userId': { $in: fromAliases },
+      paidBy: { $in: toAliases },
     },
     {
       $set: {
@@ -597,7 +644,7 @@ const confirmPaymentWithoutSession = async (
       },
     },
     {
-      arrayFilters: [{ 'elem.userId': txn.from, 'elem.isPaid': false }],
+      arrayFilters: [{ 'elem.userId': { $in: fromAliases }, 'elem.isPaid': false }],
     }
   );
 
@@ -606,8 +653,8 @@ const confirmPaymentWithoutSession = async (
     {
       tripId: new Types.ObjectId(tripId),
       isSettled: false,
-      paidBy: txn.from,
-      'splits.userId': txn.to,
+      paidBy: { $in: fromAliases },
+      'splits.userId': { $in: toAliases },
     },
     {
       $set: {
@@ -616,7 +663,7 @@ const confirmPaymentWithoutSession = async (
       },
     },
     {
-      arrayFilters: [{ 'elem.userId': txn.to, 'elem.isPaid': false }],
+      arrayFilters: [{ 'elem.userId': { $in: toAliases }, 'elem.isPaid': false }],
     }
   );
 
@@ -720,7 +767,7 @@ export const confirmPayment = async (
       );
 
       if (!txn) throw new AppError('Transaction not found', 404);
-      if (txn.to !== confirmingUid) {
+      if (txn.to !== confirmingUid && !LedgerService.areSameUser(txn.to, confirmingUid)) {
         throw new AppError('Only the recipient can confirm receipt', 403);
       }
       if (txn.status === 'confirmed') {
@@ -742,13 +789,25 @@ export const confirmPayment = async (
         metadata: { notes },
       });
 
+      // Resolve identities so that whether splits/paidBy used _id or firebaseUid, they all match
+      const idMap = await LedgerService.resolveUserIdentities([txn.from, txn.to]);
+      const fromIdent = idMap.get(txn.from);
+      const toIdent = idMap.get(txn.to);
+
+      const fromAliases = Array.from(
+        new Set([txn.from, fromIdent?.canonicalId, fromIdent?.firebaseUid, fromIdent?.mongoId].filter(Boolean) as string[])
+      );
+      const toAliases = Array.from(
+        new Set([txn.to, toIdent?.canonicalId, toIdent?.firebaseUid, toIdent?.mongoId].filter(Boolean) as string[])
+      );
+
       // Mark all splits between these two users as paid
       await Expense.updateMany(
         {
           tripId: new Types.ObjectId(tripId),
           isSettled: false,
-          'splits.userId': txn.from,
-          paidBy: txn.to,
+          'splits.userId': { $in: fromAliases },
+          paidBy: { $in: toAliases },
         },
         {
           $set: {
@@ -757,7 +816,7 @@ export const confirmPayment = async (
           },
         },
         {
-          arrayFilters: [{ 'elem.userId': txn.from, 'elem.isPaid': false }],
+          arrayFilters: [{ 'elem.userId': { $in: fromAliases }, 'elem.isPaid': false }],
           session,
         }
       );
@@ -767,8 +826,8 @@ export const confirmPayment = async (
         {
           tripId: new Types.ObjectId(tripId),
           isSettled: false,
-          paidBy: txn.from,
-          'splits.userId': txn.to,
+          paidBy: { $in: fromAliases },
+          'splits.userId': { $in: toAliases },
         },
         {
           $set: {
@@ -777,7 +836,7 @@ export const confirmPayment = async (
           },
         },
         {
-          arrayFilters: [{ 'elem.userId': txn.to, 'elem.isPaid': false }],
+          arrayFilters: [{ 'elem.userId': { $in: toAliases }, 'elem.isPaid': false }],
           session,
         }
       );
@@ -1092,8 +1151,19 @@ export const getMySettlements = async (
   userId: string,
   status?: string
 ) => {
+  const userIdentMap = await LedgerService.resolveUserIdentities([userId]);
+  const userIdent = userIdentMap.get(userId);
+  const userAliases = Array.from(
+    new Set([
+      userId,
+      userIdent?.canonicalId,
+      userIdent?.firebaseUid,
+      userIdent?.mongoId,
+    ].filter(Boolean) as string[])
+  );
+
   const userTrips = await Trip.find({
-    'members.userId': userId,
+    'members.userId': { $in: userAliases },
     'members.isActive': true,
     isDeleted: { $ne: true },
   })
@@ -1131,7 +1201,9 @@ export const getMySettlements = async (
           t.amountBase > 0 &&
           Boolean(t.from) &&
           Boolean(t.to) &&
-          (t.from === userId || t.to === userId) &&
+          t.from !== t.to &&
+          !LedgerService.areSameUser(t.from, t.to) &&
+          (userAliases.includes(t.from) || userAliases.includes(t.to)) &&
           (!status || t.status === status)
       )
       .map((t: any) => ({
@@ -1180,10 +1252,10 @@ export const getMySettlements = async (
       totalDisputed: myTransactions.filter((t) => t.status === 'disputed')
         .length,
       totalOwed: myTransactions
-        .filter((t) => t.from === userId && t.status !== 'confirmed')
+        .filter((t) => userAliases.includes(t.from) && t.status !== 'confirmed')
         .reduce((s, t) => s + t.amountBase, 0),
       totalReceivable: myTransactions
-        .filter((t) => t.to === userId && t.status !== 'confirmed')
+        .filter((t) => userAliases.includes(t.to) && t.status !== 'confirmed')
         .reduce((s, t) => s + t.amountBase, 0),
     },
   };

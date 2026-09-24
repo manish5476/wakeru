@@ -10,6 +10,7 @@ import { UserAchievement } from '../achievement/achievement.model';
 import { Bill, Goal } from '../finance/finance.model';
 import { AppError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
+import { LedgerService } from '../ledger/ledger.service';
 
 // ============================================================
 // Dashboard Service — Complete Home Screen
@@ -76,6 +77,7 @@ export const dashboardService = {
             recentAchievements,
             totalTripsCount,
             allTripsForStats,
+            authoritativeLedger,
         ] = await Promise.all([
             // This month summary
             Expense.aggregate([
@@ -232,6 +234,8 @@ export const dashboardService = {
             })
                 .select('title startDate endDate totalSpentBase members stops')
                 .lean(),
+            // Authoritative Canonical Financial Ledger Balances
+            LedgerService.getAuthoritativeBalances(userId),
         ]);
 
         // ── CALCULATIONS ────────────────────────────────
@@ -243,63 +247,90 @@ export const dashboardService = {
             ? parseFloat((((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100).toFixed(1))
             : thisMonthTotal > 0 ? 100 : 0;
 
-        // You Owe grouping
-        const oweMap: Record<string, any> = {};
-        let totalOwed = 0;
-        youOweExpenses.forEach((exp: any) => {
-            const mySplit = exp.splits?.find((s: any) => s.userId === userId);
-            if (mySplit && !mySplit.isPaid) {
-                const amount = mySplit.amountBase || 0;
-                if (!oweMap[exp.paidBy]) {
-                    oweMap[exp.paidBy] = { userId: exp.paidBy, name: exp.paidByName, amount: 0, expenses: [] };
-                }
-                oweMap[exp.paidBy].amount += amount;
-                totalOwed += amount;
-                if (oweMap[exp.paidBy].expenses.length < 5) {
-                    oweMap[exp.paidBy].expenses.push({
+        // Authoritative counterparty breakdown
+        // Filter out counterparties that are actually the same user to avoid self-debt
+        const validCounterparties = (authoritativeLedger.counterparties || []).filter(
+            (cp) => !LedgerService.areSameUser(cp.counterpartyId, userId)
+        );
+
+        // You Owe grouping (people the user actually owes after bilateral debt simplification)
+        const youOweList = validCounterparties
+            .filter((cp) => cp.direction === 'you_owe' && cp.netAmount > 0)
+            .sort((a, b) => b.netAmount - a.netAmount)
+            .map((cp) => {
+                const expenses = youOweExpenses
+                    .filter(
+                        (exp: any) =>
+                            !LedgerService.areSameUser(exp.paidBy, userId) &&
+                            (exp.paidBy === cp.counterpartyId || cp.counterpartyEmail === exp.paidByName)
+                    )
+                    .slice(0, 5)
+                    .map((exp: any) => ({
                         expenseId: exp._id,
                         title: exp.title,
-                        amount,
+                        amount: exp.splits?.find((s: any) => s.userId === userId || LedgerService.areSameUser(s.userId, userId))?.amountBase || 0,
                         category: exp.category,
                         date: exp.date,
                         tripId: exp.tripId?._id || exp.tripId,
                         tripTitle: exp.tripId?.title || 'Unknown Trip',
-                    });
-                }
-            }
-        });
+                    }));
 
-        // You Are Owed grouping
-        const owedMap: Record<string, any> = {};
-        let totalLent = 0;
-        youAreOwedExpenses.forEach((exp: any) => {
-            exp.splits?.forEach((s: any) => {
-                if (!s.isPaid && s.userId !== userId) {
-                    const amount = s.amountBase || 0;
-                    if (!owedMap[s.userId]) {
-                        owedMap[s.userId] = { userId: s.userId, name: s.displayName, amount: 0, expenses: [] };
-                    }
-                    owedMap[s.userId].amount += amount;
-                    totalLent += amount;
-                    if (owedMap[s.userId].expenses.length < 5) {
-                        owedMap[s.userId].expenses.push({
+                return {
+                    userId: cp.counterpartyId,
+                    name: cp.counterpartyName,
+                    totalAmount: Math.round(cp.netAmount * 100) / 100,
+                    expenseCount: expenses.length > 0 ? expenses.length : 1,
+                    expenses,
+                };
+            });
+
+        // You Are Owed grouping (people who owe the user after bilateral debt simplification)
+        const youAreOwedList = validCounterparties
+            .filter((cp) => cp.direction === 'owes_you' && Math.abs(cp.netAmount) > 0)
+            .sort((a, b) => Math.abs(b.netAmount) - Math.abs(a.netAmount))
+            .map((cp) => {
+                const netOwed = Math.abs(cp.netAmount);
+                const expenses = youAreOwedExpenses
+                    .filter(
+                        (exp: any) =>
+                            exp.splits?.some(
+                                (s: any) =>
+                                    !LedgerService.areSameUser(s.userId, userId) &&
+                                    (s.userId === cp.counterpartyId || s.displayName === cp.counterpartyName) &&
+                                    !s.isPaid
+                            )
+                    )
+                    .slice(0, 5)
+                    .map((exp: any) => {
+                        const split = exp.splits?.find(
+                            (s: any) =>
+                                s.userId === cp.counterpartyId ||
+                                LedgerService.areSameUser(s.userId, cp.counterpartyId)
+                        );
+                        return {
                             expenseId: exp._id,
                             title: exp.title,
-                            amount,
+                            amount: split?.amountBase || 0,
                             category: exp.category,
                             date: exp.date,
                             tripId: exp.tripId?._id || exp.tripId,
                             tripTitle: exp.tripId?.title || 'Unknown Trip',
-                        });
-                    }
-                }
+                        };
+                    });
+
+                return {
+                    userId: cp.counterpartyId,
+                    name: cp.counterpartyName,
+                    totalAmount: Math.round(netOwed * 100) / 100,
+                    expenseCount: expenses.length > 0 ? expenses.length : 1,
+                    expenses,
+                };
             });
-        });
 
         // Pending actions
         const pendingActions = this._buildPendingActions(
-            totalOwed,
-            pendingSettlements,
+            authoritativeLedger.netPayable,
+            authoritativeLedger.pendingSettlementCount,
             pendingFriendRequests,
             pendingTripInvites,
             pendingJoinRequests,
@@ -332,15 +363,18 @@ export const dashboardService = {
                 },
                 spendingChange, // Negative = spending less this month
                 activeTrips: activeTrips.length,
-                pendingSettlements,
+                pendingSettlements: authoritativeLedger.pendingSettlementCount,
             },
 
             // ── BALANCES ──────────────────────────────
             balances: {
-                totalLent: Math.round(totalLent * 100) / 100,
-                totalOwed: Math.round(totalOwed * 100) / 100,
-                netBalance: Math.round((totalLent - totalOwed) * 100) / 100,
-                baseCurrency: activeTrips[0]?.baseCurrency || 'INR',
+                totalLent: authoritativeLedger.netReceivable,
+                totalOwed: authoritativeLedger.netPayable,
+                netBalance: authoritativeLedger.netBalance,
+                grossLent: authoritativeLedger.grossOwedToYou,
+                grossOwed: authoritativeLedger.grossYouOwe,
+                status: authoritativeLedger.status,
+                baseCurrency: activeTrips[0]?.baseCurrency || authoritativeLedger.baseCurrency || 'INR',
             },
 
             // ── CATEGORY BREAKDOWN ────────────────────
@@ -362,30 +396,10 @@ export const dashboardService = {
             })),
 
             // ── YOU OWE ───────────────────────────────
-            youOwe: Object.values(oweMap)
-                .sort((a: any, b: any) => b.amount - a.amount)
-                .map((p: any) => ({
-                    userId: p.userId,
-                    name: p.name,
-                    totalAmount: Math.round(p.amount * 100) / 100,
-                    expenseCount: youOweExpenses.filter(
-                        (e: any) => e.paidBy === p.userId
-                    ).length,
-                    expenses: p.expenses,
-                })),
+            youOwe: youOweList,
 
             // ── YOU ARE OWED ──────────────────────────
-            youAreOwed: Object.values(owedMap)
-                .sort((a: any, b: any) => b.amount - a.amount)
-                .map((p: any) => ({
-                    userId: p.userId,
-                    name: p.name,
-                    totalAmount: Math.round(p.amount * 100) / 100,
-                    expenseCount: youAreOwedExpenses.filter(
-                        (e: any) => e.splits?.some((s: any) => s.userId === p.userId && !s.isPaid)
-                    ).length,
-                    expenses: p.expenses,
-                })),
+            youAreOwed: youAreOwedList,
 
             // ── ACTIVE TRIPS ──────────────────────────
             activeTrips: activeTrips.map((trip: any) => ({
