@@ -558,9 +558,6 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
 // Indexes
 // ============================================================
 
-UserSchema.index({ email: 1 });
-UserSchema.index({ phoneSearchIndex: 1 }, { sparse: true });
-UserSchema.index({ friendIds: 1 });
 UserSchema.index({ isDeleted: 1, isActive: 1 });
 UserSchema.index({ 'totalOwedAcrossTrips': -1 });
 UserSchema.index({ 'totalLentAcrossTrips': -1 });
