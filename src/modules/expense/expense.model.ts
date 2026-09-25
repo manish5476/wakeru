@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
+import { PiiCryptoService } from '../../shared/utils/piiCrypto.service';
 
 // ============================================================
 // ENUMS & CONSTANTS
@@ -110,6 +111,10 @@ export interface IExpense extends Document {
   title: string;
   category: ExpenseCategory;
   notes?: string;
+  notesEncrypted?: string;
+  isPrivateVault?: boolean;
+  integrityHash?: string;
+  previousHash?: string;
   receiptImages: string[];
   date: Date;
   tags: string[];
@@ -288,6 +293,24 @@ const expenseSchema = new Schema<IExpense>(
     notes: {
       type: String,
       maxlength: [500, 'Notes cannot exceed 500 characters'],
+      select: false,
+    },
+    notesEncrypted: {
+      type: String,
+      default: null,
+    },
+    isPrivateVault: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    integrityHash: {
+      type: String,
+      default: null,
+    },
+    previousHash: {
+      type: String,
+      default: null,
     },
     receiptImages: {
       type: [String],
@@ -401,8 +424,26 @@ const expenseSchema = new Schema<IExpense>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toJSON: {
+      virtuals: true,
+      transform: (_doc: any, ret: Record<string, any>) => {
+        if (ret.notesEncrypted) {
+          ret.notes = PiiCryptoService.decrypt(ret.notesEncrypted);
+          delete ret.notesEncrypted;
+        }
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_doc: any, ret: Record<string, any>) => {
+        if (ret.notesEncrypted) {
+          ret.notes = PiiCryptoService.decrypt(ret.notesEncrypted);
+          delete ret.notesEncrypted;
+        }
+        return ret;
+      },
+    },
     versionKey: false,
   }
 );
@@ -464,17 +505,38 @@ expenseSchema.index({ tripId: 1, 'receiptMetadata.receiptHash': 1 });
 // User expense list with pagination sort by amount
 expenseSchema.index({ tripId: 1, isArchived: 1, isSettled: 1, date: -1 });
 
+expenseSchema.index({ tripId: 1, isPrivateVault: 1, paidBy: 1 });
+
 // ============================================================
 // PRE-SAVE HOOKS
 // ============================================================
 
 expenseSchema.pre('save', function (next) {
-  // Personal expenses are always settled — no debt created
+  // Personal expenses are always settled and marked as private vault
   if (this.splitMethod === 'personal') {
     this.isSettled = true;
+    this.isPrivateVault = true;
   } else {
     this.isSettled = this.splits.every((s) => s.isPaid);
   }
+
+  // Encrypt notes if provided or modified
+  if (this.isModified('notes') && this.notes) {
+    this.notesEncrypted = PiiCryptoService.encrypt(this.notes);
+    this.notes = undefined;
+  }
+
+  // Compute tamper-proof integrity hash chain
+  if (!this.integrityHash || this.isModified('amountBase') || this.isModified('splits') || this.isModified('paidBy')) {
+    this.integrityHash = PiiCryptoService.computeHashChain(this.previousHash || '', {
+      amountBase: this.amountBase,
+      paidBy: this.paidBy,
+      title: this.title,
+      date: this.date,
+      splitsCount: this.splits?.length || 0,
+    });
+  }
+
   next();
 });
 

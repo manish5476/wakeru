@@ -118,4 +118,52 @@ export class PiiCryptoService {
     const end = clean.slice(-3);
     return `${start}${'*'.repeat(Math.max(2, clean.length - 7))}${end}`;
   }
+
+  /**
+   * Masks a bank account number (e.g., **** **** 4321).
+   */
+  static maskAccountNumber(accountNumber: string): string {
+    if (!accountNumber) return '';
+    const clean = accountNumber.trim().replace(/\s+/g, '');
+    if (clean.length <= 4) return clean;
+    const last4 = clean.slice(-4);
+    return `**** **** ${last4}`;
+  }
+
+  /**
+   * Masks a UPI ID (e.g., m****@okhdfcbank).
+   */
+  static maskUpiId(upiId: string): string {
+    if (!upiId) return '';
+    const clean = upiId.trim().toLowerCase();
+    const atIndex = clean.indexOf('@');
+    if (atIndex <= 1) return '****' + (atIndex !== -1 ? clean.slice(atIndex) : '');
+    const userPart = clean.slice(0, atIndex);
+    const handlePart = clean.slice(atIndex);
+    const visibleStart = userPart.slice(0, 1);
+    return `${visibleStart}${'*'.repeat(Math.max(3, userPart.length - 1))}${handlePart}`;
+  }
+
+  /**
+   * Computes a deterministic HMAC-SHA256 blind index for UPI IDs.
+   */
+  static computeUpiBlindIndex(upiId: string): string {
+    if (!upiId) return '';
+    const normalized = upiId.trim().toLowerCase();
+    return crypto
+      .createHmac('sha256', this.getBlindIndexSecret())
+      .update(normalized)
+      .digest('hex');
+  }
+
+  /**
+   * Computes a cryptographic SHA-256 tamper-proof ledger hash for an expense or transaction.
+   */
+  static computeHashChain(previousHash: string, data: Record<string, any>): string {
+    const serialized = JSON.stringify(data, Object.keys(data).sort());
+    return crypto
+      .createHash('sha256')
+      .update(`${previousHash || '00000000000000000000000000000000'}:${serialized}`)
+      .digest('hex');
+  }
 }

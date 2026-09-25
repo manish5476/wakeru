@@ -110,12 +110,18 @@ export interface IUserPreferences {
 
 export interface IBankingDetails {
   upiId?: string;
+  upiIdEncrypted?: string;
+  upiSearchIndex?: string;
   upiVerified?: boolean;
   bankAccount?: {
-    accountNumber: string;
-    ifscCode: string;
-    bankName: string;
-    accountHolderName: string;
+    accountNumber?: string;
+    accountNumberEncrypted?: string;
+    accountNumberMasked?: string;
+    ifscCode?: string;
+    ifscCodeEncrypted?: string;
+    bankName?: string;
+    accountHolderName?: string;
+    accountHolderNameEncrypted?: string;
   };
   walletDetails?: {
     provider: 'paytm' | 'phonepe' | 'googlepay' | 'amazonpay';
@@ -328,15 +334,21 @@ const AuthProvidersSchema = new Schema<IAuthProviders>(
 
 const BankingDetailsSchema = new Schema<IBankingDetails>(
   {
-    upiId: { type: String, sparse: true },
+    upiId: { type: String, select: false },
+    upiIdEncrypted: { type: String, default: null },
+    upiSearchIndex: { type: String, index: true, sparse: true },
     upiVerified: { type: Boolean, default: false },
     bankAccount: {
       type: new Schema(
         {
-          accountNumber: String,
-          ifscCode: String,
-          bankName: String,
-          accountHolderName: String,
+          accountNumber: { type: String, select: false },
+          accountNumberEncrypted: { type: String, default: null },
+          accountNumberMasked: { type: String, default: null },
+          ifscCode: { type: String, select: false },
+          ifscCodeEncrypted: { type: String, default: null },
+          bankName: { type: String },
+          accountHolderName: { type: String, select: false },
+          accountHolderNameEncrypted: { type: String, default: null },
         },
         { _id: false }
       ),
@@ -526,6 +538,25 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
           delete safeRet.phoneEncrypted;
         }
 
+        if (safeRet.bankingDetails) {
+          const bd = { ...safeRet.bankingDetails };
+          delete bd.upiSearchIndex;
+          if (bd.upiIdEncrypted) {
+            bd.upiId = PiiCryptoService.decrypt(bd.upiIdEncrypted);
+            delete bd.upiIdEncrypted;
+          }
+          if (bd.bankAccount) {
+            bd.bankAccount = { ...bd.bankAccount };
+            delete bd.bankAccount.accountNumberEncrypted;
+            delete bd.bankAccount.ifscCodeEncrypted;
+            delete bd.bankAccount.accountHolderNameEncrypted;
+            if (bd.bankAccount.accountNumberMasked) {
+              bd.bankAccount.accountNumber = bd.bankAccount.accountNumberMasked;
+            }
+          }
+          safeRet.bankingDetails = bd;
+        }
+
         return safeRet;
       },
     },
@@ -545,6 +576,25 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
         if (safeRet.phoneEncrypted) {
           safeRet.phoneNumber = PiiCryptoService.decrypt(safeRet.phoneEncrypted);
           delete safeRet.phoneEncrypted;
+        }
+
+        if (safeRet.bankingDetails) {
+          const bd = { ...safeRet.bankingDetails };
+          delete bd.upiSearchIndex;
+          if (bd.upiIdEncrypted) {
+            bd.upiId = PiiCryptoService.decrypt(bd.upiIdEncrypted);
+            delete bd.upiIdEncrypted;
+          }
+          if (bd.bankAccount) {
+            bd.bankAccount = { ...bd.bankAccount };
+            delete bd.bankAccount.accountNumberEncrypted;
+            delete bd.bankAccount.ifscCodeEncrypted;
+            delete bd.bankAccount.accountHolderNameEncrypted;
+            if (bd.bankAccount.accountNumberMasked) {
+              bd.bankAccount.accountNumber = bd.bankAccount.accountNumberMasked;
+            }
+          }
+          safeRet.bankingDetails = bd;
         }
 
         return safeRet;

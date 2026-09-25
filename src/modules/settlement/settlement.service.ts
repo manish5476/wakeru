@@ -14,6 +14,7 @@ import { logger } from '../../config/logger';
 import { Reminder } from '../reminders/reminder.model';
 import { NotificationService } from '../notification/notification.service';
 import { LedgerService } from '../ledger/ledger.service';
+import { PiiCryptoService } from '../../shared/utils/piiCrypto.service';
 
 // ============================================================
 // CONSTANTS
@@ -224,19 +225,23 @@ export const calculateSettlement = async (
     isActive: true,
     isDeleted: false,
   })
-    .select('firebaseUid _id email bankingDetails.upiId displayName')
+    .select('firebaseUid _id email bankingDetails.upiId bankingDetails.upiIdEncrypted displayName')
     .lean();
 
   const upiMap = new Map();
   const emailMap = new Map();
   users.forEach((u: any) => {
+    const rawUpi = u.bankingDetails?.upiIdEncrypted
+      ? PiiCryptoService.decrypt(u.bankingDetails.upiIdEncrypted)
+      : u.bankingDetails?.upiId;
+
     if (u.firebaseUid) {
-      if (u.bankingDetails?.upiId) upiMap.set(u.firebaseUid, u.bankingDetails.upiId);
+      if (rawUpi) upiMap.set(u.firebaseUid, rawUpi);
       if (u.email) emailMap.set(u.firebaseUid, u.email);
     }
     if (u._id) {
       const idStr = String(u._id);
-      if (u.bankingDetails?.upiId) upiMap.set(idStr, u.bankingDetails.upiId);
+      if (rawUpi) upiMap.set(idStr, rawUpi);
       if (u.email) emailMap.set(idStr, u.email);
     }
   });
@@ -525,10 +530,14 @@ export const initiatePayment = async (
     isActive: true,
     isDeleted: false,
   })
-    .select('bankingDetails.upiId displayName')
+    .select('bankingDetails.upiId bankingDetails.upiIdEncrypted displayName')
     .lean();
 
-  if (!recipient?.bankingDetails?.upiId) {
+  const recipientUpi = recipient?.bankingDetails?.upiIdEncrypted
+    ? PiiCryptoService.decrypt(recipient.bankingDetails.upiIdEncrypted)
+    : recipient?.bankingDetails?.upiId;
+
+  if (!recipientUpi) {
     throw new AppError(
       `${txn.toName} has not set up their UPI ID yet`,
       400
@@ -538,7 +547,7 @@ export const initiatePayment = async (
   const paymentAmount = partialAmount ?? txn.amountBase;
 
   // Build UPI deep link
-  const pa = encodeURIComponent(recipient.bankingDetails.upiId);
+  const pa = encodeURIComponent(recipientUpi);
   const pn = encodeURIComponent(txn.toName);
   const am = paymentAmount.toFixed(2);
   const cu = txn.baseCurrency;
@@ -1094,17 +1103,21 @@ export const retryPayment = async (
     isActive: true,
     isDeleted: false,
   })
-    .select('bankingDetails.upiId displayName')
+    .select('bankingDetails.upiId bankingDetails.upiIdEncrypted displayName')
     .lean();
 
-  if (!recipient?.bankingDetails?.upiId) {
+  const recipientUpi = recipient?.bankingDetails?.upiIdEncrypted
+    ? PiiCryptoService.decrypt(recipient.bankingDetails.upiIdEncrypted)
+    : recipient?.bankingDetails?.upiId;
+
+  if (!recipientUpi) {
     throw new AppError(
       `${txn.toName} has not set up their UPI ID yet`,
       400
     );
   }
 
-  const pa = encodeURIComponent(recipient.bankingDetails.upiId);
+  const pa = encodeURIComponent(recipientUpi);
   const pn = encodeURIComponent(txn.toName);
   const am = txn.amountBase.toFixed(2);
   const cu = txn.baseCurrency;

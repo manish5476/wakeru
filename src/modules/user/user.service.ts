@@ -175,19 +175,44 @@ export class UserService {
    * Update banking details
    */
   async updateBankingDetails(userId: string, bankingDetails: Record<string, any>): Promise<IUserDocument> {
-    if (bankingDetails.upiId) {
-      const upiRegex = /^[\w.-]+@[\w]+$/;
-      if (!upiRegex.test(bankingDetails.upiId)) {
-        throw new BadRequestError('Invalid UPI ID format (e.g., name@upi)');
+    const updateData: Record<string, any> = {};
+
+    if (bankingDetails.upiId !== undefined) {
+      if (bankingDetails.upiId) {
+        const upiRegex = /^[\w.-]+@[\w]+$/;
+        if (!upiRegex.test(bankingDetails.upiId)) {
+          throw new BadRequestError('Invalid UPI ID format (e.g., name@upi)');
+        }
+        const normalizedUpi = bankingDetails.upiId.trim().toLowerCase();
+        updateData['bankingDetails.upiIdEncrypted'] = PiiCryptoService.encrypt(normalizedUpi);
+        updateData['bankingDetails.upiSearchIndex'] = PiiCryptoService.computeUpiBlindIndex(normalizedUpi);
+        updateData['bankingDetails.upiVerified'] = false; // Reset on change
+      } else {
+        updateData['bankingDetails.upiIdEncrypted'] = null;
+        updateData['bankingDetails.upiSearchIndex'] = null;
+        updateData['bankingDetails.upiVerified'] = false;
       }
     }
 
-    const updateData: Record<string, any> = {};
-    for (const [key, value] of Object.entries(bankingDetails)) {
-      updateData[`bankingDetails.${key}`] = value;
+    if (bankingDetails.bankAccount) {
+      const { accountNumber, ifscCode, bankName, accountHolderName } = bankingDetails.bankAccount;
+      if (accountNumber) {
+        updateData['bankingDetails.bankAccount.accountNumberEncrypted'] = PiiCryptoService.encrypt(accountNumber.trim());
+        updateData['bankingDetails.bankAccount.accountNumberMasked'] = PiiCryptoService.maskAccountNumber(accountNumber);
+      }
+      if (ifscCode) {
+        updateData['bankingDetails.bankAccount.ifscCodeEncrypted'] = PiiCryptoService.encrypt(ifscCode.trim().toUpperCase());
+      }
+      if (bankName) {
+        updateData['bankingDetails.bankAccount.bankName'] = bankName.trim();
+      }
+      if (accountHolderName) {
+        updateData['bankingDetails.bankAccount.accountHolderNameEncrypted'] = PiiCryptoService.encrypt(accountHolderName.trim());
+      }
     }
-    if (bankingDetails.upiId) {
-      updateData['bankingDetails.upiVerified'] = false; // Reset on change
+
+    if (bankingDetails.walletDetails) {
+      updateData['bankingDetails.walletDetails'] = bankingDetails.walletDetails;
     }
 
     const user = await User.findOneAndUpdate(
