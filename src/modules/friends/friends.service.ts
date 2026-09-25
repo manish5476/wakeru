@@ -11,6 +11,7 @@ import { notificationService } from '../notification/notification.service';
 import { achievementService } from '../achievement/achievement.service';
 import { logger } from '../../config/logger';
 import { LedgerService } from '../ledger/ledger.service';
+import { PiiCryptoService } from '../../shared/utils/piiCrypto.service';
 
 // ============================================================
 // TYPES
@@ -434,18 +435,25 @@ export const friendsService = {
 
         const searchRegex = new RegExp(query, 'i');
 
+        const orConditions: any[] = [
+            { displayName: searchRegex },
+            { email: searchRegex },
+        ];
+
+        const canonicalPhone = PiiCryptoService.normalizePhoneNumber(query);
+        if (canonicalPhone) {
+            const blindIndex = PiiCryptoService.computeBlindIndex(canonicalPhone);
+            orConditions.push({ phoneSearchIndex: blindIndex });
+        }
+
         // ✅ FIXED: Query by firebaseUid, return firebaseUid
         const users = await User.find({
             firebaseUid: { $ne: userId },
             isActive: true,
             isDeleted: false,
-            $or: [
-                { displayName: searchRegex },
-                { email: searchRegex },
-                { phoneNumber: searchRegex },
-            ],
+            $or: orConditions,
         })
-            .select('firebaseUid displayName photoURL phoneNumber email')
+            .select('firebaseUid displayName photoURL phoneEncrypted phoneNumber email')
             .limit(20)
             .lean();
 
@@ -477,17 +485,22 @@ export const friendsService = {
             pendingRequests.filter((r: any) => r.toUserId === userId).map((r: any) => r.fromUserId)
         );
 
-        return users.map((u: any) => ({
-            userId: u.firebaseUid,  // ✅ Return Firebase UID
-            displayName: u.displayName,
-            photoURL: u.photoURL,
-            phoneNumber: u.phoneNumber,
-            email: u.email,
-            isFriend: friendSet.has(u.firebaseUid),
-            hasPendingRequest: pendingFromMe.has(u.firebaseUid) || pendingToMe.has(u.firebaseUid),
-            incomingRequest: pendingToMe.has(u.firebaseUid),  // They sent me a request
-            outgoingRequest: pendingFromMe.has(u.firebaseUid),  // I sent them a request
-        }));
+        return users.map((u: any) => {
+            const decryptedPhone = u.phoneEncrypted
+                ? PiiCryptoService.decrypt(u.phoneEncrypted)
+                : u.phoneNumber;
+            return {
+                userId: u.firebaseUid,  // ✅ Return Firebase UID
+                displayName: u.displayName,
+                photoURL: u.photoURL,
+                phoneNumber: decryptedPhone ? PiiCryptoService.maskPhoneNumber(decryptedPhone) : undefined,
+                email: u.email,
+                isFriend: friendSet.has(u.firebaseUid),
+                hasPendingRequest: pendingFromMe.has(u.firebaseUid) || pendingToMe.has(u.firebaseUid),
+                incomingRequest: pendingToMe.has(u.firebaseUid),  // They sent me a request
+                outgoingRequest: pendingFromMe.has(u.firebaseUid),  // I sent them a request
+            };
+        });
     },
 
     async getSuggestions(userId: string): Promise<any[]> {

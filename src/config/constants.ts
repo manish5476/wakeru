@@ -71,9 +71,9 @@ export const CONSTANTS = {
     OCR_UPLOAD: { windowMs: 60 * 1000, max: 5 },
   },
   UPLOAD_LIMITS: {
-    RECEIPT_IMAGE: { maxSize: 10 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png', 'image/heic'] },
-    PROFILE_IMAGE: { maxSize: 1 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
-    GROUP_AVATAR: { maxSize: 2 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png'] },
+    RECEIPT_IMAGE: { maxSize: 10 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'] },
+    PROFILE_IMAGE: { maxSize: 10 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'] },
+    GROUP_AVATAR: { maxSize: 10 * 1024 * 1024, allowedTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/webp'] },
   },
   CACHE_TTL: {
     USER_PROFILE: 3600,

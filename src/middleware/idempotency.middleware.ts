@@ -8,9 +8,15 @@ export class IdempotencyMiddleware {
     try {
       if (req.method === 'GET') return next();
 
+      const contentType = req.headers['content-type'] || '';
+      const isMultipart = typeof contentType === 'string' && contentType.includes('multipart/form-data');
       const idempotencyKey = req.headers['idempotency-key'] as string;
 
       if (!idempotencyKey) {
+        // If client sends a multipart upload without an Idempotency-Key, allow it to proceed uninhibited
+        if (isMultipart) {
+          return next();
+        }
         throw new AppError('Idempotency-Key header is required for mutation operations', 400, 'IDEMPOTENCY_KEY_MISSING');
       }
 
@@ -30,13 +36,16 @@ export class IdempotencyMiddleware {
         }
       }
 
+      const userId = (req as any).user?.id || (req as any).user?.userId || (req as any).user?.firebaseUid;
+      const bodyToHash = isMultipart ? { isMultipart: true, idempotencyKey } : req.body;
+
       const fingerprint = crypto
         .createHash('sha256')
         .update(JSON.stringify({
           method: req.method,
           path: req.path,
-          body: req.body,
-          userId: (req as any).user?.id
+          body: bodyToHash,
+          userId
         }))
         .digest('hex');
 

@@ -70,6 +70,10 @@ export const config = {
     .split(',')
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean),
+
+  // PII Encryption & Searchable Blind Index Secrets
+  PII_ENCRYPTION_KEY: process.env.PII_ENCRYPTION_KEY || 'e7b1c4d92a08f53198e6c72b4f910a35d28b61c9e4720fa8513db2e96417ca03',
+  PII_BLIND_INDEX_SECRET: process.env.PII_BLIND_INDEX_SECRET || 'f8a3c5d710b9e82649a21b7c03d4e658a912f3b4c5d6e7f8a9b0c1d2e3f4a5b6',
 } as const;
 
 // Validate critical configuration

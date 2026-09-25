@@ -12,6 +12,7 @@ import cloudinary from '../../config/cloudinary.config';
 import { Media } from '../media/media.model';
 import { socketServer } from '../../infrastructure/websocket/socket.server';
 import { v4 as uuidv4 } from 'uuid';
+import { PiiCryptoService } from '../../shared/utils/piiCrypto.service';
 
 function hexToRgb(color: string): [number, number, number] {
   let hex = (color || '').trim().replace(/^#/, '');
@@ -87,21 +88,35 @@ export class UserService {
    */
   async updateProfile(userId: string, updateData: Record<string, any>): Promise<IUserDocument> {
     if (updateData.phoneNumber) {
-      const existing = await User.findOne({ 
-        phoneNumber: updateData.phoneNumber, 
-        _id: { $ne: userId },
-        isDeleted: false,
-      });
-      if (existing) {
-        throw new ConflictError('Phone number already in use');
+      const canonical = PiiCryptoService.normalizePhoneNumber(updateData.phoneNumber);
+      if (canonical) {
+        const blindIndex = PiiCryptoService.computeBlindIndex(canonical);
+        const existing = await User.findOne({ 
+          phoneSearchIndex: blindIndex, 
+          _id: { $ne: userId },
+          isDeleted: false,
+        });
+        if (existing) {
+          throw new ConflictError('Phone number already in use');
+        }
       }
     }
 
-    const allowedFields = ['displayName', 'photoURL', 'bio', 'phoneNumber', 'onboardingCompleted'];
+    const allowedFields = ['displayName', 'photoURL', 'bio', 'onboardingCompleted'];
     const sanitized: Record<string, any> = {};
     for (const key of allowedFields) {
       if (updateData[key] !== undefined) {
         sanitized[key] = updateData[key];
+      }
+    }
+
+    if (updateData.phoneNumber) {
+      const canonical = PiiCryptoService.normalizePhoneNumber(updateData.phoneNumber);
+      if (canonical) {
+        sanitized.phoneSearchIndex = PiiCryptoService.computeBlindIndex(canonical);
+        sanitized.phoneEncrypted = PiiCryptoService.encrypt(canonical);
+        sanitized.encryptionVersion = 1;
+        sanitized.phoneNumber = undefined;
       }
     }
 
@@ -190,39 +205,87 @@ export class UserService {
    * Upload profile picture
    */
   async uploadProfilePicture(userId: string, file: Express.Multer.File): Promise<string> {
-    const allowedTypes = CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.allowedTypes as readonly string[];
-    if (!allowedTypes.includes(file.mimetype)) {
-      throw new BadRequestError('Invalid file type. Allowed: JPEG, PNG');
+    if (!file || !file.buffer) {
+      throw new BadRequestError('No image file provided');
     }
 
-    if (file.size > CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.maxSize) {
-      throw new BadRequestError(`File too large. Maximum ${Math.round(CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.maxSize / (1024 * 1024))}MB`);
+    const maxSize = CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.maxSize;
+    if (file.size > maxSize) {
+      throw new BadRequestError(`File too large. Maximum ${Math.round(maxSize / (1024 * 1024))}MB`);
     }
 
-    const result = await new Promise<any>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'profiles',
-          public_id: `profile-${userId}-${Date.now()}`,
-          transformation: [{ width: 400, height: 400, crop: 'fill' }, { fetch_format: 'webp', quality: 80 }],
-        },
-        (error:any, result:any) => {
-          if (error) return reject(error);
-          resolve(result);
-        }
-      );
-      streamifier.createReadStream(file.buffer).pipe(uploadStream);
-    });
+    // 1. Process and normalize image: auto-rotate orientation from EXIF, strip EXIF, resize to 400x400 WebP
+    let processedBuffer: Buffer;
+    let format = 'webp';
+    try {
+      processedBuffer = await sharp(file.buffer)
+        .rotate() // Automatically orient from mobile camera EXIF
+        .resize(400, 400, { fit: 'cover', position: 'center' })
+        .webp({ quality: 80 })
+        .toBuffer();
+    } catch (sharpError) {
+      logger.warn(`Sharp image processing failed, checking raw image: ${sharpError}`);
+      const allowedTypes = CONSTANTS.UPLOAD_LIMITS.PROFILE_IMAGE.allowedTypes as readonly string[];
+      if (!allowedTypes.includes(file.mimetype)) {
+        throw new BadRequestError('Invalid file format. Please upload a valid image (JPEG, PNG, WebP, HEIC)');
+      }
+      processedBuffer = file.buffer;
+      format = file.mimetype.split('/')[1] || 'jpeg';
+    }
 
-    const photoURL = result.secure_url;
+    let photoURL = '';
+    const publicId = `profile-${userId}-${Date.now()}`;
 
+    // 2. Attempt Cloudinary upload if configured
+    const isCloudinaryConfigured = Boolean(
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET
+    );
+
+    if (isCloudinaryConfigured) {
+      try {
+        const result = await new Promise<any>((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'profiles',
+              public_id: publicId,
+              format: 'webp',
+            },
+            (error: any, res: any) => {
+              if (error) return reject(error);
+              resolve(res);
+            }
+          );
+          streamifier.createReadStream(processedBuffer).pipe(uploadStream);
+        });
+
+        photoURL = result.secure_url;
+        logger.info(`Profile picture uploaded to Cloudinary: ${userId}`);
+      } catch (cloudErr) {
+        logger.warn(`Cloudinary upload failed, falling back to local storage: ${cloudErr}`);
+      }
+    }
+
+    // 3. Fallback to local storage if Cloudinary not available or failed
+    if (!photoURL) {
+      const uploadDir = path.join(config.UPLOAD_DIR, 'profiles');
+      await fs.mkdir(uploadDir, { recursive: true });
+      const localFilename = `${publicId}.${format}`;
+      const localFilePath = path.join(uploadDir, localFilename);
+      await fs.writeFile(localFilePath, processedBuffer);
+      photoURL = `/uploads/profiles/${localFilename}`;
+      logger.info(`Profile picture saved to local storage: ${photoURL}`);
+    }
+
+    // 4. Update Media record and User profile
     await Media.create({
       url: photoURL,
-      publicId: result.public_id,
+      publicId,
       uploadedBy: userId,
       purpose: 'profile_picture',
-      size: file.size,
-      format: result.format || 'webp',
+      size: processedBuffer.length,
+      format,
     });
 
     await User.findOneAndUpdate(
@@ -230,7 +293,6 @@ export class UserService {
       { $set: { photoURL } }
     );
 
-    logger.info(`Profile picture uploaded to Cloudinary: ${userId}`);
     return photoURL;
   }
 
@@ -300,14 +362,21 @@ export class UserService {
     }
     const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const searchRegex = new RegExp(escaped, 'i');
+    const orConditions: any[] = [
+      { email: searchRegex },
+      { displayName: searchRegex },
+    ];
+
+    const canonicalPhone = PiiCryptoService.normalizePhoneNumber(query);
+    if (canonicalPhone) {
+      const blindIndex = PiiCryptoService.computeBlindIndex(canonicalPhone);
+      orConditions.push({ phoneSearchIndex: blindIndex });
+    }
+
     const filter = {
       isDeleted: false,
       isActive: true,
-      $or: [
-        { email: searchRegex },
-        { displayName: searchRegex },
-        { phoneNumber: searchRegex },
-      ],
+      $or: orConditions,
     };
 
     const [users, total] = await Promise.all([

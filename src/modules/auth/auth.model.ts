@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import { PiiCryptoService } from '../../shared/utils/piiCrypto.service';
 
 // ============================================================
 // Interfaces
@@ -140,6 +141,9 @@ export interface IUser {
   displayName: string;
   photoURL?: string;
   phoneNumber?: string;
+  phoneEncrypted?: string;
+  phoneSearchIndex?: string;
+  encryptionVersion?: number;
   bio?: string;
 
   role: 'user' | 'premium' | 'business' | 'admin';
@@ -408,8 +412,21 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
     photoURL: { type: String },
     phoneNumber: {
       type: String,
+      sparse: true,
+      select: false,
+    },
+    phoneEncrypted: {
+      type: String,
+      default: null,
+    },
+    phoneSearchIndex: {
+      type: String,
       index: true,
-      sparse: true
+      sparse: true,
+    },
+    encryptionVersion: {
+      type: Number,
+      default: 1,
     },
     bio: {
       type: String,
@@ -500,8 +517,15 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
           fcmToken,
           authProviders,
           deletedAt,
+          phoneSearchIndex,
           ...safeRet
         } = ret;
+
+        if (safeRet.phoneEncrypted) {
+          safeRet.phoneNumber = PiiCryptoService.decrypt(safeRet.phoneEncrypted);
+          delete safeRet.phoneEncrypted;
+        }
+
         return safeRet;
       },
     },
@@ -514,8 +538,15 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
           fcmToken,
           authProviders,
           deletedAt,
+          phoneSearchIndex,
           ...safeRet
         } = ret;
+
+        if (safeRet.phoneEncrypted) {
+          safeRet.phoneNumber = PiiCryptoService.decrypt(safeRet.phoneEncrypted);
+          delete safeRet.phoneEncrypted;
+        }
+
         return safeRet;
       },
     },
@@ -528,7 +559,7 @@ const UserSchema = new Schema<IUserDocument, IUserModel>(
 // ============================================================
 
 UserSchema.index({ email: 1 });
-UserSchema.index({ phoneNumber: 1 }, { sparse: true });
+UserSchema.index({ phoneSearchIndex: 1 }, { sparse: true });
 UserSchema.index({ friendIds: 1 });
 UserSchema.index({ isDeleted: 1, isActive: 1 });
 UserSchema.index({ 'totalOwedAcrossTrips': -1 });
@@ -544,6 +575,15 @@ UserSchema.pre('save', function (next) {
   }
   if (this.isModified('isDeleted') && this.isDeleted) {
     this.deletedAt = new Date();
+  }
+  if ((this.isModified('phoneNumber') || !this.phoneSearchIndex) && this.phoneNumber) {
+    const canonical = PiiCryptoService.normalizePhoneNumber(this.phoneNumber);
+    if (canonical) {
+      this.phoneSearchIndex = PiiCryptoService.computeBlindIndex(canonical);
+      this.phoneEncrypted = PiiCryptoService.encrypt(canonical);
+      this.encryptionVersion = 1;
+      this.phoneNumber = undefined;
+    }
   }
   next();
 });

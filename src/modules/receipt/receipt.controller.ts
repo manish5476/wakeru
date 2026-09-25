@@ -9,8 +9,9 @@ import { Expense } from '../expense/expense.model';
 // ============================================================
 
 const getUser = (req: any) => {
-  if (!req.user?.firebaseUid) throw new AppError('Not authenticated', 401);
-  return req.user.firebaseUid;
+  const uid = req.user?.userId || req.user?.firebaseUid || req.user?.id;
+  if (!uid) throw new AppError('Not authenticated', 401);
+  return uid;
 };
 
 // ============================================================
