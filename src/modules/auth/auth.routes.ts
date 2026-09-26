@@ -51,6 +51,14 @@ router.post(
   authController.sendPasswordReset.bind(authController)
 );
 
+// Alias for client compatibility: /forgot-password -> sendPasswordReset
+router.post(
+  '/forgot-password',
+  strictRateLimiter,
+  ValidationMiddleware.validate(sendEmailSchema),
+  authController.sendPasswordReset.bind(authController)
+);
+
 router.post(
   '/refresh-token',
   ValidationMiddleware.validate(refreshTokenSchema),

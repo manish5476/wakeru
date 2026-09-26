@@ -32,6 +32,7 @@ import locationRoutes from './modules/location/location.routes';
 import { subscriptionRoutes, adminPlanRoutes } from './modules/subscription';
 import { syncRoutes } from './modules/sync';
 import ledgerRoutes from './modules/ledger/ledger.routes';
+import appReleaseRoutes from './modules/appRelease/appRelease.routes';
 
 import { cronJobs } from './infrastructure/cron-jobs.service';
 
@@ -146,6 +147,7 @@ app.use('/api/v1/subscription', authenticatedRateLimiter, subscriptionRoutes);
 app.use('/api/v1/admin', authenticatedRateLimiter, adminPlanRoutes);
 app.use('/api/v1/sync', authenticatedRateLimiter, syncRoutes);
 app.use('/api/v1/ledger', authenticatedRateLimiter, ledgerRoutes);
+app.use('/api/v1/app-release', appReleaseRoutes);
 
 // ============================================================
 // 404 Handler
