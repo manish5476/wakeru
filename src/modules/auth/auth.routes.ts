@@ -13,6 +13,7 @@ import {
   setUpiSchema,
   verifyUpiSchema,
   updateFcmTokenSchema,
+  sendEmailSchema,
 } from './auth.validation';
 
 const router = Router();
@@ -37,10 +38,17 @@ router.post(
 );
 
 router.post(
-  '/forgot-password',
+  '/send-verification-email',
   strictRateLimiter,
-  ValidationMiddleware.validate(forgotPasswordSchema),
-  authController.forgotPassword.bind(authController)
+  ValidationMiddleware.validate(sendEmailSchema),
+  authController.sendVerificationEmail.bind(authController)
+);
+
+router.post(
+  '/send-password-reset',
+  strictRateLimiter,
+  ValidationMiddleware.validate(sendEmailSchema),
+  authController.sendPasswordReset.bind(authController)
 );
 
 router.post(

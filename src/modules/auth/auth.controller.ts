@@ -6,6 +6,10 @@ import { NotFoundError } from '../../shared/errors/AppError';
 import { logger } from '../../config/logger';
 import { config } from '../../config';
 
+// Import email services
+import { sendVerificationEmail, sendPasswordResetEmail } from '../email/email.service';
+import { getAuth } from 'firebase-admin/auth';
+
 export class AuthController {
   
   // ============================================================
@@ -77,26 +81,84 @@ export class AuthController {
   }
 
   /**
-   * POST /api/v1/auth/forgot-password
-   * Send password reset email via Firebase.
-   * Always returns 200 to prevent email enumeration.
+   * POST /api/v1/auth/send-verification-email
+   * Triggers the sending of a custom email verification email.
    */
-  async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async sendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { email } = req.body;
-      await AuthService.forgotPassword(email);
+      const user = await getAuth().getUserByEmail(email);
 
-      const response: ApiResponse = {
+      if (!user) {
+        // To prevent user enumeration, we don't reveal that the user doesn't exist.
+        // We just log it and send a generic success response.
+        logger.warn(`Verification email requested for non-existent user: ${email}`);
+      } else if (user.emailVerified) {
+        // If the email is already verified, we don't need to send another one.
+        // We can inform the user about this.
+        res.status(200).json({
+          success: true,
+          message: 'Email is already verified.',
+        });
+        return;
+      } else {
+        await sendVerificationEmail(user);
+      }
+
+      res.status(200).json({
         success: true,
-        message: 'If an account exists for this email, reset instructions have been sent',
-        timestamp: new Date().toISOString(),
-      };
-
-      res.status(200).json(response);
+        message: 'A verification email has been sent if the user exists and is not already verified.',
+      });
     } catch (error) {
-      next(error);
+      if ((error as any).code === 'auth/user-not-found') {
+        // Sanitize the error to prevent user enumeration.
+        logger.warn(`Verification email requested for non-existent user: ${req.body.email}`);
+        res.status(200).json({
+          success: true,
+          message: 'A verification email has been sent if the user exists and is not already verified.',
+        });
+      } else {
+        next(error);
+      }
     }
   }
+
+  /**
+   * POST /api/v1/auth/send-password-reset
+   * Triggers the sending of a custom password reset email.
+   */
+  async sendPasswordReset(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      try {
+        const user = await getAuth().getUserByEmail(email);
+        await sendPasswordResetEmail(user);
+      } catch (error) {
+        if ((error as any).code === 'auth/user-not-found') {
+          // Do not reveal that the user does not exist. Log it for monitoring.
+          logger.warn(`Password reset requested for non-existent user: ${email}`);
+        } else {
+          // Re-throw other errors to be caught by the outer catch block.
+          throw error;
+        }
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'If an account exists for this email, a password reset email has been sent.',
+      });
+    } catch (error) {
+      // This will catch errors from the email sending service or other unexpected issues.
+      logger.error('Failed to process password reset request:', error);
+      // Still send a generic response to the client.
+      res.status(200).json({
+        success: true,
+        message: 'If an account exists for this email, a password reset email has been sent.',
+      });
+    }
+  }
+
 
   /**
    * POST /api/v1/auth/refresh-token

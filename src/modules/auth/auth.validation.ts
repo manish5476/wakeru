@@ -39,6 +39,11 @@ export const forgotPasswordSchema = z.object({
   email: z.string().email('Valid email is required'),
 });
 
+export const sendEmailSchema = z.object({
+  email: z.string().email('A valid email is required to send notifications.'),
+});
+
+
 // ============================================================
 // Profile Schemas
 // ============================================================
