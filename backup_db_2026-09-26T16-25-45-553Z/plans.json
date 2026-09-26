@@ -1,0 +1,221 @@
+[
+  {
+    "_id": "6aa4507bc5cd5cccc63f86f6",
+    "key": "free",
+    "name": "Free Traveler",
+    "description": "Essential split ledger for casual trips with close friends and family.",
+    "status": "active",
+    "pricing": {
+      "amount": 0,
+      "currency": "INR",
+      "billingInterval": "free",
+      "tiers": {
+        "INR": {
+          "amount": 0,
+          "yearlyAmount": 0,
+          "currency": "INR"
+        },
+        "USD": {
+          "amount": 0,
+          "yearlyAmount": 0,
+          "currency": "USD"
+        }
+      },
+      "yearlyAmount": 0
+    },
+    "features": {
+      "trip_creation": true,
+      "advanced_analytics": false,
+      "custom_trip_cover": false,
+      "expense_export": false,
+      "receipt_ocr": true,
+      "recurring_expenses": false,
+      "priority_support": false
+    },
+    "limits": {
+      "trips": {
+        "value": 1,
+        "unlimited": false,
+        "unit": "trips per account"
+      },
+      "peoplePerTrip": {
+        "value": 10,
+        "unlimited": false,
+        "unit": "travelers per trip"
+      },
+      "stopsPerTrip": {
+        "value": 5,
+        "unlimited": false,
+        "unit": "stops per itinerary"
+      },
+      "expensesPerTrip": {
+        "value": null,
+        "unlimited": true,
+        "unit": "unlimited expenses"
+      },
+      "monthlyExports": {
+        "value": 1,
+        "unlimited": false,
+        "unit": "exports per month"
+      },
+      "monthlyReceiptOCR": {
+        "value": 3,
+        "unlimited": false,
+        "unit": "scans per month"
+      }
+    },
+    "permissions": [],
+    "displayOrder": 1,
+    "isDefault": true,
+    "isPublic": true,
+    "__v": 0,
+    "createdAt": "2026-09-11T19:03:23.551Z",
+    "updatedAt": "2026-09-26T15:46:11.373Z"
+  },
+  {
+    "_id": "6aa4507bc5cd5cccc63f86f7",
+    "key": "pro",
+    "name": "Pro Explorer",
+    "description": "Ideal for frequent travelers, travel planners, and larger groups.",
+    "status": "active",
+    "pricing": {
+      "amount": 399,
+      "currency": "INR",
+      "billingInterval": "month",
+      "tiers": {
+        "INR": {
+          "amount": 399,
+          "yearlyAmount": 3830,
+          "currency": "INR"
+        },
+        "USD": {
+          "amount": 4.99,
+          "yearlyAmount": 39.99,
+          "currency": "USD"
+        }
+      },
+      "yearlyAmount": 3830
+    },
+    "features": {
+      "trip_creation": true,
+      "advanced_analytics": true,
+      "custom_trip_cover": true,
+      "expense_export": true,
+      "receipt_ocr": true,
+      "recurring_expenses": true,
+      "priority_support": false
+    },
+    "limits": {
+      "trips": {
+        "value": 50,
+        "unlimited": false,
+        "unit": "trips per account"
+      },
+      "peoplePerTrip": {
+        "value": 50,
+        "unlimited": false,
+        "unit": "travelers per trip"
+      },
+      "stopsPerTrip": {
+        "value": 25,
+        "unlimited": false,
+        "unit": "stops per itinerary"
+      },
+      "expensesPerTrip": {
+        "value": null,
+        "unlimited": true,
+        "unit": "unlimited expenses"
+      },
+      "monthlyExports": {
+        "value": 25,
+        "unlimited": false,
+        "unit": "exports per month"
+      },
+      "monthlyReceiptOCR": {
+        "value": 30,
+        "unlimited": false,
+        "unit": "scans per month"
+      }
+    },
+    "permissions": [],
+    "displayOrder": 2,
+    "isDefault": false,
+    "isPublic": true,
+    "__v": 0,
+    "createdAt": "2026-09-11T19:03:23.554Z",
+    "updatedAt": "2026-09-26T15:46:12.612Z"
+  },
+  {
+    "_id": "6aa4507bc5cd5cccc63f86f8",
+    "key": "super_pro",
+    "name": "Super Pro Nomad",
+    "description": "Uncapped power for digital nomads, tour organizers, and global expeditions.",
+    "status": "active",
+    "pricing": {
+      "amount": 899,
+      "currency": "INR",
+      "billingInterval": "month",
+      "tiers": {
+        "INR": {
+          "amount": 899,
+          "yearlyAmount": 8630,
+          "currency": "INR"
+        },
+        "USD": {
+          "amount": 9.99,
+          "yearlyAmount": 79.99,
+          "currency": "USD"
+        }
+      },
+      "yearlyAmount": 8630
+    },
+    "features": {
+      "trip_creation": true,
+      "advanced_analytics": true,
+      "custom_trip_cover": true,
+      "expense_export": true,
+      "receipt_ocr": true,
+      "recurring_expenses": true,
+      "priority_support": true
+    },
+    "limits": {
+      "trips": {
+        "value": null,
+        "unlimited": true,
+        "unit": "unlimited trips"
+      },
+      "peoplePerTrip": {
+        "value": 200,
+        "unlimited": false,
+        "unit": "travelers per trip"
+      },
+      "stopsPerTrip": {
+        "value": 100,
+        "unlimited": false,
+        "unit": "stops per itinerary"
+      },
+      "expensesPerTrip": {
+        "value": null,
+        "unlimited": true,
+        "unit": "unlimited expenses"
+      },
+      "monthlyExports": {
+        "value": null,
+        "unlimited": true,
+        "unit": "unlimited exports"
+      },
+      "monthlyReceiptOCR": {
+        "value": null,
+        "unlimited": true,
+        "unit": "unlimited scans"
+      }
+    },
+    "permissions": [],
+    "displayOrder": 3,
+    "isDefault": false,
+    "isPublic": true,
+    "__v": 0,
+    "createdAt": "2026-09-11T19:03:23.554Z",
+    "updatedAt": "2026-09-26T15:46:13.851Z"
+  }
+]

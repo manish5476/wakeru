@@ -1,0 +1,1965 @@
+[
+  {
+    "_id": "6a9185abbba755805c68af19",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "TRIP_INVITATION_ACCEPTED",
+    "title": "Invitation Accepted ✅",
+    "message": "Manish accepted your invitation to \"Home\"",
+    "data": {
+      "tripId": "6a918578bba755805c68aebe",
+      "userName": "Manish"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "✅",
+    "category": "trip",
+    "notificationId": "463476f7-956e-4f8d-a8b2-a4ed6e91a131",
+    "createdAt": "2026-08-28T12:57:15.692Z",
+    "updatedAt": "2026-08-28T12:57:15.692Z"
+  },
+  {
+    "_id": "6a9185ccbba755805c68af6f",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🌱 Budget Beginner: Add your very first expense",
+    "data": {
+      "achievementId": "first_expense",
+      "tier": "bronze",
+      "pointsValue": 10
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "cb176c8d-2980-4ad0-afd0-d28422ef248c",
+    "createdAt": "2026-08-28T12:57:48.107Z",
+    "updatedAt": "2026-08-28T12:57:48.107Z"
+  },
+  {
+    "_id": "6a9185cfbba755805c68af81",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "9a529ba4-49f4-4d36-a6fb-ca6f8848124e",
+    "createdAt": "2026-08-28T12:57:51.397Z",
+    "updatedAt": "2026-08-28T12:57:51.397Z"
+  },
+  {
+    "_id": "6a9185d1bba755805c68af8c",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "🪙 Frugal Traveler: Complete a trip spending less than ₹500/day",
+    "data": {
+      "achievementId": "frugal_traveler",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "ab71b43d-2ffc-47e9-8bf3-c550e3b35589",
+    "createdAt": "2026-08-28T12:57:53.295Z",
+    "updatedAt": "2026-08-28T12:57:53.295Z"
+  },
+  {
+    "_id": "6a9185d5bba755805c68afa3",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🗺️ First Adventure: Create your first trip",
+    "data": {
+      "achievementId": "first_trip",
+      "tier": "bronze",
+      "pointsValue": 20
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "014d7f0a-395d-4911-871e-0ffb488dc011",
+    "createdAt": "2026-08-28T12:57:57.906Z",
+    "updatedAt": "2026-08-28T12:57:57.906Z"
+  },
+  {
+    "_id": "6a9185debba755805c68b006",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "🕛 Perfect Timing: Add an expense at exactly 12:00 PM",
+    "data": {
+      "achievementId": "perfect_timing",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "c14be09a-aa29-40b1-bb19-15f99466d618",
+    "createdAt": "2026-08-28T12:58:06.337Z",
+    "updatedAt": "2026-08-28T12:58:06.337Z"
+  },
+  {
+    "_id": "6a9303c681a1417a318c7c7f",
+    "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "type": "SETTLEMENT_REQUEST",
+    "title": "Payment Sent 📤",
+    "message": "Manish has marked a payment of INR 60000 as sent. Please confirm when received.",
+    "data": {
+      "tripId": "6a5777eeae0175f202202f49",
+      "fromUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 60000,
+      "baseCurrency": "INR",
+      "transactionId": "6a9302f5a1f92e53b6fee84b"
+    },
+    "isRead": false,
+    "isActionable": true,
+    "actionButtons": [
+      {
+        "label": "✅ Confirm Received",
+        "action": "confirm_payment",
+        "value": "6a9302f5a1f92e53b6fee84b",
+        "style": "primary"
+      },
+      {
+        "label": "❌ Reject",
+        "action": "reject_payment",
+        "value": "6a9302f5a1f92e53b6fee84b",
+        "style": "danger"
+      }
+    ],
+    "actionUrl": "/trips/6a5777eeae0175f202202f49/settle",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "💸",
+    "category": "settlement",
+    "notificationId": "bc084ab6-b819-46e3-8f03-ded572344906",
+    "createdAt": "2026-08-29T16:07:34.667Z",
+    "updatedAt": "2026-08-29T16:07:34.667Z"
+  },
+  {
+    "_id": "6a93043181a1417a318c7cd6",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "type": "TRIP_INVITATION_ACCEPTED",
+    "title": "Invitation Accepted ✅",
+    "message": "nehal accepted your invitation to \"manish singh\"",
+    "data": {
+      "tripId": "6a574aee2f34362a14de1c34",
+      "userName": "nehal"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "✅",
+    "category": "trip",
+    "notificationId": "f1d774de-ef5b-4e6d-969e-7d6e55b8db6a",
+    "createdAt": "2026-08-29T16:09:21.779Z",
+    "updatedAt": "2026-08-29T16:09:21.779Z"
+  },
+  {
+    "_id": "6a9307fdc5ecff80d13ed8b8",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "SETTLEMENT_REQUEST",
+    "title": "Payment Sent 📤",
+    "message": "Manish has marked a payment of INR 2800 as sent. Please confirm when received.",
+    "data": {
+      "tripId": "6a918578bba755805c68aebe",
+      "fromUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 2800,
+      "baseCurrency": "INR",
+      "transactionId": "6a93013702743b40ac581384"
+    },
+    "isRead": false,
+    "isActionable": true,
+    "actionButtons": [
+      {
+        "label": "✅ Confirm Received",
+        "action": "confirm_payment",
+        "value": "6a93013702743b40ac581384",
+        "style": "primary"
+      },
+      {
+        "label": "❌ Reject",
+        "action": "reject_payment",
+        "value": "6a93013702743b40ac581384",
+        "style": "danger"
+      }
+    ],
+    "actionUrl": "/trips/6a918578bba755805c68aebe/settle",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "💸",
+    "category": "settlement",
+    "notificationId": "16b04dd5-071e-45b7-b87d-0b1db41fc637",
+    "createdAt": "2026-08-29T16:25:33.766Z",
+    "updatedAt": "2026-08-29T16:25:33.766Z"
+  },
+  {
+    "_id": "6a959a40cfb42985dce87acd",
+    "userId": "9c01iwfYp6P0OnpBdofbcyoh6Xo2",
+    "type": "FRIEND_REQUEST",
+    "title": "New Friend Request",
+    "message": "Manish wants to be your friend",
+    "data": {
+      "requestId": "6a959a40cfb42985dce87acb",
+      "fromUserId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2"
+    },
+    "isRead": false,
+    "isActionable": true,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🤝",
+    "notificationId": "193a7511-4419-404e-bb5f-ed59bea38934",
+    "createdAt": "2026-08-31T15:14:08.482Z",
+    "updatedAt": "2026-08-31T15:14:08.482Z"
+  },
+  {
+    "_id": "6aa6330350583851a443014b",
+    "userId": "VlLtRI2yvLQReJqLTfd4kVMj1wR2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "eeacb3f8-3f8b-4350-8c24-94b19e83fc1c",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.984Z",
+    "updatedAt": "2026-09-13T05:22:11.984Z"
+  },
+  {
+    "_id": "6aa6330350583851a443014c",
+    "userId": "T01UAuKy21X4SvoxUJuKF4kdkjs2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "be7a0d2e-d14f-4c76-ad47-41bfaf985e74",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a443014d",
+    "userId": "wjf91ewXaTbptJ8sNVWe69koQhf2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "c5bfaff6-f4f9-4bd0-8cf4-965f20280239",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a443014e",
+    "userId": "anMAS7GyuoMQ1hZc4YhZybtQLHa2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "f566a993-694c-4245-b7d1-746f5485f666",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a443014f",
+    "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "b7d89f8f-692f-47c0-bb49-0b46c5d538da",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430150",
+    "userId": "lS3LuG9W89gQnksO4pFI55pbNPe2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "ec55877d-55ac-4891-b8e8-51c5a4bba81a",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430152",
+    "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "9b28cda5-6d98-45fe-a4ed-a14350558665",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430153",
+    "userId": "9c01iwfYp6P0OnpBdofbcyoh6Xo2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "4065ccec-557e-43bf-971d-1cc2defdae9a",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430154",
+    "userId": "uS3Va6zVaig671xgjk4hi2GYuhD3",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "bda59535-7ae8-4ebe-90fd-ae869b84d71b",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430155",
+    "userId": "fa6vrr4Qf0ZnqekyrxJV7y4idwR2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "3f12f559-50d4-409e-a207-be0f4bbb0b35",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430157",
+    "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "ffa5c40a-1232-4679-8ee9-063983f13d70",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430158",
+    "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "87c18dff-e88a-4f06-8b9b-8dc551d17327",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa6330350583851a4430159",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://wakeru.app/download",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "f3101dfb-726d-498b-a0dc-29892d2a3b8e",
+    "actionButtons": [],
+    "createdAt": "2026-09-13T05:22:11.985Z",
+    "updatedAt": "2026-09-13T05:22:11.985Z"
+  },
+  {
+    "_id": "6aa7f8f785f8913158c77fba",
+    "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "type": "SETTLEMENT_REQUEST",
+    "title": "Payment Sent 📤",
+    "message": "Manish has marked a payment of USD 1494 as sent. Please confirm when received.",
+    "data": {
+      "tripId": "6a58bed14a4e6dc9456c9528",
+      "fromUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 1494,
+      "baseCurrency": "USD",
+      "transactionId": "6aa4bf466d43683f10c3a92b"
+    },
+    "isRead": false,
+    "isActionable": true,
+    "actionButtons": [
+      {
+        "label": "✅ Confirm Received",
+        "action": "confirm_payment",
+        "value": "6aa4bf466d43683f10c3a92b",
+        "style": "primary"
+      },
+      {
+        "label": "❌ Reject",
+        "action": "reject_payment",
+        "value": "6aa4bf466d43683f10c3a92b",
+        "style": "danger"
+      }
+    ],
+    "actionUrl": "/trips/6a58bed14a4e6dc9456c9528/settle",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "💸",
+    "category": "settlement",
+    "notificationId": "d35cff94-524c-4d29-a09f-487afd22e01d",
+    "createdAt": "2026-09-14T13:39:03.865Z",
+    "updatedAt": "2026-09-14T13:39:03.865Z"
+  },
+  {
+    "_id": "6aa8fad9053cda8e8583feff",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "EXPENSE_COMMENT_ADDED",
+    "title": "New Comment on Expense",
+    "message": "Manish commented on \"12\": \"hi\"",
+    "isRead": false,
+    "isActionable": true,
+    "actionButtons": [],
+    "actionUrl": "/(app)/expenses/6a92ff7f02743b40ac581194",
+    "priority": "low",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "💬",
+    "notificationId": "e36b8d3e-b5db-4edb-976c-e0275817a461",
+    "createdAt": "2026-09-15T07:59:21.469Z",
+    "updatedAt": "2026-09-15T07:59:21.469Z"
+  },
+  {
+    "_id": "6aac0c8700d0f2eb3dc4cd60",
+    "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "6b4ce317-6218-40bf-9109-c420dee1f60c",
+    "createdAt": "2026-09-17T15:51:35.446Z",
+    "updatedAt": "2026-09-17T15:51:35.446Z"
+  },
+  {
+    "_id": "6aac0c8700d0f2eb3dc4cd6b",
+    "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "🪙 Frugal Traveler: Complete a trip spending less than ₹500/day",
+    "data": {
+      "achievementId": "frugal_traveler",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "9f16efcc-8d9d-4574-8961-3870dde8e972",
+    "createdAt": "2026-09-17T15:51:35.767Z",
+    "updatedAt": "2026-09-17T15:51:35.767Z"
+  },
+  {
+    "_id": "6aac0c8a00d0f2eb3dc4cdcd",
+    "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "4dc3da29-1780-4a65-afc1-66389c0bb4db",
+    "createdAt": "2026-09-17T15:51:38.680Z",
+    "updatedAt": "2026-09-17T15:51:38.680Z"
+  },
+  {
+    "_id": "6aac0c8c00d0f2eb3dc4cddc",
+    "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "🪙 Frugal Traveler: Complete a trip spending less than ₹500/day",
+    "data": {
+      "achievementId": "frugal_traveler",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "79de8787-02e0-49b1-aaa1-a525594acb89",
+    "createdAt": "2026-09-17T15:51:40.999Z",
+    "updatedAt": "2026-09-17T15:51:40.999Z"
+  },
+  {
+    "_id": "6aac9e04c1f7d0b303885200",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "02719adf-d00b-491a-8409-1fd499edbc06",
+    "createdAt": "2026-09-18T02:12:20.305Z",
+    "updatedAt": "2026-09-18T02:12:20.305Z"
+  },
+  {
+    "_id": "6aac9e04c1f7d0b303885202",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "725330b7-4324-47df-b6ee-25839a1b0389",
+    "createdAt": "2026-09-18T02:12:20.431Z",
+    "updatedAt": "2026-09-18T02:12:20.431Z"
+  },
+  {
+    "_id": "6aac9e16c1f7d0b3038852a4",
+    "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "7424d82b-6466-47c7-b816-41d046546760",
+    "createdAt": "2026-09-18T02:12:38.002Z",
+    "updatedAt": "2026-09-18T02:12:38.002Z"
+  },
+  {
+    "_id": "6aac9e16c1f7d0b3038852a6",
+    "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "23b0e58d-e169-4b9d-8528-80d9276ba84f",
+    "createdAt": "2026-09-18T02:12:38.088Z",
+    "updatedAt": "2026-09-18T02:12:38.088Z"
+  },
+  {
+    "_id": "6aac9e27c1f7d0b303885348",
+    "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "126ebf14-8b01-4c82-8e7e-a37a36243f2e",
+    "createdAt": "2026-09-18T02:12:55.859Z",
+    "updatedAt": "2026-09-18T02:12:55.859Z"
+  },
+  {
+    "_id": "6aac9e27c1f7d0b30388534a",
+    "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "8762580a-757f-4e17-be70-0b51bac48994",
+    "createdAt": "2026-09-18T02:12:55.862Z",
+    "updatedAt": "2026-09-18T02:12:55.862Z"
+  },
+  {
+    "_id": "6aad3b76816233e25b8597b0",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "type": "SETTLEMENT_COMPLETED",
+    "title": "Payment Sent ✅",
+    "message": "You paid Manish INR 30250",
+    "data": {
+      "tripId": "6aa654399cf111f4ce54a099",
+      "toUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 30250,
+      "baseCurrency": "INR"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🎉",
+    "category": "settlement",
+    "notificationId": "4eab833e-a078-4a56-91e2-3a4a0b14eadf",
+    "createdAt": "2026-09-18T13:24:06.483Z",
+    "updatedAt": "2026-09-18T13:24:06.483Z"
+  },
+  {
+    "_id": "6ab2b4cdea0790ce785fb321",
+    "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "type": "FRIEND_ACCEPTED",
+    "title": "Friend Request Accepted",
+    "message": "Manish accepted your friend request.",
+    "data": {
+      "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "userName": "Manish"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🎉",
+    "notificationId": "f5bedd56-7216-436c-b7a7-d962c4a6f85c",
+    "createdAt": "2026-09-22T17:03:09.965Z",
+    "updatedAt": "2026-09-22T17:03:09.965Z"
+  },
+  {
+    "_id": "6ab2b4d2ea0790ce785fb339",
+    "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "0efe2409-4383-4c65-adaf-054698700232",
+    "createdAt": "2026-09-22T17:03:14.057Z",
+    "updatedAt": "2026-09-22T17:03:14.057Z"
+  },
+  {
+    "_id": "6ab2b4d3ea0790ce785fb344",
+    "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "🪙 Frugal Traveler: Complete a trip spending less than ₹500/day",
+    "data": {
+      "achievementId": "frugal_traveler",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "4016ea03-363b-475d-b02d-fa81dfcd2147",
+    "createdAt": "2026-09-22T17:03:15.968Z",
+    "updatedAt": "2026-09-22T17:03:15.968Z"
+  },
+  {
+    "_id": "6ab2b55eea0790ce785fb621",
+    "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "type": "TRIP_INVITATION_ACCEPTED",
+    "title": "Invitation Accepted ✅",
+    "message": "Manish accepted your invitation to \"Surat\"",
+    "data": {
+      "tripId": "6ab2b54fea0790ce785fb5cf",
+      "userName": "Manish"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "✅",
+    "category": "trip",
+    "notificationId": "071782e0-4ed2-4294-b252-1b6044aeb422",
+    "createdAt": "2026-09-22T17:05:34.520Z",
+    "updatedAt": "2026-09-22T17:05:34.520Z"
+  },
+  {
+    "_id": "6ab2b55fea0790ce785fb627",
+    "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "type": "TRIP_INVITATION_ACCEPTED",
+    "title": "Invitation Accepted ✅",
+    "message": "Manish accepted your invitation to \"Surat\"",
+    "data": {
+      "tripId": "6ab2b54fea0790ce785fb5cf",
+      "userName": "Manish"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "✅",
+    "category": "trip",
+    "notificationId": "1555bf3e-f8c8-416a-91ec-0cf5d118d871",
+    "createdAt": "2026-09-22T17:05:35.089Z",
+    "updatedAt": "2026-09-22T17:05:35.089Z"
+  },
+  {
+    "_id": "6ab32e51fe39a0778693ddb5",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "type": "SETTLEMENT_COMPLETED",
+    "title": "Payment Sent ✅",
+    "message": "You paid Manish INR 28250",
+    "data": {
+      "tripId": "6aa654399cf111f4ce54a099",
+      "toUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 28250,
+      "baseCurrency": "INR"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🎉",
+    "category": "settlement",
+    "notificationId": "35375417-ba1f-478d-9046-cd2444845adf",
+    "createdAt": "2026-09-23T01:41:37.628Z",
+    "updatedAt": "2026-09-23T01:41:37.628Z"
+  },
+  {
+    "_id": "6ab33f08d2c181d1bce501be",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🌱 Budget Beginner: Add your very first expense",
+    "data": {
+      "achievementId": "first_expense",
+      "tier": "bronze",
+      "pointsValue": 10
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "4e05ad4e-3f26-4586-a0be-77404451edb3",
+    "createdAt": "2026-09-23T02:52:56.061Z",
+    "updatedAt": "2026-09-23T02:52:56.061Z"
+  },
+  {
+    "_id": "6ab33f08d2c181d1bce501c1",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🌱 Budget Beginner: Add your very first expense",
+    "data": {
+      "achievementId": "first_expense",
+      "tier": "bronze",
+      "pointsValue": 10
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "c14e1d44-3656-467c-a26f-ab45d4bcfa84",
+    "createdAt": "2026-09-23T02:52:56.231Z",
+    "updatedAt": "2026-09-23T02:52:56.231Z"
+  },
+  {
+    "_id": "6ab33f0bd2c181d1bce501e5",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "e21d5ea4-493f-4abe-8d18-3a3b44800bf3",
+    "createdAt": "2026-09-23T02:52:59.367Z",
+    "updatedAt": "2026-09-23T02:52:59.367Z"
+  },
+  {
+    "_id": "6ab33f0bd2c181d1bce501e7",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "3a11a02f-1bd4-4365-b1df-23c15065cd9d",
+    "createdAt": "2026-09-23T02:52:59.527Z",
+    "updatedAt": "2026-09-23T02:52:59.527Z"
+  },
+  {
+    "_id": "6ab33f18d2c181d1bce5025b",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "da436634-deaf-41fb-ac90-fb26062db35f",
+    "createdAt": "2026-09-23T02:53:12.092Z",
+    "updatedAt": "2026-09-23T02:53:12.092Z"
+  },
+  {
+    "_id": "6ab33f18d2c181d1bce5025d",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🦉 Night Owl: Add an expense between 2 AM and 4 AM",
+    "data": {
+      "achievementId": "night_owl",
+      "tier": "bronze",
+      "pointsValue": 25
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "a1dc8ea7-8a39-435e-982e-0c53c3e2d376",
+    "createdAt": "2026-09-23T02:53:12.252Z",
+    "updatedAt": "2026-09-23T02:53:12.252Z"
+  },
+  {
+    "_id": "6ab3403cd2c181d1bce50ee9",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "TRIP_FULLY_SETTLED",
+    "title": "Trip Fully Settled! 🎉🏁",
+    "message": "All payments for \"Suraj testing\" are complete!",
+    "data": {
+      "tripId": "6ab33e97d2c181d1bce500eb"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "category": "settlement",
+    "notificationId": "eb903ef2-6714-427b-926c-c1efe170e4f5",
+    "createdAt": "2026-09-23T02:58:04.505Z",
+    "updatedAt": "2026-09-23T02:58:04.505Z"
+  },
+  {
+    "_id": "6ab3403cd2c181d1bce50eeb",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "SETTLEMENT_COMPLETED",
+    "title": "Payment Sent ✅",
+    "message": "You paid Manish INR 23010",
+    "data": {
+      "tripId": "6ab33e97d2c181d1bce500eb",
+      "toUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 23010,
+      "baseCurrency": "INR"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🎉",
+    "category": "settlement",
+    "notificationId": "e89103bb-35b2-4575-ba92-f0a279b5353d",
+    "createdAt": "2026-09-23T02:58:04.507Z",
+    "updatedAt": "2026-09-23T02:58:04.507Z"
+  },
+  {
+    "_id": "6ab3ca4850a2c6e686542c0a",
+    "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "type": "SETTLEMENT_REQUEST",
+    "title": "Payment Sent 📤",
+    "message": "Manish has marked a payment of INR 189454.5 as sent. Please confirm when received.",
+    "data": {
+      "tripId": "6a572aa07c604fb33069d969",
+      "fromUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 189454.5,
+      "baseCurrency": "INR",
+      "transactionId": "6a9302f5a1f92e53b6fee84d"
+    },
+    "isRead": false,
+    "isActionable": true,
+    "actionButtons": [
+      {
+        "label": "✅ Confirm Received",
+        "action": "confirm_payment",
+        "value": "6a9302f5a1f92e53b6fee84d",
+        "style": "primary"
+      },
+      {
+        "label": "❌ Reject",
+        "action": "reject_payment",
+        "value": "6a9302f5a1f92e53b6fee84d",
+        "style": "danger"
+      }
+    ],
+    "actionUrl": "/trips/6a572aa07c604fb33069d969/settle",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "💸",
+    "category": "settlement",
+    "notificationId": "a6d6c655-1dff-449e-9d31-e7ef9d893129",
+    "createdAt": "2026-09-23T12:47:04.797Z",
+    "updatedAt": "2026-09-23T12:47:04.797Z"
+  },
+  {
+    "_id": "6ab50b07c5215de2580cbb89",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "type": "SETTLEMENT_COMPLETED",
+    "title": "Payment Sent ✅",
+    "message": "You paid Manish INR 28250",
+    "data": {
+      "tripId": "6aa654399cf111f4ce54a099",
+      "toUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "amount": 28250,
+      "baseCurrency": "INR"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🎉",
+    "category": "settlement",
+    "notificationId": "cbbcda46-bb68-452e-9ac3-98dd4ca07f4b",
+    "createdAt": "2026-09-24T11:35:35.876Z",
+    "updatedAt": "2026-09-24T11:35:35.876Z"
+  },
+  {
+    "_id": "6ab54e2bc5215de2580ccad2",
+    "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "type": "TRIP_INVITATION_ACCEPTED",
+    "title": "Invitation Accepted ✅",
+    "message": "Manish accepted your invitation to \"Jehe\"",
+    "data": {
+      "tripId": "6ab54e11c5215de2580cc9c2",
+      "userName": "Manish"
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "medium",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "✅",
+    "category": "trip",
+    "notificationId": "0f76fc47-b444-4dd0-bb53-679fbc07a2c2",
+    "createdAt": "2026-09-24T16:22:03.611Z",
+    "updatedAt": "2026-09-24T16:22:03.611Z"
+  },
+  {
+    "_id": "6ab54e8cc5215de2580ccdee",
+    "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "💰 Budget Keeper: Complete a trip under budget",
+    "data": {
+      "achievementId": "under_budget",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "d23a100b-315e-4b8e-90e3-5f6b210bb02c",
+    "createdAt": "2026-09-24T16:23:40.564Z",
+    "updatedAt": "2026-09-24T16:23:40.564Z"
+  },
+  {
+    "_id": "6ab54e8ec5215de2580ccdfb",
+    "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥈 Achievement Unlocked!",
+    "message": "🪙 Frugal Traveler: Complete a trip spending less than ₹500/day",
+    "data": {
+      "achievementId": "frugal_traveler",
+      "tier": "silver",
+      "pointsValue": 50
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "7e3251e8-aac6-473c-861b-44296191364f",
+    "createdAt": "2026-09-24T16:23:42.460Z",
+    "updatedAt": "2026-09-24T16:23:42.460Z"
+  },
+  {
+    "_id": "6ab54e93c5215de2580cce14",
+    "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "type": "ACHIEVEMENT_UNLOCKED",
+    "title": "🥉 Achievement Unlocked!",
+    "message": "🗺️ First Adventure: Create your first trip",
+    "data": {
+      "achievementId": "first_trip",
+      "tier": "bronze",
+      "pointsValue": 20
+    },
+    "isRead": false,
+    "isActionable": false,
+    "actionButtons": [],
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": true,
+      "sms": false
+    },
+    "icon": "🏆",
+    "notificationId": "42908bc8-545a-43ff-886c-af4ebd82f84a",
+    "createdAt": "2026-09-24T16:23:47.178Z",
+    "updatedAt": "2026-09-24T16:23:47.178Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08848",
+    "userId": "VlLtRI2yvLQReJqLTfd4kVMj1wR2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "fcf0df48-e6ce-4cf4-bcdd-c9ec3c94485c",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.868Z",
+    "updatedAt": "2026-09-26T12:19:09.868Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08849",
+    "userId": "T01UAuKy21X4SvoxUJuKF4kdkjs2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "e3e7c9ed-3db1-4761-9b5e-5a361c1b02ff",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.868Z",
+    "updatedAt": "2026-09-26T12:19:09.868Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0884a",
+    "userId": "wjf91ewXaTbptJ8sNVWe69koQhf2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "a4df0772-5de7-4245-b105-34ab9716b936",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.868Z",
+    "updatedAt": "2026-09-26T12:19:09.868Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0884b",
+    "userId": "anMAS7GyuoMQ1hZc4YhZybtQLHa2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "466e8745-2c29-4497-9c54-4f0eb8d26248",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.868Z",
+    "updatedAt": "2026-09-26T12:19:09.868Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0884c",
+    "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "48aa155c-df86-4e83-bcdf-d524feb0b407",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.868Z",
+    "updatedAt": "2026-09-26T12:19:09.868Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0884d",
+    "userId": "lS3LuG9W89gQnksO4pFI55pbNPe2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "962b3cdd-a587-42fa-a560-41afb603c6f9",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.868Z",
+    "updatedAt": "2026-09-26T12:19:09.868Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0884e",
+    "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "40a0df62-5f47-4770-b1e5-e8bbe59764b9",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0884f",
+    "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "aabde1b0-b4ef-454a-ad89-eb9558dbcaa1",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08850",
+    "userId": "9c01iwfYp6P0OnpBdofbcyoh6Xo2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "4a05415e-5914-4177-b03a-6063146fe10e",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08851",
+    "userId": "uS3Va6zVaig671xgjk4hi2GYuhD3",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "37f1effd-db48-4a2f-8e28-1689b503891f",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08852",
+    "userId": "fa6vrr4Qf0ZnqekyrxJV7y4idwR2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "ee1a4d7a-eb4d-4841-af2c-0242466a5551",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08853",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "1cf789ec-2ecf-42bf-ac48-bc81a6edb620",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08854",
+    "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "48fb694c-8630-4978-8e7d-d22dfbda4226",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08855",
+    "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "ea59f005-fa4e-4854-a78c-a37e3de8b991",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08856",
+    "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "421669d7-c50d-409c-9095-d527bd5c0868",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08857",
+    "userId": "YpDg4Lroi2cirdFa3prmSGY50tz1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "3f77f5a1-ab7d-43e8-a5d0-d7780ef36df2",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08858",
+    "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "6f8d17b2-e1ac-40a9-8727-ba2cd378bb2c",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca08859",
+    "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "4faee944-16e0-4f83-ac38-3753ebaea243",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0885a",
+    "userId": "XncLlQFOYXNlebIkTY4aeFfmD9T2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "b90400a9-27a6-43f4-aeb4-0aae59b818c5",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0885b",
+    "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "138530cf-6639-4a70-bfa5-974b0525db6c",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0885c",
+    "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "21ba09f2-a98a-4a06-9f42-643f7db1f664",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0885d",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "cd4fb132-45e9-4dde-b43f-139943540692",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0885e",
+    "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "7296b139-7ebc-45a6-a438-52d883f9dda4",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  },
+  {
+    "_id": "6ab7b83d6d9788b71ca0885f",
+    "userId": "nSyCo8OwXAWo3rBUxrYJIVC2vhb2",
+    "type": "SYSTEM_UPDATE",
+    "title": "🚀 New Wakeru Update Available!",
+    "message": "A new update is available with performance improvements and bug fixes.",
+    "isRead": false,
+    "isActionable": true,
+    "actionUrl": "https://expo.dev/artifacts/eas/7Z6wdPjEDnMzwBHNxTjvu6pgDzdnxqLY-taf0V_MJIM.apk",
+    "priority": "high",
+    "channels": {
+      "inApp": true,
+      "email": false,
+      "push": false,
+      "sms": false
+    },
+    "notificationId": "a7b36b82-3b5f-4047-aff3-0c29790f11bb",
+    "actionButtons": [],
+    "createdAt": "2026-09-26T12:19:09.869Z",
+    "updatedAt": "2026-09-26T12:19:09.869Z"
+  }
+]

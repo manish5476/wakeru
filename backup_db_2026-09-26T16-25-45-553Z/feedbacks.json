@@ -1,0 +1,51 @@
+[
+  {
+    "_id": "6b4c2acf-d144-4083-97ee-73e6f0ff1309",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "displayName": "Manish",
+    "rating": 5,
+    "category": "suggestion",
+    "feedback": "Didn't",
+    "deviceInfo": {
+      "platform": "web",
+      "version": "0.0.0",
+      "screenSize": "407px"
+    },
+    "createdAt": "2026-06-26T11:59:37.952Z",
+    "updatedAt": "2026-06-26T11:59:37.952Z"
+  },
+  {
+    "_id": "067a1f93-8921-4e06-aa5f-86d45f88a98e",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "displayName": "Manish",
+    "rating": 5,
+    "category": "suggestion",
+    "feedback": "Didn't",
+    "deviceInfo": {
+      "platform": "web",
+      "version": "0.0.0",
+      "screenSize": "407px"
+    },
+    "createdAt": "2026-06-26T11:59:41.768Z",
+    "updatedAt": "2026-06-26T11:59:41.768Z"
+  },
+  {
+    "_id": "def9ceb6-5671-45b6-b39c-0603b4a97b9b",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "displayName": "Manish",
+    "rating": 5,
+    "category": "love",
+    "feedback": "manish singh here can you see it please",
+    "images": [
+      "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783954815/feedback/fb-1783954790664-eo2alc.webp",
+      "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783954832/feedback/fb-1783954790671-8iwba2.webp"
+    ],
+    "deviceInfo": {
+      "platform": "web",
+      "version": "0.0.0",
+      "screenSize": "412x915"
+    },
+    "createdAt": "2026-07-13T15:00:32.482Z",
+    "updatedAt": "2026-07-13T15:00:32.482Z"
+  }
+]

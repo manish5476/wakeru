@@ -1,0 +1,1919 @@
+[
+  {
+    "_id": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "firebaseUid": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "email": "msms5476@gmail.com",
+    "displayName": "Manish",
+    "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1790153241/profiles/profile-tO5MslLBBGSnj7XqUd9GGEl5IrQ2-1790153241096.webp",
+    "role": "admin",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0TzVNc2xMQkJHU25qN1hxVWQ5R0dFbDVJclEyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAxNjI0MDIsImV4cCI6MTc5Mjc1NDQwMn0.HfKrsdx-VBIUXU6FQCZZZJCDyVKO_BqyCp3BSxBJwzw",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-23T11:20:02.346Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0TzVNc2xMQkJHU25qN1hxVWQ5R0dFbDVJclEyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAyNDAwNjQsImV4cCI6MTc5MjgzMjA2NH0.9036jKdbAdB72PBjZKW9rKO2KW2wJZNeF4DV_9rCSuo",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-24T08:54:24.192Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0TzVNc2xMQkJHU25qN1hxVWQ5R0dFbDVJclEyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAzOTg0OTEsImV4cCI6MTc5Mjk5MDQ5MX0.F6RLorQxt9DRp5n-YXgYqQE9qCBxGmkJ1Wmqyb7rVr0",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-26T04:54:51.214Z"
+      }
+    ],
+    "lastLoginAt": "2026-09-26T15:55:32.970Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "dark",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "dark",
+        "backgroundType": "color",
+        "backgroundColor": "#F0FDFA",
+        "backgroundImage": "cover_3",
+        "fontColor": "#F59E0B",
+        "cardSurfaceStyle": "solid",
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": true,
+      "upiIdEncrypted": "v1:27d33efeb73c211a5110065b:a9b6718cdceac11b7ac0cf07c9f71125:8820528984482add673a433a3dd06c1c",
+      "upiSearchIndex": "c0215be6501fb3fa1ce17168a38fd5b5102475b8bd6bea631ac4cba85471a45a"
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-23T14:05:33.670Z",
+      "accountCreatedAt": "2026-06-23T14:05:33.670Z"
+    },
+    "createdAt": "2026-06-23T14:05:33.675Z",
+    "updatedAt": "2026-09-26T16:09:51.948Z",
+    "bio": "Manish mera naam hai",
+    "passwordResetStats": {
+      "count": 1,
+      "lastRequestAt": "2026-07-11T06:28:06.093Z"
+    },
+    "fcmTokens": [
+      "dzNcnRPrQ2dNVrCE8WOO_z:APA91bGa4-HuhGwV8jv3B2vz2xxbZtX6X-VJsyYQAX8S09bXHYVpsnzvdozOMVpU6BPd0WI059cjVM9eKm8_ObN5rIf51T8OeBpgJPjy_kgvzoWHRHhBuKk",
+      "cpJ7V3vESqXlrisx9wYIkS:APA91bHFEC1RjAjmgF45rF9MS1h0zN8hrFt8v0OzLmk3ji7gj3w0CUUyfj7D4PuNy39FnXwHT5Za3k0h68rlvfMY4SPR5AxqNSkM3N-XAd9qh-dhklgX7N0",
+      "dBQ-NETniTh-ykAoJ5pyY7:APA91bHGM5gnd0jrnAoYRTzecUgLb2x3hsRt0Xgvg5u4JiN3nM6jDYOk419jqZwqCeOar_HqOV0D_xCN6aIGhwZM_VjbIEY1gPKGop1FQNy6vaNHo33kBoQ",
+      "fMeI_mASXu8vde1YPKRyea:APA91bEG_81sq5BjSwllG8QfIfM7xsxp9n_xXxrcS69IXuvAwpbx15rQ5LDHsp7-3Ql_c6AvaL3F7nzPNToW0iVQkG9ghxbLg5eVd_8oXd600-XBokSSsLk",
+      "dG6Svya_CKrDrDa_tlXxZk:APA91bEQocy--c3Nxj6gZ8tUibu6qMwjjSkg0OeIq2VnRNa52GvhwiQmy6pP0YESlSdhpdkLlzQMw-fOkeIvOtyw3RTCH6LmV2pykHvPgNBhpAPOMf_D4kk",
+      "epmmNfjlTXy4rZdNGl6bZ9:APA91bFcMw4idOyx7ELPBkerFdFR3iTG6a4bd3beOX143hWAuvT1fXVrx6uZuacOcj79CkwXpv-HdndhYvyhBZPdBql9Oa9DTewz_fHWv6JKQdPfmNKns6M"
+    ],
+    "onboardingCompleted": true,
+    "encryptionVersion": 1,
+    "phoneEncrypted": "v1:78dadaa8d9e50218c34028fb:8929026b2a1dedafcb64d95dd5f38ed6:ffdeaf68dc1875d5d79fcee5cc",
+    "phoneSearchIndex": "2e88371d9e77f466768c654fb95ded409388f43a0ecdee57811534a7521374a4"
+  },
+  {
+    "_id": "VlLtRI2yvLQReJqLTfd4kVMj1wR2",
+    "firebaseUid": "VlLtRI2yvLQReJqLTfd4kVMj1wR2",
+    "email": "sonarh593@gmail.com",
+    "displayName": "Bhavesh",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NmM3ZDM4NC1jZWM2LTQ2ZGYtYWVhZi1jZGY2Y2MxMjNlYmYiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI3MDA3MywiZXhwIjoxNzgyODc0ODczfQ.vqD0h74_K5M9URKg-hw5SReYkaWWAkTONPMlCfDsesQ",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:52.811Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NmM3ZDM4NC1jZWM2LTQ2ZGYtYWVhZi1jZGY2Y2MxMjNlYmYiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjQ0MTUyNSwiZXhwIjoxNzgzMDQ2MzI1fQ.XXK3VgmVzjv44c-2QZ3tR9bfQPADsmbiR8s-_Ar6zJk",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:52.811Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJWbEx0UkkyeXZMUVJlSnFMVGZkNGtWTWoxd1IyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQ1NTQwMzcsImV4cCI6MTc4NTE1ODgzN30.Jv0COohp5fvxCxhvuStfgJgkI_UocG3gIDq8lI8SLuQ",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-20T13:27:17.198Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJWbEx0UkkyeXZMUVJlSnFMVGZkNGtWTWoxd1IyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODUwNTU0MDgsImV4cCI6MTc4NTY2MDIwOH0.2XpEI-OP_5tsQ-sZOKtAgrkC9PwrJP0HVptp3V4biTI",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-26T08:43:28.895Z"
+      }
+    ],
+    "lastLoginAt": "2026-07-26T08:43:28.654Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": "#701A75",
+        "backgroundImage": "cover_3",
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-24T02:35:38.279Z",
+      "accountCreatedAt": "2026-06-24T02:35:38.279Z"
+    },
+    "createdAt": "2026-06-24T02:35:38.284Z",
+    "updatedAt": "2026-07-26T08:46:22.251Z",
+    "passwordResetStats": {
+      "count": 1,
+      "lastRequestAt": "2026-07-20T12:49:36.085Z"
+    },
+    "fcmTokens": []
+  },
+  {
+    "_id": "T01UAuKy21X4SvoxUJuKF4kdkjs2",
+    "firebaseUid": "T01UAuKy21X4SvoxUJuKF4kdkjs2",
+    "email": "yashkumbhani1147@gmail.com",
+    "displayName": "Yash kumbhani",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkMmQ4NjdmMS04YTQ3LTRhMzctOWQ4Ny0xNTgzODQ5OWYwNTAiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI3MzM3NywiZXhwIjoxNzgyODc4MTc3fQ.VuhJav6kYOUOkBk-s5zG3wQx1bHv0LG-QKs5oMdxvDw",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:52.873Z"
+      }
+    ],
+    "lastLoginAt": "2026-06-24T03:56:17.462Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-24T03:56:17.464Z",
+      "accountCreatedAt": "2026-06-24T03:56:17.464Z"
+    },
+    "createdAt": "2026-06-24T03:56:17.465Z",
+    "updatedAt": "2026-06-24T03:56:17.719Z"
+  },
+  {
+    "_id": "wjf91ewXaTbptJ8sNVWe69koQhf2",
+    "firebaseUid": "wjf91ewXaTbptJ8sNVWe69koQhf2",
+    "email": "anjali.lakdawala24598@gmail.com",
+    "displayName": "anjali.lakdawala",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4M2I4ZTJiNi05OWI4LTRhM2MtYWYxZi00MWU0MTBjMmFmYTYiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI4Mjc4NywiZXhwIjoxNzgyODg3NTg3fQ.gl6uMx0beW5JtwZ5FjoNvOZ2J20pkBGh90FNHlhLJ44",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:52.932Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4M2I4ZTJiNi05OWI4LTRhM2MtYWYxZi00MWU0MTBjMmFmYTYiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI4NDg2NSwiZXhwIjoxNzgyODg5NjY1fQ.xKn9oJ_kOLeweHsGO6mVrMnxiaMmk55pRV70UD_PnnM",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:52.932Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4M2I4ZTJiNi05OWI4LTRhM2MtYWYxZi00MWU0MTBjMmFmYTYiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MzkyOTEzMywiZXhwIjoxNzg0NTMzOTMzfQ.gZ-J-k2HdElPO-jiJLu3LwfegcaH3nW2q_A2V6-wfRo",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-13T07:52:13.674Z"
+      }
+    ],
+    "lastLoginAt": "2026-07-13T07:52:13.433Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": null,
+        "backgroundImage": "cover_1",
+        "backgroundBlur": 100,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-24T06:33:06.879Z",
+      "accountCreatedAt": "2026-06-24T06:33:06.879Z"
+    },
+    "createdAt": "2026-06-24T06:33:06.882Z",
+    "updatedAt": "2026-07-13T07:52:21.977Z"
+  },
+  {
+    "_id": "anMAS7GyuoMQ1hZc4YhZybtQLHa2",
+    "firebaseUid": "anMAS7GyuoMQ1hZc4YhZybtQLHa2",
+    "email": "pearlrnaik17@gmail.com",
+    "displayName": "P",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkYjk1ZDU3ZC03NDRlLTQ5MzUtYmJlNC05NTY4ODMwZmExMmEiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI4MzgyMiwiZXhwIjoxNzgyODg4NjIyfQ.D1OIkgnbjXzR2B90ERhqD0RZ08jBiY7bBia0XVAn1Ng",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:53.006Z"
+      }
+    ],
+    "lastLoginAt": "2026-06-24T06:33:15.843Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": null,
+        "backgroundImage": null,
+        "fontColor": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-24T06:33:15.844Z",
+      "accountCreatedAt": "2026-06-24T06:33:15.844Z"
+    },
+    "createdAt": "2026-06-24T06:33:15.846Z",
+    "updatedAt": "2026-09-15T11:41:45.567Z",
+    "fcmTokens": [],
+    "passwordResetStats": {
+      "count": 1,
+      "lastRequestAt": "2026-09-15T11:41:45.513Z"
+    }
+  },
+  {
+    "_id": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "firebaseUid": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "email": "adirathod6471@gmail.com",
+    "displayName": "Aditya Rathod",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMGQ4NTc1NC05NTg5LTRjZWYtYmFlMi00NTQ5OTk5MTkyYjgiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI4NzIyMSwiZXhwIjoxNzgyODkyMDIxfQ.-fXmiALAWTxrD5ynJtwKAGNkYOTBsZyv4mUxtJIo_94",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:53.933Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMGQ4NTc1NC05NTg5LTRjZWYtYmFlMi00NTQ5OTk5MTkyYjgiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI5MDU1MCwiZXhwIjoxNzgyODk1MzUwfQ.JkCs1YNYwO-VJLlKU-6MGQFnoJjBa3m_s54Lkkl3sEg",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:53.933Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJtcU1sUnJoUDR0Wmx3d2NFVmlTcUFNem00YmcxIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQyMDA5OTgsImV4cCI6MTc4NDgwNTc5OH0.HJRpycUSXoy1liT1MSxLuwewBB-1qvY5qZQu_Crn_Xo",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-16T11:23:18.414Z"
+      }
+    ],
+    "lastLoginAt": "2026-07-16T11:23:18.178Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-24T07:40:58.418Z",
+      "accountCreatedAt": "2026-06-24T07:40:58.418Z"
+    },
+    "createdAt": "2026-06-24T07:40:58.422Z",
+    "updatedAt": "2026-07-17T11:22:27.968Z"
+  },
+  {
+    "_id": "lS3LuG9W89gQnksO4pFI55pbNPe2",
+    "firebaseUid": "lS3LuG9W89gQnksO4pFI55pbNPe2",
+    "email": "msms5476mmm@gmail.com",
+    "displayName": "Manish",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiM2U2NDg0Zi00NTI1LTQ0ZDMtYjhmMC01M2EyM2VhY2Q4YjQiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjI5MzEwNiwiZXhwIjoxNzgyODk3OTA2fQ.hEhxYisf4pzdLM6mVvQTyHpgmDuVcFwbepZqRyvQugo",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:53.992Z"
+      }
+    ],
+    "lastLoginAt": "2026-06-24T08:11:51.141Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-24T08:11:51.148Z",
+      "accountCreatedAt": "2026-06-24T08:11:51.148Z"
+    },
+    "createdAt": "2026-06-24T08:11:51.159Z",
+    "updatedAt": "2026-06-24T09:25:06.384Z"
+  },
+  {
+    "_id": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+    "firebaseUid": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+    "email": "msms5476m@gmail.com",
+    "displayName": "nehal",
+    "photoURL": "",
+    "role": "admin",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJGWkdlQ3VpbzBkZkc0a1daaTg2aWpuNHhMWHQyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODk5Nzg0MjAsImV4cCI6MTc5MjU3MDQyMH0.WBXcB-JDRQFiuIUEXgFTE95kU928FDkgm7zh7TCXaNU",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-21T08:13:40.332Z"
+      }
+    ],
+    "lastLoginAt": "2026-09-26T06:51:31.533Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "dark",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "aurora",
+        "backgroundType": "image",
+        "backgroundColor": "#064E3B",
+        "backgroundImage": "cover_1",
+        "fontColor": "#F43F5E",
+        "cardSurfaceStyle": "solid",
+        "backgroundBlur": 100,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-26T08:00:44.688Z",
+      "accountCreatedAt": "2026-06-26T08:00:44.688Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-06-26T08:00:44.688Z"
+    },
+    "createdAt": "2026-06-26T08:00:44.689Z",
+    "updatedAt": "2026-09-26T06:59:53.909Z",
+    "fcmTokens": [
+      "fMeI_mASXu8vde1YPKRyea:APA91bEG_81sq5BjSwllG8QfIfM7xsxp9n_xXxrcS69IXuvAwpbx15rQ5LDHsp7-3Ql_c6AvaL3F7nzPNToW0iVQkG9ghxbLg5eVd_8oXd600-XBokSSsLk",
+      "cpJ7V3vESqXlrisx9wYIkS:APA91bHFEC1RjAjmgF45rF9MS1h0zN8hrFt8v0OzLmk3ji7gj3w0CUUyfj7D4PuNy39FnXwHT5Za3k0h68rlvfMY4SPR5AxqNSkM3N-XAd9qh-dhklgX7N0"
+    ]
+  },
+  {
+    "_id": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+    "firebaseUid": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+    "email": "meharpatel2512@gmail.com",
+    "displayName": "Mehar Patel",
+    "photoURL": "",
+    "role": "user",
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNzZmNTY2OC1iZGFhLTQ3YmYtYWQwYi02NDU4MzBhMDAwZGUiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MjQ2MTM5MSwiZXhwIjoxNzgzMDY2MTkxfQ.d8PNMR7ehH-hkIzPT7J2CzkbZe69J6CSOUlnxNw9800",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:33:54.120Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJXRWQ3VVJ5Rkt1U0JvS3Q5VDFlaEZ4WkN6Z2YxIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQyNzk2MzYsImV4cCI6MTc4NDg4NDQzNn0.H9ocfy_enKHPEWrr0ytlUw6e_38QZ_tmmiCB22G4Ydo",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-17T09:13:56.685Z"
+      }
+    ],
+    "lastLoginAt": "2026-07-17T09:13:56.450Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmToken": null,
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": "#701A75",
+        "backgroundImage": "https://www.fomostore.in/cdn/shop/products/Brothers-Innovation-Holographic_Stickers-Movies-Marvel_Black_Panther-Image-1.jpg?v=1704203490&width=2048",
+        "backgroundBlur": 3,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-06-26T08:09:51.489Z",
+      "accountCreatedAt": "2026-06-26T08:09:51.489Z"
+    },
+    "passwordResetStats": {
+      "count": 1,
+      "lastRequestAt": "2026-07-17T09:12:03.611Z"
+    },
+    "createdAt": "2026-06-26T08:09:51.490Z",
+    "updatedAt": "2026-07-17T10:43:51.660Z",
+    "fcmTokens": []
+  },
+  {
+    "_id": "9c01iwfYp6P0OnpBdofbcyoh6Xo2",
+    "firebaseUid": "9c01iwfYp6P0OnpBdofbcyoh6Xo2",
+    "email": "nehal@gmail.com",
+    "displayName": "nehal singh",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-07-09T15:31:34.962Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4NTUzNDkyMC0xMDA0LTQ4YjktOGE5My1iZmY0MDhiNjZhNTYiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4MzYxMTA5NSwiZXhwIjoxNzg0MjE1ODk1fQ.QHgX3EwwsD0n2H76VqnA1m7P8lBUlT7ZJ0JNcmDUWZQ",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-09T15:31:35.048Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-07-09T15:31:34.963Z",
+      "accountCreatedAt": "2026-07-09T15:31:34.963Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-07-09T15:31:34.963Z"
+    },
+    "createdAt": "2026-07-09T15:31:34.964Z",
+    "updatedAt": "2026-07-09T15:31:35.048Z"
+  },
+  {
+    "_id": "uS3Va6zVaig671xgjk4hi2GYuhD3",
+    "firebaseUid": "uS3Va6zVaig671xgjk4hi2GYuhD3",
+    "email": "zeelvashi02@gmail.com",
+    "displayName": "Zeel vashi",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-07-11T07:39:45.973Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5YzVmNTU2OC01NjVhLTRmNDItYTljNC1kZDQ2OWRiMjhiOTUiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4Mzc1NTU4NiwiZXhwIjoxNzg0MzYwMzg2fQ.7VSIozZhqnSadJg1P3SmctYYsk9qLdBI9VwSYq7HwWc",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-11T07:39:46.262Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "backgroundType": "color",
+        "backgroundColor": null,
+        "backgroundImage": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-07-11T07:39:45.980Z",
+      "accountCreatedAt": "2026-07-11T07:39:45.980Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-07-11T07:39:45.980Z"
+    },
+    "createdAt": "2026-07-11T07:39:45.986Z",
+    "updatedAt": "2026-07-11T07:39:46.262Z"
+  },
+  {
+    "_id": "fa6vrr4Qf0ZnqekyrxJV7y4idwR2",
+    "firebaseUid": "fa6vrr4Qf0ZnqekyrxJV7y4idwR2",
+    "email": "vishalsharma05052002@gmail.com",
+    "displayName": "Vishal",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-07-14T09:19:13.539Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiZTRiMjdmZC1jYTc1LTQwNWQtYmM0OC1mNTdhMmVkN2I5ZjUiLCJ0eXBlIjoicmVmcmVzaCIsImlzcyI6InRyaXBzcGxpdCIsImlhdCI6MTc4NDAyMDc1MywiZXhwIjoxNzg0NjI1NTUzfQ.3hTKm_88_b7AEs2OqtY4v1bvGVMP8JpESEKYXqMhmxY",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-14T09:19:13.850Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": null,
+        "backgroundImage": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-07-14T09:19:13.545Z",
+      "accountCreatedAt": "2026-07-14T09:19:13.545Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-07-14T09:19:13.545Z"
+    },
+    "createdAt": "2026-07-14T09:19:13.597Z",
+    "updatedAt": "2026-07-14T09:19:13.850Z"
+  },
+  {
+    "_id": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "firebaseUid": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "email": "dummy.mail.me@proton.me",
+    "displayName": "Trip Split",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-14T13:53:14.365Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "cpJ7V3vESqXlrisx9wYIkS:APA91bHFEC1RjAjmgF45rF9MS1h0zN8hrFt8v0OzLmk3ji7gj3w0CUUyfj7D4PuNy39FnXwHT5Za3k0h68rlvfMY4SPR5AxqNSkM3N-XAd9qh-dhklgX7N0",
+      "dG6Svya_CKrDrDa_tlXxZk:APA91bEQocy--c3Nxj6gZ8tUibu6qMwjjSkg0OeIq2VnRNa52GvhwiQmy6pP0YESlSdhpdkLlzQMw-fOkeIvOtyw3RTCH6LmV2pykHvPgNBhpAPOMf_D4kk"
+    ],
+    "refreshTokens": [],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": null,
+        "backgroundImage": "cover_3",
+        "fontColor": null,
+        "backgroundBlur": 46,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-07-15T11:21:52.478Z",
+      "accountCreatedAt": "2026-07-15T11:21:52.478Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-07-15T11:21:52.478Z"
+    },
+    "createdAt": "2026-07-15T11:21:52.481Z",
+    "updatedAt": "2026-09-18T02:12:22.312Z"
+  },
+  {
+    "_id": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+    "firebaseUid": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+    "email": "swetalgamit@gmail.com",
+    "displayName": "swetal gamit",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-07-19T10:12:51.726Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "dBQ-NETniTh-ykAoJ5pyY7:APA91bHGM5gnd0jrnAoYRTzecUgLb2x3hsRt0Xgvg5u4JiN3nM6jDYOk419jqZwqCeOar_HqOV0D_xCN6aIGhwZM_VjbIEY1gPKGop1FQNy6vaNHo33kBoQ"
+    ],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJTSURvTE80SmU0U1ZnZDI3eklsVDB3WlNldmcyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQ0NTU5NzEsImV4cCI6MTc4NTA2MDc3MX0.ynsnBU7kH769b5vyEefUoQgqOOM059V5cXIm70RIV8Y",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-19T10:12:51.795Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJTSURvTE80SmU0U1ZnZDI3eklsVDB3WlNldmcyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQ3MTY1OTUsImV4cCI6MTc4NTMyMTM5NX0.ROqvI2k2BWKQR7flwoCDpoQeo6exTXnGyFoKfRYJ1ng",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-22T10:36:35.132Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": null,
+        "backgroundImage": "cover_1",
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-07-17T10:26:36.062Z",
+      "accountCreatedAt": "2026-07-17T10:26:36.062Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-07-17T10:26:36.062Z"
+    },
+    "createdAt": "2026-07-17T10:26:36.067Z",
+    "updatedAt": "2026-07-22T10:37:13.115Z"
+  },
+  {
+    "_id": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+    "firebaseUid": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+    "email": "jaymaturkar@gmail.com",
+    "displayName": "jay mathurkar",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-07-19T10:23:31.603Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4anJKaDZJbXNuYVBjUElmUGt3N0pTejdOM1UyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQyODQxOTIsImV4cCI6MTc4NDg4ODk5Mn0.ZilIyOjycvbO3aoW3-aP4ioMI1R2CJhUdnbGkDbRKy8",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-17T10:29:52.506Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4anJKaDZJbXNuYVBjUElmUGt3N0pTejdOM1UyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODQ0NTY2MTEsImV4cCI6MTc4NTA2MTQxMX0.195V36Sit-tRkd9AMi4G2QFZRH58CyuHLdmSi445rI0",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-07-19T10:23:31.854Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": null,
+        "backgroundImage": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-07-17T10:29:52.254Z",
+      "accountCreatedAt": "2026-07-17T10:29:52.254Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-07-17T10:29:52.254Z"
+    },
+    "createdAt": "2026-07-17T10:29:52.255Z",
+    "updatedAt": "2026-07-19T10:23:31.854Z"
+  },
+  {
+    "_id": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "firebaseUid": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "email": "manishs222002@gmail.com",
+    "displayName": "Manish Sharma",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocLCaK7sbUDctNvpP0mVizOdDx1hbM8o3p2-mv5y_9QT2MMp3g=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "email": "manishs222002@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-08-28T12:52:21.398Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "f0hwGpSdJREr1bKVYnk9af:APA91bFoKFmsiRZ0mgZGzz74KBxzvNqZt7lngj1hgl72OiST1ouBjVwhdjUmeppdcsMv3Yt0dL-TSDQsooL-XaFvbTrHSk1UGXySzUafIrUScC-aMWJ8Sm8"
+    ],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJrWGdtN0ZHNWtGZUNxVXVWVVFkYjg3YmUySzAyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODc5MjE1NDEsImV4cCI6MTc4ODUyNjM0MX0.iJEataitzIiTHW_cdZx71k3WITIVhCpVfQOxDgh8hyA",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-08-28T12:52:21.656Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": null,
+        "backgroundImage": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-08-28T12:52:21.401Z",
+      "accountCreatedAt": "2026-08-28T12:52:21.401Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-08-28T12:52:21.401Z"
+    },
+    "createdAt": "2026-08-28T12:52:21.405Z",
+    "updatedAt": "2026-08-28T12:58:07.242Z"
+  },
+  {
+    "_id": "YpDg4Lroi2cirdFa3prmSGY50tz1",
+    "firebaseUid": "YpDg4Lroi2cirdFa3prmSGY50tz1",
+    "email": "vishalsharma0505002@gmail.com",
+    "displayName": "Vishal Sharma",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-14T13:41:32.213Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "dsuuuKN6QIuGD-OLO25S5c:APA91bEbCaoOxPymDNKYfkuNjpsVrvGjXjGWY5Cf6lU87780YkAQMMK6C8Lks3oScBowUf_n-6wdow3T5-hEUXTzUXfSI6Ey7byuLu5ax51KuT3uK5JAmsc"
+    ],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJZcERnNExyb2kyY2lyZEZhM3BybVNHWTUwdHoxIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODkzOTMyOTIsImV4cCI6MTc4OTk5ODA5Mn0.NhpiprohW0UBc-im34pfq07NgbHRdENR9OBZz4E9wkY",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-14T13:41:32.473Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "dark",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": null,
+        "backgroundImage": null,
+        "fontColor": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-14T13:41:32.215Z",
+      "accountCreatedAt": "2026-09-14T13:41:32.215Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-14T13:41:32.215Z"
+    },
+    "createdAt": "2026-09-14T13:41:32.216Z",
+    "updatedAt": "2026-09-14T13:42:27.740Z"
+  },
+  {
+    "_id": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "firebaseUid": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "email": "rajeevvsiingh@gmail.com",
+    "displayName": "Rajeev Singh",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocKj_Unz3gBIRpODnw9W_WNm3BXt1huC8Y-KHxe1jzp60dr0Tw=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "pkiHWJzvNieweNeLucoRPGFELap1",
+        "email": "rajeevvsiingh@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-16T14:34:33.640Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJwa2lIV0p6dk5pZXdlTmVMdWNvUlBHRkVMYXAxIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODk1NjkyNzQsImV4cCI6MTc5MDE3NDA3NH0.rgbcMlQU8yeS1N5weZjazE3A5UWGuE22WPOFp-6D1CY",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-16T14:34:34.022Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "dark",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": null,
+        "backgroundImage": "cover_3",
+        "fontColor": "#F43F5E",
+        "backgroundBlur": 100,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-16T14:34:33.646Z",
+      "accountCreatedAt": "2026-09-16T14:34:33.646Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-16T14:34:33.646Z"
+    },
+    "createdAt": "2026-09-16T14:34:33.652Z",
+    "updatedAt": "2026-09-18T02:12:39.966Z"
+  },
+  {
+    "_id": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "firebaseUid": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+    "email": "msms5476mmmm@gmail.com",
+    "displayName": "Manish Singh",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJYYqmS47hiv2NUrJXqDYO-fFPBHgJNN126IQ6TZbZp20rBoUN7=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+        "email": "msms5476mmmm@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-23T01:45:39.538Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "dG6Svya_CKrDrDa_tlXxZk:APA91bEQocy--c3Nxj6gZ8tUibu6qMwjjSkg0OeIq2VnRNa52GvhwiQmy6pP0YESlSdhpdkLlzQMw-fOkeIvOtyw3RTCH6LmV2pykHvPgNBhpAPOMf_D4kk"
+    ],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjWUIwVWRoRUhMT01GREN5Snk4cU9TaXp1VGUyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODk1NzEzMTMsImV4cCI6MTc5MDE3NjExM30.U_BvSKcZW7LLTdSMwWVrd134WkQRQxX5izc3MGWTr3w",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-16T15:08:33.138Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": "#1E1B4B",
+        "backgroundImage": "cover_3",
+        "fontColor": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-16T15:08:32.825Z",
+      "accountCreatedAt": "2026-09-16T15:08:32.825Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-16T15:08:32.825Z"
+    },
+    "createdAt": "2026-09-16T15:08:32.837Z",
+    "updatedAt": "2026-09-23T01:45:47.542Z"
+  },
+  {
+    "_id": "XncLlQFOYXNlebIkTY4aeFfmD9T2",
+    "firebaseUid": "XncLlQFOYXNlebIkTY4aeFfmD9T2",
+    "email": "maturkarjay3@gmail.com",
+    "displayName": "johen dei",
+    "photoURL": "",
+    "role": "user",
+    "authProviders": {
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-21T05:13:02.026Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "fHdOQf3QaBFQbYnPjfqxpw:APA91bHa8J1KAZ6hapL55xtYXCcwJyzSgVMc0HlfgoFGU02-nxn-Y_Pp7eBdzyqeqlgyLIsO1h_SGuxASPGcnVcZryK9rzm1xgLXgnbY56HKnkWBQWAO6Hs"
+    ],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJYbmNMbFFGT1lYTmxlYklrVFk0YWVGZm1EOVQyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3ODk5Njc1ODIsImV4cCI6MTc5MjU1OTU4Mn0.-1KzxMEKTVqDPn1t4BYw6d9GR4kAanPSVGKTMB0e-jM",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-21T05:13:02.278Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "system",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "image",
+        "backgroundColor": null,
+        "backgroundImage": "cover_1",
+        "fontColor": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-21T05:13:02.028Z",
+      "accountCreatedAt": "2026-09-21T05:13:02.028Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-21T05:13:02.028Z"
+    },
+    "createdAt": "2026-09-21T05:13:02.034Z",
+    "updatedAt": "2026-09-21T05:15:24.536Z"
+  },
+  {
+    "_id": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "firebaseUid": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "email": "rounak1828@gmail.com",
+    "displayName": "Singh Ronak",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJ6titroHl_fbuTanCR5A-QAN3w6Iye5_x8L2LkG9-zYSa8VV9E=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+        "email": "rounak1828@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-22T17:00:19.886Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MGZnQWZTNVRiWEh2dGNGVHBLR2VLbm9IUXoyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAwOTY0MjAsImV4cCI6MTc5MjY4ODQyMH0.PSvyZXkVVZlQI9jG3lBNEg4FD3BfrhiFsXQCD6XCjgA",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-22T17:00:20.143Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": "#0F172A",
+        "backgroundImage": "cover_1",
+        "fontColor": "#F43F5E",
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-22T17:00:19.889Z",
+      "accountCreatedAt": "2026-09-22T17:00:19.890Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-22T17:00:19.890Z"
+    },
+    "createdAt": "2026-09-22T17:00:19.896Z",
+    "updatedAt": "2026-09-23T12:53:27.090Z",
+    "onboardingCompleted": true
+  },
+  {
+    "_id": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "firebaseUid": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "email": "msms5476mm@gmail.com",
+    "displayName": "Manish Singh",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocKVAg7Nf9Cdti6o4XbjKsAoSJeqnH3garsvMqtQ5Dv9DddJkX4=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+        "email": "msms5476mm@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-26T07:53:57.605Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "dG6Svya_CKrDrDa_tlXxZk:APA91bEQocy--c3Nxj6gZ8tUibu6qMwjjSkg0OeIq2VnRNa52GvhwiQmy6pP0YESlSdhpdkLlzQMw-fOkeIvOtyw3RTCH6LmV2pykHvPgNBhpAPOMf_D4kk",
+      "epmmNfjlTXy4rZdNGl6bZ9:APA91bFcMw4idOyx7ELPBkerFdFR3iTG6a4bd3beOX143hWAuvT1fXVrx6uZuacOcj79CkwXpv-HdndhYvyhBZPdBql9Oa9DTewz_fHWv6JKQdPfmNKns6M",
+      "cH4DU1FxCm0LeomxO_rrF8:APA91bFbV7v16eOQnIdZyVo-_h9yerAVEQ4ucjSF0jDXQeW95oweuMjnOW9UHerv0sSCTQAwJNOlUktqn8H92aeLCap4JKU52tS48XQRaIzCBnn4UPEg7C4"
+    ],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3SW8wNE1EQnoyUnhmcTBjTlBKaUZrNEhSNmUyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAzNTkzNTQsImV4cCI6MTc5Mjk1MTM1NH0.ULyy0RPJ6R624raghbmHHjCiz37l8yvEFtiuGgFCXoc",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-25T18:02:34.861Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3SW8wNE1EQnoyUnhmcTBjTlBKaUZrNEhSNmUyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAzNTk2OTQsImV4cCI6MTc5Mjk1MTY5NH0.HXcwpUiCmdNOiEWdMMGcAC4YRcqt7hx3rlIxXo22Aes",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-25T18:08:14.705Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3SW8wNE1EQnoyUnhmcTBjTlBKaUZrNEhSNmUyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTA0MDYwMTEsImV4cCI6MTc5Mjk5ODAxMX0.GjY5HREz0QaQIKa4gqtQd1itmlGkyhucXufUIyNVWnY",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-26T07:00:11.257Z"
+      },
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3SW8wNE1EQnoyUnhmcTBjTlBKaUZrNEhSNmUyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTA0MDcwMTksImV4cCI6MTc5Mjk5OTAxOX0.slpywbgIwJeBqzgyUzvHzxDcVezHEFUwWgo0EH1hV_4",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-26T07:16:59.129Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "ocean",
+        "backgroundType": "color",
+        "backgroundColor": "#F0FDFA",
+        "backgroundImage": "cover_1",
+        "fontColor": "#D4A03C",
+        "cardSurfaceStyle": "solid",
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-23T01:46:04.307Z",
+      "accountCreatedAt": "2026-09-23T01:46:04.307Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-23T01:46:04.307Z"
+    },
+    "createdAt": "2026-09-23T01:46:04.309Z",
+    "updatedAt": "2026-09-26T16:08:59.971Z",
+    "onboardingCompleted": true
+  },
+  {
+    "_id": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "firebaseUid": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "email": "srjahire0@gmail.com",
+    "displayName": "Suraj Ahire",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocLNGUyCUMsyF7MJ51IDbkRnWE6SpCeQLnfQNpeZxFC2I1Kk82Q=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "email": "srjahire0@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-23T02:48:11.631Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ4ZnRacndlOFQ2VERZa29uNHZRem1adnRZZWsxIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAxMzE2OTEsImV4cCI6MTc5MjcyMzY5MX0.rDRYZwdc4EUt9eQQQaheADMJlzY8n2AxxpDcA9JfgGA",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-23T02:48:11.881Z"
+      }
+    ],
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "light",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "light",
+        "backgroundType": "color",
+        "backgroundColor": "#F1F5F9",
+        "backgroundImage": "cover_1",
+        "fontColor": null,
+        "backgroundBlur": 50,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-23T02:48:11.633Z",
+      "accountCreatedAt": "2026-09-23T02:48:11.633Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-23T02:48:11.633Z"
+    },
+    "createdAt": "2026-09-23T02:48:11.636Z",
+    "updatedAt": "2026-09-23T02:53:14.130Z"
+  },
+  {
+    "_id": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "firebaseUid": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "email": "preetvasoya8@gmail.com",
+    "displayName": "preet vasoya",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJ1xLdj2Gz8mOQEHhlgcN5Ruf7s2TQXlEUy4f2xIjKFFQc7Cw=s96-c",
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+        "email": "preetvasoya8@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-24T16:18:47.648Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [],
+    "onboardingCompleted": true,
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "dark",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "ocean",
+        "backgroundType": "color",
+        "backgroundColor": "#FFFFFF",
+        "backgroundImage": "cover_6",
+        "fontColor": "#F59E0B",
+        "cardSurfaceStyle": "solid",
+        "backgroundBlur": 100,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJUbTVEVXBaemFLUVNGanpaQmNmQTltQVN5RkMyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTAyNjY3MjcsImV4cCI6MTc5Mjg1ODcyN30.AZdD91k4QCQoY4jvusrcZUehqtzhfiocKWCUHrqIBvs",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-24T16:18:47.905Z"
+      }
+    ],
+    "bankingDetails": {
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-24T16:18:47.650Z",
+      "accountCreatedAt": "2026-09-24T16:18:47.650Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-24T16:18:47.650Z"
+    },
+    "createdAt": "2026-09-24T16:18:47.651Z",
+    "updatedAt": "2026-09-24T16:23:55.694Z"
+  },
+  {
+    "_id": "nSyCo8OwXAWo3rBUxrYJIVC2vhb2",
+    "firebaseUid": "nSyCo8OwXAWo3rBUxrYJIVC2vhb2",
+    "email": "smily652001@gmail.com",
+    "displayName": "smily gamit",
+    "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJbQ_dMHq6JGBZoyFxkcRumBbcqFhZ_jX3wJJNm0QVghnjnXQ=s96-c",
+    "phoneEncrypted": null,
+    "encryptionVersion": 1,
+    "role": "user",
+    "authProviders": {
+      "google": {
+        "id": "nSyCo8OwXAWo3rBUxrYJIVC2vhb2",
+        "email": "smily652001@gmail.com"
+      },
+      "email": {
+        "verified": false
+      }
+    },
+    "lastLoginAt": "2026-09-26T07:31:12.422Z",
+    "isActive": true,
+    "isDeleted": false,
+    "deletedAt": null,
+    "totalOwedAcrossTrips": 0,
+    "totalLentAcrossTrips": 0,
+    "friendIds": [],
+    "fcmTokens": [
+      "c3z7ZT4yLyf3lUNF7uw-WY:APA91bEJEfoPBjyxb1WwLhe85vdrgdh-GVqpY1j9hDuTrRXSNuw3hbyj6DiDvNIsUirQSSCst7bLkIbfddB4irQPfXRAXtmY_VOv0cJzBp55x_7eOryBWjo",
+      "c3z7ZT4yLyf3lUNF7uw-WY:APA91bEj-eFvpg5PqJz9hSLv78pXxVxMeTesygKV5qDPYVMzhooJ7V15lRVkj7ricZZfJ9YO4fahFU7sJznLVH2TZxH28NW1UPaHcU_dQ4QwCmolwUKbXB4"
+    ],
+    "onboardingCompleted": true,
+    "preferences": {
+      "defaultCurrency": "INR",
+      "language": "en",
+      "theme": "dark",
+      "timezone": "Asia/Kolkata",
+      "notifications": {
+        "push": true,
+        "email": true,
+        "sms": false,
+        "expenseAdded": true,
+        "settlementReminder": true,
+        "monthlyReport": true
+      },
+      "appearance": {
+        "themePreset": "ocean",
+        "backgroundType": "color",
+        "backgroundColor": "#FFFFFF",
+        "backgroundImage": "cover_6",
+        "fontColor": "#F59E0B",
+        "cardSurfaceStyle": "solid",
+        "backgroundBlur": 100,
+        "backgroundImagePosition": {
+          "x": 0,
+          "y": 0,
+          "scale": 1
+        }
+      }
+    },
+    "refreshTokens": [
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJuU3lDbzhPd1hBV28zckJVeHJZSklWQzJ2aGIyIiwidHlwZSI6InJlZnJlc2giLCJpc3MiOiJ0cmlwc3BsaXQiLCJpYXQiOjE3OTA0MDc4NzIsImV4cCI6MTc5Mjk5OTg3Mn0.7tDdXx5g26OZd9DU3sEBJDyqcbhh_DT_sesN7g1L2lY",
+        "device": "Unknown Device",
+        "ip": "Unknown IP",
+        "lastActive": "2026-09-26T07:31:12.678Z"
+      }
+    ],
+    "bankingDetails": {
+      "upiIdEncrypted": null,
+      "upiVerified": false
+    },
+    "stats": {
+      "totalGroups": 0,
+      "totalExpenses": 0,
+      "totalSettled": 0,
+      "totalPending": 0,
+      "lastActiveAt": "2026-09-26T07:31:12.424Z",
+      "accountCreatedAt": "2026-09-26T07:31:12.424Z"
+    },
+    "passwordResetStats": {
+      "count": 0,
+      "lastRequestAt": "2026-09-26T07:31:12.425Z"
+    },
+    "createdAt": "2026-09-26T07:31:12.426Z",
+    "updatedAt": "2026-09-26T07:31:49.856Z"
+  }
+]

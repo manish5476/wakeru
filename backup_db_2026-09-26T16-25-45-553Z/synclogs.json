@@ -1,0 +1,465 @@
+[
+  {
+    "_id": "6aac9dc5c1f7d0b303884f98",
+    "clientOperationId": "976b1f9c-6e2c-4daa-81f7-61721c96e5e9",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6aac9dc3c1f7d0b303884f7a",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6aa654399cf111f4ce54a099",
+      "stopId": "6aa654399cf111f4ce54a09a",
+      "location": {
+        "latitude": 21.1900753,
+        "longitude": 72.8650055
+      },
+      "tags": [],
+      "title": "B",
+      "category": "other",
+      "receiptImages": [],
+      "date": "2026-09-18T02:10:53.938Z",
+      "amountLocal": 8000,
+      "amountBase": 8000,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 2000,
+          "amountBase": 2000,
+          "isPaid": true
+        },
+        {
+          "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+          "displayName": "Trip Split",
+          "amountLocal": 2000,
+          "amountBase": 2000,
+          "isPaid": false
+        },
+        {
+          "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+          "displayName": "Rajeev Singh",
+          "amountLocal": 2000,
+          "amountBase": 2000,
+          "isPaid": false
+        },
+        {
+          "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+          "displayName": "Manish Singh",
+          "amountLocal": 2000,
+          "amountBase": 2000,
+          "isPaid": false
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": false,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6aac9dc3c1f7d0b303884f7a",
+      "createdAt": "2026-09-18T02:11:15.044Z",
+      "updatedAt": "2026-09-18T02:11:15.044Z"
+    },
+    "createdAt": "2026-09-18T02:11:17.419Z",
+    "updatedAt": "2026-09-18T02:11:17.419Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab33f07d2c181d1bce501ae",
+    "clientOperationId": "4c69b6ae-7307-4242-b09c-16a43e2fb77f",
+    "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "entityType": "expense",
+    "entityId": "6ab33f05d2c181d1bce50199",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab33e97d2c181d1bce500eb",
+      "stopId": "6ab33e97d2c181d1bce500ec",
+      "tags": [
+        "Personal"
+      ],
+      "title": "Shopping",
+      "category": "shopping",
+      "notes": "Mmmm",
+      "receiptImages": [],
+      "date": "2026-09-23T02:52:12.741Z",
+      "amountLocal": 2000,
+      "amountBase": 2000,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+      "paidByName": "Suraj Ahire",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 1000,
+          "amountBase": 1000,
+          "isPaid": false
+        },
+        {
+          "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+          "displayName": "Suraj Ahire",
+          "amountLocal": 1000,
+          "amountBase": 1000,
+          "isPaid": true
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": false,
+      "isArchived": false,
+      "addedBy": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+      "expenseHistory": [],
+      "_id": "6ab33f05d2c181d1bce50199",
+      "createdAt": "2026-09-23T02:52:53.406Z",
+      "updatedAt": "2026-09-23T02:52:53.406Z"
+    },
+    "createdAt": "2026-09-23T02:52:55.288Z",
+    "updatedAt": "2026-09-23T02:52:55.288Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab33f37d2c181d1bce50473",
+    "clientOperationId": "1cdf72a4-e9a8-45d2-abc8-0b9acab5635d",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6ab33f35d2c181d1bce5044b",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab33e97d2c181d1bce500eb",
+      "stopId": "6ab33e97d2c181d1bce500ec",
+      "location": {
+        "latitude": 21.1987074,
+        "longitude": 72.8074189
+      },
+      "tags": [
+        "Business"
+      ],
+      "title": "Suran",
+      "category": "other",
+      "receiptImages": [],
+      "date": "2026-09-23T02:53:20.364Z",
+      "amountLocal": 5000,
+      "amountBase": 5000,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 2500,
+          "amountBase": 2500,
+          "isPaid": true
+        },
+        {
+          "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+          "displayName": "Suraj Ahire",
+          "amountLocal": 2500,
+          "amountBase": 2500,
+          "isPaid": false
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": false,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6ab33f35d2c181d1bce5044b",
+      "createdAt": "2026-09-23T02:53:42.072Z",
+      "updatedAt": "2026-09-23T02:53:42.072Z"
+    },
+    "createdAt": "2026-09-23T02:53:43.966Z",
+    "updatedAt": "2026-09-23T02:53:43.966Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab33f61d2c181d1bce5079b",
+    "clientOperationId": "2bb75bbd-51fd-458e-ab01-c98eb2dfd755",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6ab33f5fd2c181d1bce50774",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab33e97d2c181d1bce500eb",
+      "stopId": "6ab33e97d2c181d1bce500ec",
+      "location": {
+        "latitude": 21.1988164,
+        "longitude": 72.8086162
+      },
+      "tags": [
+        "Split with partner",
+        "Personal"
+      ],
+      "title": "Manish",
+      "category": "food",
+      "receiptImages": [],
+      "date": "2026-09-23T02:53:59.978Z",
+      "amountLocal": 20000,
+      "amountBase": 20000,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 10000,
+          "amountBase": 10000,
+          "isPaid": true
+        },
+        {
+          "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+          "displayName": "Suraj Ahire",
+          "amountLocal": 10000,
+          "amountBase": 10000,
+          "isPaid": false
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": false,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6ab33f5fd2c181d1bce50774",
+      "createdAt": "2026-09-23T02:54:23.714Z",
+      "updatedAt": "2026-09-23T02:54:23.714Z"
+    },
+    "createdAt": "2026-09-23T02:54:25.609Z",
+    "updatedAt": "2026-09-23T02:54:25.609Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab33f89d2c181d1bce50ab4",
+    "clientOperationId": "4a5b5488-89d5-409c-b2ab-0371b575b33d",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6ab33f87d2c181d1bce50a8d",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab33e97d2c181d1bce500eb",
+      "stopId": "6ab33e97d2c181d1bce500ec",
+      "location": {
+        "latitude": 21.1985556,
+        "longitude": 72.8075662
+      },
+      "tags": [
+        "Personal"
+      ],
+      "title": "Manish",
+      "category": "other",
+      "receiptImages": [],
+      "date": "2026-09-23T02:54:36.612Z",
+      "amountLocal": 10,
+      "amountBase": 10,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 5,
+          "amountBase": 5,
+          "isPaid": true
+        },
+        {
+          "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+          "displayName": "Suraj Ahire",
+          "amountLocal": 5,
+          "amountBase": 5,
+          "isPaid": false
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": false,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6ab33f87d2c181d1bce50a8d",
+      "createdAt": "2026-09-23T02:55:03.937Z",
+      "updatedAt": "2026-09-23T02:55:03.937Z"
+    },
+    "createdAt": "2026-09-23T02:55:05.833Z",
+    "updatedAt": "2026-09-23T02:55:05.833Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab48c1bc130bca572620bba",
+    "clientOperationId": "aed993cc-70dd-4b56-9adb-026cf01abeb1",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6ab48c19c130bca572620ba5",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab3726b818b490c972fb277",
+      "stopId": "6ab3726b818b490c972fb278",
+      "location": {
+        "latitude": 21.198862,
+        "longitude": 72.8549385
+      },
+      "tags": [],
+      "title": "Testing",
+      "category": "food",
+      "receiptImages": [],
+      "date": "2026-09-24T02:33:32.756Z",
+      "amountLocal": 5000,
+      "amountBase": 5000,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 5000,
+          "amountBase": 5000,
+          "isPaid": true
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": true,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6ab48c19c130bca572620ba5",
+      "createdAt": "2026-09-24T02:34:01.667Z",
+      "updatedAt": "2026-09-24T02:34:01.667Z"
+    },
+    "createdAt": "2026-09-24T02:34:03.321Z",
+    "updatedAt": "2026-09-24T02:34:03.321Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab48c5cc130bca572620ecb",
+    "clientOperationId": "cd5e8521-9ace-48f7-98fb-de6b5cc77c46",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6ab48c5bc130bca572620e9b",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab3726b818b490c972fb277",
+      "stopId": "6ab3726b818b490c972fb278",
+      "location": {
+        "latitude": 21.1979357,
+        "longitude": 72.8508886
+      },
+      "tags": [],
+      "title": "Teat",
+      "category": "other",
+      "receiptImages": [],
+      "date": "2026-09-24T02:34:43.665Z",
+      "amountLocal": 200,
+      "amountBase": 200,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 200,
+          "amountBase": 200,
+          "isPaid": true
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": true,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6ab48c5bc130bca572620e9b",
+      "createdAt": "2026-09-24T02:35:07.020Z",
+      "updatedAt": "2026-09-24T02:35:07.020Z"
+    },
+    "createdAt": "2026-09-24T02:35:08.680Z",
+    "updatedAt": "2026-09-24T02:35:08.680Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab4918d5b075e2db8f25604",
+    "clientOperationId": "76cdd9a2-9207-4cd8-9bda-936100a29b94",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "entityType": "expense",
+    "entityId": "6ab4918b5b075e2db8f255f1",
+    "operationType": "CREATE",
+    "status": "APPLIED",
+    "resultPayload": {
+      "tripId": "6ab3726b818b490c972fb277",
+      "stopId": "6ab3726b818b490c972fb278",
+      "location": {
+        "latitude": 21.1927089,
+        "longitude": 72.8002036
+      },
+      "tags": [],
+      "title": "Manish",
+      "category": "other",
+      "receiptImages": [],
+      "date": "2026-09-24T02:57:01.987Z",
+      "amountLocal": 100,
+      "amountBase": 100,
+      "localCurrency": "INR",
+      "baseCurrency": "INR",
+      "exchangeRateUsed": 1,
+      "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "paidByName": "Manish",
+      "splitMethod": "equal",
+      "splits": [
+        {
+          "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+          "displayName": "Manish",
+          "amountLocal": 100,
+          "amountBase": 100,
+          "isPaid": true
+        }
+      ],
+      "comments": [],
+      "attachments": [],
+      "isSettled": true,
+      "isArchived": false,
+      "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+      "expenseHistory": [],
+      "_id": "6ab4918b5b075e2db8f255f1",
+      "createdAt": "2026-09-24T02:57:15.776Z",
+      "updatedAt": "2026-09-24T02:57:15.776Z"
+    },
+    "createdAt": "2026-09-24T02:57:17.432Z",
+    "updatedAt": "2026-09-24T02:57:17.432Z",
+    "__v": 0
+  }
+]

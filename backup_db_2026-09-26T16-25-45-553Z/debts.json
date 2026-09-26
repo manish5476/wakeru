@@ -1,0 +1,15 @@
+[
+  {
+    "_id": "6a527a5141439fe5682fc23d",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "type": "borrowed",
+    "amount": 200000,
+    "currency": "INR",
+    "name": "manish",
+    "reason": "121",
+    "status": "pending",
+    "date": "2026-07-11T17:16:01.627Z",
+    "createdAt": "2026-07-11T17:16:01.635Z",
+    "updatedAt": "2026-07-11T17:16:01.635Z"
+  }
+]

@@ -1,0 +1,1017 @@
+[
+  {
+    "_id": "6a4c8e6f8732876e5072711d",
+    "title": "Test Trip",
+    "startDate": "2026-07-07T05:28:15.842Z",
+    "endDate": "2026-07-07T05:28:15.842Z",
+    "createdBy": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "baseCurrency": "USD",
+    "members": [
+      {
+        "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+        "role": "admin",
+        "isActive": true
+      }
+    ],
+    "status": "completed",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "updatedAt": "2026-07-08T15:25:40.802Z"
+  },
+  {
+    "_id": "6a5099299282d24aa3654aa2",
+    "title": "1",
+    "description": "2",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-07-10T07:03:48.678Z",
+    "endDate": "2026-07-17T07:03:48.678Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "createdBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "members": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-10T07:03:05.675Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a5099299282d24aa3654aa3"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-10T07:03:05.678Z",
+    "updatedAt": "2026-07-10T07:03:06.463Z",
+    "inviteCode": "6964F6CE",
+    "inviteCodeExpiresAt": "2026-07-17T07:03:05.678Z"
+  },
+  {
+    "_id": "6a54bb4c4b6844ea5c3a3a67",
+    "title": "nehal`",
+    "description": "3wrf",
+    "coverImage": "https://images.pexels.com/photos/36416921/pexels-photo-36416921.jpeg",
+    "startDate": "2026-07-13T10:18:02.088Z",
+    "endDate": "2026-07-20T10:18:02.088Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "totalBudget": 5000000,
+    "createdBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "members": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-13T10:17:48.853Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a54bb514b6844ea5c3a3a81"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-13T10:17:48.856Z",
+    "updatedAt": "2026-07-13T10:17:53.658Z",
+    "inviteCode": "228C6482",
+    "inviteCodeExpiresAt": "2026-07-20T10:17:48.856Z"
+  },
+  {
+    "_id": "6a572aa07c604fb33069d969",
+    "title": "12",
+    "description": "12",
+    "coverImage": "https://images.pexels.com/photos/33926926/pexels-photo-33926926.jpeg",
+    "startDate": "2026-07-15T06:38:40.104Z",
+    "endDate": "2026-07-22T06:38:40.104Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "createdBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "members": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-15T06:37:20.927Z",
+        "isActive": true,
+        "totalPaidBase": 500121,
+        "totalOwesBase": 310666.5
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "member",
+        "joinedAt": "2026-07-15T16:48:15.019Z",
+        "isActive": true,
+        "totalPaidBase": 121212,
+        "totalOwesBase": 310666.5
+      }
+    ],
+    "stops": [
+      "6a572aa27c604fb33069d973"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 621333,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-15T06:37:20.929Z",
+    "updatedAt": "2026-09-09T11:56:00.451Z",
+    "inviteCode": "8D2CB992",
+    "inviteCodeExpiresAt": "2026-07-22T06:37:20.929Z"
+  },
+  {
+    "_id": "6a573cc8a5a9de8f8fc391c5",
+    "title": "Manish",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-07-15T07:54:18.360Z",
+    "endDate": "2026-07-22T07:54:18.360Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "createdBy": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "members": [
+      {
+        "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-07-15T07:54:48.320Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "member",
+        "joinedAt": "2026-07-15T16:48:11.917Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a573cc9a5a9de8f8fc391d6"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-15T07:54:48.321Z",
+    "updatedAt": "2026-07-22T08:04:34.461Z",
+    "inviteCode": "93FCEA27",
+    "inviteCodeExpiresAt": "2026-07-22T07:54:48.322Z"
+  },
+  {
+    "_id": "6a574aee2f34362a14de1c34",
+    "title": "manish singh",
+    "description": "sefvwre",
+    "coverImage": "https://images.pexels.com/photos/62499/pexels-photo-62499.jpeg",
+    "startDate": "2026-07-15T08:52:55.163Z",
+    "endDate": "2026-07-22T08:52:55.163Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "createdBy": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "members": [
+      {
+        "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-07-15T08:55:10.263Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-08-29T16:09:21.646Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a574aef2f34362a14de1c3e"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-15T08:55:10.268Z",
+    "updatedAt": "2026-08-29T16:09:22.412Z",
+    "inviteCode": "CADE78D2",
+    "inviteCodeExpiresAt": "2026-07-22T08:55:10.269Z"
+  },
+  {
+    "_id": "6a5777eeae0175f202202f49",
+    "title": "Nehal",
+    "description": "Manish",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-07-15T12:06:40.917Z",
+    "endDate": "2026-07-22T12:06:40.917Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "createdBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "members": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-15T12:07:10.281Z",
+        "isActive": true,
+        "totalPaidBase": 120000,
+        "totalOwesBase": 60000
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "member",
+        "joinedAt": "2026-07-15T16:48:09.787Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 60000
+      }
+    ],
+    "stops": [
+      "6a5777efae0175f202202f53"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 120000,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-15T12:07:10.284Z",
+    "updatedAt": "2026-07-22T12:52:53.005Z",
+    "inviteCode": "1D474152",
+    "inviteCodeExpiresAt": "2026-07-22T12:07:10.285Z"
+  },
+  {
+    "_id": "6a577a2eae0175f202203126",
+    "title": "Goa Trip",
+    "description": "Hello there currently we are going to travelling all the places near goa , let's see the view",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-07-15T12:15:41.566Z",
+    "endDate": "2026-07-22T12:15:41.566Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "totalBudget": 50000,
+    "createdBy": "4492862d-6307-464d-a414-28d32d68af0b",
+    "members": [
+      {
+        "userId": "4492862d-6307-464d-a414-28d32d68af0b",
+        "displayName": "Trip Split",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-15T12:16:46.873Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "member",
+        "joinedAt": "2026-07-15T16:48:08.014Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a577a30ae0175f202203130"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-15T12:16:46.875Z",
+    "updatedAt": "2026-07-22T12:52:53.005Z",
+    "inviteCode": "8212C835",
+    "inviteCodeExpiresAt": "2026-07-22T12:16:46.875Z"
+  },
+  {
+    "_id": "6a57b817d656d8f413bfee0a",
+    "title": "goa trips",
+    "description": "manish",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-07-15T16:40:28.661Z",
+    "endDate": "2026-07-22T16:40:28.661Z",
+    "status": "archived",
+    "baseCurrency": "INR",
+    "createdBy": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "members": [
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-15T16:40:55.405Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-07-15T16:48:04.996Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a57b817d656d8f413bfee14",
+      "6a57d334fbbfb41c9219e618"
+    ],
+    "stopCount": 2,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": true,
+    "createdAt": "2026-07-15T16:40:55.413Z",
+    "updatedAt": "2026-07-24T04:56:17.120Z",
+    "inviteCode": "7DE79D9D",
+    "inviteCodeExpiresAt": "2026-07-22T16:40:55.413Z"
+  },
+  {
+    "_id": "6a58bed14a4e6dc9456c9528",
+    "title": "GOA",
+    "description": "Hsusj",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-07-16T11:21:05.947Z",
+    "endDate": "2026-07-23T11:21:05.947Z",
+    "status": "completed",
+    "baseCurrency": "USD",
+    "totalBudget": 500,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-07-16T11:21:53.685Z",
+        "isActive": true,
+        "totalPaidBase": 11385,
+        "totalOwesBase": 10369
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-07-16T11:23:36.203Z",
+        "isActive": true,
+        "totalPaidBase": 44672,
+        "totalOwesBase": 11778
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-07-17T09:14:08.946Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 11828
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-07-17T10:27:33.177Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 11090
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "photoURL": "",
+        "role": "viewer",
+        "joinedAt": "2026-07-17T10:30:49.270Z",
+        "isActive": true,
+        "totalPaidBase": 415,
+        "totalOwesBase": 11407
+      }
+    ],
+    "stops": [
+      "6a58bed34a4e6dc9456c9532",
+      "6a5a0495b3293cbd972150cb"
+    ],
+    "stopCount": 2,
+    "totalSpentBase": 56472,
+    "defaultSplitMethod": "exact",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": true,
+    "isArchived": false,
+    "createdAt": "2026-07-16T11:21:53.691Z",
+    "updatedAt": "2026-09-26T16:03:32.052Z",
+    "inviteCode": "857003EE",
+    "inviteCodeExpiresAt": "2026-10-03T16:03:32.052Z"
+  },
+  {
+    "_id": "6a62f16ac5411600a7bd9cd0",
+    "title": "Manish Singh",
+    "description": "Manish singh",
+    "coverImage": "https://plus.unsplash.com/premium_photo-1781636233496-0b8b7760f0cb?q=80&w=715&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "startDate": "2026-07-24T04:59:21.180Z",
+    "endDate": "2026-10-29T18:30:00.000Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "totalBudget": 50000,
+    "createdBy": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "members": [
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "photoURL": "",
+        "role": "admin",
+        "joinedAt": "2026-07-24T05:00:26.703Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a62f16cc5411600a7bd9cda"
+    ],
+    "stopCount": 1,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-07-24T05:00:26.706Z",
+    "updatedAt": "2026-09-14T13:58:55.726Z",
+    "inviteCode": "FC9CDDF5",
+    "inviteCodeExpiresAt": "2026-07-31T05:00:26.706Z"
+  },
+  {
+    "_id": "6a918578bba755805c68aebe",
+    "title": "Home",
+    "coverImage": "https://images.pexels.com/photos/12962094/pexels-photo-12962094.jpeg",
+    "startDate": "2026-08-28T12:55:43.742Z",
+    "endDate": "2026-09-04T12:55:43.742Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "createdBy": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "members": [
+      {
+        "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "displayName": "Manish Sharma",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocLCaK7sbUDctNvpP0mVizOdDx1hbM8o3p2-mv5y_9QT2MMp3g=s96-c",
+        "role": "admin",
+        "joinedAt": "2026-08-28T12:56:24.247Z",
+        "isActive": true,
+        "totalPaidBase": 5600,
+        "totalOwesBase": 2558606
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "member",
+        "joinedAt": "2026-08-28T12:57:15.226Z",
+        "isActive": true,
+        "totalPaidBase": 5111612,
+        "totalOwesBase": 2558606
+      }
+    ],
+    "stops": [
+      "6a918578bba755805c68aebf"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 5117212,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-08-28T12:56:24.251Z",
+    "updatedAt": "2026-09-09T07:55:58.115Z",
+    "inviteCode": "AB4C1410",
+    "inviteCodeExpiresAt": "2026-09-04T12:56:24.251Z",
+    "totalBudget": 50000
+  },
+  {
+    "_id": "6a9eaeae0edaa48b3fedd2ad",
+    "title": "Dandi paidal yatra",
+    "description": "Navsari",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-07T12:30:09.956Z",
+    "endDate": "2026-09-08T12:30:00.000Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "totalBudget": 2000,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-07T12:31:42.245Z",
+        "isActive": true,
+        "totalPaidBase": 50,
+        "totalOwesBase": 50
+      },
+      {
+        "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-09-21T08:15:06.384Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6a9eaeae0edaa48b3fedd2ae"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 50,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-07T12:31:42.254Z",
+    "updatedAt": "2026-09-21T08:15:06.385Z",
+    "inviteCode": "241C9D4A",
+    "inviteCodeExpiresAt": "2026-09-28T08:15:06.385Z"
+  },
+  {
+    "_id": "6aa18310bdc1b390cbf1578b",
+    "title": "manish singh testing",
+    "description": "s",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-09T16:01:56.364Z",
+    "endDate": "2026-09-16T16:01:56.364Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "totalBudget": 20000,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-09T16:02:24.031Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-09-14T13:59:19.585Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-09-21T08:14:51.260Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6aa18310bdc1b390cbf1578c"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-09T16:02:24.077Z",
+    "updatedAt": "2026-09-21T08:14:51.267Z",
+    "inviteCode": "FB379255",
+    "inviteCodeExpiresAt": "2026-09-28T08:14:51.267Z"
+  },
+  {
+    "_id": "6aa434b5ca207dc8ae511758",
+    "title": "Manish format testing",
+    "description": "Manish",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-11T17:04:00.082Z",
+    "endDate": "2026-09-18T17:04:00.082Z",
+    "status": "completed",
+    "baseCurrency": "USD",
+    "totalBudget": 50000,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-11T17:04:53.786Z",
+        "isActive": true,
+        "totalPaidBase": 5000,
+        "totalOwesBase": 2500
+      },
+      {
+        "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+        "displayName": "nehal",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-09-21T08:15:06.715Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 2500
+      }
+    ],
+    "stops": [
+      "6aa434b5ca207dc8ae511759"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 5000,
+    "defaultSplitMethod": "exact",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-11T17:04:53.794Z",
+    "updatedAt": "2026-09-26T06:52:45.142Z",
+    "inviteCode": "24A1EDC6",
+    "inviteCodeExpiresAt": "2026-09-28T08:15:06.716Z"
+  },
+  {
+    "_id": "6aa654399cf111f4ce54a099",
+    "title": "Hello there",
+    "description": "This is a demo project summary",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-13T07:43:11.086Z",
+    "endDate": "2026-09-20T07:43:11.086Z",
+    "status": "completed",
+    "baseCurrency": "INR",
+    "totalBudget": 105000,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-13T07:43:53.674Z",
+        "isActive": true,
+        "totalPaidBase": 113000,
+        "totalOwesBase": 28250
+      },
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "photoURL": "",
+        "role": "member",
+        "joinedAt": "2026-09-14T13:53:29.427Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 28250
+      },
+      {
+        "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+        "displayName": "Rajeev Singh",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocKj_Unz3gBIRpODnw9W_WNm3BXt1huC8Y-KHxe1jzp60dr0Tw=s96-c",
+        "role": "member",
+        "joinedAt": "2026-09-16T14:36:24.400Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 28250
+      },
+      {
+        "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+        "displayName": "Manish Singh",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJYYqmS47hiv2NUrJXqDYO-fFPBHgJNN126IQ6TZbZp20rBoUN7=s96-c",
+        "role": "member",
+        "joinedAt": "2026-09-16T15:10:12.536Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 28250
+      },
+      {
+        "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+        "displayName": "Singh Ronak",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJ6titroHl_fbuTanCR5A-QAN3w6Iye5_x8L2LkG9-zYSa8VV9E=s96-c",
+        "role": "member",
+        "joinedAt": "2026-09-22T17:02:18.604Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6aa654399cf111f4ce54a09a"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 113000,
+    "defaultSplitMethod": "percentage",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-13T07:43:53.678Z",
+    "updatedAt": "2026-09-22T17:02:18.606Z",
+    "inviteCode": "31EBD421",
+    "inviteCodeExpiresAt": "2026-09-29T17:02:18.606Z"
+  },
+  {
+    "_id": "6ab2b54fea0790ce785fb5cf",
+    "title": "Surat",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-22T17:04:35.185Z",
+    "endDate": "2026-11-29T00:00:00.000Z",
+    "status": "planning",
+    "baseCurrency": "INR",
+    "totalBudget": 105000,
+    "createdBy": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+    "members": [
+      {
+        "userId": "70fgAfS5TbXHvtcFTpKGeKnoHQz2",
+        "displayName": "Singh Ronak",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJ6titroHl_fbuTanCR5A-QAN3w6Iye5_x8L2LkG9-zYSa8VV9E=s96-c",
+        "role": "admin",
+        "joinedAt": "2026-09-22T17:05:19.550Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "member",
+        "joinedAt": "2026-09-22T17:05:34.043Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6ab2b54fea0790ce785fb5d0"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-22T17:05:19.552Z",
+    "updatedAt": "2026-09-22T17:05:34.044Z",
+    "inviteCode": "7A653075",
+    "inviteCodeExpiresAt": "2026-11-29T23:59:59.999Z"
+  },
+  {
+    "_id": "6ab33e97d2c181d1bce500eb",
+    "title": "Suraj testing",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-23T02:50:40.998Z",
+    "endDate": "2026-09-30T02:50:40.998Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "totalBudget": 100000,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-23T02:51:03.896Z",
+        "isActive": true,
+        "totalPaidBase": 50020,
+        "totalOwesBase": 27010
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocLNGUyCUMsyF7MJ51IDbkRnWE6SpCeQLnfQNpeZxFC2I1Kk82Q=s96-c",
+        "role": "member",
+        "joinedAt": "2026-09-23T02:51:15.797Z",
+        "isActive": true,
+        "totalPaidBase": 4000,
+        "totalOwesBase": 27010
+      }
+    ],
+    "stops": [
+      "6ab33e97d2c181d1bce500ec"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 54020,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-23T02:51:03.899Z",
+    "updatedAt": "2026-09-23T02:55:05.126Z",
+    "inviteCode": "DC5F2E65",
+    "inviteCodeExpiresAt": "2026-09-30T23:59:59.999Z"
+  },
+  {
+    "_id": "6ab37247818b490c972fb1fb",
+    "title": "manish",
+    "description": "q2w",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-23T06:31:15.190Z",
+    "endDate": "2026-09-30T06:31:15.190Z",
+    "status": "active",
+    "baseCurrency": "SEK",
+    "totalBudget": 100000,
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-23T06:31:35.314Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 0
+      }
+    ],
+    "stops": [
+      "6ab37247818b490c972fb1fc"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 0,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-23T06:31:35.317Z",
+    "updatedAt": "2026-09-23T06:31:35.798Z",
+    "inviteCode": "2DBE1CA5",
+    "inviteCodeExpiresAt": "2026-09-30T23:59:59.999Z"
+  },
+  {
+    "_id": "6ab3726b818b490c972fb277",
+    "title": "rsdf",
+    "description": "et",
+    "coverImage": "https://i.pinimg.com/1200x/3b/3c/86/3b3c86d3cef87a6797c96c07f3dc0124.jpg",
+    "startDate": "2026-09-23T06:32:09.119Z",
+    "endDate": "2026-09-30T06:32:09.119Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "createdBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "members": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+        "role": "admin",
+        "joinedAt": "2026-09-23T06:32:11.387Z",
+        "isActive": true,
+        "totalPaidBase": 10600,
+        "totalOwesBase": 10600
+      }
+    ],
+    "stops": [
+      "6ab3726b818b490c972fb278"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 10600,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-23T06:32:11.389Z",
+    "updatedAt": "2026-09-24T02:57:16.723Z",
+    "inviteCode": "FAE4F801",
+    "inviteCodeExpiresAt": "2026-09-30T23:59:59.999Z"
+  },
+  {
+    "_id": "6ab3c5be50a2c6e686542388",
+    "title": "Manish sing",
+    "coverImage": "",
+    "startDate": "2026-09-23T12:27:30.337Z",
+    "endDate": "2026-09-30T12:27:30.337Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "createdBy": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "members": [
+      {
+        "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+        "displayName": "Manish Singh",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocKVAg7Nf9Cdti6o4XbjKsAoSJeqnH3garsvMqtQ5Dv9DddJkX4=s96-c",
+        "role": "admin",
+        "joinedAt": "2026-09-23T12:27:42.185Z",
+        "isActive": true,
+        "totalPaidBase": 5000,
+        "totalOwesBase": 2500
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1790153241/profiles/profile-tO5MslLBBGSnj7XqUd9GGEl5IrQ2-1790153241096.webp",
+        "role": "member",
+        "joinedAt": "2026-09-23T12:29:03.673Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 2500
+      }
+    ],
+    "stops": [
+      "6ab3c5be50a2c6e686542389"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 5000,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-23T12:27:42.193Z",
+    "updatedAt": "2026-09-24T09:16:34.011Z",
+    "inviteCode": "0CAEC654",
+    "inviteCodeExpiresAt": "2026-09-30T23:59:59.999Z"
+  },
+  {
+    "_id": "6ab54e11c5215de2580cc9c2",
+    "title": "Jehe",
+    "description": "Heheej",
+    "coverImage": "",
+    "startDate": "2026-09-24T16:20:22.099Z",
+    "endDate": "2026-10-01T16:20:22.099Z",
+    "status": "active",
+    "baseCurrency": "INR",
+    "totalBudget": 10000,
+    "createdBy": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+    "members": [
+      {
+        "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+        "displayName": "preet vasoya",
+        "photoURL": "https://lh3.googleusercontent.com/a/ACg8ocJ1xLdj2Gz8mOQEHhlgcN5Ruf7s2TQXlEUy4f2xIjKFFQc7Cw=s96-c",
+        "role": "admin",
+        "joinedAt": "2026-09-24T16:21:37.711Z",
+        "isActive": true,
+        "totalPaidBase": 0,
+        "totalOwesBase": 2500
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "photoURL": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1790153241/profiles/profile-tO5MslLBBGSnj7XqUd9GGEl5IrQ2-1790153241096.webp",
+        "role": "member",
+        "joinedAt": "2026-09-24T16:22:03.132Z",
+        "isActive": true,
+        "totalPaidBase": 5000,
+        "totalOwesBase": 2500
+      }
+    ],
+    "stops": [
+      "6ab54e11c5215de2580cc9c3"
+    ],
+    "stopCount": 0,
+    "totalSpentBase": 5000,
+    "defaultSplitMethod": "equal",
+    "allowAnyPayer": true,
+    "allowOthersToArchiveTrip": false,
+    "isArchived": false,
+    "createdAt": "2026-09-24T16:21:37.714Z",
+    "updatedAt": "2026-09-24T16:23:05.309Z",
+    "inviteCode": "CEEFDF31",
+    "inviteCodeExpiresAt": "2026-10-01T23:59:59.999Z"
+  }
+]

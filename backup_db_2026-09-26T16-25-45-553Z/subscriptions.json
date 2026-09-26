@@ -1,0 +1,650 @@
+[
+  {
+    "_id": "6aa4b59784acdebab026a12e",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "planId": "6aa4507bc5cd5cccc63f86f7",
+    "planKey": "pro",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "pro",
+      "name": "Pro Explorer",
+      "pricing": {
+        "amount": 399,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": 50,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 50,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 25,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 25,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 30,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": false
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "providerSubscriptionId": "sub_mock_1789179286866",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-12T02:14:47.102Z",
+    "currentPeriodStart": "2026-09-12T02:14:47.102Z",
+    "currentPeriodEnd": "2026-10-12T02:14:47.102Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-14T13:05:45.883Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-12T02:14:47.356Z",
+    "updatedAt": "2026-09-14T13:05:45.883Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa7f12a98b960dbdee4fa68",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "planId": "6aa4507bc5cd5cccc63f86f8",
+    "planKey": "super_pro",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "super_pro",
+      "name": "Super Pro Nomad",
+      "pricing": {
+        "amount": 899,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited trips"
+        },
+        "peoplePerTrip": {
+          "value": 200,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 100,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited exports"
+        },
+        "monthlyReceiptOCR": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited scans"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": true
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "providerSubscriptionId": "sub_mock_1789391145647",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-14T13:05:45.883Z",
+    "currentPeriodStart": "2026-09-14T13:05:45.883Z",
+    "currentPeriodEnd": "2026-10-14T13:05:45.883Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-14T13:06:44.871Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-14T13:05:46.148Z",
+    "updatedAt": "2026-09-14T13:06:44.871Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa7f16598b960dbdee4fbbd",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "planId": "6aa4507bc5cd5cccc63f86f6",
+    "planKey": "free",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "free",
+      "name": "Free Traveler",
+      "pricing": {
+        "amount": 0,
+        "currency": "INR",
+        "billingInterval": "free"
+      },
+      "limits": {
+        "trips": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 10,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 5,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 3,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": false,
+        "custom_trip_cover": false,
+        "expense_export": false,
+        "receipt_ocr": true,
+        "recurring_expenses": false,
+        "priority_support": false
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "providerSubscriptionId": "sub_mock_1789391204637",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-14T13:06:44.871Z",
+    "currentPeriodStart": "2026-09-14T13:06:44.871Z",
+    "currentPeriodEnd": "2026-10-14T13:06:44.871Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-23T02:50:18.959Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-14T13:06:45.122Z",
+    "updatedAt": "2026-09-23T02:50:18.959Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab33e6bd2c181d1bce500bc",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "planId": "6aa4507bc5cd5cccc63f86f7",
+    "planKey": "pro",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "pro",
+      "name": "Pro Explorer",
+      "pricing": {
+        "amount": 399,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": 50,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 50,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 25,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 25,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 30,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": false
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "providerSubscriptionId": "sub_mock_1790131818722",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-23T02:50:18.959Z",
+    "currentPeriodStart": "2026-09-23T02:50:18.959Z",
+    "currentPeriodEnd": "2026-10-23T02:50:18.959Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-24T19:35:38.298Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-23T02:50:19.212Z",
+    "updatedAt": "2026-09-24T19:35:38.298Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab57b8ac5215de2580cd43e",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "planId": "6aa4507bc5cd5cccc63f86f8",
+    "planKey": "super_pro",
+    "status": "active",
+    "planSnapshot": {
+      "key": "super_pro",
+      "name": "Super Pro Nomad",
+      "pricing": {
+        "amount": 899,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited trips"
+        },
+        "peoplePerTrip": {
+          "value": 200,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 100,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited exports"
+        },
+        "monthlyReceiptOCR": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited scans"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": true
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "providerSubscriptionId": "sub_mock_1790278538062",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-24T19:35:38.298Z",
+    "currentPeriodStart": "2026-09-24T19:35:38.298Z",
+    "currentPeriodEnd": "2026-10-24T19:35:38.298Z",
+    "expiresAt": null,
+    "canceledAt": null,
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-24T19:35:38.548Z",
+    "updatedAt": "2026-09-24T19:35:38.548Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab57bddc5215de2580cd4ab",
+    "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "planId": "6aa4507bc5cd5cccc63f86f8",
+    "planKey": "super_pro",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "super_pro",
+      "name": "Super Pro Nomad",
+      "pricing": {
+        "amount": 899,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited trips"
+        },
+        "peoplePerTrip": {
+          "value": 200,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 100,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited exports"
+        },
+        "monthlyReceiptOCR": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited scans"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": true
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "providerSubscriptionId": "sub_mock_1790278621078",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-24T19:37:01.312Z",
+    "currentPeriodStart": "2026-09-24T19:37:01.312Z",
+    "currentPeriodEnd": "2026-10-24T19:37:01.312Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-25T04:33:47.395Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-24T19:37:01.559Z",
+    "updatedAt": "2026-09-25T04:33:47.395Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab5f9abb68872727ebfe532",
+    "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "planId": "6aa4507bc5cd5cccc63f86f7",
+    "planKey": "pro",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "pro",
+      "name": "Pro Explorer",
+      "pricing": {
+        "amount": 399,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": 50,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 50,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 25,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 25,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 30,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": false
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "providerSubscriptionId": "sub_mock_1790310827161",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-25T04:33:47.395Z",
+    "currentPeriodStart": "2026-09-25T04:33:47.395Z",
+    "currentPeriodEnd": "2026-10-25T04:33:47.395Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-25T04:33:59.807Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-25T04:33:47.658Z",
+    "updatedAt": "2026-09-25T04:33:59.807Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab5f9b8b68872727ebfe53f",
+    "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "planId": "6aa4507bc5cd5cccc63f86f8",
+    "planKey": "super_pro",
+    "status": "canceled",
+    "planSnapshot": {
+      "key": "super_pro",
+      "name": "Super Pro Nomad",
+      "pricing": {
+        "amount": 899,
+        "currency": "INR",
+        "billingInterval": "month"
+      },
+      "limits": {
+        "trips": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited trips"
+        },
+        "peoplePerTrip": {
+          "value": 200,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 100,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited exports"
+        },
+        "monthlyReceiptOCR": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited scans"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": true,
+        "custom_trip_cover": true,
+        "expense_export": true,
+        "receipt_ocr": true,
+        "recurring_expenses": true,
+        "priority_support": true
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "providerSubscriptionId": "sub_mock_1790310839572",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-25T04:33:59.807Z",
+    "currentPeriodStart": "2026-09-25T04:33:59.807Z",
+    "currentPeriodEnd": "2026-10-25T04:33:59.807Z",
+    "expiresAt": null,
+    "canceledAt": "2026-09-26T07:28:40.287Z",
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-25T04:34:00.056Z",
+    "updatedAt": "2026-09-26T07:28:40.287Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab7742827e91c1c15062162",
+    "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "planId": "6aa4507bc5cd5cccc63f86f6",
+    "planKey": "free",
+    "status": "active",
+    "planSnapshot": {
+      "key": "free",
+      "name": "Free Traveler",
+      "pricing": {
+        "amount": 0,
+        "currency": "INR",
+        "billingInterval": "free"
+      },
+      "limits": {
+        "trips": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 10,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 5,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 3,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": false,
+        "custom_trip_cover": false,
+        "expense_export": false,
+        "receipt_ocr": true,
+        "recurring_expenses": false,
+        "priority_support": false
+      }
+    },
+    "provider": "mock",
+    "providerCustomerId": "cust_mock_7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "providerSubscriptionId": "sub_mock_1790407719911",
+    "providerPaymentId": null,
+    "startedAt": "2026-09-26T07:28:40.287Z",
+    "currentPeriodStart": "2026-09-26T07:28:40.287Z",
+    "currentPeriodEnd": "2026-10-26T07:28:40.287Z",
+    "expiresAt": null,
+    "canceledAt": null,
+    "cancelAtPeriodEnd": false,
+    "autoRenew": true,
+    "entitlementPolicy": "dynamic_latest",
+    "createdAt": "2026-09-26T07:28:40.546Z",
+    "updatedAt": "2026-09-26T07:28:40.546Z",
+    "__v": 0
+  }
+]

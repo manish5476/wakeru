@@ -1,0 +1,2070 @@
+[
+  {
+    "_id": "6a4f8c347edc82146b708b4c",
+    "tripId": "6a4b92066c14a797101923c9",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 100000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 500000200000000,
+      "remaining": -500000199900000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a4f8c347edc82146b708b4d"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a4f8c347edc82146b708b4e"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a4f8c347edc82146b708b4f"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a4f8c347edc82146b708b50"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a4f8c347edc82146b708b51"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a4f8c347edc82146b708b52"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a4f8c347edc82146b708b53"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 25,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 100,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [
+      {
+        "date": "2026-07-06T11:30:32.060Z",
+        "day": "Day 1",
+        "destination": "Goa Trip",
+        "stopId": "6a4b92086c14a797101923d0",
+        "location": {
+          "lat": 21.180839637387756,
+          "lng": 72.73426216164127
+        },
+        "transport": "",
+        "accommodation": "",
+        "notes": "",
+        "_id": "6a533f67dfc92857685450bf",
+        "activities": []
+      }
+    ],
+    "flightDetails": [
+      {
+        "type": "departure",
+        "airline": "emirates",
+        "flightNo": "EEK",
+        "from": "DXB",
+        "to": "LHR",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-07-09T00:00:00.000Z",
+        "time": "2026-07-09T14:31:57.806Z",
+        "cost": 100000,
+        "currency": "USD",
+        "status": "confirmed",
+        "_id": "6a4faff6f7c11f1ec191960f"
+      }
+    ],
+    "accommodationDetails": [
+      {
+        "hotelName": "taj hotel ",
+        "address": "mansih ",
+        "location": null,
+        "checkIn": "2026-07-09T00:00:00.000Z",
+        "checkOut": "2026-07-23T00:00:00.000Z",
+        "confirmationNo": "sdv",
+        "contact": "897824r4y9",
+        "cost": 10000000,
+        "currency": "USD",
+        "amenities": [],
+        "notes": "",
+        "_id": "6a4fba6cf7c11f1ec1919956"
+      }
+    ],
+    "transportDetails": [
+      {
+        "type": "train",
+        "operator": "rajdhani express",
+        "pnr": "121212121212",
+        "from": "surat",
+        "to": "madgao",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-07-13T00:00:00.000Z",
+        "time": "2026-07-12T20:14:18.135Z",
+        "cost": 1210000,
+        "currency": "USD",
+        "notes": "",
+        "_id": "6a549e311858f44712f71c42"
+      }
+    ],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-07-09T11:55:32.175Z",
+    "updatedAt": "2026-07-13T08:13:37.620Z",
+    "__v": 3
+  },
+  {
+    "_id": "6a4faebdf7c11f1ec1919579",
+    "tripId": "6a4faeb9f7c11f1ec1919559",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 50000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 50000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a4faebdf7c11f1ec191957a"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a4faebdf7c11f1ec191957b"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a4faebdf7c11f1ec191957c"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a4faebdf7c11f1ec191957d"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a4faebdf7c11f1ec191957e"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a4faebdf7c11f1ec191957f"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a4faebdf7c11f1ec1919580"
+      }
+    ],
+    "notes": "manidh\n",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 8,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 33,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [
+      {
+        "date": "2026-07-09T14:21:39.144Z",
+        "day": "Day 1",
+        "destination": "manish singh",
+        "stopId": "6a4faeb9f7c11f1ec191955a",
+        "location": {
+          "lat": 21.165595,
+          "lng": 72.972667
+        },
+        "transport": "",
+        "accommodation": "",
+        "notes": "",
+        "_id": "6a534c3d5e77836daef54a7b",
+        "activities": []
+      }
+    ],
+    "flightDetails": [
+      {
+        "type": "departure",
+        "airline": "Emirates ",
+        "flightNo": "Ek2p2",
+        "from": "Dxb",
+        "to": "Lhr",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-07-06T00:00:00.000Z",
+        "time": "2026-07-12T08:12:17.447Z",
+        "cost": 50000,
+        "currency": "USD",
+        "status": "confirmed",
+        "_id": "6a534c675e77836daef54a8a"
+      }
+    ],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-07-09T14:22:53.772Z",
+    "updatedAt": "2026-07-13T10:10:45.771Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a577a39ae0175f202203153",
+    "tripId": "6a577a2eae0175f202203126",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 50000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 50000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a577a39ae0175f202203154"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a577a39ae0175f202203155"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a577a39ae0175f202203156"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a577a39ae0175f202203157"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a577a39ae0175f202203158"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a577a39ae0175f202203159"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a577a39ae0175f20220315a"
+      }
+    ],
+    "notes": "Hello there ",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-07-15T12:16:57.449Z",
+    "updatedAt": "2026-07-15T12:17:12.660Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a57c5a30a9a01fcab05d8a0",
+    "tripId": "6a57b817d656d8f413bfee0a",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 0,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 0
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a57c5a30a9a01fcab05d8a1"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a57c5a30a9a01fcab05d8a2"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a57c5a30a9a01fcab05d8a3"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a57c5a30a9a01fcab05d8a4"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a57c5a30a9a01fcab05d8a5"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a57c5a30a9a01fcab05d8a6"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a57c5a30a9a01fcab05d8a7"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [
+      {
+        "date": "2026-07-15T17:38:53.899Z",
+        "day": "Day 1",
+        "destination": "goa trip",
+        "location": null,
+        "transport": "ma",
+        "accommodation": "manis",
+        "notes": "srverbvrebrb\nrger\nwr\ngre\ngre\ng\ner\ngb\nre",
+        "_id": "6a57c5bb0a9a01fcab05d8b3",
+        "activities": []
+      }
+    ],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-07-15T17:38:43.105Z",
+    "updatedAt": "2026-07-23T03:46:29.799Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a58bf054a4e6dc9456c95a2",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 500,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "USD",
+      "spent": 0,
+      "remaining": 500
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a58bf054a4e6dc9456c95a3"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a58bf054a4e6dc9456c95a4"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a58bf054a4e6dc9456c95a5"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a58bf054a4e6dc9456c95a6"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a58bf054a4e6dc9456c95a7"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a58bf054a4e6dc9456c95a8"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a58bf054a4e6dc9456c95a9"
+      }
+    ],
+    "notes": "Ghubb\n12121212121212",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 38,
+      "checklist": 50,
+      "packing": 0,
+      "bookings": 100,
+      "documents": 0
+    },
+    "checklist": [
+      {
+        "item": "manish",
+        "checked": true,
+        "dueDate": "2026-08-16T00:00:00.000Z",
+        "priority": "high",
+        "category": "before-trip",
+        "_id": "6a8174551c1d5dc4389fce8f"
+      },
+      {
+        "item": "reg",
+        "checked": false,
+        "priority": "medium",
+        "category": "before-trip",
+        "_id": "6ab3aa5482c2348303b99434"
+      }
+    ],
+    "itinerary": [
+      {
+        "date": "2026-07-16T11:21:05.947Z",
+        "day": "Day 1",
+        "destination": "goa",
+        "stopId": "6a58bed34a4e6dc9456c9532",
+        "location": {
+          "lat": 21.1811017,
+          "lng": 72.734438
+        },
+        "transport": "",
+        "accommodation": "",
+        "notes": "",
+        "_id": "6ab39767eed5f9cce4037a64",
+        "activities": []
+      },
+      {
+        "date": "2026-07-17T10:33:01.628Z",
+        "day": "Day 2",
+        "destination": "Mumbai",
+        "stopId": "6a5a0495b3293cbd972150cb",
+        "transport": "",
+        "accommodation": "",
+        "notes": "",
+        "_id": "6ab39767eed5f9cce4037a65",
+        "activities": []
+      }
+    ],
+    "flightDetails": [
+      {
+        "type": "departure",
+        "airline": "emirates",
+        "flightNo": "EK202",
+        "from": "DCC",
+        "to": "DFF",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-08-16T08:20:08.702Z",
+        "time": "2026-08-16T08:20:00.000Z",
+        "cost": 121212,
+        "currency": "USD",
+        "status": "confirmed",
+        "_id": "6a8172c71c1d5dc4389fce37"
+      }
+    ],
+    "accommodationDetails": [
+      {
+        "hotelName": "TAj Hotels",
+        "address": "",
+        "location": null,
+        "checkIn": "2026-08-16T08:20:36.889Z",
+        "checkOut": "2026-08-26T08:20:39.818Z",
+        "confirmationNo": "121212121",
+        "contact": "12112121212121",
+        "cost": 12121212,
+        "currency": "USD",
+        "amenities": [],
+        "notes": "",
+        "_id": "6a8172eb1c1d5dc4389fce50"
+      }
+    ],
+    "transportDetails": [
+      {
+        "type": "train",
+        "operator": "1212",
+        "pnr": "1212",
+        "from": "12",
+        "to": "12",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-08-16T08:21:10.747Z",
+        "time": "2026-08-16T10:21:00.000Z",
+        "cost": 11,
+        "currency": "USD",
+        "notes": "",
+        "_id": "6a8172fe1c1d5dc4389fce6c"
+      }
+    ],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-07-16T11:22:45.512Z",
+    "updatedAt": "2026-09-23T11:31:32.406Z",
+    "__v": 10
+  },
+  {
+    "_id": "6a958c2fcfb42985dce877b0",
+    "tripId": "6a918578bba755805c68aebe",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 50000,
+      "flights": 5,
+      "accommodation": 50000,
+      "transport": 5000,
+      "food": 1000,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 5117212,
+      "remaining": -5067212
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a958c2fcfb42985dce877b1"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a958c2fcfb42985dce877b2"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a958c2fcfb42985dce877b3"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a958c2fcfb42985dce877b4"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a958c2fcfb42985dce877b5"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a958c2fcfb42985dce877b6"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a958c2fcfb42985dce877b7"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 25,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 100,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [
+      {
+        "date": null,
+        "day": "Day 1",
+        "destination": "manish",
+        "location": null,
+        "transport": "ljanfn",
+        "accommodation": "lsnwegflen",
+        "notes": "erber\nwegwe",
+        "_id": "6a959399cfb42985dce8786c",
+        "activities": []
+      }
+    ],
+    "flightDetails": [
+      {
+        "type": "departure",
+        "airline": "1212",
+        "flightNo": "12",
+        "from": "12",
+        "to": "112",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-08-31T00:00:00.000Z",
+        "time": "19:54",
+        "cost": 121212,
+        "currency": "USD",
+        "status": "confirmed",
+        "_id": "6a958e69cfb42985dce877e1"
+      }
+    ],
+    "accommodationDetails": [
+      {
+        "hotelName": "Taj",
+        "address": "12121",
+        "location": null,
+        "checkIn": "2026-08-31T00:00:00.000Z",
+        "checkOut": "2026-08-31T00:00:00.000Z",
+        "confirmationNo": "12",
+        "contact": "1",
+        "cost": 12,
+        "currency": "USD",
+        "amenities": [],
+        "notes": "",
+        "_id": "6a959321cfb42985dce87829"
+      }
+    ],
+    "transportDetails": [
+      {
+        "type": "train",
+        "operator": "12",
+        "pnr": "121212121",
+        "from": "12",
+        "to": "12",
+        "fromLocation": null,
+        "toLocation": null,
+        "date": "2026-08-31T00:00:00.000Z",
+        "time": "21:14",
+        "cost": 12121,
+        "currency": "USD",
+        "notes": "",
+        "_id": "6a959345cfb42985dce87844"
+      }
+    ],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-08-31T14:14:07.144Z",
+    "updatedAt": "2026-09-08T03:11:17.692Z",
+    "__v": 1
+  },
+  {
+    "_id": "6a9ed4e6115496629b2c8463",
+    "tripId": "6a9eaeae0edaa48b3fedd2ad",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 2000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 50,
+      "remaining": 1950
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6a9ed4e6115496629b2c8464"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6a9ed4e6115496629b2c8465"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6a9ed4e6115496629b2c8466"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6a9ed4e6115496629b2c8467"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6a9ed4e6115496629b2c8468"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a9ed4e6115496629b2c8469"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6a9ed4e6115496629b2c846a"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-07T15:14:46.807Z",
+    "updatedAt": "2026-09-07T15:14:46.807Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa210bf333bcd03093923fa",
+    "tripId": "6aa18310bdc1b390cbf1578b",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 20000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 20000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6aa210bf333bcd03093923fb"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6aa210bf333bcd03093923fc"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6aa210bf333bcd03093923fd"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6aa210bf333bcd03093923fe"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6aa210bf333bcd03093923ff"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aa210bf333bcd0309392400"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aa210bf333bcd0309392401"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-10T02:06:55.417Z",
+    "updatedAt": "2026-09-10T02:06:55.417Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa654449cf111f4ce54a0d2",
+    "tripId": "6aa654399cf111f4ce54a099",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 105000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 105000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6aa654449cf111f4ce54a0d3"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6aa654449cf111f4ce54a0d4"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6aa654449cf111f4ce54a0d5"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6aa654449cf111f4ce54a0d6"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6aa654449cf111f4ce54a0d7"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aa654449cf111f4ce54a0d8"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aa654449cf111f4ce54a0d9"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [
+      {
+        "date": "2026-09-13T07:43:11.086Z",
+        "day": "Day 1",
+        "destination": "Hello there",
+        "stopId": "6aa654399cf111f4ce54a09a",
+        "transport": "",
+        "accommodation": "",
+        "notes": "",
+        "_id": "6aa654649cf111f4ce54a0fe",
+        "activities": []
+      }
+    ],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-13T07:44:04.706Z",
+    "updatedAt": "2026-09-13T07:44:36.223Z",
+    "__v": 2
+  },
+  {
+    "_id": "6aa654819cf111f4ce54a146",
+    "tripId": "6aa434b5ca207dc8ae511758",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 50000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "USD",
+      "spent": 0,
+      "remaining": 50000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6aa654819cf111f4ce54a147"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6aa654819cf111f4ce54a148"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6aa654819cf111f4ce54a149"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6aa654819cf111f4ce54a14a"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6aa654819cf111f4ce54a14b"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aa654819cf111f4ce54a14c"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aa654819cf111f4ce54a14d"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-13T07:45:05.093Z",
+    "updatedAt": "2026-09-13T07:45:05.093Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab4a8f6b5e498009c7b637",
+    "tripId": "6a5777eeae0175f202202f49",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 0,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 120000,
+      "remaining": -120000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6aab4a8f6b5e498009c7b638"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6aab4a8f6b5e498009c7b639"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6aab4a8f6b5e498009c7b63a"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6aab4a8f6b5e498009c7b63b"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6aab4a8f6b5e498009c7b63c"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aab4a8f6b5e498009c7b63d"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aab4a8f6b5e498009c7b63e"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-17T02:03:59.537Z",
+    "updatedAt": "2026-09-17T02:03:59.537Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab4ac16b5e498009c7b6ae",
+    "tripId": "6a572aa07c604fb33069d969",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 0,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 621333,
+      "remaining": -621333
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6aab4ac16b5e498009c7b6af"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6aab4ac16b5e498009c7b6b0"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6aab4ac16b5e498009c7b6b1"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6aab4ac16b5e498009c7b6b2"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6aab4ac16b5e498009c7b6b3"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aab4ac16b5e498009c7b6b4"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6aab4ac16b5e498009c7b6b5"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-17T02:04:49.899Z",
+    "updatedAt": "2026-09-17T02:04:49.899Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab33eb4d2c181d1bce50153",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 100000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 100000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6ab33eb4d2c181d1bce50154"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6ab33eb4d2c181d1bce50155"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6ab33eb4d2c181d1bce50156"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6ab33eb4d2c181d1bce50157"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6ab33eb4d2c181d1bce50158"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab33eb4d2c181d1bce50159"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab33eb4d2c181d1bce5015a"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-23T02:51:32.720Z",
+    "updatedAt": "2026-09-23T02:51:32.720Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab37091818b490c972fb13d",
+    "tripId": "6ab2b54fea0790ce785fb5cf",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 105000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 105000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6ab37091818b490c972fb13e"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6ab37091818b490c972fb13f"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6ab37091818b490c972fb140"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6ab37091818b490c972fb141"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6ab37091818b490c972fb142"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab37091818b490c972fb143"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab37091818b490c972fb144"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-23T06:24:17.739Z",
+    "updatedAt": "2026-09-23T06:24:17.739Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab3b5f9c325c3c490a60f3b",
+    "tripId": "6ab37247818b490c972fb1fb",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 100000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "SEK",
+      "spent": 0,
+      "remaining": 100000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6ab3b5f9c325c3c490a60f3c"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6ab3b5f9c325c3c490a60f3d"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6ab3b5f9c325c3c490a60f3e"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6ab3b5f9c325c3c490a60f3f"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6ab3b5f9c325c3c490a60f40"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab3b5f9c325c3c490a60f41"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab3b5f9c325c3c490a60f42"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-23T11:20:25.350Z",
+    "updatedAt": "2026-09-23T11:20:25.350Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab3c64950a2c6e6865426a5",
+    "tripId": "6ab3c5be50a2c6e686542388",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 0,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 0
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6ab3c64950a2c6e6865426a6"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6ab3c64950a2c6e6865426a7"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6ab3c64950a2c6e6865426a8"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6ab3c64950a2c6e6865426a9"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6ab3c64950a2c6e6865426aa"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab3c64950a2c6e6865426ab"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab3c64950a2c6e6865426ac"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-23T12:30:01.933Z",
+    "updatedAt": "2026-09-23T12:30:01.933Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab48c82c130bca5726210f9",
+    "tripId": "6ab3726b818b490c972fb277",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 1,
+    "budgetOverview": {
+      "total": 0,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 10400,
+      "remaining": -10400
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6ab48c82c130bca5726210fa"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6ab48c82c130bca5726210fb"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6ab48c82c130bca5726210fc"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6ab48c82c130bca5726210fd"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6ab48c82c130bca5726210fe"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab48c82c130bca5726210ff"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab48c82c130bca572621100"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-24T02:35:46.214Z",
+    "updatedAt": "2026-09-24T02:35:46.214Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab54e3ac5215de2580ccba1",
+    "tripId": "6ab54e11c5215de2580cc9c2",
+    "purpose": "",
+    "travelStyle": "comfort",
+    "groupSize": 2,
+    "budgetOverview": {
+      "total": 10000,
+      "flights": 0,
+      "accommodation": 0,
+      "transport": 0,
+      "food": 0,
+      "activities": 0,
+      "shopping": 0,
+      "miscellaneous": 0,
+      "currency": "INR",
+      "spent": 0,
+      "remaining": 10000
+    },
+    "importantContacts": [
+      {
+        "type": "emergency",
+        "name": "Emergency Contact",
+        "phone": "Not provided",
+        "email": "",
+        "relation": "",
+        "isPrimary": true,
+        "_id": "6ab54e3ac5215de2580ccba2"
+      },
+      {
+        "type": "insurance",
+        "name": "Travel Insurance",
+        "phone": "Not provided",
+        "provider": "",
+        "policyNo": "",
+        "coverage": "",
+        "isPrimary": true,
+        "_id": "6ab54e3ac5215de2580ccba3"
+      },
+      {
+        "type": "hotel",
+        "name": "Hotel",
+        "phone": "Not provided",
+        "address": "",
+        "isPrimary": true,
+        "_id": "6ab54e3ac5215de2580ccba4"
+      },
+      {
+        "type": "embassy",
+        "name": "Embassy",
+        "phone": "Not provided",
+        "email": "",
+        "address": "",
+        "country": "",
+        "workingHours": "",
+        "isPrimary": true,
+        "_id": "6ab54e3ac5215de2580ccba5"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Police",
+        "phone": "Not provided",
+        "isPrimary": true,
+        "_id": "6ab54e3ac5215de2580ccba6"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Ambulance",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab54e3ac5215de2580ccba7"
+      },
+      {
+        "type": "localEmergency",
+        "name": "Fire",
+        "phone": "Not provided",
+        "isPrimary": false,
+        "_id": "6ab54e3ac5215de2580ccba8"
+      }
+    ],
+    "notes": "",
+    "travelGoals": [],
+    "planningProgress": {
+      "overall": 0,
+      "checklist": 0,
+      "packing": 0,
+      "bookings": 0,
+      "documents": 0
+    },
+    "checklist": [],
+    "itinerary": [],
+    "flightDetails": [],
+    "accommodationDetails": [],
+    "transportDetails": [],
+    "packingList": [],
+    "documents": [],
+    "createdAt": "2026-09-24T16:22:18.732Z",
+    "updatedAt": "2026-09-24T16:22:18.732Z",
+    "__v": 0
+  }
+]

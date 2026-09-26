@@ -1,0 +1,133 @@
+[
+  {
+    "_id": "6aa7f14a98b960dbdee4fa7d",
+    "actorUserId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "targetType": "plan",
+    "targetId": "6aa4507bc5cd5cccc63f86f6",
+    "action": "update_plan",
+    "beforeState": {
+      "_id": "6aa4507bc5cd5cccc63f86f6",
+      "key": "free",
+      "name": "Free Traveler",
+      "description": "Essential split ledger for casual trips with close friends and family.",
+      "status": "active",
+      "pricing": {
+        "amount": 0,
+        "currency": "INR",
+        "billingInterval": "free"
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": false,
+        "custom_trip_cover": false,
+        "expense_export": false,
+        "receipt_ocr": true,
+        "recurring_expenses": false,
+        "priority_support": false
+      },
+      "limits": {
+        "trips": {
+          "value": 5,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 10,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 5,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 3,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "permissions": [],
+      "displayOrder": 1,
+      "isDefault": true,
+      "isPublic": true,
+      "createdAt": "2026-09-11T19:03:23.551Z",
+      "updatedAt": "2026-09-11T19:03:23.551Z",
+      "id": "6aa4507bc5cd5cccc63f86f6"
+    },
+    "afterState": {
+      "_id": "6aa4507bc5cd5cccc63f86f6",
+      "key": "free",
+      "name": "Free Traveler",
+      "description": "Essential split ledger for casual trips with close friends and family.",
+      "status": "active",
+      "pricing": {
+        "amount": 0,
+        "currency": "INR",
+        "billingInterval": "free"
+      },
+      "features": {
+        "trip_creation": true,
+        "advanced_analytics": false,
+        "custom_trip_cover": false,
+        "expense_export": false,
+        "receipt_ocr": true,
+        "recurring_expenses": false,
+        "priority_support": false
+      },
+      "limits": {
+        "trips": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "trips per account"
+        },
+        "peoplePerTrip": {
+          "value": 10,
+          "unlimited": false,
+          "unit": "travelers per trip"
+        },
+        "stopsPerTrip": {
+          "value": 5,
+          "unlimited": false,
+          "unit": "stops per itinerary"
+        },
+        "expensesPerTrip": {
+          "value": null,
+          "unlimited": true,
+          "unit": "unlimited expenses"
+        },
+        "monthlyExports": {
+          "value": 1,
+          "unlimited": false,
+          "unit": "exports per month"
+        },
+        "monthlyReceiptOCR": {
+          "value": 3,
+          "unlimited": false,
+          "unit": "scans per month"
+        }
+      },
+      "permissions": [],
+      "displayOrder": 1,
+      "isDefault": true,
+      "isPublic": true,
+      "createdAt": "2026-09-11T19:03:23.551Z",
+      "updatedAt": "2026-09-14T13:06:18.069Z",
+      "id": "6aa4507bc5cd5cccc63f86f6"
+    },
+    "reason": "Admin updated plan free from admin portal",
+    "ipAddress": null,
+    "createdAt": "2026-09-14T13:06:18.309Z",
+    "__v": 0
+  }
+]

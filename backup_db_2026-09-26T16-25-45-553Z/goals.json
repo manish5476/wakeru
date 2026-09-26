@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "6a5272e7175602b7cf1dc575",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "title": "New Car",
+    "description": "i ma going to add thi smuch amount in thi s",
+    "targetAmount": 2000000,
+    "savedAmount": 2000000,
+    "currency": "INR",
+    "targetDate": "2027-07-11T00:00:00.000Z",
+    "category": "savings",
+    "icon": "🏠",
+    "color": "#EC4899",
+    "isCompleted": true,
+    "progress": 100,
+    "createdAt": "2026-07-11T16:44:23.519Z",
+    "updatedAt": "2026-07-13T10:02:36.012Z",
+    "completedAt": "2026-07-13T10:02:36.012Z"
+  }
+]

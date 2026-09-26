@@ -1,0 +1,293 @@
+[
+  {
+    "_id": "6a3eb13c56e9dd74d9be74a5",
+    "month": "2026-06",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "__v": 0,
+    "categoryBudgets": [],
+    "createdAt": "2026-06-26T17:05:00.328Z",
+    "totalBudget": 2000,
+    "updatedAt": "2026-07-09T18:21:09.953Z",
+    "isActive": true,
+    "totalSpent": 675000
+  },
+  {
+    "_id": "6a474cf401fb606fc4dbfaeb",
+    "month": "2026-07",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "__v": 0,
+    "categoryBudgets": [
+      {
+        "category": "food",
+        "amount": 200,
+        "spent": 200020000
+      }
+    ],
+    "createdAt": "2026-07-03T05:47:31.978Z",
+    "totalBudget": 20000,
+    "updatedAt": "2026-07-14T10:14:11.125Z",
+    "isActive": true,
+    "totalSpent": 500000224376712
+  },
+  {
+    "_id": "6a519fa5fe935541f2f52e4a",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "month": "2026-08",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-11T01:43:01.355Z",
+    "updatedAt": "2026-07-11T01:43:01.355Z"
+  },
+  {
+    "_id": "6a519faafe935541f2f52e87",
+    "userId": "aeb013f3-fff5-4e60-b1aa-9bc54bf4d256",
+    "month": "2026-09",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-11T01:43:06.577Z",
+    "updatedAt": "2026-07-11T01:43:06.577Z"
+  },
+  {
+    "_id": "6a51f34ebadd9dc0576e2a81",
+    "userId": "9c5f5568-565a-4f42-a9c4-dd469db28b95",
+    "month": "2026-07",
+    "totalBudget": 0,
+    "totalSpent": 5000,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-11T07:39:58.213Z",
+    "updatedAt": "2026-07-11T07:40:31.525Z"
+  },
+  {
+    "_id": "6a5499431858f44712f71ad0",
+    "userId": "83b8e2b6-99b8-4a3c-af1f-41e410c2afa6",
+    "month": "2026-07",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-13T07:52:35.373Z",
+    "updatedAt": "2026-07-13T07:52:35.373Z"
+  },
+  {
+    "_id": "6a54bb024b6844ea5c3a3a30",
+    "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "month": "2026-07",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-13T10:16:34.370Z",
+    "updatedAt": "2026-07-13T10:16:34.370Z"
+  },
+  {
+    "_id": "6a55ff2013d1a34a9d42b66d",
+    "userId": "be4b27fd-ca75-405d-bc48-f57a2ed7b9f5",
+    "month": "2026-07",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-14T09:19:28.080Z",
+    "updatedAt": "2026-07-14T09:19:28.080Z"
+  },
+  {
+    "_id": "6a576e584cb9caf9b3134dc9",
+    "userId": "4492862d-6307-464d-a414-28d32d68af0b",
+    "month": "2026-07",
+    "totalBudget": 5000,
+    "totalSpent": 20,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-15T11:26:16.777Z",
+    "updatedAt": "2026-07-15T11:32:08.494Z"
+  },
+  {
+    "_id": "6a57d1f7fbbfb41c9219e574",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "month": "2026-07",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-15T18:31:19.710Z",
+    "updatedAt": "2026-07-15T18:31:19.710Z"
+  },
+  {
+    "_id": "6a5870b221b74d7d5c04479e",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "month": "2026-07",
+    "totalBudget": 60000,
+    "totalSpent": 901369.6,
+    "categoryBudgets": [
+      {
+        "category": "food",
+        "amount": 12,
+        "spent": 508445.19999999995
+      },
+      {
+        "category": "stay",
+        "amount": 12,
+        "spent": 127000
+      },
+      {
+        "category": "transport",
+        "amount": 12,
+        "spent": 2241
+      },
+      {
+        "category": "shopping",
+        "amount": 12,
+        "spent": 0
+      },
+      {
+        "category": "entertainment",
+        "amount": 12,
+        "spent": 0
+      },
+      {
+        "category": "bills",
+        "amount": 12,
+        "spent": 0
+      },
+      {
+        "category": "education",
+        "amount": 12,
+        "spent": 0
+      },
+      {
+        "category": "travel",
+        "amount": 12,
+        "spent": 0
+      },
+      {
+        "category": "other",
+        "amount": 12,
+        "spent": 21789.199999999997
+      }
+    ],
+    "isActive": true,
+    "createdAt": "2026-07-16T05:48:34.768Z",
+    "updatedAt": "2026-08-16T08:36:57.254Z"
+  },
+  {
+    "_id": "6a5e0a523bb58e0d99861403",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "month": "2026-06",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-20T11:45:22.900Z",
+    "updatedAt": "2026-07-20T11:45:22.900Z"
+  },
+  {
+    "_id": "6a5e1a0221202f284b44e99f",
+    "userId": "VlLtRI2yvLQReJqLTfd4kVMj1wR2",
+    "month": "2026-07",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-07-20T12:52:18.694Z",
+    "updatedAt": "2026-07-20T12:52:18.694Z"
+  },
+  {
+    "_id": "6a76ec0b26132b9ab37cb445",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "month": "2026-08",
+    "totalBudget": 5000,
+    "totalSpent": 5167462,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-08-08T08:42:51.195Z",
+    "updatedAt": "2026-08-30T05:37:23.985Z"
+  },
+  {
+    "_id": "6a959ccbcfb42985dce87df9",
+    "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+    "month": "2026-08",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-08-31T15:24:59.791Z",
+    "updatedAt": "2026-08-31T15:24:59.791Z"
+  },
+  {
+    "_id": "6a96552611d25d91bbcbaca6",
+    "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "month": "2026-09",
+    "totalBudget": 5000,
+    "totalSpent": 146421,
+    "categoryBudgets": [
+      {
+        "category": "food",
+        "amount": 500,
+        "spent": 100
+      }
+    ],
+    "isActive": true,
+    "createdAt": "2026-09-01T04:31:34.321Z",
+    "updatedAt": "2026-09-24T16:17:57.676Z"
+  },
+  {
+    "_id": "6aa7f9f085f8913158c78085",
+    "userId": "YpDg4Lroi2cirdFa3prmSGY50tz1",
+    "month": "2026-09",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-09-14T13:43:12.029Z",
+    "updatedAt": "2026-09-14T13:43:12.029Z"
+  },
+  {
+    "_id": "6aa7fdb185f8913158c785cc",
+    "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+    "month": "2026-09",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-09-14T13:59:13.451Z",
+    "updatedAt": "2026-09-14T13:59:13.451Z"
+  },
+  {
+    "_id": "6aaaaa01860195971482c759",
+    "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+    "month": "2026-09",
+    "totalBudget": 0,
+    "totalSpent": 5000,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-09-16T14:38:57.188Z",
+    "updatedAt": "2026-09-16T14:39:17.567Z"
+  },
+  {
+    "_id": "6ab0e7b1ff75dceb8ea3c557",
+    "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+    "month": "2026-09",
+    "totalBudget": 0,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-09-21T08:15:45.906Z",
+    "updatedAt": "2026-09-21T08:15:45.906Z"
+  },
+  {
+    "_id": "6ab676ca5baea6ef31617a85",
+    "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "month": "2026-09",
+    "totalBudget": 500000,
+    "totalSpent": 0,
+    "categoryBudgets": [],
+    "isActive": true,
+    "createdAt": "2026-09-25T13:27:38.700Z",
+    "updatedAt": "2026-09-26T07:15:06.373Z"
+  }
+]

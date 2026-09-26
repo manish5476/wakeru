@@ -1,0 +1,4820 @@
+[
+  {
+    "_id": "6a59c88f7ebd62b3bc8f6536",
+    "tripId": "6a572aa07c604fb33069d969",
+    "stopId": "6a572aa27c604fb33069d973",
+    "location": {
+      "latitude": 21.180650052766126,
+      "longitude": 72.7343074620871
+    },
+    "tags": [],
+    "title": "12",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T06:17:04.988Z",
+    "amountLocal": 500000,
+    "amountBase": 500000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "paidByName": "nehal",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "amountLocal": 250000,
+        "amountBase": 250000,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 250000,
+        "amountBase": 250000,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T06:15:43.741Z",
+    "updatedAt": "2026-07-17T06:15:43.741Z",
+    "integrityHash": "be4fcfa87358fa859b8037819e86d2f493409676a2e09447fb463c2e9abfa344"
+  },
+  {
+    "_id": "6a59c89e7ebd62b3bc8f658c",
+    "tripId": "6a572aa07c604fb33069d969",
+    "stopId": "6a572aa27c604fb33069d973",
+    "location": {
+      "latitude": 21.180650052766126,
+      "longitude": 72.7343074620871
+    },
+    "tags": [],
+    "title": "1212",
+    "category": "transport",
+    "receiptImages": [],
+    "date": "2026-07-17T06:17:28.705Z",
+    "amountLocal": 121,
+    "amountBase": 121,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "paidByName": "nehal",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "amountLocal": 60.5,
+        "amountBase": 60.5,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 60.5,
+        "amountBase": 60.5,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T06:15:58.273Z",
+    "updatedAt": "2026-07-17T06:15:58.273Z",
+    "integrityHash": "d9392a3db9b36b216faaca8ef5b1a411c6d1ebc18f97f0e958a00e074c574eb4",
+    "notesEncrypted": "v1:fe08999d4089c5c33dd4debc:a8bc382490347274bfa9e5bf0215affc:e8cd5cc5"
+  },
+  {
+    "_id": "6a59c8b07ebd62b3bc8f664e",
+    "tripId": "6a572aa07c604fb33069d969",
+    "stopId": "6a572aa27c604fb33069d973",
+    "location": {
+      "latitude": 21.180650052766126,
+      "longitude": 72.7343074620871
+    },
+    "tags": [],
+    "title": "12121212",
+    "category": "health",
+    "receiptImages": [],
+    "date": "2026-07-17T06:17:39.628Z",
+    "amountLocal": 121212,
+    "amountBase": 121212,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "amountLocal": 60606,
+        "amountBase": 60606,
+        "isPaid": false
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 60606,
+        "amountBase": 60606,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T06:16:16.881Z",
+    "updatedAt": "2026-07-17T06:16:16.881Z",
+    "integrityHash": "0dc2e884c371ce0eed31d1a87e1097eaa132bcd6a11d3f4589316f2017cc4a61"
+  },
+  {
+    "_id": "6a59c8c77ebd62b3bc8f67a6",
+    "tripId": "6a5777eeae0175f202202f49",
+    "stopId": "6a5777efae0175f202202f53",
+    "location": {
+      "latitude": 21.180650052766126,
+      "longitude": 72.7343074620871
+    },
+    "tags": [],
+    "title": "12121",
+    "category": "stay",
+    "receiptImages": [],
+    "date": "2026-07-17T06:18:05.514Z",
+    "amountLocal": 120000,
+    "amountBase": 120000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+    "paidByName": "nehal",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "e974fd51-b13d-4e8a-94ea-8cce86a4fa5e",
+        "displayName": "nehal",
+        "amountLocal": 60000,
+        "amountBase": 60000,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 60000,
+        "amountBase": 60000,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T06:16:39.428Z",
+    "updatedAt": "2026-07-17T06:16:39.428Z",
+    "integrityHash": "48067def40be77eb69db0142fb0e2136479b48cc5f7c353df1c1ac20ee353933",
+    "notesEncrypted": "v1:a8eb33b95c6bf8a2a65a0283:7c676f466019e73d301d06f0e42ef845:36574d2d"
+  },
+  {
+    "_id": "6a5a04f3b3293cbd972150e9",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.180590859044756,
+      "longitude": 72.73433442555924
+    },
+    "tags": [],
+    "title": "Burger King at Chruch Gate",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T10:34:03.812Z",
+    "amountLocal": 1914,
+    "amountBase": 1914,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 382.8,
+        "amountBase": 382.8,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 382.8,
+        "amountBase": 382.8,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 382.8,
+        "amountBase": 382.8,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 382.8,
+        "amountBase": 382.8,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 382.8,
+        "amountBase": 382.8,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:33:23.563Z",
+    "updatedAt": "2026-07-17T10:33:23.563Z",
+    "integrityHash": "713aefd19afed115122f8ae14ce289d7699206cfdf61aeab74f9d9f667473400"
+  },
+  {
+    "_id": "6a5a051fb3293cbd972151be",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.180590859044756,
+      "longitude": 72.73433442555924
+    },
+    "tags": [],
+    "title": "obsession movie",
+    "category": "activity",
+    "receiptImages": [],
+    "date": "2026-07-17T10:35:10.778Z",
+    "amountLocal": 1813,
+    "amountBase": 1813,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 362.6,
+        "amountBase": 362.6,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 362.6,
+        "amountBase": 362.6,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 362.6,
+        "amountBase": 362.6,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 362.6,
+        "amountBase": 362.6,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 362.6,
+        "amountBase": 362.6,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:34:07.278Z",
+    "updatedAt": "2026-07-17T10:34:07.278Z",
+    "integrityHash": "992aca964c00a4b3c208da924d7c7f7537c618d9fc5b12f6ba7882b7523d3273"
+  },
+  {
+    "_id": "6a5a055eb3293cbd97215419",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.180590859044756,
+      "longitude": 72.73433442555924
+    },
+    "tags": [],
+    "title": "watches and google",
+    "category": "shopping",
+    "receiptImages": [],
+    "date": "2026-07-17T10:36:06.782Z",
+    "amountLocal": 700,
+    "amountBase": 700,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "exact",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 0,
+        "amountBase": 0,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 400,
+        "amountBase": 400,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 0,
+        "amountBase": 0,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 0,
+        "amountBase": 0,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:35:10.994Z",
+    "updatedAt": "2026-07-17T10:35:10.994Z",
+    "integrityHash": "0fecbe5046314c2664a634f8e3c36ec1a162caf503518dc60cc004c9d9986c32"
+  },
+  {
+    "_id": "6a5a0591b3293cbd972155b3",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "juice and ice cream",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T10:37:03.262Z",
+    "amountLocal": 213,
+    "amountBase": 213,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 71,
+        "amountBase": 71,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 71,
+        "amountBase": 71,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 71,
+        "amountBase": 71,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [
+      {
+        "changedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "changedAt": "2026-07-17T11:47:00.372Z",
+        "changes": [
+          {
+            "field": "date",
+            "oldValue": "2026-07-17T10:37:03.262Z",
+            "newValue": "2026-07-17T10:37:03.262Z"
+          },
+          {
+            "field": "location",
+            "oldValue": {
+              "latitude": 21.1826,
+              "longitude": 72.7625
+            },
+            "newValue": {
+              "latitude": 21.1826,
+              "longitude": 72.7625
+            }
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-07-17T10:36:01.874Z",
+    "updatedAt": "2026-07-17T11:47:00.375Z",
+    "editedAt": "2026-07-17T11:47:00.372Z",
+    "editedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "integrityHash": "ce471007695471fd5dee2de14a717c1c9cb679c4b3a1485e685d3f90731097b3"
+  },
+  {
+    "_id": "6a5a05b3b3293cbd972156f1",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.180590859044756,
+      "longitude": 72.73433442555924
+    },
+    "tags": [],
+    "title": "ticket night time",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:37:57.625Z",
+    "amountLocal": 25,
+    "amountBase": 25,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:36:35.465Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "db7285d441b9a5bb058d1507c38ae1ddcccc1e5ed683c2ceba92f24792fac845"
+  },
+  {
+    "_id": "6a5a060db3293cbd97215a07",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "metro train ticket",
+    "category": "transport",
+    "receiptImages": [],
+    "date": "2026-07-17T10:38:19.197Z",
+    "amountLocal": 150,
+    "amountBase": 150,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [
+      {
+        "changedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "changedAt": "2026-07-17T10:38:56.813Z",
+        "changes": [
+          {
+            "field": "date",
+            "oldValue": "2026-07-17T10:38:19.197Z",
+            "newValue": "2026-07-17T10:38:19.197Z"
+          },
+          {
+            "field": "location",
+            "oldValue": {
+              "latitude": 21.1826,
+              "longitude": 72.7625
+            },
+            "newValue": {
+              "latitude": 21.1826,
+              "longitude": 72.7625
+            }
+          },
+          {
+            "field": "paidBy",
+            "oldValue": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+            "newValue": "mqMlRrhP4tZlwwcEViSqAMzm4bg1"
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-07-17T10:38:05.856Z",
+    "updatedAt": "2026-07-17T10:38:56.815Z",
+    "editedAt": "2026-07-17T10:38:56.813Z",
+    "editedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "integrityHash": "afc1f55d0e30e28deeb4399c6f1fa38ca209c2cf0ffa9c37989ba8ba05f6a9d6"
+  },
+  {
+    "_id": "6a5a0661b3293cbd97215bf6",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "lassi",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:40:53.364Z",
+    "amountLocal": 250,
+    "amountBase": 250,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:39:29.009Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "992d009ec51b895d3ddb729e7f1326d75370371f9d2300821c5be623d1308352"
+  },
+  {
+    "_id": "6a5a0687b3293cbd97215d00",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a5a0495b3293cbd972150cb",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "vada pav",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:41:21.611Z",
+    "amountLocal": 165,
+    "amountBase": 165,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+    "paidByName": "jay mathurkar",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 33,
+        "amountBase": 33,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.846Z"
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 33,
+        "amountBase": 33,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 33,
+        "amountBase": 33,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 33,
+        "amountBase": 33,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 33,
+        "amountBase": 33,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:40:07.728Z",
+    "updatedAt": "2026-08-16T07:38:45.063Z",
+    "integrityHash": "867cdab6041b32ca258908aa5709f48386a7b4c54f3ff4124a21fbe75376f3d0"
+  },
+  {
+    "_id": "6a5a06b8b3293cbd97215ecf",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "boat photo",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:42:11.860Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:40:56.676Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "56b060fed178ac9e46b7b494e96a77f7970295eb92658c873fd6988e99c995cd"
+  },
+  {
+    "_id": "6a5a06dcb3293cbd97216058",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "siddhivinayak temple",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:42:43.903Z",
+    "amountLocal": 200,
+    "amountBase": 200,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 100,
+        "amountBase": 100,
+        "isPaid": true
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 100,
+        "amountBase": 100,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:41:32.926Z",
+    "updatedAt": "2026-08-16T07:38:45.277Z",
+    "integrityHash": "f8031b957b5d82e09a6937b389579df8d5766bf29540958b997301f93312c789"
+  },
+  {
+    "_id": "6a5a0723b3293cbd9721630d",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "mapusa to calungut bus",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:43:54.955Z",
+    "amountLocal": 150,
+    "amountBase": 150,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:42:43.149Z",
+    "updatedAt": "2026-07-17T10:42:43.149Z",
+    "integrityHash": "cc909e70f8f9238fd03978de6abd3c658d06b9bd4672701a882a262fbf2d08f1"
+  },
+  {
+    "_id": "6a5a0740b3293cbd97216418",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "thivim to mapusa",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:44:24.883Z",
+    "amountLocal": 250,
+    "amountBase": 250,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:43:12.663Z",
+    "updatedAt": "2026-07-17T10:43:12.663Z",
+    "integrityHash": "7a45d4b75d1ce6f6184acd260304f56fdbbaec55bf5b5eb9cd0bd34784133c6e"
+  },
+  {
+    "_id": "6a5a0758b3293cbd97216501",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:44:59.915Z",
+    "amountLocal": 200,
+    "amountBase": 200,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 40,
+        "amountBase": 40,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 40,
+        "amountBase": 40,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 40,
+        "amountBase": 40,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 40,
+        "amountBase": 40,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 40,
+        "amountBase": 40,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:43:36.732Z",
+    "updatedAt": "2026-07-17T10:43:36.732Z",
+    "integrityHash": "41ad72d75bd65d8ae941eeda7f92b9056e956792c5bd6f6144fa15682431829a"
+  },
+  {
+    "_id": "6a5a076fb3293cbd9721663a",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "cab to madgao",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:45:18.066Z",
+    "amountLocal": 2000,
+    "amountBase": 2000,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 400,
+        "amountBase": 400,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 400,
+        "amountBase": 400,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 400,
+        "amountBase": 400,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 400,
+        "amountBase": 400,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 400,
+        "amountBase": 400,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:43:59.244Z",
+    "updatedAt": "2026-07-17T10:43:59.244Z",
+    "integrityHash": "6747b29f04ff9e1b3112a40362a11af05e27acea053bb08a08b721acc5992c1e"
+  },
+  {
+    "_id": "6a5a0786b3293cbd972167dc",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "tip in train",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:45:40.970Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:44:22.083Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "0a8a9d91f5df89db9f705c166006dac678ef6389ecbe43dc0689063d681c5a52"
+  },
+  {
+    "_id": "6a5a0798b3293cbd9721693f",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "dinner",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T10:46:03.730Z",
+    "amountLocal": 1740,
+    "amountBase": 1740,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 348,
+        "amountBase": 348,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 348,
+        "amountBase": 348,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 348,
+        "amountBase": 348,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 348,
+        "amountBase": 348,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 348,
+        "amountBase": 348,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:44:40.095Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "20ae5842da0acd06b28867a731e6f32c776ae70f2d27e2353c6c567c0f935e85"
+  },
+  {
+    "_id": "6a5a07b1b3293cbd97216b40",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "timepass chakh",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:46:21.829Z",
+    "amountLocal": 50,
+    "amountBase": 50,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 10,
+        "amountBase": 10,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 10,
+        "amountBase": 10,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 10,
+        "amountBase": 10,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 10,
+        "amountBase": 10,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 10,
+        "amountBase": 10,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:45:05.593Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "d1f3347b05b336a00bd8286ba5f1ca18c867845b2464f2be5bfc55fddedcddcd"
+  },
+  {
+    "_id": "6a5a07c3b3293cbd97216cbf",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:46:47.058Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:45:23.934Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "d09ee65c141a2550694e84c6eb16d753ab28cda90b13c7226a635c879c53082c"
+  },
+  {
+    "_id": "6a5a07dab3293cbd97216ea3",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "bike rental",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:47:06.453Z",
+    "amountLocal": 900,
+    "amountBase": 900,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 180,
+        "amountBase": 180,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 180,
+        "amountBase": 180,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 180,
+        "amountBase": 180,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 180,
+        "amountBase": 180,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 180,
+        "amountBase": 180,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:45:46.719Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "c1e50e6eec02a44731d320d62badefea1b00124718c92ae5d57fe1ddb0944ec7"
+  },
+  {
+    "_id": "6a5a07eeb3293cbd97217048",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "boat ride",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:47:28.433Z",
+    "amountLocal": 6000,
+    "amountBase": 6000,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 1200,
+        "amountBase": 1200,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 1200,
+        "amountBase": 1200,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 1200,
+        "amountBase": 1200,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 1200,
+        "amountBase": 1200,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 1200,
+        "amountBase": 1200,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:46:06.226Z",
+    "updatedAt": "2026-07-17T10:46:06.226Z",
+    "integrityHash": "946cd3af2288d0edeb77a469394781526a4a0a7e0c9e6f5e51fb96145d82d2c1"
+  },
+  {
+    "_id": "6a5a082fb3293cbd9721747d",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "bike rental",
+    "category": "transport",
+    "receiptImages": [],
+    "date": "2026-07-17T10:48:26.407Z",
+    "amountLocal": 1500,
+    "amountBase": 1500,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:47:11.448Z",
+    "updatedAt": "2026-07-17T10:47:11.448Z",
+    "integrityHash": "375aad1045282dd9f7b94c328f177279faae37c5b9b4fa068f3f6dcbfc31006f"
+  },
+  {
+    "_id": "6a5a0846b3293cbd9721759c",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "de baga deck food",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:48:54.045Z",
+    "amountLocal": 2523,
+    "amountBase": 2523,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 504.6,
+        "amountBase": 504.6,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 504.6,
+        "amountBase": 504.6,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 504.6,
+        "amountBase": 504.6,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 504.6,
+        "amountBase": 504.6,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 504.6,
+        "amountBase": 504.6,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:47:34.823Z",
+    "updatedAt": "2026-07-17T10:47:34.823Z",
+    "integrityHash": "8c8d063068a4ba17b25a61387b7746698f5193fddd1ba1c64d70df70d05a8c1e"
+  },
+  {
+    "_id": "6a5a0859b3293cbd9721767f",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "tac bell classic",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T10:49:16.745Z",
+    "amountLocal": 299,
+    "amountBase": 299,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 59.8,
+        "amountBase": 59.8,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 59.8,
+        "amountBase": 59.8,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 59.8,
+        "amountBase": 59.8,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 59.8,
+        "amountBase": 59.8,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 59.8,
+        "amountBase": 59.8,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:47:53.945Z",
+    "updatedAt": "2026-07-17T10:47:53.945Z",
+    "integrityHash": "67728533a2818be73a2cae0a345229959e94acd6261cbf2d96e35ee8030413b0"
+  },
+  {
+    "_id": "6a5a0874b3293cbd972177f2",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "Mc d Mall",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:49:37.181Z",
+    "amountLocal": 1056,
+    "amountBase": 1056,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 211.2,
+        "amountBase": 211.2,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 211.2,
+        "amountBase": 211.2,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 211.2,
+        "amountBase": 211.2,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 211.2,
+        "amountBase": 211.2,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 211.2,
+        "amountBase": 211.2,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:48:20.761Z",
+    "updatedAt": "2026-07-17T10:48:20.761Z",
+    "integrityHash": "fb708b89fa6d7aa1677f89f77334ac5539bdb3ec76eac6f51256c43450371a2d"
+  },
+  {
+    "_id": "6a5a089ab3293cbd97217a72",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "meusium of goa",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:50:06.622Z",
+    "amountLocal": 1500,
+    "amountBase": 1500,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 300,
+        "amountBase": 300,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:48:58.060Z",
+    "updatedAt": "2026-07-17T10:48:58.060Z",
+    "integrityHash": "c1b4f8a864f0273373242b46b0f23006ce612cf232e2f97f4a7ff1ddd85a98c5"
+  },
+  {
+    "_id": "6a5a08a7b3293cbd97217b5c",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:50:39.420Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:49:11.156Z",
+    "updatedAt": "2026-07-17T10:49:11.156Z",
+    "integrityHash": "b86b3489462fab0e286b778463e1a2e24bf2fa050a4deb894da5d3d2df98fcbc"
+  },
+  {
+    "_id": "6a5a08beb3293cbd97217d0c",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1646299,
+      "longitude": 72.9724459
+    },
+    "tags": [],
+    "title": "st anthony baga beach",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:50:52.631Z",
+    "amountLocal": 1194,
+    "amountBase": 1194,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 398,
+        "amountBase": 398,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 398,
+        "amountBase": 398,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 398,
+        "amountBase": 398,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [
+      {
+        "changedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "changedAt": "2026-07-17T16:14:55.769Z",
+        "changes": [
+          {
+            "field": "date",
+            "oldValue": "2026-07-17T10:50:52.631Z",
+            "newValue": "2026-07-17T10:50:52.631Z"
+          },
+          {
+            "field": "location",
+            "oldValue": {
+              "latitude": 21.1646299,
+              "longitude": 72.9724459
+            },
+            "newValue": {
+              "latitude": 21.1646299,
+              "longitude": 72.9724459
+            }
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-07-17T10:49:34.109Z",
+    "updatedAt": "2026-07-17T16:14:55.771Z",
+    "editedAt": "2026-07-17T16:14:55.769Z",
+    "editedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "integrityHash": "cb96ffcd2102b36d8bacfdc41f190d47d747e0d3ed40c79d716367897f16ab29"
+  },
+  {
+    "_id": "6a5a08ceb3293cbd97217e3a",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:51:17.046Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:49:50.773Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "30b3ce2c206048dac7cf2b92d0bb2d2b1f620a21ebbe55b6c4cda4fe497ad168"
+  },
+  {
+    "_id": "6a5a08e1b3293cbd97217fc6",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "church entry",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:51:35.073Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 20,
+        "amountBase": 20,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:50:09.812Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "6374b9f60930555709e9f93e8645cd869fdedf45cd056a65b283f65d3e9dd24c"
+  },
+  {
+    "_id": "6a5a090fb3293cbd97218361",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "parking",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T10:52:01.877Z",
+    "amountLocal": 160,
+    "amountBase": 160,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T10:50:55.895Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "42e741b51901f3d11e77e81d0016fc5994195beb203b5f9e5076b14871bc8cfa"
+  },
+  {
+    "_id": "6a5a0ec02390df8b0de1c198",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "food at the",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T11:16:13.700Z",
+    "amountLocal": 1880,
+    "amountBase": 1880,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 376,
+        "amountBase": 376,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 376,
+        "amountBase": 376,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 376,
+        "amountBase": 376,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 376,
+        "amountBase": 376,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 376,
+        "amountBase": 376,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:15:12.911Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "97e2a90891b768c1cfb0d094752bd5c8c6bb0ad64b9941af9d2ec1cf0fac19e8"
+  },
+  {
+    "_id": "6a5a0ef82390df8b0de1c2b1",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "drink",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:17:24.502Z",
+    "amountLocal": 1920,
+    "amountBase": 1920,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 640,
+        "amountBase": 640,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 640,
+        "amountBase": 640,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 640,
+        "amountBase": 640,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:16:08.855Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "8a6591b72ba710a89a43910ca4e6658139cdf079ea78f133d06cc5ef14eb59c6"
+  },
+  {
+    "_id": "6a5a0f162390df8b0de1c3be",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "ice cream",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-07-17T11:17:58.010Z",
+    "amountLocal": 160,
+    "amountBase": 160,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 32,
+        "amountBase": 32,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:16:38.140Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "d9e0b49ac5e61de7547d62cd67d49fa98dfadeec217d380fc76999d91ec7f901"
+  },
+  {
+    "_id": "6a5a0f2c2390df8b0de1c4d6",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "water and refresh ments",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:18:22.377Z",
+    "amountLocal": 120,
+    "amountBase": 120,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 24,
+        "amountBase": 24,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 24,
+        "amountBase": 24,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 24,
+        "amountBase": 24,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 24,
+        "amountBase": 24,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 24,
+        "amountBase": 24,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:17:00.991Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "b48ccecf0a5750ff502e13135d2ae4667e247025596a4cd2f8ec66783c34dec8"
+  },
+  {
+    "_id": "6a5a0f3d2390df8b0de1c5ba",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "dinner",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:18:42.835Z",
+    "amountLocal": 2120,
+    "amountBase": 2120,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 424,
+        "amountBase": 424,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 424,
+        "amountBase": 424,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 424,
+        "amountBase": 424,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 424,
+        "amountBase": 424,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 424,
+        "amountBase": 424,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:17:17.686Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "81efca4064157bbebc7e4e7801821d1bb9fdfdb2fe3c754bb2e8cf62eef8fe9b"
+  },
+  {
+    "_id": "6a5a0f502390df8b0de1c71a",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "soda",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:19:00.802Z",
+    "amountLocal": 400,
+    "amountBase": 400,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 80,
+        "amountBase": 80,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 80,
+        "amountBase": 80,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 80,
+        "amountBase": 80,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 80,
+        "amountBase": 80,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 80,
+        "amountBase": 80,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:17:36.604Z",
+    "updatedAt": "2026-07-17T11:17:36.604Z",
+    "integrityHash": "058da69d448ee37ad8b72dd90313eef0a1836bb7c95a1a0463a62a1b7c470f51"
+  },
+  {
+    "_id": "6a5a0f602390df8b0de1c881",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:19:20.470Z",
+    "amountLocal": 250,
+    "amountBase": 250,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+    "paidByName": "jay mathurkar",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.846Z"
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:17:52.331Z",
+    "updatedAt": "2026-08-16T07:38:45.063Z",
+    "integrityHash": "df252329107a5d828fec00a8a2dfbf706ba173afb56a4b04ba8b04de79dac9b5"
+  },
+  {
+    "_id": "6a5a0f772390df8b0de1caba",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "red thread",
+    "category": "stay",
+    "receiptImages": [],
+    "date": "2026-07-17T11:19:35.584Z",
+    "amountLocal": 17500,
+    "amountBase": 17500,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 3500,
+        "amountBase": 3500,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 3500,
+        "amountBase": 3500,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 3500,
+        "amountBase": 3500,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 3500,
+        "amountBase": 3500,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 3500,
+        "amountBase": 3500,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:18:15.231Z",
+    "updatedAt": "2026-07-17T11:18:15.231Z",
+    "integrityHash": "da052395841f137eaa1952813a3f02c0896b39184a38fe72256fcc403bd327c8"
+  },
+  {
+    "_id": "6a5a0f962390df8b0de1cd61",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "govan food",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:20:06.403Z",
+    "amountLocal": 1510,
+    "amountBase": 1510,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 302,
+        "amountBase": 302,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 302,
+        "amountBase": 302,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 302,
+        "amountBase": 302,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 302,
+        "amountBase": 302,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 302,
+        "amountBase": 302,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:18:46.955Z",
+    "updatedAt": "2026-07-17T11:18:46.955Z",
+    "integrityHash": "f834c43cc73841bb4f35959925ed597129be830ac383ddc3ed399aba27714315"
+  },
+  {
+    "_id": "6a5a0fa22390df8b0de1ce5e",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:20:28.378Z",
+    "amountLocal": 250,
+    "amountBase": 250,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:18:58.847Z",
+    "updatedAt": "2026-07-17T11:18:58.847Z",
+    "integrityHash": "2d58e5ad8049fccb456f6c5e3ffb0e72837a33242b916ef3f7385f90b098d05e"
+  },
+  {
+    "_id": "6a5a0fb62390df8b0de1d00e",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "scooty rent",
+    "category": "transport",
+    "receiptImages": [],
+    "date": "2026-07-17T11:20:40.113Z",
+    "amountLocal": 2400,
+    "amountBase": 2400,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 480,
+        "amountBase": 480,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 480,
+        "amountBase": 480,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 480,
+        "amountBase": 480,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 480,
+        "amountBase": 480,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 480,
+        "amountBase": 480,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:19:18.512Z",
+    "updatedAt": "2026-07-17T11:19:18.512Z",
+    "integrityHash": "a2aaa5520c8a16dbd925e8c9c4ad528f7b8da185fd87752dd5288b28a2adee16"
+  },
+  {
+    "_id": "6a5a0fc82390df8b0de1d193",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "petrol",
+    "category": "transport",
+    "receiptImages": [],
+    "date": "2026-07-17T11:20:59.261Z",
+    "amountLocal": 250,
+    "amountBase": 250,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:19:36.540Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "b413e671797201322c094798fbfc2449eb6bd9425850b066be80a81d27488e94"
+  },
+  {
+    "_id": "6a5a0fe52390df8b0de1d3e1",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "foot at aguda fort",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:21:25.365Z",
+    "amountLocal": 710,
+    "amountBase": 710,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 142,
+        "amountBase": 142,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 142,
+        "amountBase": 142,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 142,
+        "amountBase": 142,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 142,
+        "amountBase": 142,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 142,
+        "amountBase": 142,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:20:05.099Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "563577d826fbdbe6aec8564cb74bf4dc9115cbf7a361b87217f6a8a62635a459"
+  },
+  {
+    "_id": "6a5a100b2390df8b0de1d6dc",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "fort entry fees",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:22:07.210Z",
+    "amountLocal": 125,
+    "amountBase": 125,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:20:43.139Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "e942fba81f784aa93e24d188eb707a16cade7a26a6282d709aaee3b273eaf234"
+  },
+  {
+    "_id": "6a5a101a2390df8b0de1d7f1",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "light house",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:22:23.987Z",
+    "amountLocal": 125,
+    "amountBase": 125,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 25,
+        "amountBase": 25,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:20:58.756Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "0acff94f3e8006a859ef845c935fec24a132e58280cc64b82be92db9ecc414fa"
+  },
+  {
+    "_id": "6a5a10312390df8b0de1d975",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "parking at agudafort",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:22:40.669Z",
+    "amountLocal": 150,
+    "amountBase": 150,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": true
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": true,
+        "paidAt": "2026-08-16T07:38:44.763Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:21:21.390Z",
+    "updatedAt": "2026-08-16T07:38:45.005Z",
+    "integrityHash": "fa84272d325acd0ead3b4b44da907c76854dbb015d1e1fdbfaf2b65ead217fff"
+  },
+  {
+    "_id": "6a5a10402390df8b0de1da82",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "parking",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:23:04.892Z",
+    "amountLocal": 150,
+    "amountBase": 150,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+        "displayName": "Aditya Rathod",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": true
+      },
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      },
+      {
+        "userId": "8jrJh6ImsnaPcPIfPkw7JSz7N3U2",
+        "displayName": "jay mathurkar",
+        "amountLocal": 30,
+        "amountBase": 30,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:21:36.022Z",
+    "updatedAt": "2026-08-16T10:07:30.919Z",
+    "integrityHash": "f82a0d5578b04402c9e55653bbfd4c51c9a98ed7c353704be6e3509931598e9a"
+  },
+  {
+    "_id": "6a5a10592390df8b0de1dc7a",
+    "tripId": "6a58bed14a4e6dc9456c9528",
+    "stopId": "6a58bed34a4e6dc9456c9532",
+    "location": {
+      "latitude": 21.1826,
+      "longitude": 72.7625
+    },
+    "tags": [],
+    "title": "ornament",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-07-17T11:23:19.481Z",
+    "amountLocal": 900,
+    "amountBase": 900,
+    "localCurrency": "INR",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "mqMlRrhP4tZlwwcEViSqAMzm4bg1",
+    "paidByName": "Aditya Rathod",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "WEd7URyFKuSBoKt9T1ehFxZCzgf1",
+        "displayName": "Mehar Patel",
+        "amountLocal": 450,
+        "amountBase": 450,
+        "isPaid": false
+      },
+      {
+        "userId": "SIDoLO4Je4SVgd27zIlT0wZSevg2",
+        "displayName": "swetal gamit",
+        "amountLocal": 450,
+        "amountBase": 450,
+        "isPaid": false
+      }
+    ],
+    "comments": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "text": "man",
+        "createdAt": "2026-07-20T11:00:33.658Z",
+        "_id": "6a5dffd13bb58e0d99860df9"
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "text": "2",
+        "createdAt": "2026-07-24T04:35:14.205Z",
+        "_id": "6a62eb82c5411600a7bd9a01"
+      }
+    ],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-07-17T11:22:01.951Z",
+    "updatedAt": "2026-07-24T04:35:14.212Z",
+    "integrityHash": "a153a71c45faeb36339cbef354b0b64a505e5fac49f90e25e99f8f154e567df1"
+  },
+  {
+    "_id": "6a9185c9bba755805c68af5b",
+    "tripId": "6a918578bba755805c68aebe",
+    "stopId": "6a918578bba755805c68aebf",
+    "location": {
+      "latitude": 21.153153153153152,
+      "longitude": 72.97089378905852
+    },
+    "tags": [],
+    "title": "Daal",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-08-28T12:57:25.532Z",
+    "amountLocal": 500,
+    "amountBase": 500,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "paidByName": "Manish Sharma",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "displayName": "Manish Sharma",
+        "amountLocal": 250,
+        "amountBase": 250,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 250,
+        "amountBase": 250,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "expenseHistory": [],
+    "createdAt": "2026-08-28T12:57:45.177Z",
+    "updatedAt": "2026-08-28T12:57:45.177Z",
+    "integrityHash": "98518f5a1a843895d3f3f76436c0f700992948f169b94d1833ac17459bdfd3fe"
+  },
+  {
+    "_id": "6a918650bba755805c68b154",
+    "tripId": "6a918578bba755805c68aebe",
+    "stopId": "6a918578bba755805c68aebf",
+    "location": {
+      "latitude": 21.1637763,
+      "longitude": 72.9746602
+    },
+    "tags": [],
+    "title": "Mmm",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-08-28T12:59:29.592Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "paidByName": "Manish Sharma",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "displayName": "Manish Sharma",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-08-28T13:00:00.936Z",
+    "updatedAt": "2026-08-28T13:00:00.936Z",
+    "integrityHash": "f4600349f27ede9c9e985ce41783bb4f9bdff2b1b6810122050448003c028dfa"
+  },
+  {
+    "_id": "6a918678bba755805c68b21c",
+    "tripId": "6a918578bba755805c68aebe",
+    "stopId": "6a918578bba755805c68aebf",
+    "location": {
+      "latitude": 21.1637763,
+      "longitude": 72.9746602
+    },
+    "tags": [],
+    "title": "Mm",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-08-28T13:00:28.477Z",
+    "amountLocal": 500,
+    "amountBase": 500,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "displayName": "Manish Sharma",
+        "amountLocal": 250,
+        "amountBase": 250,
+        "isPaid": true,
+        "paidAt": "2026-08-29T15:45:37.406Z"
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 250,
+        "amountBase": 250,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-08-28T13:00:40.407Z",
+    "updatedAt": "2026-08-29T15:45:37.410Z",
+    "integrityHash": "6c401c53322f0e906eb333ac3c564a5e0d7ed9826a7f0d6dbf3d51db1e539804"
+  },
+  {
+    "_id": "6a92ff2202743b40ac580ffc",
+    "tripId": "6a918578bba755805c68aebe",
+    "stopId": "6a918578bba755805c68aebf",
+    "location": {
+      "latitude": 21.1652,
+      "longitude": 72.7799
+    },
+    "tags": [],
+    "title": "Testing",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-08-29T15:47:23.806Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+    "paidByName": "Manish Sharma",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "displayName": "Manish Sharma",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-08-29T15:47:46.432Z",
+    "updatedAt": "2026-08-29T15:47:46.432Z",
+    "integrityHash": "fd49825fc75132b93e8144d0718539ed71543e1ec9d3ed19e707d72ab8cdab3b"
+  },
+  {
+    "_id": "6a92ff7f02743b40ac581194",
+    "tripId": "6a918578bba755805c68aebe",
+    "stopId": "6a918578bba755805c68aebf",
+    "location": {
+      "latitude": 21.1652,
+      "longitude": 72.7799
+    },
+    "tags": [],
+    "title": "12",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-08-29T15:49:00.156Z",
+    "amountLocal": 5111112,
+    "amountBase": 5111112,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "kXgm7FG5kFeCqUuVUQdb87be2K02",
+        "displayName": "Manish Sharma",
+        "amountLocal": 2555556,
+        "amountBase": 2555556,
+        "isPaid": true,
+        "paidAt": "2026-08-29T15:50:34.311Z"
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2555556,
+        "amountBase": 2555556,
+        "isPaid": true
+      }
+    ],
+    "comments": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "text": "hi",
+        "createdAt": "2026-09-15T07:59:21.199Z",
+        "_id": "6aa8fad9053cda8e8583fefd"
+      }
+    ],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-08-29T15:49:19.339Z",
+    "updatedAt": "2026-09-15T07:59:21.226Z",
+    "integrityHash": "3e390f9b4a29c8e8bb5b98ea22be883728b6013359158f67429e79f83db1288f"
+  },
+  {
+    "_id": "6a9eaefe0edaa48b3fedd32b",
+    "tripId": "6a9eaeae0edaa48b3fedd2ad",
+    "stopId": "6a9eaeae0edaa48b3fedd2ae",
+    "location": {
+      "latitude": 21.2076102,
+      "longitude": 72.8198286
+    },
+    "tags": [
+      "Personal"
+    ],
+    "title": "Desert",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-09-07T12:32:15.769Z",
+    "amountLocal": 50,
+    "amountBase": 50,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 50,
+        "amountBase": 50,
+        "isPaid": true
+      }
+    ],
+    "comments": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "text": "Hi",
+        "createdAt": "2026-09-21T02:05:20.772Z",
+        "_id": "6ab090e00e2daf6635a29432"
+      }
+    ],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-07T12:33:02.789Z",
+    "updatedAt": "2026-09-21T02:05:20.775Z",
+    "integrityHash": "2eaee78f73877501d5b97f45ca697874bb10db425f71d0bf8047293236272efd"
+  },
+  {
+    "_id": "6aac0c7d00d0f2eb3dc4cc5f",
+    "tripId": "6aa654399cf111f4ce54a099",
+    "stopId": "6aa654399cf111f4ce54a09a",
+    "location": {
+      "latitude": 21.1650597,
+      "longitude": 72.9745913
+    },
+    "tags": [
+      "Reimbursable"
+    ],
+    "title": "N",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-17T15:50:54.567Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 1250,
+        "amountBase": 1250,
+        "isPaid": true
+      },
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "amountLocal": 1250,
+        "amountBase": 1250,
+        "isPaid": true,
+        "paidAt": "2026-09-24T11:35:34.402Z"
+      },
+      {
+        "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+        "displayName": "Rajeev Singh",
+        "amountLocal": 1250,
+        "amountBase": 1250,
+        "isPaid": false
+      },
+      {
+        "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+        "displayName": "Manish Singh",
+        "amountLocal": 1250,
+        "amountBase": 1250,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-17T15:51:25.340Z",
+    "updatedAt": "2026-09-24T11:35:34.403Z",
+    "integrityHash": "a0a6e7436cc9675b233af6f76bf5ea1ae0288a46e20e2c97f69e934245588c28"
+  },
+  {
+    "_id": "6aac0d3b00d0f2eb3dc4cef3",
+    "tripId": "6aa654399cf111f4ce54a099",
+    "stopId": "6aa654399cf111f4ce54a09a",
+    "location": {
+      "latitude": 21.1650597,
+      "longitude": 72.9745913
+    },
+    "tags": [],
+    "title": "Nehal",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-17T15:53:55.348Z",
+    "amountLocal": 50000,
+    "amountBase": 50000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": true
+      },
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": true,
+        "paidAt": "2026-09-24T11:35:34.402Z"
+      },
+      {
+        "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+        "displayName": "Rajeev Singh",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": false
+      },
+      {
+        "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+        "displayName": "Manish Singh",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-17T15:54:35.327Z",
+    "updatedAt": "2026-09-24T11:35:34.403Z",
+    "integrityHash": "8fd7fbdfeeafca6ded38ec3eaacde57c3ab67d448cd0b640e3c91d8bb0356591"
+  },
+  {
+    "_id": "6aac0d4a00d0f2eb3dc4d096",
+    "tripId": "6aa654399cf111f4ce54a099",
+    "stopId": "6aa654399cf111f4ce54a09a",
+    "location": {
+      "latitude": 21.1650597,
+      "longitude": 72.9745913
+    },
+    "tags": [],
+    "title": "Nehal",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-17T15:53:55.348Z",
+    "amountLocal": 50000,
+    "amountBase": 50000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": true
+      },
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": true,
+        "paidAt": "2026-09-24T11:35:34.402Z"
+      },
+      {
+        "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+        "displayName": "Rajeev Singh",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": false
+      },
+      {
+        "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+        "displayName": "Manish Singh",
+        "amountLocal": 12500,
+        "amountBase": 12500,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-17T15:54:50.435Z",
+    "updatedAt": "2026-09-24T11:35:34.403Z",
+    "integrityHash": "8fd7fbdfeeafca6ded38ec3eaacde57c3ab67d448cd0b640e3c91d8bb0356591"
+  },
+  {
+    "_id": "6aac9dc3c1f7d0b303884f7a",
+    "tripId": "6aa654399cf111f4ce54a099",
+    "stopId": "6aa654399cf111f4ce54a09a",
+    "location": {
+      "latitude": 21.1900753,
+      "longitude": 72.8650055
+    },
+    "tags": [],
+    "title": "B",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-18T02:10:53.938Z",
+    "amountLocal": 8000,
+    "amountBase": 8000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2000,
+        "amountBase": 2000,
+        "isPaid": true
+      },
+      {
+        "userId": "ndJsUql5qGP6A8YVZkLBiF0VGl12",
+        "displayName": "Trip Split",
+        "amountLocal": 2000,
+        "amountBase": 2000,
+        "isPaid": true,
+        "paidAt": "2026-09-24T11:35:34.402Z"
+      },
+      {
+        "userId": "pkiHWJzvNieweNeLucoRPGFELap1",
+        "displayName": "Rajeev Singh",
+        "amountLocal": 2000,
+        "amountBase": 2000,
+        "isPaid": false
+      },
+      {
+        "userId": "cYB0UdhEHLOMFDCyJy8qOSizuTe2",
+        "displayName": "Manish Singh",
+        "amountLocal": 2000,
+        "amountBase": 2000,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-18T02:11:15.044Z",
+    "updatedAt": "2026-09-24T11:35:34.403Z",
+    "integrityHash": "afd93a84dc8dbf07525ca95b12a0ac1b9b40c877fbf3afeb3f1672895c42e11f"
+  },
+  {
+    "_id": "6ab33f05d2c181d1bce50197",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "tags": [
+      "Personal"
+    ],
+    "title": "Shopping",
+    "category": "shopping",
+    "receiptImages": [],
+    "date": "2026-09-23T02:52:12.741Z",
+    "amountLocal": 2000,
+    "amountBase": 2000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "paidByName": "Suraj Ahire",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 1000,
+        "amountBase": 1000,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:03.071Z"
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 1000,
+        "amountBase": 1000,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:52:53.195Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "ffd50527bcd9441724bd6fe948edc29983abdf31ecf6d1b2a9b6c30f207b9d77",
+    "notesEncrypted": "v1:6284bae74abf8ab6eef425c4:9fcaf52dd95bc5d8f183f66933182260:f9f08af2"
+  },
+  {
+    "_id": "6ab33f05d2c181d1bce50199",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "tags": [
+      "Personal"
+    ],
+    "title": "Shopping",
+    "category": "shopping",
+    "receiptImages": [],
+    "date": "2026-09-23T02:52:12.741Z",
+    "amountLocal": 2000,
+    "amountBase": 2000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "paidByName": "Suraj Ahire",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 1000,
+        "amountBase": 1000,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:03.071Z"
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 1000,
+        "amountBase": 1000,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:52:53.406Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "ffd50527bcd9441724bd6fe948edc29983abdf31ecf6d1b2a9b6c30f207b9d77",
+    "notesEncrypted": "v1:51751fa337634a5693e85ec6:e03d22a9dd4f2e52a42cfd5de2d36e22:1baf5967"
+  },
+  {
+    "_id": "6ab33f34d2c181d1bce50439",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "location": {
+      "latitude": 21.1987074,
+      "longitude": 72.8074189
+    },
+    "tags": [
+      "Business"
+    ],
+    "title": "Suran",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-23T02:53:20.364Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:02.814Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:53:40.504Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "3f8cc40adf1d214822f0f174d34136e1ef6d57d3f1cced778b64afccaa05b630"
+  },
+  {
+    "_id": "6ab33f35d2c181d1bce5044b",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "location": {
+      "latitude": 21.1987074,
+      "longitude": 72.8074189
+    },
+    "tags": [
+      "Business"
+    ],
+    "title": "Suran",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-23T02:53:20.364Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:02.814Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:53:42.072Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "3f8cc40adf1d214822f0f174d34136e1ef6d57d3f1cced778b64afccaa05b630"
+  },
+  {
+    "_id": "6ab33f5fd2c181d1bce50770",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "location": {
+      "latitude": 21.1988164,
+      "longitude": 72.8086162
+    },
+    "tags": [
+      "Split with partner",
+      "Personal"
+    ],
+    "title": "Manish",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-09-23T02:53:59.978Z",
+    "amountLocal": 20000,
+    "amountBase": 20000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 10000,
+        "amountBase": 10000,
+        "isPaid": true
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 10000,
+        "amountBase": 10000,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:02.814Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:54:23.530Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "36ae56649fd17f7db70ddbb6f05f0194bad22853d025bd41a8c2cb5b938a60fd"
+  },
+  {
+    "_id": "6ab33f5fd2c181d1bce50774",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "location": {
+      "latitude": 21.1988164,
+      "longitude": 72.8086162
+    },
+    "tags": [
+      "Split with partner",
+      "Personal"
+    ],
+    "title": "Manish",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-09-23T02:53:59.978Z",
+    "amountLocal": 20000,
+    "amountBase": 20000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 10000,
+        "amountBase": 10000,
+        "isPaid": true
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 10000,
+        "amountBase": 10000,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:02.814Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:54:23.714Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "36ae56649fd17f7db70ddbb6f05f0194bad22853d025bd41a8c2cb5b938a60fd"
+  },
+  {
+    "_id": "6ab33f86d2c181d1bce50a7c",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "location": {
+      "latitude": 21.1985556,
+      "longitude": 72.8075662
+    },
+    "tags": [
+      "Personal"
+    ],
+    "title": "Manish",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-23T02:54:36.612Z",
+    "amountLocal": 10,
+    "amountBase": 10,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": true
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:02.814Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:55:02.991Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "448af5d4fb5d1b82d80808546235ee8746d081b4355cbcf2763327186ffe9860"
+  },
+  {
+    "_id": "6ab33f87d2c181d1bce50a8d",
+    "tripId": "6ab33e97d2c181d1bce500eb",
+    "stopId": "6ab33e97d2c181d1bce500ec",
+    "location": {
+      "latitude": 21.1985556,
+      "longitude": 72.8075662
+    },
+    "tags": [
+      "Personal"
+    ],
+    "title": "Manish",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-23T02:54:36.612Z",
+    "amountLocal": 10,
+    "amountBase": 10,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": true
+      },
+      {
+        "userId": "xftZrwe8T6TDYkon4vQzmZvtYek1",
+        "displayName": "Suraj Ahire",
+        "amountLocal": 5,
+        "amountBase": 5,
+        "isPaid": true,
+        "paidAt": "2026-09-23T02:58:02.814Z"
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-23T02:55:03.937Z",
+    "updatedAt": "2026-09-23T02:58:03.554Z",
+    "integrityHash": "448af5d4fb5d1b82d80808546235ee8746d081b4355cbcf2763327186ffe9860"
+  },
+  {
+    "_id": "6ab48c18c130bca572620b9e",
+    "tripId": "6ab3726b818b490c972fb277",
+    "stopId": "6ab3726b818b490c972fb278",
+    "location": {
+      "latitude": 21.198862,
+      "longitude": 72.8549385
+    },
+    "tags": [],
+    "title": "Testing",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-09-24T02:33:32.756Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 5000,
+        "amountBase": 5000,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T02:34:00.926Z",
+    "updatedAt": "2026-09-24T02:34:00.926Z",
+    "integrityHash": "5d5c551b287f4e82beaf8ed0ed9b8bbd6a3d6f19dff013db9aff0342ec357d9c"
+  },
+  {
+    "_id": "6ab48c19c130bca572620ba5",
+    "tripId": "6ab3726b818b490c972fb277",
+    "stopId": "6ab3726b818b490c972fb278",
+    "location": {
+      "latitude": 21.198862,
+      "longitude": 72.8549385
+    },
+    "tags": [],
+    "title": "Testing",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-09-24T02:33:32.756Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 5000,
+        "amountBase": 5000,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T02:34:01.667Z",
+    "updatedAt": "2026-09-24T02:34:01.667Z",
+    "integrityHash": "5d5c551b287f4e82beaf8ed0ed9b8bbd6a3d6f19dff013db9aff0342ec357d9c"
+  },
+  {
+    "_id": "6ab48c5ac130bca572620e8d",
+    "tripId": "6ab3726b818b490c972fb277",
+    "stopId": "6ab3726b818b490c972fb278",
+    "location": {
+      "latitude": 21.1979357,
+      "longitude": 72.8508886
+    },
+    "tags": [],
+    "title": "Teat",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-24T02:34:43.665Z",
+    "amountLocal": 200,
+    "amountBase": 200,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 200,
+        "amountBase": 200,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T02:35:06.020Z",
+    "updatedAt": "2026-09-24T02:35:06.020Z",
+    "integrityHash": "cd75c7f837bdcee0bcd230169153c4af9a1f4b3c127f4efc241e2d5cf55678c4"
+  },
+  {
+    "_id": "6ab48c5bc130bca572620e9b",
+    "tripId": "6ab3726b818b490c972fb277",
+    "stopId": "6ab3726b818b490c972fb278",
+    "location": {
+      "latitude": 21.1979357,
+      "longitude": 72.8508886
+    },
+    "tags": [],
+    "title": "Teat",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-24T02:34:43.665Z",
+    "amountLocal": 200,
+    "amountBase": 200,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 200,
+        "amountBase": 200,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T02:35:07.020Z",
+    "updatedAt": "2026-09-24T02:35:07.020Z",
+    "integrityHash": "cd75c7f837bdcee0bcd230169153c4af9a1f4b3c127f4efc241e2d5cf55678c4"
+  },
+  {
+    "_id": "6ab4918b5b075e2db8f255ee",
+    "tripId": "6ab3726b818b490c972fb277",
+    "stopId": "6ab3726b818b490c972fb278",
+    "location": {
+      "latitude": 21.1927089,
+      "longitude": 72.8002036
+    },
+    "tags": [],
+    "title": "Manish",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-24T02:57:01.987Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 100,
+        "amountBase": 100,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T02:57:15.537Z",
+    "updatedAt": "2026-09-24T02:57:15.537Z",
+    "integrityHash": "2a30f3e07c05ccb2e0abc2d2b4331cc7c3340e5562209090584427c56df2395c"
+  },
+  {
+    "_id": "6ab4918b5b075e2db8f255f1",
+    "tripId": "6ab3726b818b490c972fb277",
+    "stopId": "6ab3726b818b490c972fb278",
+    "location": {
+      "latitude": 21.1927089,
+      "longitude": 72.8002036
+    },
+    "tags": [],
+    "title": "Manish",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-24T02:57:01.987Z",
+    "amountLocal": 100,
+    "amountBase": 100,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 100,
+        "amountBase": 100,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": true,
+    "isArchived": false,
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T02:57:15.776Z",
+    "updatedAt": "2026-09-24T02:57:15.776Z",
+    "integrityHash": "2a30f3e07c05ccb2e0abc2d2b4331cc7c3340e5562209090584427c56df2395c"
+  },
+  {
+    "_id": "6ab4ea70c5215de2580cb703",
+    "tripId": "6ab3c5be50a2c6e686542388",
+    "stopId": "6ab3c5be50a2c6e686542389",
+    "location": {
+      "latitude": 21.18049515295499,
+      "longitude": 72.73442974536435
+    },
+    "tags": [],
+    "title": "d",
+    "category": "other",
+    "receiptImages": [],
+    "date": "2026-09-24T09:16:10.398Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+    "paidByName": "Manish Singh",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "7Io04MDBz2Rxfq0cNPJiFk4HR6e2",
+        "displayName": "Manish Singh",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": false,
+        "paidAt": null
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "clientOperationId": "a8aa64e9-75f6-427f-ac81-75762a2ee2b2",
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T09:16:32.818Z",
+    "updatedAt": "2026-09-26T07:10:33.040Z",
+    "integrityHash": "35417cfc10ed252346ec884c33c301a0598f07a69b33c8813a26e2646d5251b7"
+  },
+  {
+    "_id": "6ab54e68c5215de2580ccc82",
+    "tripId": "6ab54e11c5215de2580cc9c2",
+    "stopId": "6ab54e11c5215de2580cc9c3",
+    "location": {
+      "latitude": 21.1587332,
+      "longitude": 72.9990675
+    },
+    "tags": [],
+    "title": "Test preet",
+    "category": "food",
+    "receiptImages": [],
+    "date": "2026-09-24T16:22:25.623Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "INR",
+    "baseCurrency": "INR",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "Tm5DUpZzaKQSFjzZBcfA9mASyFC2",
+        "displayName": "preet vasoya",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": false
+      },
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "clientOperationId": "58e6e747-cc55-458c-9ad6-c17b28965967",
+    "addedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-24T16:23:04.106Z",
+    "updatedAt": "2026-09-24T16:23:04.106Z",
+    "integrityHash": "5dbe9d74fe56b7f11dec2ed85259ce6e4eeb56f7b4f746ba6ab9d6420f7d6251"
+  },
+  {
+    "_id": "6ab76bbb27e91c1c15061575",
+    "tripId": "6aa434b5ca207dc8ae511758",
+    "stopId": "6aa434b5ca207dc8ae511759",
+    "location": {
+      "latitude": 21.180313672937178,
+      "longitude": 72.73442387545282
+    },
+    "tags": [],
+    "title": "mansih",
+    "category": "other",
+    "notesEncrypted": null,
+    "isPrivateVault": false,
+    "integrityHash": "6049a19fb1edbdb91bbe5bfb0f48d6f396e15c63cdce6b607f5bcfa6f138d7fe",
+    "previousHash": null,
+    "receiptImages": [],
+    "date": "2026-09-26T06:52:15.136Z",
+    "amountLocal": 5000,
+    "amountBase": 5000,
+    "localCurrency": "USD",
+    "baseCurrency": "USD",
+    "exchangeRateUsed": 1,
+    "paidBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "paidByName": "Manish",
+    "splitMethod": "equal",
+    "splits": [
+      {
+        "userId": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+        "displayName": "Manish",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": true
+      },
+      {
+        "userId": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+        "displayName": "nehal",
+        "amountLocal": 2500,
+        "amountBase": 2500,
+        "isPaid": false
+      }
+    ],
+    "comments": [],
+    "attachments": [],
+    "isSettled": false,
+    "isArchived": false,
+    "clientOperationId": "dd9cbe09-69bc-4b9b-9ff1-1b62ec24463d",
+    "addedBy": "FZGeCuio0dfG4kWZi86ijn4xLXt2",
+    "expenseHistory": [],
+    "createdAt": "2026-09-26T06:52:43.651Z",
+    "updatedAt": "2026-09-26T06:52:43.651Z"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "6a4a87f8fbbc37e81b0a130e",
+    "url": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783269368/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783269364301.webp",
+    "publicId": "profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783269364301",
+    "uploadedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "purpose": "profile_picture",
+    "size": 977676,
+    "format": "webp",
+    "createdAt": "2026-07-05T16:36:08.236Z",
+    "updatedAt": "2026-07-15T16:58:34.779Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4fb4a6f7c11f1ec191969a",
+    "url": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1783608485/profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661.webp",
+    "publicId": "profiles/profile-aeb013f3-fff5-4e60-b1aa-9bc54bf4d256-1783608480661",
+    "uploadedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "purpose": "profile_picture",
+    "size": 672437,
+    "format": "webp",
+    "createdAt": "2026-07-09T14:48:06.203Z",
+    "updatedAt": "2026-07-15T16:58:34.779Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab3921beed5f9cce4037691",
+    "url": "https://res.cloudinary.com/dhny8v8mr/image/upload/v1790153241/profiles/profile-tO5MslLBBGSnj7XqUd9GGEl5IrQ2-1790153241096.webp",
+    "publicId": "profiles/profile-tO5MslLBBGSnj7XqUd9GGEl5IrQ2-1790153241096",
+    "uploadedBy": "tO5MslLBBGSnj7XqUd9GGEl5IrQ2",
+    "purpose": "profile_picture",
+    "size": 397972,
+    "format": "webp",
+    "createdAt": "2026-09-23T08:47:23.035Z",
+    "updatedAt": "2026-09-23T08:47:23.035Z",
+    "__v": 0
+  }
+]
