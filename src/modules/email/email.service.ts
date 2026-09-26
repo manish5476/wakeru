@@ -18,7 +18,7 @@ export const sendPasswordResetEmail = async (user: UserRecord): Promise<void> =>
   const actionUrl = await generateCustomAuthActionLink(linkParams);
 
   const { subject, html, text } = generatePasswordResetTemplate({
-    displayName: user.displayName || 'Wareku User',
+    displayName: user.displayName || 'Traveler',
     actionUrl,
   });
 
@@ -43,7 +43,7 @@ export const sendVerificationEmail = async (user: UserRecord): Promise<void> => 
   const actionUrl = await generateCustomAuthActionLink(linkParams);
 
   const { subject, html, text } = generateVerificationEmailTemplate({
-    displayName: user.displayName || 'Wareku User',
+    displayName: user.displayName || 'Traveler',
     actionUrl,
   });
 
