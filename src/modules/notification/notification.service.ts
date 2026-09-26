@@ -711,6 +711,38 @@ export class NotificationService {
   }
 
   /**
+   * Notify counterparty that a payment was undone / reversed back to pending.
+   */
+  async notifyPaymentReverted(
+    targetUid: string,
+    actorName: string,
+    amount: number,
+    baseCurrency: string,
+    tripId: string,
+    transactionId: string,
+    previousStatus: string,
+    reason?: string
+  ): Promise<void> {
+    const statusText = previousStatus === 'confirmed' ? 'confirmed' : 'initiated';
+    const reasonText = reason ? ` Reason: ${reason}` : '';
+    await this.create(
+      targetUid,
+      'PAYMENT_REVERSED',
+      'Payment Reversed ↺',
+      `${actorName} reversed a previously ${statusText} payment of ${baseCurrency} ${amount}.${reasonText} Status is reset to pending.`,
+      {
+        data: { tripId, transactionId, amount, baseCurrency, previousStatus, reason },
+        isActionable: true,
+        actionUrl: `/settlements/${tripId}`,
+        deepLink: `tripsplit://settlements/${tripId}`,
+        priority: 'high',
+        category: 'settlement',
+        channels: { inApp: true, push: true, email: false },
+      }
+    );
+  }
+
+  /**
    * Notify payer of a payment reminder from the receiver.
    */
   async notifyPaymentReminder(

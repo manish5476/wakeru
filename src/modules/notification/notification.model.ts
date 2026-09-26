@@ -18,6 +18,8 @@ export type NotificationType =
   | 'SETTLEMENT_COMPLETED'
   | 'SETTLEMENT_DISPUTED'
   | 'SETTLEMENT_CALCULATED'
+  | 'SETTLEMENT_REVERTED'
+  | 'PAYMENT_REVERSED'
   | 'PAYMENT_REMINDER'
   | 'TRIP_FULLY_SETTLED'
 
@@ -198,6 +200,8 @@ const NotificationSchema = new Schema<INotification>(
         'SETTLEMENT_COMPLETED',
         'SETTLEMENT_DISPUTED',
         'SETTLEMENT_CALCULATED',
+        'SETTLEMENT_REVERTED',
+        'PAYMENT_REVERSED',
         'PAYMENT_REMINDER',
         'TRIP_FULLY_SETTLED',
         // Trip Events

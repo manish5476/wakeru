@@ -1747,13 +1747,24 @@ export const revertPayment = async (
 
   const previousStatus = txn.status;
 
+  // Resolve user identities so both Mongo _id and Firebase UID match across splits and paidBy
+  const idMap = await LedgerService.resolveUserIdentities([txn.from, txn.to, actorUid]);
+  const fromIdent = idMap.get(txn.from);
+  const toIdent = idMap.get(txn.to);
+  const fromAliases = Array.from(
+    new Set([txn.from, fromIdent?.canonicalId, fromIdent?.firebaseUid, fromIdent?.mongoId].filter(Boolean) as string[])
+  );
+  const toAliases = Array.from(
+    new Set([txn.to, toIdent?.canonicalId, toIdent?.firebaseUid, toIdent?.mongoId].filter(Boolean) as string[])
+  );
+
   // If the transaction was confirmed, revert affected expense splits
   if (previousStatus === 'confirmed') {
     await Expense.updateMany(
       {
         tripId: new Types.ObjectId(tripId),
-        'splits.userId': txn.from,
-        paidBy: txn.to,
+        'splits.userId': { $in: fromAliases },
+        paidBy: { $in: toAliases },
       },
       {
         $set: {
@@ -1763,15 +1774,15 @@ export const revertPayment = async (
         },
       },
       {
-        arrayFilters: [{ 'elem.userId': txn.from }],
+        arrayFilters: [{ 'elem.userId': { $in: fromAliases } }],
       }
     );
 
     await Expense.updateMany(
       {
         tripId: new Types.ObjectId(tripId),
-        paidBy: txn.from,
-        'splits.userId': txn.to,
+        paidBy: { $in: fromAliases },
+        'splits.userId': { $in: toAliases },
       },
       {
         $set: {
@@ -1781,7 +1792,7 @@ export const revertPayment = async (
         },
       },
       {
-        arrayFilters: [{ 'elem.userId': txn.to }],
+        arrayFilters: [{ 'elem.userId': { $in: toAliases } }],
       }
     );
 
@@ -1814,6 +1825,8 @@ export const revertPayment = async (
   txn.rejectedAt = undefined;
   txn.rejectionReason = undefined;
 
+  settlement.isFullySettled = false;
+
   settlement.history.push({
     action: 'payment_reverted',
     actorUid,
@@ -1835,7 +1848,46 @@ export const revertPayment = async (
     settlementId: settlement._id.toString(),
     action: 'payment_reverted',
     transactionId,
+    revertedBy: actorUid,
   });
+
+  // Isolated notification dispatch to affected counterparties
+  try {
+    const actorUser = await User.findOne({
+      $or: [
+        { firebaseUid: actorUid },
+        ...(Types.ObjectId.isValid(actorUid) ? [{ _id: new Types.ObjectId(actorUid) }] : []),
+      ],
+    });
+    const actorName = actorUser?.name || 'A trip member';
+
+    const notifyUids: string[] = [];
+    const isActorPayer = fromAliases.includes(actorUid);
+    const isActorReceiver = toAliases.includes(actorUid);
+
+    if (isActorPayer) {
+      notifyUids.push(txn.to);
+    } else if (isActorReceiver) {
+      notifyUids.push(txn.from);
+    } else {
+      notifyUids.push(txn.from, txn.to);
+    }
+
+    for (const targetUid of notifyUids) {
+      await notificationService.notifyPaymentReverted(
+        targetUid,
+        actorName,
+        txn.amountBase,
+        txn.baseCurrency,
+        tripId,
+        transactionId,
+        previousStatus,
+        reason
+      );
+    }
+  } catch (notifErr: any) {
+    logger.error('Failed to dispatch payment_reverted notification:', notifErr);
+  }
 
   return { settlement, transaction: txn };
 };
