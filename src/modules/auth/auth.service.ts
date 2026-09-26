@@ -155,7 +155,7 @@ export const AuthService = {
     // Determine auth provider from Firebase token
     const authProvider = decodedToken.firebase?.sign_in_provider || 'email';
     const authProviders: any = {};
-    
+
     if (authProvider === 'google.com') {
       authProviders.google = { id: firebaseUid, email };
     } else if (authProvider === 'apple.com') {
@@ -189,10 +189,10 @@ export const AuthService = {
 
     try {
       await user.save();
-      logger.info('New user registered', { 
-        userId: user._id, 
+      logger.info('New user registered', {
+        userId: user._id,
         email: user.email,
-        provider: authProvider 
+        provider: authProvider
       });
     } catch (error: any) {
       if (error.code === 11000) {
@@ -241,11 +241,19 @@ export const AuthService = {
       throw new ForbiddenError('This account has been deactivated. Contact support.');
     }
 
-    // Bypass full document validation to avoid errors with stale refreshTokens
+    const authProvider = decodedToken.firebase?.sign_in_provider || 'email';
+    const isSocialAuth = ['google.com', 'apple.com'].includes(authProvider);
+    if (!isSocialAuth && !decodedToken.email_verified) {
+      throw new UnauthorizedError('Please verify your email address before logging in.');
+    }
+
     const userEmail = (user.email || '').toLowerCase().trim();
     const isAdminEmail = config.ADMIN_EMAILS.includes(userEmail);
 
     const updates: Record<string, any> = { lastLoginAt: new Date() };
+    if (decodedToken.email_verified && user.authProviders?.email && !user.authProviders.email.verified) {
+      updates['authProviders.email.verified'] = true;
+    }
     if (isAdminEmail && user.role !== 'admin') {
       user.role = 'admin';
       updates.role = 'admin';
@@ -353,18 +361,18 @@ export const AuthService = {
 
       // 🔑 CHECK: Google-only account?
       if (user.authProviders?.google && !user.authProviders?.email?.verified) {
-        logger.info('Password reset attempted for Google-only account', { 
-          userId: user._id, 
-          email: user.email 
+        logger.info('Password reset attempted for Google-only account', {
+          userId: user._id,
+          email: user.email
         });
         return { provider: 'google' }; // Frontend can show specific message
       }
 
       // 🔑 CHECK: Apple-only account?
       if (user.authProviders?.apple && !user.authProviders?.email?.verified) {
-        logger.info('Password reset attempted for Apple-only account', { 
-          userId: user._id, 
-          email: user.email 
+        logger.info('Password reset attempted for Apple-only account', {
+          userId: user._id,
+          email: user.email
         });
         return { provider: 'apple' }; // Frontend can show specific message
       }
@@ -388,7 +396,7 @@ export const AuthService = {
       await user.save();
 
       return {}; // Success (don't reveal details)
-      
+
     } catch (error: any) {
       if (error instanceof AppError) throw error;
       logger.warn('Password reset flow error', { email, error });
