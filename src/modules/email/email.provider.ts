@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer, { Transporter } from 'nodemailer';
 import { config } from '../../config';
 import { logger } from '../../config/logger';
 
@@ -12,7 +12,7 @@ export interface EmailProvider {
 }
 
 export class SmtpEmailProvider implements EmailProvider {
-  private transporter: nodemailer.Transporter;
+  private transporter: Transporter;
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -25,7 +25,7 @@ export class SmtpEmailProvider implements EmailProvider {
       },
     });
 
-    this.transporter.verify().catch(error => {
+    this.transporter.verify().catch((error: unknown) => {
       logger.error('Failed to verify SMTP transporter:', error);
     });
   }
@@ -36,8 +36,11 @@ export class SmtpEmailProvider implements EmailProvider {
     html: string;
     text: string;
   }): Promise<void> {
+    const fromName = config.EMAIL_FROM_NAME || 'TripSplit';
+    const fromAddress = config.EMAIL_FROM || 'tripSplit@proton.me';
     const mailOptions = {
-      from: `"${config.EMAIL_FROM_NAME}" <${config.EMAIL_FROM}>`,
+      from: `"${fromName}" <${fromAddress}>`,
+      replyTo: config.EMAIL_REPLY_TO || fromAddress,
       to: options.to,
       subject: options.subject,
       html: options.html,

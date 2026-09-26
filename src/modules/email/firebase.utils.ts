@@ -25,7 +25,7 @@ export const generateCustomAuthActionLink = async (
     handleCodeInApp: true,
   };
 
-  const auth = getAuth(firebaseApp);
+  const auth = firebaseApp ? getAuth(firebaseApp) : getAuth();
 
   switch (action) {
     case 'verifyEmail':

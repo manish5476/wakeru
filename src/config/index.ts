@@ -75,15 +75,15 @@ export const config = {
   PII_ENCRYPTION_KEY: process.env.PII_ENCRYPTION_KEY || 'e7b1c4d92a08f53198e6c72b4f910a35d28b61c9e4720fa8513db2e96417ca03',
   PII_BLIND_INDEX_SECRET: process.env.PII_BLIND_INDEX_SECRET || 'f8a3c5d710b9e82649a21b7c03d4e658a912f3b4c5d6e7f8a9b0c1d2e3f4a5b6',
 
-  // Email
-  EMAIL_FROM: process.env.EMAIL_FROM || '',
-  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || '',
-  EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO || '',
-  SMTP_HOST: process.env.SMTP_HOST || '',
-  SMTP_PORT: parseInt(process.env.SMTP_PORT || '587', 10),
-  SMTP_USER: process.env.SMTP_USER || '',
-  SMTP_PASS: process.env.SMTP_PASS || '',
-  WEB_URL: process.env.WEB_URL || '',
+  // Email & SMTP Configuration
+  EMAIL_FROM: process.env.EMAIL_FROM || process.env.EMAIL_FROM1 || 'tripSplit@proton.me',
+  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || 'TripSplit',
+  EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO || 'tripSplit@proton.me',
+  SMTP_HOST: process.env.SMTP_HOST || process.env.EMAIL_HOST || 'smtp-relay.brevo.com',
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || process.env.EMAIL_PORT || '587', 10),
+  SMTP_USER: process.env.SMTP_USER || process.env.EMAIL_USER || '',
+  SMTP_PASS: process.env.SMTP_PASS || process.env.EMAIL_PASS || '',
+  WEB_URL: process.env.WEB_URL || 'https://www.wakeru.net',
 } as const;
 
 // Validate critical configuration
